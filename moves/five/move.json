@@ -1,0 +1,7 @@
+{
+ "name": "five",
+ "label": "High five",
+ "duration_ms": 1500,
+ "enabled": false,
+ "requires": []
+}

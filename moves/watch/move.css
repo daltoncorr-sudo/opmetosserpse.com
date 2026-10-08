@@ -1,0 +1,23 @@
+/* Watch check: turns the wrist up, a small watch appears and its hands whiz around twice. */
+.mark.m-watch{animation:watch 3s both}
+.mark.m-watch .pose-watch{animation:watch-on 3s both}
+.pose-watch .wm,.pose-watch .wh{transform-box:fill-box;transform-origin:50% 100%}
+.mark.m-watch .wm{animation:watch-min 3s both}
+.mark.m-watch .wh{animation:watch-hour 3s both}
+@keyframes watch{
+ 0%{transform:translateY(0) rotate(0) scale(1);animation-timing-function:cubic-bezier(.45,0,.55,1)}
+ 11%{transform:translateY(3px) rotate(7deg) scale(.97);animation-timing-function:cubic-bezier(.3,0,.15,1)}
+ 30%{transform:translateY(-8px) rotate(-84deg) scale(1.12);animation-timing-function:cubic-bezier(.45,0,.55,1)}
+ 38%{transform:translateY(-6px) rotate(-74deg) scale(1.1);animation-timing-function:cubic-bezier(.45,0,.55,1)}
+ 45%{transform:translateY(-6px) rotate(-77deg) scale(1.1);animation-timing-function:cubic-bezier(.45,0,.55,1)}
+ 60%{transform:translateY(-6px) rotate(-76deg) scale(1.1);animation-timing-function:cubic-bezier(.45,0,.55,1)}
+ 63%{transform:translateY(-8px) rotate(-79deg) scale(1.1);animation-timing-function:cubic-bezier(.45,0,.55,1)}
+ 66%{transform:translateY(-6px) rotate(-75deg) scale(1.1);animation-timing-function:cubic-bezier(.45,0,.55,1)}
+ 69%{transform:translateY(-8px) rotate(-78deg) scale(1.1);animation-timing-function:cubic-bezier(.45,0,.55,1)}
+ 72%{transform:translateY(-6px) rotate(-76deg) scale(1.1);animation-timing-function:cubic-bezier(.4,0,.6,1)}
+ 87%{transform:translateY(2px) rotate(7deg) scale(.98);animation-timing-function:cubic-bezier(.45,0,.55,1)}
+ 95%{transform:translateY(-1px) rotate(-2deg) scale(1);animation-timing-function:cubic-bezier(.45,0,.55,1)}
+ 100%{transform:translateY(0) rotate(0) scale(1)}}
+@keyframes watch-on{0%,15%{opacity:0}21%,79%{opacity:1}85%,100%{opacity:0}}
+@keyframes watch-min{0%,36%{transform:rotate(0)}58%{transform:rotate(720deg)}100%{transform:rotate(720deg)}}
+@keyframes watch-hour{0%,36%{transform:rotate(0)}58%{transform:rotate(60deg)}100%{transform:rotate(60deg)}}

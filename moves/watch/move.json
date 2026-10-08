@@ -1,0 +1,7 @@
+{
+ "name": "watch",
+ "label": "Watch check",
+ "duration_ms": 3000,
+ "enabled": false,
+ "requires": []
+}

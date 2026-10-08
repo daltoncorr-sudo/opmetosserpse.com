@@ -1,0 +1,9 @@
+{
+ "name": "thumbs",
+ "label": "Thumbs up",
+ "duration_ms": 2400,
+ "enabled": true,
+ "requires": [
+  "thumbs-up.svg"
+ ]
+}

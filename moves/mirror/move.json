@@ -1,0 +1,7 @@
+{
+ "name": "mirror",
+ "label": "Mirror",
+ "duration_ms": 1900,
+ "enabled": false,
+ "requires": []
+}

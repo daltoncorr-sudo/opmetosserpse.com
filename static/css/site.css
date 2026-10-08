@@ -1,0 +1,106 @@
+/* Opmet Osserpse: the look of a sheet of paper (Lareu Gonzalez), the calm of LoveFrom,
+   the organization and motion of Porto Rocha. Every value lives in :root. */
+@font-face{font-family:"Libre Caslon Text";font-style:normal;font-weight:400;font-display:swap;src:url(../fonts/libre-caslon-text/libre-caslon-text-latin-400-normal.woff2) format("woff2");unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:"Libre Caslon Text";font-style:normal;font-weight:400;font-display:swap;src:url(../fonts/libre-caslon-text/libre-caslon-text-latin-ext-400-normal.woff2) format("woff2");unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+1E00-1E9F,U+A720-A7FF}
+@font-face{font-family:"Libre Caslon Text";font-style:italic;font-weight:400;font-display:swap;src:url(../fonts/libre-caslon-text/libre-caslon-text-latin-400-italic.woff2) format("woff2")}
+@font-face{font-family:"Instrument Sans";font-style:normal;font-weight:400;font-display:swap;src:url(../fonts/instrument-sans/instrument-sans-latin-400-normal.woff2) format("woff2")}
+@font-face{font-family:"Instrument Sans";font-style:normal;font-weight:400;font-display:swap;src:url(../fonts/instrument-sans/instrument-sans-latin-ext-400-normal.woff2) format("woff2");unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+1E00-1E9F,U+A720-A7FF}
+@font-face{font-family:"Instrument Sans";font-style:normal;font-weight:500;font-display:swap;src:url(../fonts/instrument-sans/instrument-sans-latin-500-normal.woff2) format("woff2")}
+
+:root{
+  /* Off-white paper, near-black ink. One accent: none. */
+  --paper:#FBFBF8; --paper-deep:#F1F0EC; --ink:#1C1A17; --graphite:#7A756D;
+  /* Two faces. When Opmet Serif ships, put it first in --serif. */
+  --serif:"Libre Caslon Text",Georgia,"Times New Roman",serif;
+  --sans:"Instrument Sans","Helvetica Neue",Arial,sans-serif;
+  /* Two sizes. */
+  --size-s:14px; --size-m:17px;
+  --gutter:clamp(16px,3.2vw,40px); --measure:34rem;
+  /* One motion value, as on Porto Rocha. */
+  --t:.5s; --ease:ease;
+}
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+body{margin:0;min-height:100vh;display:flex;flex-direction:column;background:var(--paper);color:var(--ink);font:400 var(--size-s)/1.55 var(--sans);-webkit-font-smoothing:antialiased}
+img,video{display:block;max-width:100%;height:auto}
+a{color:inherit;text-decoration:none;transition:color var(--t) var(--ease)}
+a:hover{color:var(--graphite)}
+:focus-visible{outline:1px solid var(--ink);outline-offset:3px}
+.skip{position:absolute;left:-9999px}.skip:focus{left:var(--gutter);top:8px;background:var(--paper);padding:4px 8px;z-index:20}
+p{margin:0 0 1em}
+h1{font:inherit;margin:0}
+ul{list-style:none;margin:0;padding:0}
+
+/* Smooth page changes (cross-document View Transitions); other browsers load normally */
+@view-transition{navigation:auto}
+::view-transition-old(root),::view-transition-new(root){animation-duration:var(--t);animation-timing-function:var(--ease)}
+
+/* Inner pages: the name only, centered. No menu bar. */
+.site-header{display:flex;justify-content:center;padding:28px var(--gutter) 0}
+.wordmark{font-family:var(--serif);font-size:var(--size-m);letter-spacing:.02em;white-space:nowrap}
+main{padding:0 var(--gutter);flex:1}
+
+/* The cover: the hand and the name, alone */
+.cover{min-height:100vh;min-height:100svh;display:flex;align-items:center;justify-content:center;text-align:center}
+.cover h1{display:flex;flex-direction:column;align-items:center;gap:clamp(22px,3vw,36px);animation:arrive 1.6s var(--ease) both}
+.cover .mark{position:relative;display:block;width:clamp(44px,4.6vw,70px);transform-origin:50% 96%;will-change:transform}
+.cover .hand{display:block;width:100%;height:auto}
+.cover .pose{position:absolute;left:0;top:0;width:100%;height:auto;opacity:0}
+.cover .name{font-family:var(--serif);font-size:clamp(26px,3.1vw,46px);letter-spacing:.03em;line-height:1}
+/* The hand on the cover. Each move lives in its own folder under moves/; build.py gathers them into /css/moves.css. */
+@keyframes arrive{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+/* After the scroll: the studio in a few lines, then the index */
+.about{max-width:30rem;margin:0 auto;padding:18vh 0 16vh;font-family:var(--serif);font-size:clamp(18px,1.45vw,21px);line-height:1.6}
+.about p{margin:0 0 1.1em}
+.about a{text-decoration:underline;text-underline-offset:.2em;text-decoration-thickness:1px}
+.index{max-width:30rem;margin:0 auto;padding:0 0 18vh}
+.index .archive{margin-top:3em;color:var(--graphite)}
+.list li{margin:0 0 .35em}
+.list a,.list .plain{font-family:var(--serif);font-size:clamp(17px,1.3vw,19px)}
+.list .plain{color:var(--graphite)}
+.list .yr{color:var(--graphite);font-family:var(--sans);font-size:var(--size-s);margin-left:.5em}
+.preview{position:fixed;left:0;top:0;width:min(24vw,340px);pointer-events:none;opacity:0;z-index:30;transition:opacity var(--t) var(--ease)}
+.preview.on{opacity:1}
+.preview img{width:100%;aspect-ratio:4/5;object-fit:cover}
+@media (hover:none),(max-width:720px){.preview{display:none}}
+
+/* A project: title, one line, images, a few plain lines */
+.project-head{text-align:center;margin:16vh auto 14vh;max-width:var(--measure)}
+.project-head h1{font-family:var(--serif);font-size:clamp(22px,2.2vw,32px);letter-spacing:.01em;line-height:1.2}
+.project-head p{color:var(--graphite);margin:4px 0 0}
+.media{display:flex;flex-direction:column;gap:clamp(40px,7vw,96px);margin:0 0 10vh}
+.media figure{margin:0}
+.media .full{margin:0 calc(var(--gutter) * -1)}
+.media .full img,.media .full video{width:100%}
+.media .wide{width:min(88%,1400px);margin:0 auto}
+.media .wide img,.media .wide video{width:100%}
+.media .narrow{width:min(52%,720px);margin:0 auto}
+.media .narrow img{width:100%}
+.pair{display:grid;grid-template-columns:1fr 1fr;gap:var(--gutter);width:min(88%,1400px);margin:0 auto;align-items:start}
+.pair img,.pair video{width:100%}
+@media (max-width:720px){.media .wide,.media .narrow,.pair{width:100%}.pair{grid-template-columns:1fr}}
+.project-foot{text-align:center;color:var(--graphite);margin:4vh auto 16vh;line-height:1.7}
+.project-foot p{margin:0 0 1.6em}
+.project-foot a{color:var(--ink)}
+
+/* Simple pages */
+.index:first-child{padding-top:16vh}
+.page{max-width:var(--measure);margin:12vh auto 14vh;font-size:var(--size-m)}
+.page a{text-decoration:underline;text-underline-offset:3px;text-decoration-thickness:1px}
+.notfound,.single{text-align:center;padding:20vh 0;font-size:var(--size-m)}
+.single p{margin:0 0 .6em}
+
+/* Footer */
+.site-footer{display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px 24px;padding:24px var(--gutter) 28px;color:var(--graphite);font-size:13px}
+.site-footer .clock{font-variant-numeric:tabular-nums}
+@media (max-width:720px){.site-footer .clock{display:none}}
+.site-footer a{color:inherit}
+
+.fade{opacity:0;transition:opacity var(--t) var(--ease)}.fade.in{opacity:1}
+@media (prefers-reduced-motion:reduce){
+  .cover h1,.cover .mark,.cover .mark *{animation:none!important}
+  *,*::before,*::after{transition:none!important;animation:none!important}
+  @view-transition{navigation:none}
+  .fade{opacity:1}
+}

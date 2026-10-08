@@ -1,0 +1,123 @@
+{
+ "slug": "polish-film-festival",
+ "title": "Polish Film Festival North America",
+ "deck": "Mid-century Polish illustration meets the Hollywood Sign.",
+ "client": "Polish Film Festival North America",
+ "year": "2025",
+ "role": "Creative direction and illustration",
+ "sector": "Festivals",
+ "location": "Los Angeles",
+ "lede": "A Polish film festival held in Los Angeles got a poster that belongs to both cities' traditions, painted after rounds of red-marker studies.",
+ "challenge": "The Polish Film Festival North America is held in Los Angeles. Its identity had to speak to two cultures at once: Polish cinema and its great tradition of poster illustration, and Hollywood, where the films are shown.",
+ "work": [
+  "The answer was a painting. The poster blends mid-century Polish illustration with Hollywood iconography: the red carpet, Walk of Fame stars, the Hollywood Sign and landmarks, rendered in a bold, painterly style. A couple walks across a globe ringed with Hollywood landmarks.",
+  "The process ran from concept sketches and rendering studies to digital painting. It began with pencil thumbnails, then red-marker studies of the composition, the iconography (including a map of Poland), the couple, a Polish folk figure and a man in a hat. A six-panel study took the woman's face from sketch to paint. Then came a flat-color block-in with palette swatches, a pass that added palm trees and landmarks, and a final painterly pass with a textured ground.",
+  "The symbols are explained in an annotated version of the poster, from the Polish White Eagle crest to the Lee Strasberg Theatre. An alternate Los Angeles edition followed."
+ ],
+ "system": [
+  [
+   "The painting",
+   "Two poster editions."
+  ],
+  [
+   "The logo",
+   "A festival logo."
+  ],
+  [
+   "The collateral",
+   "All marketing material."
+  ]
+ ],
+ "deliverables": [
+  "Two poster editions",
+  "Festival logo",
+  "Marketing collateral"
+ ],
+ "credits": [
+  [
+   "Design",
+   [
+    "Dalton Corr: creative direction, illustration, festival logo"
+   ]
+  ],
+  [
+   "Client",
+   [
+    "Polish Film Festival North America"
+   ]
+  ]
+ ],
+ "links": [],
+ "press": [],
+ "seo": {
+  "title": "Polish Film Festival North America identity | Opmet Osserpse",
+  "description": "The visual identity for the Polish Film Festival North America in Los Angeles: two hand-painted poster editions, the festival logo and all marketing material."
+ },
+ "media": [
+  {
+   "slot": "P",
+   "src": "images/design/polish-film-festival/poster-hollywood-full.webp",
+   "alt": "The Polish Film Festival North America poster: a couple walking across a globe ringed with Hollywood landmarks."
+  },
+  {
+   "slot": "P",
+   "src": "images/design/polish-film-festival/poster-la.webp",
+   "alt": "The alternate Los Angeles edition of the poster."
+  },
+  {
+   "slot": "W",
+   "src": "images/design/polish-film-festival/poster-explained.webp",
+   "alt": "Annotated breakdown of the poster, naming each symbol."
+  },
+  {
+   "slot": "P",
+   "src": "images/design/polish-film-festival/wip-01.webp",
+   "alt": "Pencil thumbnails of the poster composition."
+  },
+  {
+   "slot": "P",
+   "src": "images/design/polish-film-festival/wip-06.webp",
+   "alt": "Red marker composition studies."
+  },
+  {
+   "slot": "P",
+   "src": "images/design/polish-film-festival/wip-07.webp",
+   "alt": "Red marker iconography studies, including the map of Poland motif."
+  },
+  {
+   "slot": "P",
+   "src": "images/design/polish-film-festival/wip-08.webp",
+   "alt": "Loose gesture studies of the couple."
+  },
+  {
+   "slot": "W",
+   "src": "images/design/polish-film-festival/wip-02.webp",
+   "alt": "Six-panel study taking the woman’s face from sketch to paint."
+  },
+  {
+   "slot": "P",
+   "src": "images/design/polish-film-festival/wip-03.webp",
+   "alt": "Digital flat-color block-in, with palette swatches."
+  },
+  {
+   "slot": "P",
+   "src": "images/design/polish-film-festival/wip-05.webp",
+   "alt": "Painterly pass with a textured background."
+  },
+  {
+   "slot": "P",
+   "src": "images/design/polish-film-festival/wip-09.webp",
+   "alt": "Red marker study of a Polish folk figure."
+  },
+  {
+   "slot": "P",
+   "src": "images/design/polish-film-festival/wip-10.webp",
+   "alt": "Red marker study of a man in a hat."
+  }
+ ],
+ "card": {
+  "src": "images/cards/polish-film-festival-lg.webp",
+  "alt": "The Polish Film Festival North America poster."
+ },
+ "og": "images/og/polish-film-festival.jpg"
+}

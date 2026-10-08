@@ -1,0 +1,76 @@
+{
+ "slug": "miles-regis",
+ "title": "Miles Regis",
+ "deck": "An artist's paintings, redrawn by hand for a coloring book.",
+ "client": "Miles Regis",
+ "year": "2023",
+ "role": "Illustrator",
+ "sector": "Culture and publishing",
+ "location": "Los Angeles",
+ "lede": "Miles Regis paints crowds of figures and words. For his coloring book, each painting was redrawn by hand as a black line, leaving the color to the reader.",
+ "challenge": "The artist Miles Regis was making a coloring book from his paintings, and they needed to become black-and-white illustrations without losing what made them his.",
+ "work": [
+  "Each drawing keeps the artist's composition and his words, figure for figure, and turns the paint into an open line that leaves the color to whoever holds the pencil.",
+  "A painting of figures under the words “Respect my pronouns” becomes a clean line drawing of the same scene, and a crowd in printed tees becomes “Does my shirt have that much power?” in line."
+ ],
+ "system": [
+  [
+   "The line",
+   "Hand-drawn, black and open."
+  ],
+  [
+   "The words",
+   "Kept from the artist's paintings."
+  ]
+ ],
+ "deliverables": [
+  "Black-and-white line illustrations, adapted from the paintings"
+ ],
+ "credits": [
+  [
+   "Illustration",
+   [
+    "Dalton Corr: hand-drawn adaptations"
+   ]
+  ],
+  [
+   "Artist",
+   [
+    "Miles Regis: the original paintings"
+   ]
+  ]
+ ],
+ "links": [],
+ "press": [],
+ "seo": {
+  "title": "Miles Regis coloring book illustrations | Opmet Osserpse",
+  "description": "Hand-drawn black-and-white adaptations of Miles Regis's paintings for his coloring book. Los Angeles, 2023."
+ },
+ "media": [
+  {
+   "slot": "P",
+   "src": "images/cdn/miles-regis/IMG_3876-80c615.webp",
+   "alt": "A painting by Miles Regis: figures under the words “Respect my pronouns.”"
+  },
+  {
+   "slot": "P",
+   "src": "images/cdn/miles-regis/Miles-Respect-My-Pronouns-a908e0.webp",
+   "alt": "The same painting, adapted by hand into a black-and-white line drawing for coloring."
+  },
+  {
+   "slot": "P",
+   "src": "images/cdn/miles-regis/76586FD6-765B-4167-99DA-DFDDB515A8BF-21dc5f.webp",
+   "alt": "A second painting by Miles Regis: a crowd of figures in printed tees."
+  },
+  {
+   "slot": "P",
+   "src": "images/cdn/miles-regis/Miles-Does-My-Shirt-Have-That-Much-Power-580237.webp",
+   "alt": "The second painting as a line drawing: “Does my shirt have that much power?”"
+  }
+ ],
+ "card": {
+  "src": "images/cards/miles-regis-lg.webp",
+  "alt": "A line drawing adapted from a Miles Regis painting."
+ },
+ "og": "images/og/miles-regis.png"
+}

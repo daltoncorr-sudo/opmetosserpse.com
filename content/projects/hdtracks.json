@@ -1,0 +1,131 @@
+{
+ "slug": "hdtracks",
+ "title": "HDtracks",
+ "deck": "Rebuilding a high-resolution music store from the ground up.",
+ "client": "HDtracks",
+ "year": "2019",
+ "role": "Director of marketing and lead designer",
+ "sector": "Music",
+ "location": "",
+ "lede": "In 2019, HDtracks, the high-resolution music store, was rebranded and its website rebuilt from the ground up, from the database to the logo and the campaigns.",
+ "challenge": "HDtracks sells high-resolution music downloads to listeners who care how a recording sounds. In 2019 it took on a complete rebrand and a redesign of its website, which meant making a deep catalog easy to browse and the brand as clear as the audio.",
+ "work": [
+  "The redesign started under the surface: a new website built from the ground up, with new database storage, then the UX and UI design, updated branding, logos and the ad campaigns.",
+  "The store shows albums in a clean grid, gives each one a page, and makes room for editorial features on classic recordings. Around it runs a steady line of email and campaigns, from VIP sales and Grammy winners to browsing by genre, New York Music Month and the storewide sale that opened 2021.",
+  "The rebrand and redesign increased customer retention and sales."
+ ],
+ "system": [
+  [
+   "The store",
+   "Built from the ground up."
+  ],
+  [
+   "The brand",
+   "Updated branding and logos."
+  ],
+  [
+   "Campaigns",
+   "Email and ads around the year."
+  ]
+ ],
+ "deliverables": [
+  "Website, built from the ground up",
+  "Database storage",
+  "UX and UI design",
+  "Branding and logos",
+  "Ad campaigns",
+  "Email"
+ ],
+ "credits": [
+  [
+   "Design",
+   [
+    "Dalton Corr: rebrand, website design, UX and UI, logos, campaigns"
+   ]
+  ],
+  [
+   "Client",
+   [
+    "HDtracks"
+   ]
+  ]
+ ],
+ "links": [
+  [
+   "hdtracks.com",
+   "https://www.hdtracks.com"
+  ]
+ ],
+ "press": [],
+ "seo": {
+  "title": "HDtracks rebrand and store redesign | Opmet Osserpse",
+  "description": "The 2019 rebrand and website rebuild for HDtracks, the high-resolution music store: new branding, logos, UX and UI, campaigns and email."
+ },
+ "media": [
+  {
+   "slot": "H",
+   "src": "images/cdn/hdtracks/HDtrackswide-88945d.webp",
+   "alt": "The HDtracks logo in white on blue."
+  },
+  {
+   "slot": "W",
+   "src": "images/cdn/hdtracks/Screen-Shot-2021-05-10-at-12.58.46-PM-9451e1.webp",
+   "alt": "The redesigned store: a grid of albums."
+  },
+  {
+   "slot": "W",
+   "src": "images/cdn/hdtracks/Screen-Shot-2021-05-10-at-1.04.37-PM-f6b0c6.webp",
+   "alt": "An album page on the redesigned store."
+  },
+  {
+   "slot": "W",
+   "src": "images/cdn/hdtracks/Screen-Shot-2021-05-10-at-1.06.42-PM-183a61.webp",
+   "alt": "A store page with editorial text."
+  },
+  {
+   "slot": "P",
+   "src": "images/cdn/hdtracks/HDtracks-SplashPage-Mock-Up-7144ee.webp",
+   "alt": "The full splash page, top to bottom (crop to a section)."
+  },
+  {
+   "slot": "P",
+   "src": "images/cdn/hdtracks/Screen-Shot-2021-05-10-at-1.18.22-PM-70d2e3.webp",
+   "alt": "An email: up to 35% off VIP sales and featured new releases."
+  },
+  {
+   "slot": "W",
+   "src": "images/cdn/hdtracks/Chuck-fa4dcd.webp",
+   "alt": "An editorial feature on a classic album, set in 24-bit."
+  },
+  {
+   "slot": "P",
+   "src": "images/cdn/hdtracks/Screen-Shot-2021-05-10-at-1.18.33-PM-884084.webp",
+   "alt": "An email: browse the store by genre."
+  },
+  {
+   "slot": "P",
+   "src": "images/cdn/hdtracks/Screen-Shot-2021-05-10-at-1.17.14-PM-b58e33.webp",
+   "alt": "An email for the Grammy winners."
+  },
+  {
+   "slot": "W",
+   "src": "images/cdn/hdtracks/10470178_663675363703231_3821372901395509111_o-2daabe.webp",
+   "alt": "An ad: the HDtracks logo with a listener in red light."
+  },
+  {
+   "slot": "P",
+   "src": "images/cdn/hdtracks/65303997_2952501178124033_8095062357006352384_n-7ab985.webp",
+   "alt": "A campaign ad: 25% off top New York artists for New York Music Month."
+  },
+  {
+   "slot": "S",
+   "src": "images/cdn/hdtracks/Screen-Shot-2020-09-16-at-12.17.22-PM-66d9d9.webp",
+   "alt": "A campaign ad: 21% off storewide to celebrate 2021."
+  }
+ ],
+ "card": {
+  "src": "images/cards/hdtracks-lg.webp",
+  "alt": "The HDtracks logo."
+ },
+ "og": "images/og/hdtracks.jpg"
+}

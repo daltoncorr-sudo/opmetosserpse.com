@@ -1,0 +1,6 @@
+{
+ "first": "",
+ "first_delay_ms": 3200,
+ "interval_ms": 10000,
+ "order": "random, never the same twice in a row"
+}

@@ -1,0 +1,7 @@
+{
+ "name": "wave",
+ "label": "Wave",
+ "duration_ms": 2300,
+ "enabled": false,
+ "requires": []
+}

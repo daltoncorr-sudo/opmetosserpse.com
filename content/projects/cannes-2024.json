@@ -1,0 +1,66 @@
+{
+ "slug": "cannes-2024",
+ "title": "Cannes 2024",
+ "deck": "Drawings of Cannes for Kodak's events at the festival.",
+ "client": "Kodak",
+ "year": "2024",
+ "role": "Illustrator",
+ "sector": "Festivals",
+ "location": "Cannes, France",
+ "lede": "A year after the HollyShorts invitation, Kodak's events at Cannes got the same fine blue line: the town's streets and buildings, drawn for posters and invitations.",
+ "challenge": "Kodak, a name built on film, hosted events at the 2024 Cannes Film Festival and needed original illustrations and poster design for them.",
+ "work": [
+  "The illustrations draw Cannes in a light blue line, a street and a building at a time, loose enough to feel made on the spot and clean enough to print. They carried the events' posters and invitations, in the same hand as the HollyShorts invitation a year before."
+ ],
+ "system": [
+  [
+   "The line",
+   "Cannes drawn in blue."
+  ],
+  [
+   "The posters",
+   "For the events."
+  ]
+ ],
+ "deliverables": [
+  "Original illustrations",
+  "Poster design"
+ ],
+ "credits": [
+  [
+   "Design",
+   [
+    "Dalton Corr: illustration and poster design"
+   ]
+  ],
+  [
+   "Client",
+   [
+    "Kodak"
+   ]
+  ]
+ ],
+ "links": [],
+ "press": [],
+ "seo": {
+  "title": "Cannes Film Festival 2024 for Kodak | Opmet Osserpse",
+  "description": "Original illustrations and poster design for Kodak-hosted events at the 2024 Cannes Film Festival."
+ },
+ "media": [
+  {
+   "slot": "H",
+   "src": "images/cdn/cannes-2024/Cannes-2024-Artwork-8efbad.webp",
+   "alt": "A blue line drawing of a Cannes street."
+  },
+  {
+   "slot": "P",
+   "src": "images/cdn/cannes-2024/Cannes-2024-Artwork-6-3c6cfe.webp",
+   "alt": "A blue line drawing of a Cannes building."
+  }
+ ],
+ "card": {
+  "src": "images/cdn/cannes-2024/Cannes-2024-Artwork-8efbad.webp",
+  "alt": "A blue line drawing of a Cannes street."
+ },
+ "og": null
+}

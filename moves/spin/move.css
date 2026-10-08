@@ -1,0 +1,9 @@
+/* Spin: winds up, spins a full turn with a lift, overshoots and settles. */
+.mark.m-spin{animation:spin 2s both;transform-origin:50% 52%}
+@keyframes spin{
+ 0%{transform:translateY(0) rotate(0) scale(1,1);animation-timing-function:cubic-bezier(.45,0,.55,1)}
+ 16%{transform:translateY(4px) rotate(-22deg) scale(1.04,.93);animation-timing-function:cubic-bezier(.55,0,.1,1)}
+ 64%{transform:translateY(-16px) rotate(374deg) scale(.97,1.06);animation-timing-function:cubic-bezier(.45,0,.55,1)}
+ 78%{transform:translateY(2px) rotate(355deg) scale(1.03,.96);animation-timing-function:cubic-bezier(.45,0,.55,1)}
+ 90%{transform:translateY(0) rotate(362deg) scale(1,1);animation-timing-function:cubic-bezier(.45,0,.55,1)}
+ 100%{transform:translateY(0) rotate(360deg) scale(1,1)}}

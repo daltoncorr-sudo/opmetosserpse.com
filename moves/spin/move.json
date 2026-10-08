@@ -1,0 +1,7 @@
+{
+ "name": "spin",
+ "label": "Spin",
+ "duration_ms": 2000,
+ "enabled": false,
+ "requires": []
+}

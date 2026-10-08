@@ -1,0 +1,121 @@
+{
+ "slug": "red-mask",
+ "title": "Red Mask",
+ "deck": "Thirteen posters for a horror franchise that never existed.",
+ "client": "Ritesh Films",
+ "year": "2025",
+ "role": "Poster designer",
+ "sector": "Film",
+ "location": "",
+ "lede": "To build the world of an independent feature, Ritesh Films commissioned the one-sheets of a horror franchise that never was: 13 films over 25 years, each poster true to its year.",
+ "challenge": "“Red Mask” is an independent feature in production with Ritesh Films. Its story needed the history of an imagined horror franchise, and that history had to look real on screen.",
+ "work": [
+  "Each of the 13 posters is conceived as an artifact from a specific year across a 25-year arc, researched to match the visual language of its era: the typography and color palette, the taglines, the distributor marks and the printing conventions of the period.",
+  "The series opens with “Red Mask: Night of Blood” (1982) and “Red Mask Part 2” (1984), and closes with “Red Mask 13: Unlucky Strike” (2007). Along the way the numbering changes the way real franchises do, from “Red Mask 4: Trail of Terror” to “Red Mask VII: Karina's Revenge” and “Red Mask X: Beyond the Mask.” Together, the set works as a graphic timeline inside the film's world."
+ ],
+ "system": [
+  [
+   "The era",
+   "Type, color and print conventions matched to each poster's year."
+  ],
+  [
+   "The franchise",
+   "Titles, numbering, taglines and distributor marks that change over 25 years."
+  ]
+ ],
+ "deliverables": [
+  "13 posters, 1982 to 2007"
+ ],
+ "credits": [
+  [
+   "Design",
+   [
+    "Dalton Corr: poster design and period research"
+   ]
+  ],
+  [
+   "Client",
+   [
+    "Ritesh Films"
+   ]
+  ]
+ ],
+ "links": [],
+ "press": [],
+ "seo": {
+  "title": "Red Mask: a fictional poster series | Opmet Osserpse",
+  "description": "Thirteen period-accurate posters for an imagined horror franchise, spanning 25 years, commissioned by Ritesh Films for the independent feature Red Mask."
+ },
+ "media": [
+  {
+   "slot": "P",
+   "src": "images/design/red-mask/poster-1.webp",
+   "alt": "Red Mask: Night of Blood, 1982."
+  },
+  {
+   "slot": "P",
+   "src": "images/design/red-mask/poster-2.webp",
+   "alt": "Red Mask Part 2, 1984."
+  },
+  {
+   "slot": "P",
+   "src": "images/design/red-mask/poster-3.webp",
+   "alt": "Red Mask 3."
+  },
+  {
+   "slot": "P",
+   "src": "images/design/red-mask/poster-4.webp",
+   "alt": "Red Mask 4: Trail of Terror."
+  },
+  {
+   "slot": "P",
+   "src": "images/design/red-mask/poster-5.webp",
+   "alt": "Red Mask 5: A New Frontier."
+  },
+  {
+   "slot": "P",
+   "src": "images/design/red-mask/poster-6.webp",
+   "alt": "Red Mask 6."
+  },
+  {
+   "slot": "P",
+   "src": "images/design/red-mask/poster-7.webp",
+   "alt": "Red Mask VII: Karina’s Revenge."
+  },
+  {
+   "slot": "P",
+   "src": "images/design/red-mask/poster-8.webp",
+   "alt": "Red Mask 8."
+  },
+  {
+   "slot": "P",
+   "src": "images/design/red-mask/poster-9.webp",
+   "alt": "Red Mask IX: The Death Knell."
+  },
+  {
+   "slot": "P",
+   "src": "images/design/red-mask/poster-10.webp",
+   "alt": "Red Mask X: Beyond the Mask."
+  },
+  {
+   "slot": "P",
+   "src": "images/design/red-mask/poster-11.webp",
+   "alt": "Red Mask 11."
+  },
+  {
+   "slot": "P",
+   "src": "images/design/red-mask/poster-12.webp",
+   "alt": "Red Mask 12."
+  },
+  {
+   "slot": "P",
+   "src": "images/design/red-mask/poster-13.webp",
+   "alt": "Red Mask 13: Unlucky Strike, 2007."
+  }
+ ],
+ "card": {
+  "src": "images/cards/red-mask-lg.webp",
+  "alt": "“Red Mask: Night of Blood,” the first poster in the series."
+ },
+ "og": "images/og/red-mask.jpg"
+}

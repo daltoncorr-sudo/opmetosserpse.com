@@ -1,0 +1,7 @@
+{
+ "name": "shrug",
+ "label": "Shrug",
+ "duration_ms": 2200,
+ "enabled": false,
+ "requires": []
+}

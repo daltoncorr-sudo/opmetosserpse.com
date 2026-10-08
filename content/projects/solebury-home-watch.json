@@ -1,0 +1,98 @@
+{
+ "slug": "solebury-home-watch",
+ "title": "Solebury Home Watch Services",
+ "deck": "An owl on the roof, keeping watch while you're away.",
+ "client": "Solebury Home Watch Services",
+ "year": "2026",
+ "role": "Brand development, web design and copy",
+ "sector": "Small business",
+ "location": "Bucks County, Pennsylvania",
+ "lede": "A home watch service looks after houses while their owners are away. Its new mark says so in one image: an owl keeping watch from the roof.",
+ "challenge": "Solebury Home Watch Services is a licensed, insured home watch service in Bucks County, Pennsylvania, that looks after houses while their owners are away. It needed a logo, a brand, a website and the words to go on it.",
+ "work": [
+  "An owl is the one who stays awake while the house sleeps. Set on the ridge of a roof, it reads at a glance as a home being watched over, and it holds up from a van door to a favicon. The emblem comes in tall, stacked and wide versions, in blue, in white on navy and in black.",
+  "The website keeps everything on one page: the services, what clients say and the owner's story. For a business that holds the keys to other people's houses, trust is the product, so the page leads with it. It opens on “Peace of mind while you're away” and then lists the services plainly: property checks, mail and packages, storm monitoring, plant care and more. The copy was written alongside the design."
+ ],
+ "system": [
+  [
+   "The owl",
+   "Keeping watch from the roof."
+  ],
+  [
+   "The versions",
+   "Tall, emblem, stacked and wide."
+  ],
+  [
+   "The site",
+   "Services, testimonials and the owner, on one page."
+  ]
+ ],
+ "deliverables": [
+  "Logo and emblem, four versions",
+  "Brand development",
+  "One-page website",
+  "Copywriting"
+ ],
+ "credits": [
+  [
+   "Design",
+   [
+    "Dalton Corr: logo and emblem, brand development, website design, copywriting"
+   ]
+  ],
+  [
+   "Client",
+   [
+    "Solebury Home Watch Services"
+   ]
+  ]
+ ],
+ "links": [
+  [
+   "soleburyhomewatchservices.com",
+   "https://www.soleburyhomewatchservices.com/"
+  ]
+ ],
+ "press": [],
+ "seo": {
+  "title": "Solebury Home Watch Services identity | Opmet Osserpse",
+  "description": "Logo, brand, website and copy for Solebury Home Watch Services, a licensed, insured home watch service in Bucks County, Pennsylvania."
+ },
+ "media": [
+  {
+   "slot": "W",
+   "src": "images/design/solebury-home-watch/logo-emblem.webp",
+   "alt": "The emblem, an owl on the roof of a house, in white on navy."
+  },
+  {
+   "slot": "W",
+   "src": "images/design/solebury-home-watch/logo-tall.webp",
+   "alt": "The logo, tall version, in blue."
+  },
+  {
+   "slot": "W",
+   "src": "images/design/solebury-home-watch/logo-stacked.webp",
+   "alt": "The logo with the emblem beside the stacked name, in blue."
+  },
+  {
+   "slot": "W",
+   "src": "images/design/solebury-home-watch/logo-wide.webp",
+   "alt": "The logo on one line, in black."
+  },
+  {
+   "slot": "W",
+   "src": "images/design/solebury-home-watch/website-desktop.webp",
+   "alt": "The website’s first screen: “Peace of mind while you’re away.”"
+  },
+  {
+   "slot": "W",
+   "src": "images/design/solebury-home-watch/website-services.webp",
+   "alt": "The website’s services: property checks, mail and packages, storm monitoring, plant care and more."
+  }
+ ],
+ "card": {
+  "src": "images/cards/solebury-home-watch-lg.webp",
+  "alt": "The Solebury Home Watch Services logo: an owl on the roof of a house, in white on blue."
+ },
+ "og": "images/og/solebury-home-watch.jpg"
+}

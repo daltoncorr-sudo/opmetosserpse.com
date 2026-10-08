@@ -1,0 +1,16 @@
+/* Thumbs up: the hand swaps to the thumbs-up drawing at the top of its pop. Needs thumbs-up.svg in this folder. */
+.mark.m-thumbs{animation:thumbs 2.4s both}
+.mark.m-thumbs .hand{animation:thumbs-hand-out 2.4s both}
+.mark.m-thumbs .pose-thumbs-up{animation:thumbs-pose-in 2.4s both}
+@keyframes thumbs{
+ 0%{transform:translateY(0) rotate(0) scale(1,1);animation-timing-function:cubic-bezier(.45,0,.55,1)}
+ 14%{transform:translateY(5px) rotate(-7deg) scale(1.04,.92);animation-timing-function:cubic-bezier(.2,.9,.25,1)}
+ 30%{transform:translateY(-12px) rotate(9deg) scale(.96,1.12);animation-timing-function:cubic-bezier(.45,0,.55,1)}
+ 40%{transform:translateY(-6px) rotate(-2deg) scale(1.03,1.03);animation-timing-function:cubic-bezier(.45,0,.55,1)}
+ 52%{transform:translateY(-8px) rotate(1deg) scale(1.02,1.04);animation-timing-function:cubic-bezier(.45,0,.55,1)}
+ 70%{transform:translateY(-7px) rotate(0) scale(1.03,1.03);animation-timing-function:cubic-bezier(.5,0,.75,0)}
+ 82%{transform:translateY(3px) rotate(0) scale(1.03,.95);animation-timing-function:cubic-bezier(.2,.9,.25,1)}
+ 92%{transform:translateY(-1px) rotate(0) scale(.99,1.01);animation-timing-function:cubic-bezier(.45,0,.55,1)}
+ 100%{transform:translateY(0) rotate(0) scale(1,1)}}
+@keyframes thumbs-hand-out{0%,21%{opacity:1}25%,78%{opacity:0}82%,100%{opacity:1}}
+@keyframes thumbs-pose-in{0%,21%{opacity:0}25%,78%{opacity:1}82%,100%{opacity:0}}

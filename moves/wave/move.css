@@ -1,0 +1,12 @@
+/* Wave: a wind-up, then a wave that loses energy as it settles. */
+.mark.m-wave{animation:wave 2.3s both}
+@keyframes wave{
+ 0%{transform:translateY(0) rotate(0) scaleY(1);animation-timing-function:cubic-bezier(.45,0,.55,1)}
+ 9%{transform:translateY(2px) rotate(-5deg) scaleY(.97);animation-timing-function:cubic-bezier(.3,0,.2,1)}
+ 22%{transform:translateY(-5px) rotate(17deg) scaleY(1.03);animation-timing-function:cubic-bezier(.45,0,.55,1)}
+ 36%{transform:translateY(-3px) rotate(-11deg) scaleY(1);animation-timing-function:cubic-bezier(.45,0,.55,1)}
+ 50%{transform:translateY(-3px) rotate(13deg) scaleY(1);animation-timing-function:cubic-bezier(.45,0,.55,1)}
+ 64%{transform:translateY(-2px) rotate(-7deg) scaleY(1);animation-timing-function:cubic-bezier(.45,0,.55,1)}
+ 78%{transform:translateY(0) rotate(5deg) scaleY(1);animation-timing-function:cubic-bezier(.45,0,.55,1)}
+ 90%{transform:translateY(0) rotate(-1.5deg) scaleY(1);animation-timing-function:cubic-bezier(.45,0,.55,1)}
+ 100%{transform:translateY(0) rotate(0) scaleY(1)}}

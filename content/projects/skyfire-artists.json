@@ -1,0 +1,123 @@
+{
+ "slug": "skyfire-artists",
+ "title": "Skyfire Artists",
+ "deck": "A lightning bolt in a square, from sign to cap.",
+ "client": "Skyfire Artists",
+ "year": "2024",
+ "role": "Brand designer",
+ "sector": "Culture and publishing",
+ "location": "Los Angeles",
+ "lede": "For Skyfire Artists, a single mark, a lightning bolt breaking out of a square, carries everything from the wall sign and business card to the merch. In motion, it splits into color.",
+ "challenge": "Skyfire Artists, in Los Angeles, needed its whole brand at once: logos, merchandise and graphics for its website and social channels, all from one idea.",
+ "work": [
+  "The idea is a bolt that won't stay inside its box. The logo sets a lightning bolt in a square above the name, in white on black and black on white, and an animated version splits the bolt into color.",
+  "Every asset came from that mark. It was set out on a projecting sign, a window, a business card, a tote, three caps and a tee, and across the website and social graphics."
+ ],
+ "system": [
+  [
+   "The mark",
+   "A lightning bolt breaking out of a square."
+  ],
+  [
+   "In motion",
+   "The bolt splitting into color."
+  ],
+  [
+   "Merchandise",
+   "Caps, tee and tote."
+  ]
+ ],
+ "deliverables": [
+  "Logo, light and dark",
+  "Animated logo",
+  "Merchandise",
+  "Website and social graphics"
+ ],
+ "credits": [
+  [
+   "Design",
+   [
+    "Dalton Corr: brand design, logos, merchandise, web and social graphics"
+   ]
+  ],
+  [
+   "Client",
+   [
+    "Skyfire Artists"
+   ]
+  ]
+ ],
+ "links": [],
+ "press": [],
+ "seo": {
+  "title": "Skyfire Artists brand identity | Opmet Osserpse",
+  "description": "Every asset for the Skyfire Artists brand: the logo and its animated version, merchandise, and graphics for the website and social. Los Angeles, 2024."
+ },
+ "media": [
+  {
+   "slot": "S",
+   "src": "images/cdn/skyfire-artists/SA-Tall---White-e7838d.webp",
+   "alt": "The Skyfire Artists logo, a lightning bolt in a square above the name, in white on black."
+  },
+  {
+   "slot": "S",
+   "src": "images/cdn/skyfire-artists/SA-Tall---Black-7c74c0.webp",
+   "alt": "The logo in black on white."
+  },
+  {
+   "slot": "V",
+   "src": "images/design/skyfire-artists/3dgifmaker24386.webp",
+   "alt": "The animated logo, light version: the bolt splitting into color."
+  },
+  {
+   "slot": "V",
+   "src": "images/design/skyfire-artists/3dgifmaker00298.webp",
+   "alt": "The animated logo, dark version."
+  },
+  {
+   "slot": "W",
+   "src": "images/cdn/skyfire-artists/Sign-26a42b.webp",
+   "alt": "Mockup: the logo on a projecting wall sign."
+  },
+  {
+   "slot": "W",
+   "src": "images/cdn/skyfire-artists/Sign-2-6d0d5e.webp",
+   "alt": "Mockup: the logo on a glass window."
+  },
+  {
+   "slot": "P",
+   "src": "images/cdn/skyfire-artists/Card-f9461a.webp",
+   "alt": "Mockup: a black business card in the hand."
+  },
+  {
+   "slot": "P",
+   "src": "images/cdn/skyfire-artists/Card-2-95062b.webp",
+   "alt": "Mockup: a black tote with the logo."
+  },
+  {
+   "slot": "P",
+   "src": "images/cdn/skyfire-artists/Hat-3-9a0f25.webp",
+   "alt": "Mockup: a stone-colored cap with the logo."
+  },
+  {
+   "slot": "P",
+   "src": "images/cdn/skyfire-artists/Hat-4-11af7f.webp",
+   "alt": "Mockup: a navy cap with the logo."
+  },
+  {
+   "slot": "P",
+   "src": "images/cdn/skyfire-artists/SA-Hat-2-58068b.webp",
+   "alt": "Mockup: a black cap with the logo."
+  },
+  {
+   "slot": "P",
+   "src": "images/cdn/skyfire-artists/SA-Shirt-d2139c.webp",
+   "alt": "Mockup: a black tee with the logo."
+  }
+ ],
+ "card": {
+  "src": "images/cards/skyfire-artists-lg.webp",
+  "alt": "The Skyfire Artists logo on a wall sign."
+ },
+ "og": "images/og/skyfire-artists.jpg"
+}

@@ -1,0 +1,108 @@
+{
+ "slug": "dont-let-them-out",
+ "title": "Don't Let Them Out",
+ "deck": "From thumbnail sketches to a poster on a tee.",
+ "client": "“Don't Let Them Out,” directed by Lila McLaughlin",
+ "year": "2025",
+ "role": "Poster designer and illustrator",
+ "sector": "Film",
+ "location": "",
+ "lede": "For Lila McLaughlin's short film, the poster went from a page of thumbnail sketches to two finals, then off the screen and onto paper and tees.",
+ "challenge": "The short film “Don't Let Them Out,” directed by Lila McLaughlin, needed original poster design and illustration: one image that holds the film's tension at the size of a one-sheet and of a thumbnail.",
+ "work": [
+  "It started small: a page of thumbnail sketches, then process scans that narrowed the idea to two final posters.",
+  "The poster then left the screen. It was printed and shown leaning on a wall beside a smaller print, laid on a wood floor, and pinned above black and white tees printed with the same art."
+ ],
+ "system": [
+  [
+   "The illustration",
+   "Original, from thumbnails to finals."
+  ],
+  [
+   "Two finals",
+   "Poster A and poster B."
+  ],
+  [
+   "In print",
+   "Posters and tees."
+  ]
+ ],
+ "deliverables": [
+  "Original illustration",
+  "Two final posters",
+  "Printed poster",
+  "Poster tees"
+ ],
+ "credits": [
+  [
+   "Design",
+   [
+    "Dalton Corr: poster design and illustration"
+   ]
+  ],
+  [
+   "Film",
+   [
+    "Lila McLaughlin, director"
+   ]
+  ]
+ ],
+ "links": [],
+ "press": [],
+ "seo": {
+  "title": "Don't Let Them Out, film poster | Opmet Osserpse",
+  "description": "Original poster design and illustration for the short film Don't Let Them Out, directed by Lila McLaughlin, from thumbnail sketches to print and tees."
+ },
+ "media": [
+  {
+   "slot": "P",
+   "src": "images/design/dont-let-them-out/final-a.webp",
+   "alt": "Final poster A."
+  },
+  {
+   "slot": "P",
+   "src": "images/design/dont-let-them-out/final-b.webp",
+   "alt": "Final poster B."
+  },
+  {
+   "slot": "P",
+   "src": "images/design/dont-let-them-out/scans-03.webp",
+   "alt": "Thumbnail sketches for the poster."
+  },
+  {
+   "slot": "P",
+   "src": "images/design/dont-let-them-out/scans-01.webp",
+   "alt": "Process scans."
+  },
+  {
+   "slot": "P",
+   "src": "images/design/dont-let-them-out/scans-02.webp",
+   "alt": "More process scans."
+  },
+  {
+   "slot": "P",
+   "src": "images/design/dont-let-them-out/printed-wall.webp",
+   "alt": "The printed poster leaning on a white wall, with a smaller print."
+  },
+  {
+   "slot": "P",
+   "src": "images/design/dont-let-them-out/printed-floor.webp",
+   "alt": "The printed poster on a wood floor."
+  },
+  {
+   "slot": "P",
+   "src": "images/design/dont-let-them-out/printed-tees.webp",
+   "alt": "The printed poster on the wall, with black and white tees printed with the poster."
+  },
+  {
+   "slot": "V",
+   "src": "media/dont-let-them-out-tees.mp4",
+   "alt": "The poster tees, in motion."
+  }
+ ],
+ "card": {
+  "src": "images/cards/dont-let-them-out-lg.webp",
+  "alt": "The “Don’t Let Them Out” poster."
+ },
+ "og": "images/og/dont-let-them-out.jpg"
+}

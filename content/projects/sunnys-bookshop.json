@@ -1,0 +1,222 @@
+{
+ "slug": "sunnys-bookshop",
+ "title": "Sunny's Bookshop",
+ "deck": "A loved brand, refined rather than reinvented.",
+ "client": "Sunny's Bookshop",
+ "year": "2026",
+ "role": "Creative direction, rebrand and logo design",
+ "sector": "Small business",
+ "location": "Tarzana and the NoHo Arts District, Los Angeles",
+ "lede": "An independent bookshop with a brand its readers already loved needed it ready for a second store. The book was redrawn by hand; the rest was put in order.",
+ "challenge": "Sunny's Bookshop is an independent bookshop and book bar in Tarzana, with a second shop coming to the NoHo Arts District. The owner, Sanaz Tamjidi, already had a brand people loved: a seal, a cursive signature, a dark green. She asked for it refined, not reinvented.",
+ "work": [
+  "The open book was drawn by hand, in ink first, then cut down to a solid version that still reads at the size of a favicon. The signature was rebuilt to be read rather than admired: Sloop Script, tidied for legibility, with a custom S and the flourishes politely declined.",
+  "An SB monogram was set inside the seal's two rings, and a serif was paired with the script. The rules went into a 24-page brand bible, set like a book, because it was for a bookshop. Behind it sits a working archive of 46 pages of studies, from bookseller tickets and printer's marks to the pen paths of the signature.",
+  "The slogan didn't need writing. “For readers and writers” was already stitched into her label. A second mark followed for Sunny's Journal & Press, a wordmark and stamp in the same world, and an announcement film set the drawing, the type and the studies to the sound of the room."
+ ],
+ "system": [
+  [
+   "The book",
+   "Drawn in ink, with hero and small-size versions."
+  ],
+  [
+   "The seal and monogram",
+   "The book inside two rings; SB inside the rings."
+  ],
+  [
+   "The signature",
+   "Sloop Script with a custom S."
+  ],
+  [
+   "Lockups",
+   "Horizontal, stacked, half-moon and signature."
+  ],
+  [
+   "Color",
+   "Library Green, Vellum, Ink Navy, Gilt, Binding Brown and Linen, with Pantone, thread and foil references."
+  ]
+ ],
+ "deliverables": [
+  "Hand-drawn book mark, hero and small-size versions",
+  "Seal and SB monogram",
+  "Signature",
+  "Horizontal, stacked, half-moon and signature lockups",
+  "Sunny's Journal & Press wordmark and stamp",
+  "Typography and color, with Pantone, thread and foil references",
+  "24-page brand bible",
+  "Master asset package",
+  "Announcement film"
+ ],
+ "credits": [
+  [
+   "Design",
+   [
+    "Dalton Corr: creative direction, rebrand, logo design, brand bible, photography, announcement film"
+   ]
+  ],
+  [
+   "Client",
+   [
+    "Sanaz Tamjidi, owner, Sunny's Bookshop"
+   ]
+  ],
+  [
+   "Fonts",
+   [
+    "Sailing Club, Jen Wagner Co.",
+    "Sloop Script, Font Bureau, with a custom S",
+    "Cormorant Garamond, EB Garamond and Jost, SIL Open Font License"
+   ]
+  ]
+ ],
+ "links": [],
+ "press": [
+  "Delivered in October 2026: every mark in green, vellum, black and white, as SVG, PDF, EPS, Illustrator and PNG files, ready for the NoHo opening in 2027."
+ ],
+ "seo": {
+  "title": "Sunny's Bookshop rebrand and logo | Opmet Osserpse",
+  "description": "A full rebrand for Sunny's Bookshop, an independent book bar in Los Angeles: a hand-drawn book, seal, signature, monogram and a 24-page brand bible."
+ },
+ "media": [
+  {
+   "slot": "V",
+   "src": "media/sunnys-bookshop/sb-00-hero-01-16x9.mp4",
+   "alt": "An open book drawn by hand in green ink, settling into the Sunny’s Bookshop logo."
+  },
+  {
+   "slot": "W",
+   "src": "images/design/sunnys-bookshop/sb-03-book-01-16x9-2400.jpg",
+   "alt": "The hand-drawn open book in Library Green on vellum."
+  },
+  {
+   "slot": "P",
+   "src": "images/design/sunnys-bookshop/sb-03-book-02-4x5-2400.jpg",
+   "alt": "The original ink drawing of the book."
+  },
+  {
+   "slot": "P",
+   "src": "images/design/sunnys-bookshop/sb-03-book-03-4x5-2400.jpg",
+   "alt": "The simplified small-size book on its construction grid."
+  },
+  {
+   "slot": "W",
+   "src": "images/design/sunnys-bookshop/sb-03-book-04-16x9-2400.jpg",
+   "alt": "The book at three sizes: hero, digital and tiny."
+  },
+  {
+   "slot": "F",
+   "src": "images/design/sunnys-bookshop/sb-04-seal-01-16x9-2400.jpg",
+   "alt": "The seal: the book inside two rings, with “For readers and writers.”"
+  },
+  {
+   "slot": "P",
+   "src": "images/design/sunnys-bookshop/sb-04-seal-02-4x5-2400.jpg",
+   "alt": "The SB monogram inside the seal’s two rings."
+  },
+  {
+   "slot": "P",
+   "src": "images/design/sunnys-bookshop/sb-04-seal-03-4x5-2400.jpg",
+   "alt": "The seal in black line on white: the book, the name round the ring and “For readers and writers.”"
+  },
+  {
+   "slot": "W",
+   "src": "images/design/sunnys-bookshop/sb-05-signature-01-16x9-2400.jpg",
+   "alt": "The signature in green script on vellum."
+  },
+  {
+   "slot": "V",
+   "src": "media/sunnys-bookshop/sb-05-signature-02-16x9.mp4",
+   "alt": "The signature written on, stroke by stroke."
+  },
+  {
+   "slot": "W",
+   "src": "images/design/sunnys-bookshop/sb-06-system-01-16x9-2400.jpg",
+   "alt": "Five lockups: horizontal, stacked, half-moon, signature with book, and Tarzana and NoHo."
+  },
+  {
+   "slot": "P",
+   "src": "images/design/sunnys-bookshop/sb-06-system-02-4x5-2400.jpg",
+   "alt": "The stacked logo, the book above the name, in vellum on Library Green."
+  },
+  {
+   "slot": "P",
+   "src": "images/design/sunnys-bookshop/sb-06-system-03-4x5-2400.jpg",
+   "alt": "The stacked logo in ink on white."
+  },
+  {
+   "slot": "W",
+   "src": "images/design/sunnys-bookshop/sb-07-type-01-16x9-2400.jpg",
+   "alt": "The type: Sailing Club capitals, the signature, Cormorant Garamond italic and EB Garamond."
+  },
+  {
+   "slot": "W",
+   "src": "images/design/sunnys-bookshop/sb-07-colour-02-16x9-2400.jpg",
+   "alt": "The palette: Library Green, Vellum, Ink Navy, Gilt, Binding Brown and Linen."
+  },
+  {
+   "slot": "P",
+   "src": "images/design/sunnys-bookshop/sb-08-journal-01-4x5-2400.jpg",
+   "alt": "The Sunny’s Journal & Press stamp in vellum on navy."
+  },
+  {
+   "slot": "P",
+   "src": "images/design/sunnys-bookshop/sb-08-journal-02-4x5-2400.jpg",
+   "alt": "The Sunny’s Journal & Press wordmark in navy on vellum."
+  },
+  {
+   "slot": "W",
+   "src": "images/design/sunnys-bookshop/sb-11-assets-01-16x9-2400.jpg",
+   "alt": "The horizontal logo with its construction lines in blue pencil."
+  },
+  {
+   "slot": "P",
+   "src": "images/design/sunnys-bookshop/sb-11-assets-02-4x5-2400.jpg",
+   "alt": "The seal with its construction circles."
+  },
+  {
+   "slot": "P",
+   "src": "images/design/sunnys-bookshop/sb-11-assets-05-4x5-2400.jpg",
+   "alt": "The Sunny’s Journal & Press stamp, half inked."
+  },
+  {
+   "slot": "F",
+   "src": "images/design/sunnys-bookshop/sb-12-bible-01-16x9-2400.jpg",
+   "alt": "The cover of the Sunny’s Bookshop Brand Bible."
+  },
+  {
+   "slot": "P",
+   "src": "images/design/sunnys-bookshop/sb-12-bible-02-4x5-2400.jpg",
+   "alt": "Brand Bible page: the marks."
+  },
+  {
+   "slot": "P",
+   "src": "images/design/sunnys-bookshop/sb-12-bible-04-4x5-2400.jpg",
+   "alt": "Brand Bible page: color."
+  },
+  {
+   "slot": "W",
+   "src": "images/design/sunnys-bookshop/sb-13-world-01-16x9-2400.jpg",
+   "alt": "A canvas tote printed with the horizontal logo."
+  },
+  {
+   "slot": "P",
+   "src": "images/design/sunnys-bookshop/sb-13-world-02-4x5-2400.jpg",
+   "alt": "A navy cap embroidered with the seal."
+  },
+  {
+   "slot": "P",
+   "src": "images/design/sunnys-bookshop/sb-13-world-03-4x5-2400.jpg",
+   "alt": "Hang tags: the seal stamped on kraft, the signature on black."
+  },
+  {
+   "slot": "V",
+   "src": "media/sunnys-bookshop/sb-14-film-01-9x16.mp4",
+   "alt": "The announcement film, vertical."
+  }
+ ],
+ "card": {
+  "src": "images/cards/sunnys-bookshop-lg.webp",
+  "alt": "The Sunny’s Bookshop seal in vellum on Library Green."
+ },
+ "og": "images/design/sunnys-bookshop/sb-00-og-01-1200x630.jpg"
+}

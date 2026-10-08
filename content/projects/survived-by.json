@@ -1,0 +1,60 @@
+{
+ "slug": "survived-by",
+ "title": "Survived By",
+ "deck": "A painted one-sheet for an independent film.",
+ "client": "“Survived By,” directed by K.D. Chalk",
+ "year": "2024",
+ "role": "Poster designer",
+ "sector": "Film",
+ "location": "Los Angeles",
+ "lede": "For K.D. Chalk's “Survived By,” the one-sheet is a single illustrated figure: a woman in pink, holding a record.",
+ "challenge": "“Survived By,” directed by K.D. Chalk in Los Angeles, needed a poster that could stand for the whole film in one image.",
+ "work": [
+  "The one-sheet rests on a single figure, painted in loose strokes: a woman in pink, holding a record close, against a pale ground. One figure, one object and the title above them. Nothing on the poster competes with her."
+ ],
+ "system": [
+  [
+   "The figure",
+   "A woman in pink, holding a record."
+  ],
+  [
+   "The ground",
+   "Pale and open, so she carries the poster."
+  ]
+ ],
+ "deliverables": [
+  "Poster and illustration"
+ ],
+ "credits": [
+  [
+   "Design",
+   [
+    "Dalton Corr: poster design and illustration"
+   ]
+  ],
+  [
+   "Film",
+   [
+    "K.D. Chalk, director"
+   ]
+  ]
+ ],
+ "links": [],
+ "press": [],
+ "seo": {
+  "title": "Survived By, film poster | Opmet Osserpse",
+  "description": "Poster design and illustration for Survived By, an independent film directed by K.D. Chalk. Los Angeles, 2024."
+ },
+ "media": [
+  {
+   "slot": "P",
+   "src": "images/cdn/survived-by/Survived-By---Final-Large-32e9fa.webp",
+   "alt": "The “Survived By” one-sheet: a painted woman in pink holding a record."
+  }
+ ],
+ "card": {
+  "src": "images/cards/survived-by-lg.webp",
+  "alt": "The “Survived By” one-sheet."
+ },
+ "og": "images/og/survived-by.jpg"
+}

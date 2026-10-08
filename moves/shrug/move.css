@@ -1,0 +1,12 @@
+/* Shrug: tips the palm back and up, holds, drops with a small bounce. */
+.mark.m-shrug{animation:shrug 2.2s both}
+@keyframes shrug{
+ 0%{transform:perspective(600px) translateY(0) rotateX(0) rotate(0) scaleY(1);animation-timing-function:cubic-bezier(.45,0,.55,1)}
+ 12%{transform:perspective(600px) translateY(3px) rotateX(0) rotate(3deg) scaleY(.96);animation-timing-function:cubic-bezier(.2,.9,.25,1)}
+ 32%{transform:perspective(600px) translateY(-12px) rotateX(40deg) rotate(-15deg) scaleY(1.02);animation-timing-function:cubic-bezier(.45,0,.55,1)}
+ 42%{transform:perspective(600px) translateY(-9px) rotateX(34deg) rotate(-10deg) scaleY(1);animation-timing-function:cubic-bezier(.45,0,.55,1)}
+ 56%{transform:perspective(600px) translateY(-10px) rotateX(36deg) rotate(-14deg) scaleY(1);animation-timing-function:cubic-bezier(.45,0,.55,1)}
+ 66%{transform:perspective(600px) translateY(-9px) rotateX(35deg) rotate(-11deg) scaleY(1);animation-timing-function:cubic-bezier(.5,0,.75,0)}
+ 82%{transform:perspective(600px) translateY(3px) rotateX(0) rotate(1deg) scaleY(.96);animation-timing-function:cubic-bezier(.2,.9,.25,1)}
+ 92%{transform:perspective(600px) translateY(-1px) rotateX(0) rotate(0) scaleY(1.01);animation-timing-function:cubic-bezier(.45,0,.55,1)}
+ 100%{transform:perspective(600px) translateY(0) rotateX(0) rotate(0) scaleY(1)}}

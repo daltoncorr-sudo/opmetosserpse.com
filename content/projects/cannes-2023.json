@@ -1,0 +1,66 @@
+{
+ "slug": "cannes-2023",
+ "title": "Cannes 2023",
+ "deck": "An invitation to Cannes, drawn in blue line.",
+ "client": "HollyShorts Film Festival",
+ "year": "2023",
+ "role": "Designer and illustrator",
+ "sector": "Festivals",
+ "location": "Cannes, France",
+ "lede": "For HollyShorts' events at the 2023 Cannes Film Festival, the invitation was a drawing: the coast in a fine blue line, and above the details, “Tu es invité.”",
+ "challenge": "In May 2023, the Oscar-qualifying HollyShorts Film Festival hosted events at the Cannes Film Festival. They needed original artwork and an invitation.",
+ "work": [
+  "The invitation is drawn rather than photographed: a light blue line of the coast, like a sketch on hotel stationery, with the event details set below. It is written in French, for a festival in France, and continues on the back."
+ ],
+ "system": [
+  [
+   "The drawing",
+   "The coast in blue line."
+  ],
+  [
+   "The invitation",
+   "Front and back, in French."
+  ]
+ ],
+ "deliverables": [
+  "Original artwork",
+  "Invitation, front and back"
+ ],
+ "credits": [
+  [
+   "Design",
+   [
+    "Dalton Corr: original artwork and invitation design"
+   ]
+  ],
+  [
+   "Client",
+   [
+    "HollyShorts Film Festival"
+   ]
+  ]
+ ],
+ "links": [],
+ "press": [],
+ "seo": {
+  "title": "Cannes Film Festival 2023 invitation | Opmet Osserpse",
+  "description": "Original artwork and invitation design for events at the 2023 Cannes Film Festival, hosted by the Oscar-qualifying HollyShorts Film Festival."
+ },
+ "media": [
+  {
+   "slot": "P",
+   "src": "images/cdn/cannes-2023/Cannes-Invite-Alt-4-babb06.webp",
+   "alt": "The invitation, front: a blue line drawing of the coast above the words “Tu es invité.”"
+  },
+  {
+   "slot": "P",
+   "src": "images/cdn/cannes-2023/Cannes-Invite-Alt-4-853cc5.webp",
+   "alt": "The invitation, back."
+  }
+ ],
+ "card": {
+  "src": "images/cards/cannes-2023-lg.webp",
+  "alt": "The 2023 Cannes invitation: a blue line drawing above “Tu es invité.”"
+ },
+ "og": "images/og/cannes-2023.jpg"
+}

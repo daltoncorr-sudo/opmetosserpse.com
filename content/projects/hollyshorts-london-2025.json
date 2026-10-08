@@ -1,0 +1,135 @@
+{
+ "slug": "hollyshorts-london-2025",
+ "title": "HollyShorts London 2025",
+ "deck": "The second London edition, from poster to award show.",
+ "client": "HollyShorts Film Festival",
+ "year": "2025",
+ "role": "Art director and creative direction",
+ "sector": "Festivals",
+ "location": "London",
+ "lede": "A second year in London meant growing the identity without starting over. The 2025 system carried from the poster to the jury, the schedule and the award show screen.",
+ "challenge": "After the first London edition in 2024, the second needed to keep evolving the visual identity established in the inaugural year and take it across every part of the festival.",
+ "work": [
+  "The second year kept the hand-drawn London of the first and widened it to the parts of a festival that live on screens and paper: the jury, the schedule, the invitation and the award show.",
+  "The system runs from the poster to a set of award show slides (welcome, London, honoree and grand prize), jury graphics, on-screen visuals in landscape and vertical formats, the schedule, the badge, the invitation and the step-and-repeat."
+ ],
+ "system": [
+  [
+   "The poster",
+   "The edition's key art."
+  ],
+  [
+   "The stage",
+   "Award show and jury graphics."
+  ],
+  [
+   "On screen",
+   "Landscape and vertical formats."
+  ]
+ ],
+ "deliverables": [
+  "Festival poster",
+  "Award show graphics",
+  "Jury graphics",
+  "On-screen visuals",
+  "Schedule",
+  "Badge",
+  "Invitation",
+  "Step-and-repeat",
+  "Digital marketing"
+ ],
+ "credits": [
+  [
+   "Design",
+   [
+    "Dalton Corr: creative direction and design"
+   ]
+  ],
+  [
+   "Client",
+   [
+    "HollyShorts Film Festival"
+   ]
+  ]
+ ],
+ "links": [
+  [
+   "hollyshorts.com/london",
+   "https://www.hollyshorts.com/london"
+  ]
+ ],
+ "press": [
+  "British Cinematographer covered the second annual HollyShorts London."
+ ],
+ "seo": {
+  "title": "HollyShorts London 2025 | Opmet Osserpse",
+  "description": "Creative direction for the second HollyShorts London: poster, award show and jury graphics, on-screen visuals, schedule, badge, invitation and step-and-repeat."
+ },
+ "media": [
+  {
+   "slot": "H",
+   "src": "work/hs-london-2025/award-london.webp",
+   "alt": "The London slide from the 2025 award show."
+  },
+  {
+   "slot": "P",
+   "src": "work/hs-london-2025/poster.webp",
+   "alt": "The HollyShorts London 2025 poster."
+  },
+  {
+   "slot": "P",
+   "src": "work/hs-london-2025/invite.webp",
+   "alt": "The festival invitation."
+  },
+  {
+   "slot": "W",
+   "src": "work/hs-london-2025/award-welcome.webp",
+   "alt": "The award show welcome slide."
+  },
+  {
+   "slot": "W",
+   "src": "work/hs-london-2025/award-honoree.webp",
+   "alt": "The award show honoree slide."
+  },
+  {
+   "slot": "W",
+   "src": "work/hs-london-2025/award-grand-prize.webp",
+   "alt": "The Grand Prize slide."
+  },
+  {
+   "slot": "P",
+   "src": "work/hs-london-2025/jury-1.webp",
+   "alt": "A jury graphic."
+  },
+  {
+   "slot": "P",
+   "src": "work/hs-london-2025/jury-2.webp",
+   "alt": "A second jury graphic."
+  },
+  {
+   "slot": "W",
+   "src": "work/hs-london-2025/onscreen-2.webp",
+   "alt": "On-screen graphic, landscape."
+  },
+  {
+   "slot": "P",
+   "src": "work/hs-london-2025/onscreen-1.webp",
+   "alt": "On-screen graphic, vertical."
+  },
+  {
+   "slot": "P",
+   "src": "work/hs-london-2025/schedule.webp",
+   "alt": "The festival schedule."
+  },
+  {
+   "slot": "P",
+   "src": "work/hs-london-2025/badge.webp",
+   "alt": "The festival badge."
+  }
+ ],
+ "card": {
+  "src": "images/cards/hollyshorts-london-2025-lg.webp",
+  "alt": "The HollyShorts London 2025 poster."
+ },
+ "og": "images/og/hollyshorts-london-2025.png"
+}

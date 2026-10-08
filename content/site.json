@@ -1,0 +1,57 @@
+{
+ "name": "Opmet Osserpse",
+ "domain": "opmetosserpse.com",
+ "email": "hello@opmetosserpse.com",
+ "instagram": "opmetosserpse",
+ "description": "Creative studio founded in Venice, California.",
+ "line": "Unseen, unheard.",
+ "clock_place": "Venice, California",
+ "clock_timezone": "America/Los_Angeles",
+ "copyright": "© 2026 Opmet Osserpse",
+ "privacy_line": "This site uses no cookies and no tracking.",
+ "home": {
+  "og_title": "Opmet Osserpse",
+  "og_description": "A creative studio in Venice, California: identities, key art and campaigns for festivals, films and businesses.",
+  "about": [
+   "Opmet Osserpse is a creative studio based in Venice, California.",
+   "We give ideas a form, a voice and a little sleight of hand.",
+   "Our music and sound studio is called espresso tempo.",
+   "Browse our portfolio to discover our work, visit our foundry to explore our shop, or say hi.",
+   "hello@opmetosserpse.com\n@opmetosserpse"
+  ],
+  "all_link": "Archive",
+  "links": {
+   "espresso tempo": "https://espressotempo.com/",
+   "portfolio": "#index",
+   "foundry": "/foundry",
+   "say hi": "mailto:hello@opmetosserpse.com",
+   "hello@opmetosserpse.com": "mailto:hello@opmetosserpse.com",
+   "@opmetosserpse": "https://www.instagram.com/opmetosserpse/"
+  }
+ },
+ "projects": {
+  "og_title": "Archive | Opmet Osserpse",
+  "og_description": "Every project, newest first."
+ },
+ "privacy": {
+  "og_title": "Privacy | Opmet Osserpse",
+  "og_description": "How opmetosserpse.com handles your information: no cookies, no tracking and email only when you write.",
+  "lines": [
+   "No cookies, no analytics, no tracking. Email is used only to reply.",
+   "Video and sound, where there is any, load only when they play."
+  ]
+ },
+ "notfound": {
+  "og_title": "Not found | Opmet Osserpse",
+  "line": "This page isn't here. Perhaps it's reading itself backward.",
+  "link": "Opmet Osserpse"
+ },
+ "foundry": {
+  "og_title": "Foundry | Opmet Osserpse",
+  "og_description": "The Opmet Osserpse foundry: type and things to keep. Opening soon.",
+  "lines": [
+   "The foundry opens soon, with type and things to keep.",
+   "Write to hello@opmetosserpse.com to hear when it does."
+  ]
+ }
+}
