@@ -92,11 +92,22 @@ def video_tag(src, alt, poster=None):
     pa = ' poster="%s"' % poster if poster else ''
     return '<video data-loop muted playsinline loop preload="none"%s aria-label="%s" src="%s"></video>' % (pa, esc(alt), src)
 
+def brand_svg(name, cls, label=None):
+    """Inline one of static/brand/*.svg in ink (currentColor), sized by CSS."""
+    with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'static', 'brand', name), encoding='utf-8') as f:
+        s = f.read().strip()
+    s = re.sub(r'\s(width|height)="[^"]*"', '', s, count=2)
+    s = re.sub(r'fill="#[0-9A-Fa-f]{3,6}"', 'fill="currentColor"', s)
+    a11y = 'role="img" aria-label="%s"' % label if label else 'aria-hidden="true"'
+    return s.replace('<svg ', '<svg class="%s" %s focusable="false" ' % (cls, a11y), 1)
+
+
 def page(site, title, desc, path, body, og_image=None, current=None, extra_head=''):
     url = 'https://%s%s' % (site['domain'], path)
     og = og_image or '/media/site/og.jpg'
-    # No menu bar. Inner pages carry only the name, centered, back to the cover.
-    header = '' if path == '/' else '<header class="site-header"><a class="wordmark" href="/">Opmet Osserpse</a></header>'
+    # No menu bar. Inner pages carry only the hand and the name, centered, back to the cover.
+    header = '' if path == '/' else ('<header class="site-header"><a class="lockup" href="/" aria-label="Opmet Osserpse">%s%s</a></header>'
+                                     % (brand_svg('hand-mark.svg', 'lockup-hand'), brand_svg('wordmark.svg', 'wordmark')))
     nav = header
     return '''<!doctype html>
 <html lang="en">
@@ -114,7 +125,7 @@ def page(site, title, desc, path, body, og_image=None, current=None, extra_head=
 <meta property="og:image" content="https://%(domain)s%(og)s">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="theme-color" content="#FBFBF8">
-<link rel="icon" href="/brand/hand.svg" type="image/svg+xml">
+<link rel="icon" href="/brand/hand-mark.svg" type="image/svg+xml">
 <link rel="preload" href="/fonts/libre-caslon-text/libre-caslon-text-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/fonts/instrument-sans/instrument-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/css/site.css?v=%(v)s">
@@ -258,10 +269,10 @@ def main():
         return pat.sub(sub, s).replace('\n', '<br>')
     about = ''.join('<p>%s</p>' % link(typo(x)) for x in h['about'])
     home_entries = [dict(slug=p['slug'], title=p['title'], deck=p['deck'], sector=p['sector'], year=p['year'][-4:], preview=p.get('preview')) for p in ordered]
-    body = ('<section class="cover"><h1><span class="mark" %s>%s</span><span class="name">Opmet Osserpse</span></h1></section>'
+    body = ('<section class="cover"><h1><span class="mark" %s>%s</span><span class="name">%s</span></h1></section>'
             '<section class="about">%s</section>'
             '<section class="index" id="index" aria-label="Index">%s<p class="archive"><a href="/projects/">%s</a></p></section>'
-            '<div class="preview" aria-hidden="true"><img alt=""></div>') % (moves.mark_attrs(mv), hand + mv['layers'], about, list_rows(home_entries), esc(h['all_link']))
+            '<div class="preview" aria-hidden="true"><img alt=""></div>') % (moves.mark_attrs(mv), hand + mv['layers'], brand_svg('wordmark.svg', 'wordmark', 'Opmet Osserpse'), about, list_rows(home_entries), esc(h['all_link']))
     write('/index.html', page(site, 'Opmet Osserpse', h['og_description'], '/', body, so, '/',
                               extra_head='<link rel="stylesheet" href="/css/moves.css?v=%s">\n' % site['_v']))
 

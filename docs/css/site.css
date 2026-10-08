@@ -37,7 +37,9 @@ ul{list-style:none;margin:0;padding:0}
 
 /* Inner pages: the name only, centered. No menu bar. */
 .site-header{display:flex;justify-content:center;padding:28px var(--gutter) 0}
-.wordmark{font-family:var(--serif);font-size:var(--size-m);letter-spacing:.02em;white-space:nowrap}
+.lockup{display:flex;align-items:flex-end;gap:10px;color:var(--ink)}
+.lockup-hand{display:block;height:30px;width:auto}
+.lockup .wordmark{display:block;width:118px;height:auto;margin-bottom:3px}
 main{padding:0 var(--gutter);flex:1}
 
 /* The cover: the hand and the name, alone */
@@ -46,7 +48,8 @@ main{padding:0 var(--gutter);flex:1}
 .cover .mark{position:relative;display:block;width:clamp(44px,4.6vw,70px);transform-origin:50% 96%;will-change:transform}
 .cover .hand{display:block;width:100%;height:auto}
 .cover .pose{position:absolute;left:0;top:0;width:100%;height:auto;opacity:0}
-.cover .name{font-family:var(--serif);font-size:clamp(26px,3.1vw,46px);letter-spacing:.03em;line-height:1}
+.cover .name{display:block;color:var(--ink);line-height:0}
+.cover .name .wordmark{display:block;width:clamp(200px,24vw,360px);height:auto}
 /* The hand on the cover. Each move lives in its own folder under moves/; build.py gathers them into /css/moves.css. */
 @keyframes arrive{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
 
