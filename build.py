@@ -125,11 +125,6 @@ def page(site, title, desc, path, body, og_image=None, current=None, extra_head=
 <main id="main">
 %(body)s
 </main>
-<footer class="site-footer">
-<a href="mailto:%(email)s">%(email)s</a>
-<span class="clock" data-clock data-tz="%(tz)s" data-place="%(place)s">%(place)s</span>
-<span>%(copy)s &nbsp; <a href="/privacy">Privacy</a></span>
-</footer>
 <script src="/js/site.js?v=%(v)s" defer></script>
 </body>
 </html>
