@@ -9,7 +9,7 @@
 
 :root{
   /* Off-white paper, near-black ink. One accent: none. */
-  --paper:#FBFBF8; --paper-deep:#F1F0EC; --ink:#1C1A17; --graphite:#7A756D;
+  --paper:#F7F5F0; --paper-deep:#EEEBE4; --ink:#1C1A17; --graphite:#7A756D;
   /* Two faces. When Opmet Serif ships, put it first in --serif. */
   --serif:"Libre Caslon Text",Georgia,"Times New Roman",serif;
   --sans:"Instrument Sans","Helvetica Neue",Arial,sans-serif;
@@ -37,9 +37,9 @@ ul{list-style:none;margin:0;padding:0}
 
 /* Inner pages: the name only, centered. No menu bar. */
 .site-header{display:flex;justify-content:center;padding:28px var(--gutter) 0}
-.lockup{display:flex;align-items:flex-end;gap:10px;color:var(--ink)}
-.lockup-hand{display:block;height:30px;width:auto}
-.lockup .wordmark{display:block;width:118px;height:auto;margin-bottom:3px}
+.lockup{display:flex;align-items:flex-end;gap:13px;color:var(--ink)}
+.lockup-hand{display:block;height:42px;width:auto}
+.lockup .wordmark{display:block;width:168px;height:auto;margin-bottom:4px}
 main{padding:0 var(--gutter);flex:1}
 
 /* The cover: the hand and the name, alone */

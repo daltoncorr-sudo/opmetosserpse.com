@@ -124,7 +124,7 @@ def page(site, title, desc, path, body, og_image=None, current=None, extra_head=
 <meta property="og:url" content="%(url)s">
 <meta property="og:image" content="https://%(domain)s%(og)s">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="theme-color" content="#FBFBF8">
+<meta name="theme-color" content="#F7F5F0">
 <link rel="icon" href="/brand/hand-mark.svg" type="image/svg+xml">
 <link rel="preload" href="/fonts/libre-caslon-text/libre-caslon-text-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/fonts/instrument-sans/instrument-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
