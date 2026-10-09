@@ -31,6 +31,7 @@ def typo(s):
     s = esc(s)
     s = re.sub(r'(^|[\s(\[\u2014])&#x27;', '\\1\u2018', s).replace('&#x27;', '\u2019')
     s = re.sub(r'(^|[\s(\[\u2014])&quot;', '\\1\u201c', s).replace('&quot;', '\u201d')
+    s = s.replace(' | ', '\u00a0| ')  # a bar in a title stays at the end of its line
     return s.replace('Venice, California', 'Venice,\u00a0California')  # keep the place on one line
 
 def ff(*args):
@@ -157,8 +158,8 @@ class Media:
 
 # How wide each block draws, for srcset
 # How wide each block draws, for srcset
-SIZES = {'hero': '(max-width:640px) 100vw, 76vw', 'plate': '(max-width:640px) 100vw, 60vw', 'wide': '(max-width:640px) 100vw, 76vw',
-         'pair': '(max-width:640px) 50vw, 38vw', 'full': '100vw', 'tall': '(max-width:640px) 100vw, 45vw'}
+SIZES = {'single': '(max-width:640px) 100vw, 62vw', 'row': '(max-width:640px) 50vw, 31vw', 'full': '100vw',
+         'tall': '(max-width:640px) 100vw, 46vw'}
 
 def img_tag(m, sizes, alt, eager=False, extra=''):
     src, srcset, w, h = m
@@ -282,88 +283,92 @@ def cap(x):
     return x[:1].upper() + x[1:]
 
 def credit_rows(p, notes):
-    """Credits, role then names, set with the facts at the top. Every "Dalton Corr: roles" is credited to
-    "Dalton Corr, Opmet Osserpse". The client is already a fact, so it isn't repeated. Photographers come from the notes
-    file ("photography"); until they're known, the row says [To come]. Returns the rows and whether there is a photo credit."""
+    """Credits, short: our credit as its first role ("Art direction: Dalton Corr, Opmet Osserpse"), each partner as role
+    and name, typefaces, then photography. A "credits" list in the notes file replaces the derived rows. Photographers
+    come from the notes file ("photography"); until they're known, the row says [To come]. Returns (rows, has photo)."""
     rows, photo = [], False
-    for label, names in p['credits']:
-        photo = photo or 'photo' in label.lower() or any('photo' in x.lower() for x in names)
-        if label == 'Client': continue
-        if label == 'Fonts': rows.append(('Typefaces', names)); continue
-        plain = []
-        for x in names:
-            if x.startswith('Dalton Corr: '): rows.append((cap(x[len('Dalton Corr: '):]), ['Dalton Corr, Opmet Osserpse']))
-            elif ': ' in x: who, role = x.split(': ', 1); rows.append((cap(role), [who]))
-            else: plain.append(x)
-        if plain: rows.append((label, plain))
-    if notes.get('photography'): rows.append(('Photography', notes['photography'])); photo = True
+    if notes.get('credits'):
+        rows = [(r, [n]) for r, n in notes['credits']]
+    else:
+        for label, names in p['credits']:
+            photo = photo or 'photo' in label.lower() or any('photo' in x.lower() for x in names)
+            if label == 'Client': continue
+            if label == 'Fonts': rows.append(('Typefaces', names)); continue
+            plain = []
+            for x in names:
+                if x.startswith('Dalton Corr: '):
+                    rows.append((cap(re.split(r', | and ', x[len('Dalton Corr: '):])[0]), ['Dalton Corr, Opmet Osserpse']))
+                elif ': ' in x: who, role = x.split(': ', 1); rows.append((cap(role), [who]))
+                else: plain.append(x)
+            if plain: rows.append((label, plain))
+    if notes.get('photography'): rows.append(('Photography', [', '.join(notes['photography'])])); photo = True
     elif not photo: rows.append(('Photography', None))
     return rows, photo
 
 BILLBOARD = re.compile(r'billboard', re.I)
 
 def make_blocks(items, notes):
-    """Group the items, in order, into blocks. Two pictures side by side when they sit next to each other in the same
-    gallery on daltoncorr.com and share a shape (both P, or both landscape); a billboard always has its own row; a 3D or
-    interactive piece is a block of its own. The first picture on its own, the poster on most pages, draws largest."""
+    """Group the items, in order, into blocks. Pictures from the same gallery on daltoncorr.com sit two to a row, at one
+    height, so a gallery reads as a group; outside a gallery, two P pictures in a row pair up, as before. A billboard,
+    a full bleed (H, F), a film and a 3D or interactive piece each stand alone."""
     out, i = [], 0
+    def alone(x):
+        return x['kind'] != 'img' or x['slot'] in ('H', 'F') or BILLBOARD.search(x.get('alt', ''))
     def pairable(x, y):
-        return (y and x['kind'] == y['kind'] == 'img' and x['gallery'] == y['gallery'] and x['slot'] == y['slot']
-                and x['slot'] in ('P', 'L') and not BILLBOARD.search(x.get('alt', '')) and not BILLBOARD.search(y.get('alt', '')))
+        if not y or alone(x) or alone(y) or x['gallery'] != y['gallery']: return False
+        return bool(x['gallery']) or x['slot'] == y['slot'] == 'P'
     while i < len(items):
         it = items[i]; nxt = items[i + 1] if i + 1 < len(items) else None
         grp = [it, nxt] if pairable(it, nxt) else [it]
         i += len(grp)
         note = next((notes[x['key']]['text'] for x in grp if x['key'] in notes), None)
-        if len(grp) == 2: kind = 'pair'
-        elif not out and it['kind'] != 'widget' and it['slot'] not in ('H', 'F'): kind = 'hero'
-        elif it['kind'] == 'widget': kind = 'plate' if it['name'] == 'logo-switch' else 'wide'
-        elif it['kind'] == 'video':
-            r = it['w'] / it['h']
-            kind = 'wide' if r > 1.2 else 'tall' if r < 0.83 else 'plate'
-        elif it['slot'] in ('H', 'F'): kind = 'full'
-        elif it['h'] <= it['w']: kind = 'wide'
-        else: kind = 'plate'
-        out.append(dict(kind=kind, items=grp, note=note))
+        if len(grp) == 2: kind = 'row'
+        elif it['kind'] == 'img' and it['slot'] in ('H', 'F'): kind = 'full'
+        elif it['kind'] == 'video' and it['w'] / it['h'] < 0.83: kind = 'tall'
+        else: kind = 'single'
+        prev = out[-1] if out else None  # a row that continues its gallery sits closer to the one before it
+        cont = kind == 'row' and prev and prev['kind'] == 'row' and it['gallery'] and prev['items'][0]['gallery'] == it['gallery']
+        out.append(dict(kind=kind, items=grp, note=note, cont=bool(cont)))
     return out
 
 def block_html(b, slug):
-    """A block, with its note (if it has one) set below it, at its left edge."""
+    """A block, with its note (if it has one) in the right margin, beside its top."""
     kind = b['kind']
     ms = []
-    for k, it in enumerate(b['items'], 1):
-        cls = 'm m%d' % k if kind == 'pair' else 'm'
-        if it['kind'] == 'widget': cls += ' piece'
-        ms.append('<div class="%s" data-i="%s">%s</div>' % (cls, esc(it['key']), it['html'](SIZES[kind])))
+    for it in b['items']:
+        cls = 'm' + (' piece' if it['kind'] == 'widget' else '')
+        grow = ' style="flex-grow:%.4f"' % (it['w'] / it['h']) if kind == 'row' else ''
+        ms.append('<div class="%s" data-i="%s"%s>%s</div>' % (cls, esc(it['key']), grow, it['html'](SIZES[kind])))
+    media = '<div class="row">%s</div>' % ''.join(ms) if kind == 'row' else ''.join(ms)
     cap_ = typo(b['note']) if b['note'] else ''
     for it in b['items']:
         if it['kind'] == 'video':
             if it['sound']: cap_ += ' <a href="#" class="again" data-sound="%s">Play with sound</a>' % it['id']
             cap_ += ' <a href="#" class="again" data-again="%s" hidden>Play again</a>' % it['id']
     cap_ = cap_.strip()
-    if kind == 'full':  # a full bleed has no grid of its own: its note sits in one, under it
+    if kind == 'full':  # a full bleed has no grid of its own: its note sits in one, under it, in the right margin
         fc = '<figcaption class="g fcap"><span class="note">%s</span></figcaption>' % cap_ if cap_ else ''
-    else:
-        fc = '<figcaption class="note">%s</figcaption>' % cap_ if cap_ else ''
-    return '<figure class="b%s b-%s"%s>%s%s</figure>' % ('' if kind == 'full' else ' g', kind, ' data-read' if cap_ else '', ''.join(ms), fc)
+        return '<figure class="b b-full"%s>%s%s</figure>' % (' data-read' if cap_ else '', media, fc)
+    fc = '<figcaption class="note">%s</figcaption>' % cap_ if cap_ else ''
+    return '<figure class="b g b-%s%s"%s>%s%s</figure>' % (kind, ' b-cont' if b.get('cont') else '', ' data-read' if cap_ else '', media, fc)
 
-def project_body(p, blocks, chapters, notes, back='Back', all_work='All work', top='Back to top'):
-    """The opening (title; under it the paragraph, and the facts and credits), then the work in up to four chapters,
-    then the way out: back to the top, or to all the work. No next project."""
+def project_body(p, blocks, chapters, notes, back='Back', home='Home', all_work='All work', top='Back to top'):
+    """Back and Home under the name; the title; under it the paragraph, and one list of facts and credits. Then the
+    work, centered, with chapter labels in the left margin and notes in the right one. At the end: Back to top and
+    All work. No next project."""
     facts = [('Client', typo(p['client'])), ('Year', esc(p['year']))]
     if notes.get('work'): facts.append(('Work', typo(notes['work'])))
     facts.append(('Role', typo(p['role'])))
     if p['links']:
         t, u = p['links'][0]; facts.append(('Link', '<a href="%s" rel="noopener">%s</a>' % (esc(u), typo(t))))
     rows, _ = credit_rows(p, notes)
-    credits = ''.join('<div><dt>%s</dt><dd>%s</dd></div>' % (typo(r), '<br>'.join(typo(x) for x in names) if names else '<span class="ph">[To come]</span>')
-                      for r, names in rows)
+    credits = [(typo(r), ', '.join(typo(x) for x in names) if names else '<span class="ph">[To come]</span>') for r, names in rows]
+    dl = lambda xs, cls: '<dl class="%s">%s</dl>' % (cls, ''.join('<div><dt>%s</dt><dd>%s</dd></div>' % x for x in xs))
     # data-page-only: a page with a 3D or interactive piece opens as its own page from home, so its scripts run
     out = ['<div class="pp"%s>' % (' data-page-only' if p.get('_scripts') else ''),
-           '<section class="open g"><p class="pback"><a href="/#work" data-back>%s</a></p><h1>%s</h1><p class="lede">%s</p>'
-           '<dl class="facts">%s</dl><div class="credits"><h2 class="lab">Credits</h2><dl class="cr">%s</dl></div></section>' % (
-               esc(back), typo(p['title']), typo(notes.get('lede') or p['lede']),
-               ''.join('<div><dt>%s</dt><dd>%s</dd></div>' % x for x in facts), credits)]
+           '<nav class="pnav" aria-label="Back"><a href="/#work" data-back>%s</a><a href="/">%s</a></nav>' % (esc(back), esc(home)),
+           '<section class="open g"><h1>%s</h1><p class="lede">%s</p><div class="info">%s%s</div></section>' % (
+               typo(p['title']), typo(notes.get('lede') or p['lede']), dl(facts, 'facts'), dl(credits, 'cr'))]
     starts = {c['starts_at']: c for c in chapters}
     open_ch, n = False, 0
     for b in blocks:
@@ -371,8 +376,9 @@ def project_body(p, blocks, chapters, notes, back='Back', all_work='All work', t
         if c:
             if open_ch: out.append('</section>')
             n += 1; open_ch = True
-            out.append('<section class="ch" aria-label="%s"><div class="chl g"><h2 class="chap"><span class="n">%d</span>%s</h2></div>'
-                       % (esc(c['label']), n, typo(c['label'])))
+            # the label sits in the left margin beside its first block; above it, on its own line, when that block is a full bleed
+            out.append('<section class="ch%s" aria-label="%s"><div class="chl g"><h2 class="chap"><span class="n">%d</span>%s</h2></div>'
+                       % (' ch-full' if b['kind'] == 'full' else '', esc(c['label']), n, typo(c['label'])))
         out.append(block_html(b, p['slug']))
     if open_ch: out.append('</section>')
     out.append('<nav class="g pfoot" aria-label="More"><a href="#main" data-totop>%s</a><a href="/#archive">%s</a></nav>' % (esc(top), esc(all_work)))
@@ -530,9 +536,9 @@ def main():
             p.setdefault('_bigs', []).append(r[0])
         blocks = make_blocks(items, notes['notes'])
         chapters = notes['chapters'] if len(items) >= 8 else []
-        starts = {b['items'][0]['key'] for b in blocks}
-        bad = [c['label'] for c in chapters if c['starts_at'] not in starts]
-        if bad: sys.exit('Fix content/notes/%s.json first:\n  chapter %s must start on the first item of a block' % (s, ', '.join(bad)))
+        # a chapter starts at the block that holds its first picture (a picture may sit second in a row)
+        first_of = {x['key']: b['items'][0]['key'] for b in blocks for x in b['items']}
+        chapters = [dict(c, starts_at=first_of.get(c['starts_at'], c['starts_at'])) for c in chapters]
         p['_blocks'], p['_chapters'], p['_items'] = blocks, chapters, items
         p['_scripts'] = [n for x in items if x['kind'] == 'widget' for n in x['scripts']]
         used_scripts |= set(p['_scripts'])
@@ -571,7 +577,7 @@ def main():
                 for n, rel in enumerate(bigs, 1):
                     full = os.path.join(DIST, rel.lstrip('/'))
                     z.write(full, '%s-%02d%s' % (s, n, os.path.splitext(full)[1]))
-        body = project_body(p, p['_blocks'], p['_chapters'], p['_notes'], site['project_back'], site['project_all'], site['project_top'])
+        body = project_body(p, p['_blocks'], p['_chapters'], p['_notes'], site['project_back'], site['back'], site['project_all'], site['project_top'])
         head = ''
         if p['_scripts']:  # a page with a 3D or interactive piece: its styles and scripts, in order
             head = '<link rel="stylesheet" href="/css/work.css?v=%s">\n' % site['_v'] + ''.join(
