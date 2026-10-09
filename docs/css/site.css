@@ -164,7 +164,8 @@ html:not(.js) .stage:has(#about:target){transform:translateX(-66.6667%)}
 /* site.js sizes the column to its widest row (all projects, tags included) so it sits centered; this measures it */
 .works.measuring{width:max-content}.works.measuring .work-row{display:flex!important}.works.measuring .work-row{flex-wrap:nowrap}
 .work:focus{outline:none}
-.work-head{display:flex;align-items:baseline;gap:var(--s3);margin:0 0 var(--s4)}
+.work-head{display:flex;flex-wrap:wrap;align-items:baseline;gap:0 var(--s3);margin:0 0 var(--s4)}
+.work-head>*{white-space:nowrap}  /* the label and its options never break mid-phrase; site.js widens the column to fit them */
 .work-label{font:400 clamp(24px,2.3vw,34px)/1.15 var(--serif);margin:0}
 .archive-toggle{font:italic 400 clamp(17px,1.35vw,20px)/1.4 var(--serif);letter-spacing:.01em;color:var(--ink);background:none;border:0;padding:0;cursor:pointer;transition:color var(--t) var(--ease)}
 .archive-toggle:hover{color:var(--graphite)}

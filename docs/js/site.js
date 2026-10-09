@@ -223,9 +223,9 @@
     });
     // Center the column on its content: as wide as the widest row of the full list, tags included
     L.fit = function () {
-      L.list.classList.add('measuring');
-      var w = Math.ceil(L.list.getBoundingClientRect().width);
-      L.list.classList.remove('measuring');
+      L.list.classList.add('measuring'); L.head.style.width = 'max-content';
+      var w = Math.ceil(Math.max(L.list.getBoundingClientRect().width, L.head.getBoundingClientRect().width));
+      L.list.classList.remove('measuring'); L.head.style.width = '';
       section.style.setProperty('--work-w', w + 'px');
     };
     L.fit();
@@ -234,6 +234,11 @@
     return L;
   }
 
+  // Focus that follows a click lands quietly (no ring); after a key press the ring shows, for keyboard users
+  var byKey = false;
+  document.addEventListener('keydown', function () { byKey = true; }, true);
+  document.addEventListener('pointerdown', function () { byKey = false; }, true);
+  var place = function (el) { el.focus({ preventScroll: true, focusVisible: byKey }); };
   var articles = $('#articles') && List($('#articles'), { wait: true, glideHead: true });
   if (!stage) return;
   root.classList.add('js');
@@ -261,8 +266,8 @@
     // Leaving the blog: once the slide has finished, empty the article slot, so the next visit starts at the list
     if (articles && name === 'blog') { clearTimeout(blogReset); resetBlog(); }
     if (articles && was === 'blog' && name !== 'blog') { document.title = homeTitle; blogReset = setTimeout(resetBlog, instant ? 0 : slideMs); }
-    if (name) { panels[name].scrollTop = 0; $('[data-studio]', panels[name]).focus({ preventScroll: true }); }
-    else if (was && animate) { var l = $('[data-go="' + was + '"]'); if (l) l.focus({ preventScroll: true }); }
+    if (name) { panels[name].scrollTop = 0; place($('[data-studio]', panels[name])); }
+    else if (was && animate) { var l = $('[data-go="' + was + '"]'); if (l) place(l); }
   }
   function closePanel() {
     // From an article, step back over its entries too (and the blog's own, if this visit added it)
@@ -311,7 +316,7 @@
     e.preventDefault();
     history.replaceState(history.state, '', location.pathname + location.search);
     window.scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' });
-    var w = $('[data-go="work"]'); if (w) w.focus({ preventScroll: true });
+    var w = $('[data-go="work"]'); if (w) place(w);
   });
 
   // A project opens as a screen below home. Its page is fetched once, its content dropped into the panel, and the view
@@ -335,13 +340,13 @@
     root.classList.toggle('is-locked', open);
     ppOpen = open; pp.inert = !open; home.inert = open;
     if (instant) { void pp.offsetWidth; stage.classList.remove('no-anim'); pp.classList.remove('no-anim'); }
-    if (open) { var b = $('[data-back]', pp); if (b) b.focus({ preventScroll: true }); }
+    if (open) { var b = $('[data-back]', pp); if (b) place(b); }
     else {
       document.title = homeTitle;
       if (list.classList.contains('is-open') && location.hash !== '#archive') history.replaceState(history.state, '', location.pathname + location.search + '#archive');
       var r = work.getBoundingClientRect();
       if (r.bottom < 0 || r.top > innerHeight) centerWork(false);  // back onto the work list, wherever the project came from
-      if (ppFrom && animate) ppFrom.focus({ preventScroll: true });
+      if (ppFrom && animate) place(ppFrom);
     }
   }
   function openProject(slug, animate, push) {
