@@ -12,9 +12,9 @@ CHECKS = [(r'\bAI\b', 'the word "AI"'), (r'\bvibes?\b', '"vibes"'), (r'Opmetosse
 
 # Bracketed placeholders, like "[Name to come]": flagged in a normal build, let through in a drafts build
 # (build.py --drafts marks the home page with <meta name="drafts">). Image panels marked data-placeholder are
-# placeholders by design until the photographs exist, and Opmet Serif's price is still to come.
+# placeholders by design until the photographs exist.
 BRACKETS = r'\[[A-Z][^\]<>\n]{0,60}\]'
-ALLOWED = {'[Price]'}
+ALLOWED = set()
 
 problems = []
 if not os.path.isdir(D):
