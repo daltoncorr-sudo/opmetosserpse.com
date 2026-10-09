@@ -117,19 +117,135 @@
   setTimeout(function () { play(first); setInterval(function () { play(); }, every); }, delay);
 })();
 
-// Home: the side panels (foundry to the left, About to the right), the Work link, the list that opens in place,
-// and the project hover hook.
+// Home: the side panels (foundry to the left, About to the right, the blog above), the Work link, the two lists that
+// open in place (work and blog), projects and articles, and the project hover hook.
 (function () {
   var stage = document.querySelector('[data-stage]');
-  if (!stage) return;
   var root = document.documentElement;
-  root.classList.add('js');
   var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
   var $ = function (s, el) { return (el || document).querySelector(s); };
   var $$ = function (s, el) { return Array.prototype.slice.call((el || document).querySelectorAll(s)); };
+
+  // One list, two uses: the work list below home and the blog list above it. Collapsed, only the Selected rows show; See
+  // more opens the rest in place, and on the blog it also reveals topics that filter the rows. Every change runs in three
+  // steps, transform and opacity only: rows that leave fade out, rows that stay glide to their new places (measured first
+  // and last), and rows that arrive fade in one after another between them.
+  //   o.address(state): keeps the address in step (the work list's #archive)
+  //   o.wait: ignore clicks while a change is running (the blog)
+  //   o.glideHead: the head glides too (the blog's list is anchored to the bottom of its screen, so its head moves)
+  function List(section, o) {
+    var L = { section: section, list: $('.works', section), toggle: $('.archive-toggle', section), label: $('.work-label', section),
+              head: $('.work-head', section), topics: $('.blog-topics', section), live: $('[data-count]', section),
+              timer: 0, busy: false, state: { open: false, topic: 'All' }, years: {} };
+    L.rows = $$('.work-row', L.list);
+    $$('.yr', L.list).forEach(function (y) { L.years[y.textContent] = y; });
+    var tops = function (els) { return els.map(function (r) { return r.getBoundingClientRect().top; }); };
+    var moving = function (els) { return o.glideHead ? els.concat([L.head]) : els; };
+    L.shows = function (r, st) {
+      if (!st.open) return !r.classList.contains('extra');
+      return st.topic === 'All' || (r.getAttribute('data-tags') || '').split('|').indexOf(st.topic) >= 0;
+    };
+    function glide(els, before) {
+      var after = tops(els);
+      els.forEach(function (r, n) { r.classList.remove('glide'); r.style.transform = 'translateY(' + (before[n] - after[n]) + 'px)'; });
+      void L.list.offsetWidth;
+      els.forEach(function (r) { r.classList.add('glide'); r.style.transform = ''; });
+    }
+    L.clean = function () {
+      L.rows.concat(o.glideHead ? [L.head] : [], L.topics ? [L.topics] : []).forEach(function (r) { r.classList.remove('glide', 'rise', 'go', 'fall'); r.style.transform = ''; });
+    };
+    // The year in the margin sits on the first showing row of its year
+    function years(animate) {
+      var first = {};
+      L.rows.forEach(function (r) { var y = r.getAttribute('data-year'); if (y && !first[y] && L.shows(r, L.state)) first[y] = r; });
+      Object.keys(L.years).forEach(function (y) {
+        var span = L.years[y], r = first[y];
+        if (!r || span.parentNode === r) return;
+        r.insertBefore(span, r.firstChild);
+        if (animate) { span.classList.add('moved'); void span.offsetWidth; span.classList.remove('moved'); }
+      });
+    }
+    function apply(st, animate) {
+      L.state = st;
+      L.list.classList.toggle('is-open', st.open);
+      if (L.topics) {
+        L.topics.hidden = !st.open;
+        L.rows.forEach(function (r) { r.classList.toggle('out', !L.shows(r, st)); });
+        years(animate);
+      }
+    }
+    L.set = function (st, animate) {
+      var was = L.state;
+      if (st.open === was.open && st.topic === was.topic) return;
+      clearTimeout(L.timer); L.clean();
+      L.toggle.setAttribute('aria-expanded', st.open);
+      L.toggle.textContent = L.toggle.getAttribute(st.open ? 'data-close-label' : 'data-open-label');
+      L.label.textContent = L.label.getAttribute(st.open ? 'data-open' : 'data-closed');
+      if (L.topics) $$('button', L.topics).forEach(function (b) { b.setAttribute('aria-pressed', b.getAttribute('data-topic') === st.topic); });
+      if (o.address) o.address(st);
+      var leaving = L.rows.filter(function (r) { return L.shows(r, was) && !L.shows(r, st); }),
+          arriving = L.rows.filter(function (r) { return !L.shows(r, was) && L.shows(r, st); }),
+          staying = moving(L.rows.filter(function (r) { return L.shows(r, was) && L.shows(r, st); }));
+      var topicsIn = L.topics && st.open && !was.open, topicsOut = L.topics && !st.open && was.open;
+      if (L.live) {
+        var n = L.rows.filter(function (r) { return L.shows(r, st); }).length;
+        L.live.textContent = n + ' ' + L.live.getAttribute(n === 1 ? 'data-one' : 'data-many');
+      }
+      if (!animate || reduce) { apply(st, false); L.busy = false; return; }
+      L.busy = true;
+      var settle = function () {
+        var before = tops(staying);
+        arriving.forEach(function (r, n) { r.style.setProperty('--i', n); r.classList.add('rise'); });
+        if (topicsIn) L.topics.classList.add('rise');
+        apply(st, true);
+        leaving.forEach(function (r) { r.classList.remove('fall'); });
+        if (topicsOut) L.topics.classList.remove('fall');
+        glide(staying, before);
+        arriving.forEach(function (r) { r.classList.add('go'); });
+        if (topicsIn) L.topics.classList.add('go');
+        // the glide takes --open (.7s); the last arrival starts at 160ms + 14ms a row and takes .5s
+        L.timer = setTimeout(function () { L.clean(); L.busy = false; }, Math.max(700, arriving.length ? 660 + 14 * arriving.length : 0) + 100);
+      };
+      if (leaving.length || topicsOut) {
+        leaving.forEach(function (r) { r.classList.add('fall'); });
+        if (topicsOut) L.topics.classList.add('fall');
+        L.timer = setTimeout(settle, 250);
+      } else settle();
+    };
+    L.toggle.addEventListener('click', function () {
+      if (o.wait && L.busy) return;
+      L.set({ open: !L.state.open, topic: 'All' }, true);  // See less also resets the topic to All
+    });
+    if (L.topics) L.topics.addEventListener('click', function (e) {
+      var b = e.target.closest('button[data-topic]');
+      if (!b || L.busy) return;
+      L.set({ open: true, topic: b.getAttribute('data-topic') }, true);
+    });
+    // Center the column on its content: as wide as the widest row of the full list, tags included
+    L.fit = function () {
+      L.list.classList.add('measuring'); L.head.style.width = 'max-content';
+      var w = Math.ceil(Math.max(L.list.getBoundingClientRect().width, L.head.getBoundingClientRect().width));
+      L.list.classList.remove('measuring'); L.head.style.width = '';
+      section.style.setProperty('--work-w', w + 'px');
+    };
+    L.fit();
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(L.fit);
+    var rt; window.addEventListener('resize', function () { clearTimeout(rt); rt = setTimeout(L.fit, 150); });
+    return L;
+  }
+
+  // Focus that follows a click lands quietly (no ring); after a key press the ring shows, for keyboard users
+  var byKey = false;
+  document.addEventListener('keydown', function () { byKey = true; }, true);
+  document.addEventListener('pointerdown', function () { byKey = false; }, true);
+  var place = function (el) { el.focus({ preventScroll: true, focusVisible: byKey }); };
+  var articles = $('#articles') && List($('#articles'), { wait: true, glideHead: true });
+  if (!stage) return;
+  root.classList.add('js');
   var home = $('[data-home]'), panels = { foundry: $('#foundry'), about: $('#about'), blog: $('#blog') };
   var url = function (hash) { return location.pathname + location.search + (hash || ''); };
   var current = '', pushed = false;  // pushed: this visit added the panel's entry, so closing can step back over it
+  var leaving = false, homeTitle = document.title;  // leaving: Home or Esc is stepping back through history to the cover
 
   // A panel slides in from its side (transform only); its name goes in the address. Back, Esc and Studio slide home.
   function setPanel(name, animate) {
@@ -147,11 +263,17 @@
     Object.keys(panels).forEach(function (k) { panels[k].inert = k !== name; });
     home.inert = !!name;
     if (instant) { void stage.offsetWidth; stage.classList.remove('no-anim'); }
-    if (name) { panels[name].scrollTop = 0; $('[data-studio]', panels[name]).focus({ preventScroll: true }); }
-    else if (was && animate) { var l = $('[data-go="' + was + '"]'); if (l) l.focus({ preventScroll: true }); }
+    // Leaving the blog: once the slide has finished, empty the article slot, so the next visit starts at the list
+    if (articles && name === 'blog') { clearTimeout(blogReset); resetBlog(); }
+    if (articles && was === 'blog' && name !== 'blog') { document.title = homeTitle; blogReset = setTimeout(resetBlog, instant ? 0 : slideMs); }
+    if (name) { panels[name].scrollTop = 0; place($('[data-studio]', panels[name])); }
+    else if (was && animate) { var l = $('[data-go="' + was + '"]'); if (l) place(l); }
   }
   function closePanel() {
-    if (pushed) history.back();  // popstate slides it home
+    // From an article, step back over its entries too (and the blog's own, if this visit added it)
+    var steps = (current === 'blog' && history.state && history.state.depth) || 0;
+    if (pushed) steps += 1;
+    if (steps) { leaving = true; history.go(-steps); }  // popstate slides it home
     else { history.replaceState(null, '', url()); setPanel('', true); }
   }
   ['foundry', 'about', 'blog'].forEach(function (name) {
@@ -184,67 +306,23 @@
     });
   });
 
-  // The list opens in place: the rows already showing glide apart to their new places while the rest fade in
-  // between them. Closing fades the extras out, then the rest glide back together. Transform and opacity only.
-  var list = $('#works'), toggle = $('.archive-toggle'), label = $('.work-label'), rows = $$('.work-row', list), extras = $$('.extra', list), timer = 0;
-  var tops = function (els) { return els.map(function (r) { return r.getBoundingClientRect().top; }); };
-  function glide(els, before) {
-    var after = tops(els);
-    els.forEach(function (r, n) { r.classList.remove('glide'); r.style.transform = 'translateY(' + (before[n] - after[n]) + 'px)'; });
-    void list.offsetWidth;
-    els.forEach(function (r) { r.classList.add('glide'); r.style.transform = ''; });
-  }
-  function clean() { rows.forEach(function (r) { r.classList.remove('glide', 'rise', 'go', 'fall'); r.style.transform = ''; }); }
-  function setOpen(open, animate) {
-    if (open === list.classList.contains('is-open')) return;
-    clearTimeout(timer); clean();
-    toggle.setAttribute('aria-expanded', open);
-    toggle.textContent = toggle.getAttribute(open ? 'data-close-label' : 'data-open-label');
-    label.textContent = label.getAttribute(open ? 'data-open' : 'data-closed');
-    history.replaceState(history.state, '', url(open ? '#archive' : (location.hash === '#archive' ? '#work' : location.hash)));
-    var kept = rows.filter(function (r) { return !r.classList.contains('extra'); });
-    if (!animate || reduce) { list.classList.toggle('is-open', open); return; }
-    if (open) {
-      var before = tops(kept);
-      extras.forEach(function (r) { r.classList.add('rise'); });
-      list.classList.add('is-open');
-      glide(kept, before);
-      extras.forEach(function (r) { r.classList.add('go'); });
-      timer = setTimeout(clean, 1400);
-    } else {
-      extras.forEach(function (r) { r.classList.add('fall'); });
-      timer = setTimeout(function () {
-        var before = tops(kept);
-        list.classList.remove('is-open'); clean();
-        glide(kept, before);
-        timer = setTimeout(clean, 800);
-      }, 250);
-    }
-  }
-  toggle.addEventListener('click', function () { setOpen(!list.classList.contains('is-open'), true); });
+  // The work list opens in place; See more puts #archive in the address, See less takes it out
+  var list = $('#works'), workList = List(work, { address: function (st) {
+    history.replaceState(history.state, '', url(st.open ? '#archive' : (location.hash === '#archive' ? '#work' : location.hash)));
+  } }), rows = workList.rows;
+  var setOpen = function (open, animate) { workList.set({ open: open, topic: 'All' }, animate); };
   // Home, beside See more: up to the top of home, focus on the Work option
   $('[data-top]').addEventListener('click', function (e) {
     e.preventDefault();
     history.replaceState(history.state, '', location.pathname + location.search);
     window.scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' });
-    var w = $('[data-go="work"]'); if (w) w.focus({ preventScroll: true });
+    var w = $('[data-go="work"]'); if (w) place(w);
   });
-
-  // Center the column on its content: as wide as the widest row of the full list, tags included
-  function fit() {
-    list.classList.add('measuring');
-    var w = Math.ceil(list.getBoundingClientRect().width);
-    list.classList.remove('measuring');
-    work.style.setProperty('--work-w', w + 'px');
-  }
-  fit();
-  if (document.fonts && document.fonts.ready) document.fonts.ready.then(fit);
-  var rt; window.addEventListener('resize', function () { clearTimeout(rt); rt = setTimeout(fit, 150); });
 
   // A project opens as a screen below home. Its page is fetched once, its content dropped into the panel, and the view
   // slides down to it; Back, Esc or the browser's back button slide up to the list exactly as it was. The address is the
   // project's own, so a reload or a shared link simply opens the project page.
-  var pp = $('#project'), ppInner = $('.project-inner', pp), ppOpen = false, ppPushed = false, ppFrom = null, cache = {}, homeTitle = document.title;
+  var pp = $('#project'), ppInner = $('.project-inner', pp), ppOpen = false, ppPushed = false, ppFrom = null, cache = {};
   pp.inert = true;
   var projectOf = function (u) { var m = u && new URL(u, location.href).pathname.match(/^\/projects\/([^\/]+)$/); return m && m[1]; };
   function fetchProject(slug) {
@@ -262,13 +340,13 @@
     root.classList.toggle('is-locked', open);
     ppOpen = open; pp.inert = !open; home.inert = open;
     if (instant) { void pp.offsetWidth; stage.classList.remove('no-anim'); pp.classList.remove('no-anim'); }
-    if (open) { var b = $('[data-back]', pp); if (b) b.focus({ preventScroll: true }); }
+    if (open) { var b = $('[data-back]', pp); if (b) place(b); }
     else {
       document.title = homeTitle;
       if (list.classList.contains('is-open') && location.hash !== '#archive') history.replaceState(history.state, '', location.pathname + location.search + '#archive');
       var r = work.getBoundingClientRect();
       if (r.bottom < 0 || r.top > innerHeight) centerWork(false);  // back onto the work list, wherever the project came from
-      if (ppFrom && animate) ppFrom.focus({ preventScroll: true });
+      if (ppFrom && animate) place(ppFrom);
     }
   }
   function openProject(slug, animate, push) {
@@ -314,6 +392,85 @@
     r.addEventListener('focusout', function (e) { if (!r.contains(e.relatedTarget)) fire('project:leave'); });
   });
 
+  // The blog: an article opens above the list. Its page is fetched once and its <article> dropped into the slot, with the
+  // panel's scroll corrected so the list doesn't move; then the panel scrolls up to the article's first line. Reading
+  // to the end brings you back to the list, which simply follows the article. The address is the article's own.
+  var blogPanel = panels.blog, slot = $('[data-article]', blogPanel), shown = null, articleCache = {}, blogReset = 0;
+  var cssVar = function (n) { return getComputedStyle(root).getPropertyValue(n); };
+  var slideMs = parseFloat(cssVar('--slide')) * 1000 || 900;
+  var curve = (cssVar('--slide-ease').match(/-?[\d.]+/g) || [.65, 0, .35, 1]).map(Number);
+  // The stage's curve, for scrolling (native smooth scrolling can't take one): solve x(s) = t, return y(s)
+  function ease(t) {
+    var lo = 0, hi = 1, u = t, b = function (s, p1, p2) { return 3 * (1 - s) * (1 - s) * s * p1 + 3 * (1 - s) * s * s * p2 + s * s * s; };
+    for (var i = 0; i < 24; i++) { u = (lo + hi) / 2; if (b(u, curve[0], curve[2]) < t) lo = u; else hi = u; }
+    return b(u, curve[1], curve[3]);
+  }
+  var raf = 0;
+  function scrollPanel(to, done) {
+    cancelAnimationFrame(raf);
+    to = Math.max(0, Math.min(to, blogPanel.scrollHeight - blogPanel.clientHeight));
+    var from = blogPanel.scrollTop, t0 = performance.now();
+    if (reduce || Math.abs(to - from) < 1) { blogPanel.scrollTop = to; if (done) done(); return; }
+    (function step(now) {
+      var p = Math.min(1, (now - t0) / slideMs);
+      blogPanel.scrollTop = from + (to - from) * ease(p);
+      if (p < 1) raf = requestAnimationFrame(step); else if (done) done();
+    })(t0);
+  }
+  if (blogPanel) ['wheel', 'touchstart'].forEach(function (ev) { blogPanel.addEventListener(ev, function () { cancelAnimationFrame(raf); }, { passive: true }); });
+  // Change what's above the list without moving the list: measure its head before and after, and scroll by the difference
+  function holdList(change) {
+    var head = $('.work-head', blogPanel), y = head.getBoundingClientRect().top;
+    change();
+    blogPanel.scrollTop += head.getBoundingClientRect().top - y;
+  }
+  function markRow(slug) {
+    articles.rows.forEach(function (r) {
+      var on = r.getAttribute('data-slug') === slug, a = $('a', r);
+      r.classList.toggle('is-current', on);
+      if (on) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current');
+    });
+  }
+  var articleOf = function (u) { var m = u && new URL(u, location.href).pathname.match(/^\/blog\/([^\/]+)$/); return m && m[1]; };
+  function fetchArticle(slug) {
+    if (articleCache[slug]) return Promise.resolve(articleCache[slug]);
+    return fetch('/blog/' + slug).then(function (r) { if (!r.ok) throw new Error(r.status); return r.text(); }).then(function (t) {
+      var d = new DOMParser().parseFromString(t, 'text/html');
+      return (articleCache[slug] = { html: d.querySelector('article').outerHTML, title: d.title });
+    });
+  }
+  function showArticle(slug, push) {
+    return fetchArticle(slug).then(function (a) {
+      if (current !== 'blog') return;
+      holdList(function () { slot.innerHTML = a.html; });
+      if (push) history.pushState({ article: slug, depth: ((history.state && history.state.depth) || 0) + 1 }, '', '/blog/' + slug);
+      shown = slug; document.title = a.title; markRow(slug);
+      $('h1', slot).focus({ preventScroll: true });
+      scrollPanel(slot.getBoundingClientRect().top - blogPanel.getBoundingClientRect().top + blogPanel.scrollTop);
+    }).catch(function () { location.href = '/blog/' + slug; });
+  }
+  // Back from an article: down to the list, then the article goes and the list stays exactly where it is
+  function hideArticle() {
+    if (!shown) return;
+    shown = null;
+    scrollPanel(blogPanel.scrollHeight - blogPanel.clientHeight, function () {
+      if (shown) return;  // another article opened meanwhile
+      holdList(function () { slot.innerHTML = ''; });
+      markRow(null); document.title = homeTitle;
+    });
+  }
+  function resetBlog() {
+    if (!articles) return;
+    cancelAnimationFrame(raf);
+    slot.innerHTML = ''; shown = null; markRow(null); blogPanel.scrollTop = 0;
+  }
+  if (articles) articles.list.addEventListener('click', function (e) {
+    var a = e.target.closest('.work-row a');
+    if (!a || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button) return;
+    var slug = articleOf(a.href); if (!slug) return;
+    e.preventDefault(); showArticle(slug, true);
+  });
+
   // Arriving at #foundry (or #foundry/<id>) or #about opens that panel at once; #archive opens the list at once
   function sync(first) {
     var h = location.hash.slice(1).split(/[\/?]/)[0];  // #foundry/<id> is the foundry with a product open, #foundry?digital filtered
@@ -324,7 +481,13 @@
   sync(true);
   if (location.hash === '#archive') work.scrollIntoView();
   if (location.hash === '#work') { centerWork(false); window.addEventListener('load', function () { centerWork(false); }); }
-  window.addEventListener('popstate', function () { pushed = false; sync(false); });
+  window.addEventListener('popstate', function () {
+    if (leaving) { leaving = false; pushed = false; if (location.hash || articleOf(location.href)) history.replaceState(null, '', '/'); setPanel('', true); return; }
+    var slug = articles && articleOf(location.href);
+    if (slug) { if (current !== 'blog') setPanel('blog', true); if (slug !== shown) showArticle(slug, false); return; }  // forward onto an article
+    if (articles && current === 'blog' && location.hash === '#blog') { hideArticle(); return; }  // back from an article, to the list
+    pushed = false; sync(false);
+  });
 })();
 
 // Back to top, at the end of a project: in the panel it scrolls the panel, on a project page the page; focus goes to Back

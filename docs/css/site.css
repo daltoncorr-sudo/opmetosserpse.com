@@ -93,11 +93,19 @@ main{padding:0 var(--gutter);flex:1}
 html:not(.js) .stage:has(#blog:target){transform:translate(-33.3333%,100vh)}
 /* The blog: one screen above home. While it's open the page holds still. */
 .home-panel{position:relative}
-.blog-panel{position:absolute;left:calc(var(--gutter) * -1);right:calc(var(--gutter) * -1);top:-100vh;height:100vh;padding:0 var(--gutter);overflow-y:auto;overscroll-behavior:contain}
+.blog-panel{position:absolute;left:0;right:0;top:-100vh;height:100vh;padding:0 var(--gutter);overflow-y:auto;overscroll-behavior:contain}
 html.is-locked{overflow:hidden}
 .blog-inner{padding:12vh clamp(8px,calc(4vw - var(--gutter)),56px) 14vh}
 .blog-body{font:400 clamp(18px,1.55vw,23px)/1.5 var(--serif);max-width:34em}
 .blog-body p{margin:0}
+/* With posts, the list is one screen, centered on it. An article opens above; reading to its end brings the list back
+   to the middle of the screen. The same in both states, so the list never moves when an article comes or goes. */
+.blog-list{display:flex;flex-direction:column;justify-content:center;min-height:100vh;padding:calc(var(--s6) * 2) 0}
+.blog-article{display:flow-root}  /* keeps the title's margin inside, so scrolling to the article lands above its title */
+.article-head h1:focus{outline:none}
+.article-body{max-width:var(--measure);margin:0 auto;font:400 19px/1.6 var(--serif)}
+.article-body p{margin:0 0 1.2em}
+@media (max-width:599px){.article-body{font-size:18px}}
 html:not(.js) .stage:has(#foundry:target){transform:none}
 html:not(.js) .stage:has(#about:target){transform:translateX(-66.6667%)}
 .panel{flex:none;width:33.3333%;padding:0 var(--gutter)}
@@ -154,11 +162,14 @@ html:not(.js) .stage:has(#about:target){transform:translateX(-66.6667%)}
 }
 
 /* Work: one list on a grid (title, tags, year). Collapsed, only the Selected rows show; See more opens the rest in place. */
-.work{width:min(var(--work-w,44rem),100%);margin:0 auto;padding:var(--s6) 0 50vh;scroll-margin-top:0}
+/* The blog list (.blog-list) is the same list, above home. */
+.work,.blog-list{width:min(var(--work-w,44rem),100%);margin:0 auto}
+.work{padding:var(--s6) 0 50vh;scroll-margin-top:0}
 /* site.js sizes the column to its widest row (all projects, tags included) so it sits centered; this measures it */
-.works.measuring{width:max-content}.works.measuring .extra{display:flex!important}.works.measuring .work-row{flex-wrap:nowrap}
+.works.measuring{width:max-content}.works.measuring .work-row{display:flex!important}.works.measuring .work-row{flex-wrap:nowrap}
 .work:focus{outline:none}
-.work-head{display:flex;align-items:baseline;gap:var(--s3);margin:0 0 var(--s4)}
+.work-head{display:flex;flex-wrap:wrap;align-items:baseline;gap:0 var(--s3);margin:0 0 var(--s4)}
+.work-head>*{white-space:nowrap}  /* the label and its options never break mid-phrase; site.js widens the column to fit them */
 .work-label{font:400 clamp(24px,2.3vw,34px)/1.15 var(--serif);margin:0}
 .archive-toggle{font:italic 400 clamp(17px,1.35vw,20px)/1.4 var(--serif);letter-spacing:.01em;color:var(--ink);background:none;border:0;padding:0;cursor:pointer;transition:color var(--t) var(--ease)}
 .archive-toggle:hover{color:var(--graphite)}
@@ -168,19 +179,31 @@ html:not(.js) .stage:has(#about:target){transform:translateX(-66.6667%)}
 .work-row{position:relative;display:flex;flex-wrap:wrap;align-items:baseline;column-gap:.9em;padding:0 0 14px}
 .work-row>a,.work-row .plain{font-family:var(--serif);font-size:clamp(17px,1.3vw,19px);line-height:1.25}
 .work-row .plain{color:var(--tag-gray)}
+/* The blog's rows: more air. The article you just read turns gray. */
+.blog-list .work-row{padding-bottom:24px;column-gap:1.4em;row-gap:4px}
+.work-row.is-current>a{color:var(--tag-gray)}
+/* The topics See more reveals on the blog: a plain row of words; the chosen one in ink. The negative margins keep the
+   text --s4 from the head and the rows, while each button stays an easy target. */
+.blog-topics{display:flex;flex-wrap:wrap;column-gap:var(--s4);margin:-12px 0 calc(var(--s4) - 12px)}
+.blog-topics button{font:400 var(--size-s)/1.4 var(--sans);letter-spacing:.02em;color:var(--tag-gray);background:none;border:0;padding:12px 0;cursor:pointer;transition:color var(--t) var(--ease)}
+.blog-topics button:hover,.blog-topics button[aria-pressed="true"]{color:var(--ink)}
 .tags{display:inline-flex;flex-wrap:wrap;gap:.15em .8em;font:400 11.5px/1.4 var(--sans);letter-spacing:.02em;color:var(--tag-gray)}
 /* The year, once per year, in the left margin */
 .yr{position:absolute;right:calc(100% + var(--s4));top:0;font:400 11.5px/1.4 var(--sans);letter-spacing:.02em;color:var(--tag-gray);font-variant-numeric:tabular-nums;padding-top:.45em}
 /* Tags and years only once the list is open: they fade in with the rest */
 .tags,.yr{opacity:0;visibility:hidden;transition:opacity .5s var(--ease) .15s,visibility 0s .65s}
 .works.is-open .tags,.works.is-open .yr{opacity:1;visibility:visible;transition:opacity .5s var(--ease) .15s,visibility 0s}
-.works:not(.is-open) .extra{display:none}
+.works:not(.is-open) .extra,.works .out{display:none}
 @media (max-width:599px){.works{padding-left:3.2rem}.yr{right:auto;left:-3.2rem}}
 /* The motion: rows already showing glide to their new places while the others fade in between (transform and opacity) */
-.works .glide{transition:transform var(--open) var(--slide-ease)}
+.work .glide,.blog-list .glide{transition:transform var(--open) var(--slide-ease)}
 .works .rise{opacity:0;transform:translateY(-4px)}
 .works .rise.go{opacity:1;transform:none;transition:opacity .5s var(--ease),transform .5s var(--slide-ease);transition-delay:calc(160ms + var(--i) * 14ms)}
-.works .fall{opacity:0;transition:opacity .25s var(--ease)}
+.works .fall,.blog-topics.fall{opacity:0;transition:opacity .25s var(--ease)}
+.blog-topics.rise{opacity:0;transform:translateY(-4px)}
+.blog-topics.rise.go{opacity:1;transform:none;transition:opacity .5s var(--ease),transform .5s var(--slide-ease)}
+/* A year that moves to a new first row fades in again there */
+.works .yr.moved{opacity:0;transition:none}
 
 /* The Archive page */
 .index{max-width:30rem;margin:0 auto;padding:0 0 18vh}
@@ -193,9 +216,10 @@ html:not(.js) .stage:has(#about:target){transform:translateX(-66.6667%)}
 @media (hover:none),(max-width:960px){.preview{display:none}}
 
 /* A project: title, one line, images, a few plain lines */
-.project-head{text-align:center;margin:16vh auto 14vh;max-width:var(--measure)}
-.project-head h1{font-family:var(--serif);font-size:clamp(22px,2.2vw,32px);letter-spacing:.01em;line-height:1.2}
-.project-head p{color:var(--graphite);margin:4px 0 0}
+.project-head,.article-head{text-align:center;margin:16vh auto 14vh;max-width:var(--measure)}
+.project-head h1,.article-head h1{font-family:var(--serif);font-size:clamp(22px,2.2vw,32px);letter-spacing:.01em;line-height:1.2}
+.project-head p,.article-head p{color:var(--graphite);margin:4px 0 0}
+.article-head p{font-size:var(--size-s)}
 .media{display:flex;flex-direction:column;gap:clamp(40px,7vw,96px);margin:0 0 10vh}
 .media figure{margin:0}
 .media .full{margin:0 calc(var(--gutter) * -1)}

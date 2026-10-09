@@ -243,6 +243,76 @@ def work_section(items, w):
             '<ul class="works" id="works">%s</ul></section>') % (
         esc(w['label']), esc(w['selected']), esc(w['all']), esc(w['selected']), esc(w['more']), esc(w['less']), esc(w['more']), esc(w['back']), ''.join(rows))
 
+AP_MONTHS = ('Jan.', 'Feb.', 'March', 'April', 'May', 'June', 'July', 'Aug.', 'Sept.', 'Oct.', 'Nov.', 'Dec.')
+
+def ap_date(d):
+    """2026-03-15 -> March 15, 2026 (AP style)."""
+    return '%s %d, %d' % (AP_MONTHS[d.month - 1], d.day, d.year)
+
+def load_blog():
+    """content/blog.json: every post, newest first, with its tags and whether it is Selected. The text of each post is
+    content/blog/<slug>.txt, one paragraph per block, blocks separated by a blank line. Fails on drift."""
+    b = load(os.path.join(CONTENT, 'blog.json')); vocab = b['tags']; seen = set(); errs = []
+    folder = os.path.join(CONTENT, 'blog')
+    for e in b['posts']:
+        s = e['slug']
+        if s in seen: errs.append('%s: listed twice' % s)
+        seen.add(s)
+        try:
+            if not re.fullmatch(r'\d{4}-\d{2}-\d{2}', e.get('date', '')): raise ValueError
+            e['_date'] = date.fromisoformat(e['date'])
+        except ValueError:
+            errs.append('%s: date must be ISO, like 2026-03-15' % s); e['_date'] = date.min
+        if not 1 <= len(e.get('tags', [])) <= 2: errs.append('%s: needs one or two tags' % s)
+        errs += ['%s: "%s" is not in the tag list' % (s, t) for t in e.get('tags', []) if t not in vocab]
+        fn = os.path.join(folder, s + '.txt')
+        if not os.path.exists(fn): errs.append('%s: content/blog/%s.txt is missing' % (s, s)); continue
+        with open(fn, encoding='utf-8') as f: text = f.read().strip()
+        e['paras'] = [' '.join(x.split()) for x in re.split(r'\n\s*\n', text) if x.strip()]
+        if not e['paras']: errs.append('%s: content/blog/%s.txt is empty' % (s, s))
+    if os.path.isdir(folder):
+        errs += ['%s: has a .txt but is missing from blog.json' % fn[:-4] for fn in sorted(os.listdir(folder)) if fn.endswith('.txt') and fn[:-4] not in seen]
+    if errs: sys.exit('Fix content/blog.json first:\n  ' + '\n  '.join(errs))
+    return sorted(b['posts'], key=lambda e: e['_date'], reverse=True), vocab
+
+def blog_section(posts, vocab, w, current=None):
+    """The blog list: the work list turned upside down, with the same markup, so the same CSS and motion apply. See more
+    also reveals a row of topics that filter it."""
+    rows, seen, i = [], set(), 0
+    for e in posts:
+        y = str(e['_date'].year)
+        yr = '' if y in seen else '<span class="yr">%s</span>' % y
+        seen.add(y)
+        extra = not e['selected']
+        cur = e['slug'] == current
+        rows.append('<li class="work-row%s%s" data-slug="%s" data-tags="%s" data-year="%s"%s>%s<a href="/blog/%s"%s>%s</a>%s</li>' % (
+            ' extra' if extra else '', ' is-current' if cur else '', e['slug'], esc('|'.join(e['tags'])), y,
+            ' style="--i:%d"' % i if extra else '', yr, e['slug'], ' aria-current="page"' if cur else '', typo(e['title']), tag_list(e['tags'])))
+        if extra: i += 1
+    topics = ''.join('<button type="button" data-topic="%s" aria-pressed="%s">%s</button>' % (esc(t), 'true' if t == 'All' else 'false', esc(t))
+                     for t in ['All'] + vocab)
+    return ('<section class="blog-list" id="articles" aria-label="%s"><div class="work-head">'
+            '<h2 class="work-label" data-closed="%s" data-open="%s">%s</h2>'
+            '<button type="button" class="archive-toggle" aria-expanded="false" aria-controls="article-rows" data-open-label="%s" data-close-label="%s">%s</button>'
+            '<a class="work-back" href="/" data-studio>%s</a></div>'
+            '<div class="blog-topics" role="group" aria-label="Topics" hidden>%s</div>'
+            '<p class="vh" aria-live="polite" data-count data-one="article" data-many="articles"></p>'
+            '<ul class="works" id="article-rows">%s</ul></section>') % (
+        esc(w['label']), esc(w['selected']), esc(w['all']), esc(w['selected']), esc(w['more']), esc(w['less']), esc(w['more']), esc(w['back']),
+        topics, ''.join(rows))
+
+def article(e):
+    """One post: the title, the date, the text. Nothing else."""
+    return ('<article class="article"><header class="article-head"><h1 tabindex="-1">%s</h1>'
+            '<p class="article-date"><time datetime="%s">%s</time></p></header>'
+            '<div class="article-body">%s</div></article>') % (
+        typo(e['title']), e['date'], ap_date(e['_date']), ''.join('<p>%s</p>' % typo(x) for x in e['paras']))
+
+def blurb(s, n=155):
+    """A search description: the first paragraph, trimmed at a word break."""
+    if len(s) <= n: return s
+    return s[:n].rsplit(' ', 1)[0].rstrip(' ,;:.—') + '…'
+
 def press_list(press):
     """Press, by year, newest first. Plain lines: the outlet, then the headline."""
     out, year = [], None
@@ -417,12 +487,23 @@ def main():
                    '<div class="about-main"><div class="about-body">%s</div></div>'
                    '<div class="about-press"><h3 class="press-title">%s</h3>%s</div></div></section>') % (
         ' '.join('<span>%s</span>' % esc(x) for x in ap['title'].split()), esc(site['back']), ''.join('<p>%s</p>' % link(typo(x)) for x in ap['lines']) + ''.join('<p class="contact">%s</p>' % link(typo(x)) for x in ap['contact']), esc(ap['press_title']), press_list(press))
-    # The blog sits one screen above home. Posts can go in content/blog.html later; until then, the lines from site.json.
-    bl = site['blog']; bl_file = os.path.join(CONTENT, 'blog.html')
-    bl_body = open(bl_file, encoding='utf-8').read() if os.path.exists(bl_file) else ''.join('<p>%s</p>' % typo(x) for x in bl['lines'])
-    blog = ('<section class="blog-panel" id="blog" aria-labelledby="blog-title"><div class="blog-inner"><div class="title-row">'
-            '<h2 class="vh" id="blog-title">%s</h2><p class="home-big"><a href="#" data-studio>%s</a></p></div>'
-            '<div class="blog-body">%s</div></div></section>') % (esc(bl['title']), esc(site['back']), bl_body)
+    # The blog sits one screen above home: an empty slot for an article, then the list at the bottom of the screen,
+    # next to home. Until there are posts, the lines from site.json (or content/blog.html).
+    bl = site['blog']
+    posts, blog_tags = load_blog()
+    if posts:
+        blog = ('<section class="blog-panel" id="blog" aria-labelledby="blog-title"><h2 class="vh" id="blog-title">%s</h2>'
+                '<div class="blog-article" data-article></div>%s</section>') % (esc(bl['title']), blog_section(posts, blog_tags, bl))
+    else:
+        bl_file = os.path.join(CONTENT, 'blog.html')
+        bl_body = open(bl_file, encoding='utf-8').read() if os.path.exists(bl_file) else ''.join('<p>%s</p>' % typo(x) for x in bl['lines'])
+        blog = ('<section class="blog-panel" id="blog" aria-labelledby="blog-title"><div class="blog-inner"><div class="title-row">'
+                '<h2 class="vh" id="blog-title">%s</h2><p class="home-big"><a href="#" data-studio>%s</a></p></div>'
+                '<div class="blog-body">%s</div></div></section>') % (esc(bl['title']), esc(site['back']), bl_body)
+    # One page per post, so a reload or a shared link lands on the article and still ends at the list
+    for e in posts:
+        body = '<div class="blog-article" data-article>%s</div>%s' % (article(e), blog_section(posts, blog_tags, bl, e['slug']))
+        write('/blog/%s.html' % e['slug'], page(site, '%s | %s' % (e['full_title'], site['name']), blurb(e['paras'][0]), '/blog/%s' % e['slug'], body, so))
     cover = ('<section class="cover"><div class="cover-inner"><h1><span class="mark" %s>%s</span><span class="name ink">%s<span class="name-text">Opmet Osserpse</span></span></h1>'
              '<nav class="cover-nav" aria-label="Site">%s</nav></div></section>') % (
         moves.mark_attrs(mv), hand + mv['layers'], brand_svg('wordmark.svg', 'wordmark'), nav)
@@ -452,12 +533,12 @@ def main():
     write('/CNAME', site['domain'] + '\n')
     write('/.nojekyll', '')
     write('/robots.txt', 'User-agent: *\nAllow: /\nSitemap: https://%s/sitemap.xml\n' % site['domain'])
-    urls = ['/', '/projects/', '/privacy'] + ['/projects/%s' % p['slug'] for p in ordered]
+    urls = ['/', '/projects/', '/privacy'] + ['/projects/%s' % p['slug'] for p in ordered] + ['/blog/%s' % e['slug'] for e in posts]
     write('/sitemap.xml', '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n%s</urlset>\n' % ''.join(
         '  <url><loc>https://%s%s</loc></url>\n' % (site['domain'], u) for u in urls))
 
     size = sum(os.path.getsize(os.path.join(dp, f)) for dp, _, fs in os.walk(DIST) for f in fs)
-    print('Built %d project pages, %d list rows, into %s (%.0f MB).' % (len(ordered), len(entries), DIST, size / 1e6))
+    print('Built %d project pages, %d list rows, %d articles, into %s (%.0f MB).' % (len(ordered), len(entries), len(posts), DIST, size / 1e6))
     if media.log: print('\n'.join(media.log))
 
 if __name__ == '__main__':
