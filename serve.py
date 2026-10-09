@@ -2,13 +2,13 @@
 """Preview docs/ the way GitHub Pages serves it: /projects/sunnys-bookshop -> projects/sunnys-bookshop.html.
     python3 serve.py            # http://127.0.0.1:8080/
 """
-import http.server, os, sys
+import http.server, os, sys, urllib.parse
 ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'docs')
 class H(http.server.SimpleHTTPRequestHandler):
     def __init__(self, *a, **k): super().__init__(*a, directory=ROOT, **k)
     def send_head(self):
         path = self.path.split('?', 1)[0].split('#', 1)[0]
-        full = os.path.join(ROOT, path.lstrip('/'))
+        full = os.path.join(ROOT, urllib.parse.unquote(path).lstrip('/'))  # file names with spaces arrive as %20
         if not os.path.exists(full) and os.path.exists(full + '.html'):
             self.path = path + '.html'
         elif not os.path.exists(full) and not path.endswith('/'):

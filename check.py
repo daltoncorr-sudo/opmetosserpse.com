@@ -32,8 +32,6 @@ for f in glob.glob(D + '/**/*.html', recursive=True):
 # Project pages (v02): alt text, no looping video, notes and chapters within limits, media order, project order
 import html as H, json
 ROOT = os.path.dirname(os.path.abspath(__file__))
-HS = {'hollyshorts-18', 'hollyshorts-19', 'hollyshorts-20', 'hollyshorts-21', 'hollyshorts-22', 'hollyshorts-comedy-2025',
-      'hollyshorts-comedy-2026', 'hollyshorts-dubai-2025', 'hollyshorts-london-2024', 'hollyshorts-london-2025'}
 for f in glob.glob(D + '/**/*.html', recursive=True):
     t = open(f, encoding='utf-8').read(); rel = os.path.relpath(f, D)
     for tag in re.findall(r'<img\b[^>]*>', t):
@@ -42,7 +40,8 @@ for f in glob.glob(D + '/**/*.html', recursive=True):
         if not re.search(r'\saria-label="[^"]+"', tag): problems.append('%s: a <video> without aria-label' % rel)
         if re.search(r'\sloop(?=[\s>=])', tag): problems.append('%s: a <video> that loops' % rel)
 order = json.load(open(os.path.join(ROOT, 'content', 'index.json'), encoding='utf-8')).get('project_order', [])
-record = json.load(open(os.path.join(ROOT, '_review', '2026-10-08_media-order-record_v01.json'), encoding='utf-8'))
+# The order of each project's daltoncorr.com page, as recorded on Oct. 8, 2026: the pages must show it, item for item
+record = json.load(open(os.path.join(ROOT, '_review', '2026-10-08_media-order-record_v02.json'), encoding='utf-8'))
 for i, slug in enumerate(order):
     f = os.path.join(D, 'projects', slug + '.html')
     if not os.path.exists(f): problems.append('projects/%s: in project_order but not built' % slug); continue
@@ -55,17 +54,20 @@ for i, slug in enumerate(order):
         words = re.sub(r'<a [^>]*>[^<]*</a>', ' ', cap); words = re.sub(r'<[^>]+>', ' ', words)
         if len(words.split()) > 25: problems.append('%s: a note runs over 25 words' % rel)
     if t.count('class="chap"') > 4: problems.append('%s: more than four chapter labels' % rel)
-    # media order: the record, with the poster first on HollyShorts pages and only Sunny's hidden items left out
-    alts = record.get(slug, []); op = notes.get('opener', 1); hide = notes.get('hide', [])
-    if op != 1 and slug not in HS: problems.append('%s: only HollyShorts pages open out of order' % rel)
+    # media order: the record, with only Sunny's repeats left out
+    hide = notes.get('hide', [])
     if hide and slug != 'sunnys-bookshop': problems.append('%s: only Sunny\'s Bookshop hides items' % rel)
-    want = [alts[op - 1]] + [a for n, a in enumerate(alts, 1) if n != op] if alts else []
-    want = [a for a in want if a not in hide]
+    pj = json.load(open(os.path.join(ROOT, 'content', 'projects', slug + '.json'), encoding='utf-8'))
+    stem = lambda p: re.sub(r'-(600|720|800|1200|1600|2400|sm|lg|xl)$', '', re.sub(r'\.(webp|jpe?g|png|gif|mp4|webm|mov)$', '', os.path.basename(p), flags=re.I))
+    hidden = {stem(m['src']) for m in pj['media'] if m['alt'] in hide}
+    want = [k for k in record.get(slug, []) if k not in hidden]
     body = t.split('class="pp"', 1)[-1].split('class="g end"', 1)[0]
-    got = [H.unescape(a) for a in re.findall(r'data-i="\d+">\s*<(?:img|video)\b[^>]*?(?:alt|aria-label)="([^"]*)"', body)]
-    if got != want: problems.append('%s: media order differs from the record (%d items, expected %d)' % (rel, len(got), len(want)))
+    got = [H.unescape(k) for k in re.findall(r'data-i="([^"]+)"', body)]
+    if got != want: problems.append('%s: media order differs from daltoncorr.com (%d items, expected %d)' % (rel, len(got), len(want)))
     nx = re.search(r'<a class="next" href="/projects/([^"]+)"', t)
     if not nx or nx.group(1) != order[(i + 1) % len(order)]: problems.append('%s: Next project does not follow project_order' % rel)
+for f in glob.glob(D + '/**/*.js', recursive=True) + glob.glob(D + '/**/*.css', recursive=True):
+    if 'Dalton Corr' in open(f, encoding='utf-8', errors='ignore').read(): problems.append('%s: Dalton\'s name' % os.path.relpath(f, D))
 # the home list and the projects index list the pages in project_order
 for page_, pat in (('index.html', r'class="work-row[^"]*" data-project="([^"]+)"><?(?:span class="yr">\d+</span>)?<a href'),
                    ('projects/index.html', r'<li id="([^"]+)"><a href="/projects/')):

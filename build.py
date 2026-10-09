@@ -6,8 +6,8 @@
 
 Needs Python 3.9+, Pillow (pip install Pillow) and, for video only, ffmpeg (brew install ffmpeg). No framework.
 """
-import argparse, hashlib, html, json, os, re, shutil, subprocess, sys, tempfile, zipfile
-import moves
+import argparse, hashlib, html, json, os, re, shutil, subprocess, sys, tempfile, urllib.parse, zipfile
+import moves, dc_source
 from datetime import date
 
 try:
@@ -60,7 +60,28 @@ def frames_to_mp4(src, dst):
 
 class Media:
     def __init__(self, src_root, out_root):
-        self.src_root, self.out_root, self.cache, self.log = src_root, out_root, {}, []
+        self.src_root, self.out_root, self.cache, self.log, self.made = src_root, out_root, {}, [], set()
+
+    def assets(self, paths):
+        """Files the 3D and interactive pieces read, copied as they are into docs/dc/."""
+        dc_source.copy_assets(self.src_root, paths, os.path.dirname(self.out_root))
+
+    def has_audio(self, rel):
+        src = os.path.join(self.src_root, rel)
+        if not rel.lower().endswith(('.mp4', '.mov', '.webm')) or not os.path.exists(src): return False
+        r = subprocess.run(['ffprobe', '-v', 'error', '-select_streams', 'a', '-show_entries', 'stream=index', '-of', 'csv=p=0', src],
+                           capture_output=True, text=True)
+        return bool(r.stdout.strip())
+
+    def tidy(self, slugs):
+        """Remove files in each project's media folder that this build didn't write (an earlier order's leftovers)."""
+        gone = 0
+        for s in slugs:
+            d = os.path.join(self.out_root, s)
+            for f in os.listdir(d) if os.path.isdir(d) else []:
+                full = os.path.join(d, f)
+                if full not in self.made and os.path.isfile(full): os.remove(full); gone += 1
+        if gone: print('Removed %d media files no page uses any more.' % gone)
 
     def image(self, rel, slug, name, max_w=2400):
         """Resize one source image into WebP at up to three widths. Returns (src, srcset, w, h)."""
@@ -71,7 +92,7 @@ class Media:
             self.log.append('missing: ' + rel); return None
         out_dir = os.path.join(self.out_root, slug); os.makedirs(out_dir, exist_ok=True)
         if rel.lower().endswith('.webp') and getattr(Image.open(src), 'is_animated', False):
-            dst = os.path.join(out_dir, name + '.webp'); shutil.copyfile(src, dst)
+            dst = os.path.join(out_dir, name + '.webp'); shutil.copyfile(src, dst); self.made.add(dst)
             im = Image.open(src); r = ('/media/%s/%s.webp' % (slug, name), '', im.width, im.height)
             self.cache[key] = r; return r
         im = ImageOps.exif_transpose(Image.open(src))
@@ -83,7 +104,7 @@ class Media:
             fn = '%s-%d.webp' % (name, w); dst = os.path.join(out_dir, fn)
             if not os.path.exists(dst) or not os.path.getsize(dst):  # re-encode an empty file too
                 (im if w == im.width else im.resize((w, h), Image.LANCZOS)).save(dst, 'WEBP', quality=QUALITY, method=4)
-            parts.append(('/media/%s/%s' % (slug, fn), w))
+            parts.append(('/media/%s/%s' % (slug, fn), w)); self.made.add(dst)
         big = parts[-1]; w = big[1]; h = round(im.height * w / im.width)
         r = (big[0], ', '.join('%s %dw' % p for p in parts), w, h)
         self.cache[key] = r; return r
@@ -104,7 +125,8 @@ class Media:
             self.log.append('missing: ' + rel); return None
         out_dir = os.path.join(self.out_root, slug); os.makedirs(out_dir, exist_ok=True)
         mp4, webm = os.path.join(out_dir, name + '.mp4'), os.path.join(out_dir, name + '.webm')
-        if rel.lower().endswith('.webp'):  # an animated WebP: its frames become a film, so it can play once and rest
+        self.made |= {mp4, webm, os.path.join(out_dir, name + '-poster.webp')}
+        if rel.lower().endswith(('.webp', '.gif')):  # an animated picture: its frames become a film, so it can play once and rest
             if not os.path.exists(mp4): frames_to_mp4(src, mp4)
         elif not os.path.exists(mp4) or os.path.getsize(mp4) != os.path.getsize(src):
             shutil.copyfile(src, mp4)
@@ -130,7 +152,7 @@ class Media:
         if not rel or not os.path.exists(src): return None
         im = ImageOps.fit(ImageOps.exif_transpose(Image.open(src)).convert('RGB'), (1200, 630), Image.LANCZOS)
         out_dir = os.path.join(self.out_root, slug); os.makedirs(out_dir, exist_ok=True)
-        im.save(os.path.join(out_dir, 'og.jpg'), 'JPEG', quality=85)
+        im.save(os.path.join(out_dir, 'og.jpg'), 'JPEG', quality=85); self.made.add(os.path.join(out_dir, 'og.jpg'))
         return '/media/%s/og.jpg' % slug
 
 # How wide each block draws, for srcset
@@ -231,29 +253,22 @@ def write(path, text):
     os.makedirs(os.path.dirname(full), exist_ok=True)
     with open(full, 'w', encoding='utf-8') as f: f.write(text)
 
-# The HollyShorts pages open on the festival's official poster (notes: "opener")
-HOLLYSHORTS = {'hollyshorts-18', 'hollyshorts-19', 'hollyshorts-20', 'hollyshorts-21', 'hollyshorts-22', 'hollyshorts-comedy-2025',
-               'hollyshorts-comedy-2026', 'hollyshorts-dubai-2025', 'hollyshorts-london-2024', 'hollyshorts-london-2025'}
-
-def load_notes(p):
-    """content/notes/<slug>.json: the opener, the Work line, chapter labels, margin notes, video rest frames and hidden items.
-    Indexes are 1-based positions in the project's media list. Fails on anything that doesn't fit."""
+def load_notes(p, keys):
+    """content/notes/<slug>.json: the Work line, chapter labels, margin notes, how each film rests and plays, and (Sunny's
+    only) the items it hides. Items are named by key: a picture's file name without size or extension ("poster"), or
+    "w:" and the piece's name for a 3D or interactive piece ("w:badge3d"). Fails on anything that doesn't fit."""
     fn = os.path.join(CONTENT, 'notes', p['slug'] + '.json')
     n = load(fn) if os.path.exists(fn) else {}
-    n.setdefault('opener', 1); n.setdefault('chapters', []); n.setdefault('notes', {}); n.setdefault('video', {}); n.setdefault('hide', [])
-    s, count, errs = p['slug'], len(p['media']), []
-    alts = [m['alt'] for m in p['media']]
-    if not 1 <= n['opener'] <= count: errs.append('opener %s is not in media' % n['opener'])
-    if n['opener'] != 1 and s not in HOLLYSHORTS: errs.append('only the HollyShorts pages open on a poster out of order')
+    n.setdefault('chapters', []); n.setdefault('notes', {}); n.setdefault('video', {}); n.setdefault('hide', [])
+    s, errs = p['slug'], []
+    by_alt = {m['alt']: dc_source.stem(m['src']) for m in p['media']}
     n['_hide'] = set()
     for alt in n['hide']:
-        if alt not in alts: errs.append('hide: no item with the alt text "%s"' % alt)
-        else: n['_hide'].add(alts.index(alt) + 1)
+        if alt not in by_alt or by_alt[alt] not in keys: errs.append('hide: no item with the alt text "%s"' % alt)
+        else: n['_hide'].add(by_alt[alt])
     if n['_hide'] and s != 'sunnys-bookshop': errs.append('hide is only for sunnys-bookshop')
-    for k in list(n['notes']) + list(n['video']):
-        if not k.isdigit() or not 1 <= int(k) <= count: errs.append('index %s is not in media' % k)
-    for k in n['video']:
-        if k.isdigit() and int(k) <= count and p['media'][int(k) - 1]['slot'] != 'V': errs.append('video %s is not a V item' % k)
+    for k in list(n['notes']) + list(n['video']) + [c['starts_at'] for c in n['chapters']]:
+        if k not in keys: errs.append('"%s" is not an item on this page' % k)
     for k, x in n['notes'].items():
         if len(x['text'].split()) > 25: errs.append('note %s runs over 25 words' % k)
     if len(n['chapters']) > 4: errs.append('more than four chapter labels')
@@ -282,24 +297,25 @@ def credit_rows(p):
     if not photo: rows.append(('Photography', None))
     return rows, photo
 
-def make_blocks(items, notes, opener_alone):
-    """Group the items, in order, into blocks. Pairs form from consecutive P images, as before."""
+def make_blocks(items, notes):
+    """Group the items, in order, into blocks. Two pictures side by side when they sit next to each other in the same
+    gallery on daltoncorr.com and share a shape (both P, or both landscape); a 3D or interactive piece is a block of its own."""
     out, i = [], 0
+    def pairable(x, y):
+        return (y and x['kind'] == y['kind'] == 'img' and x['gallery'] == y['gallery']
+                and x['slot'] == y['slot'] and x['slot'] in ('P', 'L'))
     while i < len(items):
-        it = items[i]
-        nxt = items[i + 1] if i + 1 < len(items) else None
-        if (it['slot'] == 'P' and it['kind'] == 'img' and nxt and nxt['slot'] == 'P' and nxt['kind'] == 'img'
-                and not (opener_alone and i == 0)):
-            grp = [it, nxt]; i += 2
-        else:
-            grp = [it]; i += 1
-        note = next((notes[str(x['n'])]['text'] for x in grp if str(x['n']) in notes), None)
+        it = items[i]; nxt = items[i + 1] if i + 1 < len(items) else None
+        grp = [it, nxt] if pairable(it, nxt) else [it]
+        i += len(grp)
+        note = next((notes[x['key']]['text'] for x in grp if x['key'] in notes), None)
         if len(grp) == 2: kind = 'pair'
+        elif it['kind'] == 'widget': kind = 'plate' if it['name'] == 'logo-switch' else 'field'
         elif it['kind'] == 'video':
             r = it['w'] / it['h']
             kind = ('field' if note else 'wide') if r > 1.2 else 'tall' if r < 0.83 else 'plate'
         elif it['slot'] in ('H', 'F'): kind = 'full'
-        elif it['slot'] == 'W' and it['h'] <= it['w']: kind = 'field' if note else 'wide'
+        elif it['slot'] in ('W', 'L') and it['h'] <= it['w']: kind = 'field' if note else 'wide'
         else: kind = 'plate'
         out.append(dict(kind=kind, items=grp, note=note))
     return out
@@ -309,7 +325,8 @@ def block_html(b, slug):
     ms = []
     for k, it in enumerate(b['items'], 1):
         cls = 'm m%d' % k if kind == 'pair' else 'm'
-        ms.append('<div class="%s" data-i="%d">%s</div>' % (cls, it['n'], it['html'](SIZES[kind])))
+        if it['kind'] == 'widget': cls += ' piece'
+        ms.append('<div class="%s" data-i="%s">%s</div>' % (cls, esc(it['key']), it['html'](SIZES[kind])))
     cap_ = typo(b['note']) if b['note'] else ''
     for it in b['items']:
         if it['kind'] == 'video':
@@ -330,14 +347,15 @@ def project_body(p, blocks, chapters, nxt, notes, back='Back'):
     facts.append(('Role', typo(p['role'])))
     if p['links']:
         t, u = p['links'][0]; facts.append(('Link', '<a href="%s" rel="noopener">%s</a>' % (esc(u), typo(t))))
-    out = ['<div class="pp">',
-           '<section class="open g"><p class="pback"><a href="/#work" data-back>%s</a></p><div class="oi"><h1>%s</h1><p class="lede">%s</p></div>'
-           '<dl class="facts">%s</dl></section>' % (esc(back), typo(p['title']), typo(notes.get('lede') or p['lede']),
-                                                    ''.join('<div><dt>%s</dt><dd>%s</dd></div>' % x for x in facts))]
+    # data-page-only: a page with a 3D or interactive piece opens as its own page from home, so its scripts run
+    out = ['<div class="pp"%s>' % (' data-page-only' if p.get('_scripts') else ''),
+           '<section class="open g"><p class="pback"><a href="/#work" data-back>%s</a></p><h1>%s</h1>'
+           '<p class="lede">%s</p><dl class="facts">%s</dl></section>' % (esc(back), typo(p['title']), typo(notes.get('lede') or p['lede']),
+                                                                     ''.join('<div><dt>%s</dt><dd>%s</dd></div>' % x for x in facts))]
     starts = {c['starts_at']: c for c in chapters}
     open_ch, n = False, 0
     for b in blocks:
-        c = starts.get(b['items'][0]['n'])
+        c = starts.get(b['items'][0]['key'])
         if c:
             if open_ch: out.append('</section>')
             n += 1; open_ch = True
@@ -459,44 +477,82 @@ def main():
     os.makedirs(os.path.join(DIST, 'media', 'site'), exist_ok=True)
     so = media.og(first['og'] or first['card']['src'], 'site')
 
-    # project pages, first pass: every item, in its media order (the opener first on HollyShorts pages, hidden items left out)
-    stats = {}
+    # project pages, first pass: every item on the project's daltoncorr.com page, in its order (Sunny's repeats left out)
+    stats, used_scripts = {}, set()
     for p in ordered:
-        s = p['slug']; notes = p['_notes'] = load_notes(p); items = []
-        seq = [notes['opener']] + [n for n in range(1, len(p['media']) + 1) if n != notes['opener']]
-        for n in seq:
-            if n in notes['_hide']: continue
-            m = p['media'][n - 1]; name = '%02d' % n; eager = not items
-            if m['slot'] == 'V':
-                vn = notes['video'].get(str(n), {}); rest, sound = str(vn.get('rest', 'end')), bool(vn.get('sound'))
-                animated_poster = s in HOLLYSHORTS and n == notes['opener']
-                v = media.video(m['src'], s, name, rest, sound, first=animated_poster)
+        s = p['slug']; items = []
+        dc = dc_source.items(src_root, s)
+        js = {dc_source.stem(m['src']): m for m in p['media']}
+        seen = {}
+        for x in dc:  # keys: a picture's file name, or w:<piece>; numbered when one repeats
+            k = 'w:' + x['name'] if x['kind'] == 'widget' else dc_source.stem(x['src'])
+            seen[k] = seen.get(k, 0) + 1; x['key'] = k if seen[k] == 1 else '%s-%d' % (k, seen[k])
+        notes = p['_notes'] = load_notes(p, [x['key'] for x in dc])
+        p['_record'] = [x['key'] for x in dc]
+        for x in dc:
+            k = x['key']
+            if k in notes['_hide']: continue
+            jm = js.get(k); eager = not items
+            alt = jm['alt'] if jm else x.get('alt', '')
+            name = re.sub(r'[^a-z0-9]+', '-', k.lower()).strip('-')
+            if x['kind'] == 'widget':
+                items.append(dict(key=k, kind='widget', name=x['name'], slot='X', gallery=0, html=lambda sz, h=x['html']: h, scripts=x['scripts']))
+                media.assets(x['assets'])
+                continue
+            src = x['src'] if os.path.exists(os.path.join(src_root, x['src'])) or not jm else jm['src']
+            animated = x['kind'] == 'img' and src.lower().endswith(('.webp', '.gif')) and getattr(Image.open(os.path.join(src_root, src)), 'is_animated', False)
+            if x['kind'] == 'video' or animated:  # films, and animated pictures made into films, so nothing loops
+                vn = notes['video'].get(k, {})
+                has_sound = media.has_audio(src)
+                rest, sound = str(vn.get('rest', 'end')), bool(vn.get('sound', has_sound))
+                v = media.video(src, s, name, rest, sound, first=vn.get('poster_frame') == 'first')
                 if not v: continue
-                vid = 'v-%s-%d' % (s, n)
-                items.append(dict(n=n, slot='V', kind='video', w=v['w'], h=v['h'], id=vid, sound=sound, v=v, rest=rest,
-                                  html=lambda sz, v=v, vid=vid, alt=m['alt'], rest=rest, sound=sound, e=eager: video_tag(v, vid, alt, rest, sound, e)))
+                vid = 'v-%s-%s' % (s, name)
+                items.append(dict(key=k, slot='V', kind='video', w=v['w'], h=v['h'], id=vid, sound=sound, v=v, rest=rest, gallery=x['gallery'], alt=alt,
+                                  html=lambda sz, v=v, vid=vid, alt=alt, rest=rest, sound=sound, e=eager: video_tag(v, vid, alt, rest, sound, e)))
                 p.setdefault('_bigs', []).append(v['mp4'])
-            else:
-                r = media.image(m['src'], s, name)
-                if not r: continue
-                items.append(dict(n=n, slot=m['slot'], kind='img', w=r[2], h=r[3], r=r,
-                                  html=lambda sz, r=r, alt=m['alt'], e=eager: img_tag(r, sz, alt, e)))
-                p.setdefault('_bigs', []).append(r[0])
-        blocks = make_blocks(items, notes['notes'], s in HOLLYSHORTS and notes['opener'] != 1)
+                continue
+            r = media.image(src, s, name)
+            if not r: continue
+            # the size: the approved slot when the picture was already on this site; otherwise from daltoncorr.com's layout
+            if jm: slot = jm['slot']
+            elif x['wide']: slot = 'W'
+            else: slot = 'P' if r[3] > r[2] else 'L'
+            items.append(dict(key=k, slot=slot, kind='img', w=r[2], h=r[3], r=r, gallery=x['gallery'], alt=alt,
+                              html=lambda sz, r=r, alt=alt, e=eager: img_tag(r, sz, alt, e)))
+            p.setdefault('_bigs', []).append(r[0])
+        blocks = make_blocks(items, notes['notes'])
         chapters = notes['chapters'] if len(items) >= 8 else []
-        starts = {b['items'][0]['n'] for b in blocks}
+        starts = {b['items'][0]['key'] for b in blocks}
         bad = [c['label'] for c in chapters if c['starts_at'] not in starts]
         if bad: sys.exit('Fix content/notes/%s.json first:\n  chapter %s must start on the first item of a block' % (s, ', '.join(bad)))
-        p['_blocks'], p['_chapters'] = blocks, chapters
-        o = items[0]
-        p['_thumb'] = ('<img src="%s" alt="%s" loading="lazy" decoding="async" width="%d" height="%d">' % (o['v']['poster'], esc(p['media'][o['n'] - 1]['alt']), o['w'], o['h'])
-                       if o['kind'] == 'video' else img_tag(o['r'], '(max-width:640px) 100vw, 60vw', p['media'][o['n'] - 1]['alt']))
+        p['_blocks'], p['_chapters'], p['_items'] = blocks, chapters, items
+        p['_scripts'] = [n for x in items if x['kind'] == 'widget' for n in x['scripts']]
+        used_scripts |= set(p['_scripts'])
+        o = next(x for x in items if x['kind'] != 'widget')
+        p['_thumb'] = ('<img src="%s" alt="%s" loading="lazy" decoding="async" width="%d" height="%d">' % (o['v']['poster'], esc(o['alt']), o['w'], o['h'])
+                       if o['kind'] == 'video' else img_tag(o['r'], '(max-width:640px) 100vw, 60vw', o['alt']))
         kinds = [b['kind'] for b in blocks]
         runs = [kinds[k] for k in range(2, len(kinds)) if kinds[k] == kinds[k - 1] == kinds[k - 2]]
-        stats[s] = dict(order=[x['n'] for x in items], blocks=kinds, full=kinds.count('full'), runs=sorted(set(runs)),
-                        lede_words=len((p['_notes'].get('lede') or p['lede']).split()), photo=credit_rows(p)[1],
-                        videos=[dict(n=x['n'], block=next(b['kind'] for b in blocks if x in b['items']), rest=x['rest'], sound=x['sound'], bytes=x['v']['bytes'])
+        stats[s] = dict(order=[x['key'] for x in items], blocks=kinds, full=kinds.count('full'), runs=sorted(set(runs)),
+                        pieces=[x['key'] for x in items if x['kind'] == 'widget'],
+                        lede_words=len((notes.get('lede') or p['lede']).split()), photo=credit_rows(p)[1],
+                        videos=[dict(key=x['key'], block=next(b['kind'] for b in blocks if x in b['items']), rest=x['rest'], sound=x['sound'], bytes=x['v']['bytes'])
                                 for x in items if x['kind'] == 'video'])
+
+    # the 3D and interactive pieces: their scripts and styles, as on daltoncorr.com, and the files their scripts read
+    if used_scripts:
+        media.assets(dc_source.port_scripts(src_root, sorted(used_scripts), os.path.join(DIST, 'js', 'work')))
+        write('/css/work.css', dc_source.port_css(src_root))
+    # the phone reaches its logo from its folder with ../ : bring along what any script names that way
+    for p in ordered:
+        for x in p['_items']:
+            if x['kind'] == 'widget':
+                for base in re.findall(r'data-base="/dc/([^"]+)"', x['html']({})):
+                    for n in set(x['scripts']):
+                        if n.startswith('vendor/'): continue
+                        for up in re.findall(r"'\.\./([^'/]+\.(?:webp|png|jpe?g))'", open(os.path.join(src_root, 'js', n), encoding='utf-8').read()):
+                            media.assets([os.path.normpath(os.path.join(urllib.parse.unquote(base), '..', up))])
 
     # second pass: write each page, with the next project after it in project_order (the last wraps to the first)
     for i, p in enumerate(ordered):
@@ -506,7 +562,7 @@ def main():
         og = media.og(p['og'] or p['card']['src'], s)
         bigs = [b for b in p.get('_bigs', [])]
         if a.zip and bigs:
-            zp = os.path.join(DIST, 'media', s, '%s-images.zip' % s)
+            zp = os.path.join(DIST, 'media', s, '%s-images.zip' % s); media.made.add(zp)
             with zipfile.ZipFile(zp, 'w', zipfile.ZIP_STORED) as z:
                 for n, rel in enumerate(bigs, 1):
                     full = os.path.join(DIST, rel.lstrip('/'))
@@ -514,10 +570,18 @@ def main():
         nxt = ordered[(i + 1) % len(ordered)]
         stats[s]['next'] = nxt['slug']
         body = project_body(p, p['_blocks'], p['_chapters'], nxt, p['_notes'], site['project_back'])
-        write('/projects/%s.html' % s, page(site, p['seo']['title'], p['seo']['description'], '/projects/%s' % s, body, og, '/projects'))
+        head = ''
+        if p['_scripts']:  # a page with a 3D or interactive piece: its styles and scripts, in order
+            head = '<link rel="stylesheet" href="/css/work.css?v=%s">\n' % site['_v'] + ''.join(
+                '<script src="/js/%s?v=%s" defer></script>\n' % (n if n.startswith('vendor/') else 'work/' + n, site['_v'])
+                for n in dict.fromkeys(p['_scripts']))
+        write('/projects/%s.html' % s, page(site, p['seo']['title'], p['seo']['description'], '/projects/%s' % s, body, og, '/projects', extra_head=head))
     os.makedirs(os.path.join(ROOT, '_review'), exist_ok=True)
     with open(os.path.join(ROOT, '_review', 'build-stats.json'), 'w', encoding='utf-8') as fh:
         json.dump(stats, fh, indent=1)
+    with open(os.path.join(ROOT, '_review', 'media-order-daltoncorr.json'), 'w', encoding='utf-8') as fh:
+        json.dump({p['slug']: p['_record'] for p in ordered}, fh, indent=1, ensure_ascii=False)
+    media.tidy([p['slug'] for p in ordered])
 
     # projects list: pages and rows, newest first
     items, vocab = load_work(projects)  # vocab: the tag list, checked inside load_work
