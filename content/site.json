@@ -92,7 +92,13 @@
   "title": "Blog",
   "lines": [
    "Notes from the studio, coming soon."
-  ]
+  ],
+  "label": "Blog",
+  "selected": "Selected articles",
+  "all": "All articles",
+  "more": "See more",
+  "less": "See less",
+  "back": "Home"
  },
  "project_back": "Back",
  "project_all": "All work",
