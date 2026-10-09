@@ -129,9 +129,11 @@ def page(site, title, desc, path, body, og_image=None, current=None, extra_head=
     # No menu bar. Inner pages carry only the hand and the name, centered, back to the cover.
     header = '' if path == '/' else ('<header class="site-header"><a class="lockup" href="/" aria-label="Opmet Osserpse">%s%s</a></header>'
                                      % (brand_svg('hand-mark.svg', 'lockup-hand'), brand_svg('wordmark.svg', 'wordmark ink')))
+    # Which way the page flips: forward onto a project, back onto home
+    page_cls = ' class="page-home"' if path == '/' else ' class="page-project"' if path.startswith('/projects/') and path != '/projects/' else ''
     nav = header
     return '''<!doctype html>
-<html lang="en" data-ink="medium">
+<html lang="en" data-ink="medium"%(page_cls)s>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -158,22 +160,22 @@ def page(site, title, desc, path, body, og_image=None, current=None, extra_head=
 <main id="main"%(main_cls)s>
 %(body)s
 </main>
-<script src="/js/site.js?v=%(v)s" defer></script>
+<script src="/js/site.js?v=%(v)s" defer blocking="render"></script>
 </body>
 </html>
 ''' % dict(title=esc(title), desc=esc(desc), url=url, domain=site['domain'], og=og, nav=nav, tz=site['clock_timezone'],
            place=esc(site['clock_place']), body=body, name=esc(site['name']), descr=esc(site['description'].rstrip('.')),
            email=site['email'], line=esc(site['line']), copy=esc(site['copyright']), privacy=esc(site['privacy_line']),
-           v=site['_v'], extra=extra_head, ink=ink_filters(), main_cls=' class="%s"' % main_cls if main_cls else '')
+           v=site['_v'], extra=extra_head, ink=ink_filters(), page_cls=page_cls, main_cls=' class="%s"' % main_cls if main_cls else '')
 
 def write(path, text):
     full = os.path.join(DIST, path.lstrip('/'))
     os.makedirs(os.path.dirname(full), exist_ok=True)
     with open(full, 'w', encoding='utf-8') as f: f.write(text)
 
-def project_body(p, media, prev, nxt, zip_href):
+def project_body(p, media, prev, nxt, zip_href, back='Back'):
     """Image first. A title, one line, the images, then a few plain lines. No headers."""
-    out = ['<header class="project-head"><h1>%s</h1><p>%s</p></header>' % (typo(p['title']), typo(p['deck']))]
+    out = ['<header class="project-head"><p class="back"><a href="/#work" data-back>%s</a></p><h1>%s</h1><p>%s</p></header>' % (esc(back), typo(p['title']), typo(p['deck']))]
     items, html_, i = media[:], [], 0
     while i < len(items):
         m = items[i]
@@ -313,7 +315,7 @@ def main():
                     z.write(full, '%s-%02d%s' % (s, n, os.path.splitext(full)[1]))
             zip_href = '/media/%s/%s-images.zip' % (s, s)
         prev, nxt = ordered[i - 1], ordered[(i + 1) % len(ordered)]
-        body = project_body(p, built, prev, nxt, zip_href)
+        body = project_body(p, built, prev, nxt, zip_href, site['project_back'])
         write('/projects/%s.html' % s, page(site, p['seo']['title'], p['seo']['description'], '/projects/%s' % s, body, og, '/projects'))
 
     # projects list: pages and rows, newest first

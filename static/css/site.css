@@ -61,9 +61,34 @@ ul{list-style:none;margin:0;padding:0}
 /* Smooth page changes (cross-document View Transitions); other browsers load normally */
 @view-transition{navigation:auto}
 ::view-transition-old(root),::view-transition-new(root){animation-duration:var(--t);animation-timing-function:var(--ease)}
+/* Opening a project from the list: its title zooms into the project page's title, the rows above slide up, the rows
+   below slide down, and the project rises in beneath the title. Going back reverses it onto the same list.
+   site.js names the elements as the page swaps; Chrome, Edge and Safari 18.2+; other browsers simply load the page. */
+::view-transition-group(project-title){animation-duration:.75s;animation-timing-function:var(--slide-ease)}
+::view-transition-old(project-title),::view-transition-new(project-title){height:100%;object-fit:contain;animation-duration:.75s}
+::view-transition-group(*.above),::view-transition-group(*.below){animation-duration:.7s;animation-timing-function:var(--slide-ease)}
+::view-transition-old(*.above){animation:vt-out-up .6s var(--slide-ease) both}
+::view-transition-old(*.below){animation:vt-out-down .6s var(--slide-ease) both}
+::view-transition-new(*.above){animation:vt-in-up .7s var(--slide-ease) both}
+::view-transition-new(*.below){animation:vt-in-down .7s var(--slide-ease) both}
+.page-project::view-transition-old(root),.page-home::view-transition-old(root){animation:vt-fade-out .3s var(--ease) both}
+.page-project::view-transition-new(root){animation:vt-rise .6s var(--slide-ease) .35s both}
+.page-home::view-transition-new(root){animation:vt-fade-in .5s var(--ease) .25s both}
+@keyframes vt-out-up{to{transform:translateY(-55vh);opacity:0}}
+@keyframes vt-out-down{to{transform:translateY(55vh);opacity:0}}
+@keyframes vt-in-up{from{transform:translateY(-55vh);opacity:0}}
+@keyframes vt-in-down{from{transform:translateY(55vh);opacity:0}}
+@keyframes vt-fade-out{to{opacity:0}}
+@keyframes vt-fade-in{from{opacity:0}}
+@keyframes vt-rise{from{opacity:0;transform:translateY(40px)}}
+.page-project .project-head h1{view-transition-name:project-title;width:fit-content;margin:0 auto}
 
 /* Inner pages: the name only, centered. No menu bar. */
-.site-header{display:flex;justify-content:center;padding:28px var(--gutter) 0}
+.site-header{position:relative;display:flex;justify-content:center;padding:28px var(--gutter) 0}
+/* Back, just above a project's title: returns to the list it was opened from */
+.project-head .back{margin:0 0 var(--s3);font:italic 400 clamp(17px,1.35vw,20px)/1.4 var(--serif);letter-spacing:.01em}
+.project-head .back a{color:var(--tag-gray)}
+.project-head .back a:hover,.project-head .back a:focus-visible{color:var(--ink)}
 .lockup{display:flex;align-items:flex-end;gap:13px;color:var(--ink)}
 .lockup-hand{display:block;height:42px;width:auto}
 .lockup .wordmark{display:block;width:168px;height:auto;margin-bottom:4px}

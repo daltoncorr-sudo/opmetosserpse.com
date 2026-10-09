@@ -220,6 +220,49 @@
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(fit);
   var rt; window.addEventListener('resize', function () { clearTimeout(rt); rt = setTimeout(fit, 150); });
 
+  // Into a project and back. As the page swaps, the clicked title is named project-title (the project page's h1 has the
+  // same name, so the browser zooms one into the other) and the rows on screen are named above or below it, so they
+  // slide away and, coming back, slide in again. The list's state and the row's place are kept for the return.
+  var KEY = 'oo-return';
+  var projectOf = function (u) { var m = u && new URL(u, location.href).pathname.match(/^\/projects\/([^\/]+)$/); return m && m[1]; };
+  function untag() {
+    $$('[data-vt]').forEach(function (el) { el.style.viewTransitionName = ''; el.style.viewTransitionClass = ''; el.removeAttribute('data-vt'); });
+  }
+  function tag(slug) {
+    untag();
+    var row = $('.work-row[data-project="' + slug + '"]', list);
+    if (!row || !row.getClientRects().length) return false;
+    var title = row.querySelector('a, .plain');
+    var name = function (el, n, cls) { el.style.viewTransitionName = n; if (cls) el.style.viewTransitionClass = cls; el.setAttribute('data-vt', ''); };
+    name(title, 'project-title');
+    var past = false, n = 0;
+    [$('.work-head')].concat(rows).forEach(function (el) {
+      if (el === row) { past = true; return; }
+      var r = el.getBoundingClientRect();
+      if (!r.height || r.bottom < 0 || r.top > innerHeight) return;
+      name(el, 'vt-' + (n++), past ? 'below' : 'above');
+    });
+    return true;
+  }
+  list.addEventListener('click', function (e) {
+    var a = e.target.closest('.work-row a'); if (!a) return;
+    try { sessionStorage.setItem(KEY, JSON.stringify({ slug: a.closest('[data-project]').getAttribute('data-project'), top: a.getBoundingClientRect().top, open: list.classList.contains('is-open') })); } catch (err) {}
+  });
+  window.addEventListener('pageswap', function (e) {
+    var to = e.activation && e.activation.entry && projectOf(e.activation.entry.url);
+    if (e.viewTransition && to && !reduce) tag(to);
+  });
+  window.addEventListener('pagereveal', function (e) {
+    untag();
+    var from = window.navigation && navigation.activation && navigation.activation.from && projectOf(navigation.activation.from.url);
+    var st = null; try { st = JSON.parse(sessionStorage.getItem(KEY)); } catch (err) {}
+    if (!from || !st || st.slug !== from) return;
+    if (st.open) setOpen(true, false);  // back onto the same list
+    var row = $('.work-row[data-project="' + from + '"]', list);
+    if (row) { var a = row.querySelector('a, .plain'); window.scrollTo(0, window.scrollY + a.getBoundingClientRect().top - st.top); }
+    if (e.viewTransition && !reduce && tag(from)) e.viewTransition.finished.finally(untag);
+  });
+
   // Hover hook for later: every project row says when the pointer or keyboard focus enters and leaves it
   rows.forEach(function (r) {
     var fire = function (name) { r.dispatchEvent(new CustomEvent(name, { bubbles: true, detail: { slug: r.getAttribute('data-project') } })); };
@@ -239,4 +282,14 @@
   sync(true);
   if (location.hash === '#archive') work.scrollIntoView();
   window.addEventListener('popstate', function () { pushed = false; sync(false); });
+})();
+
+// Project pages: Back returns to the list you came from (the way back zooms out onto it); straight in, it opens the work list.
+(function () {
+  var back = document.querySelector('[data-back]');
+  if (!back) return;
+  back.addEventListener('click', function (e) {
+    var ref = null; try { ref = document.referrer && new URL(document.referrer); } catch (err) {}
+    if (ref && ref.origin === location.origin && ref.pathname === '/' && history.length > 1) { e.preventDefault(); history.back(); }
+  });
 })();
