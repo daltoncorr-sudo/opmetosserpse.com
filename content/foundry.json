@@ -1,0 +1,94 @@
+{
+ "labels": {
+  "filters": [["all", "All"], ["digital", "Digital"], ["physical", "Physical"]],
+  "home": "Home",
+  "back": "Back",
+  "drag": "Drag to rotate"
+ },
+ "products": [
+  {
+   "id": "serif",
+   "kind": "digital",
+   "type": "Typeface",
+   "name": "Opmet Serif",
+   "line": "A classic text serif with a small wink: the o, e and p lean the other way. Nine weights, roman and italic.",
+   "meta": "[Price]",
+   "actions": [["Try it", "#"], ["Specimen", "#"], ["Trial", "#"], ["Buy", "#"]],
+   "images": [["[Specimen page]", "4 / 5"], ["[The italic, close]", "1 / 1"], ["[In use]", "4 / 5"], ["[Weights, side by side]", "16 / 9"]],
+   "object": "serif",
+   "draft": false
+  },
+  {
+   "id": "book",
+   "kind": "physical",
+   "type": "Book",
+   "name": "Season One",
+   "line": "The best of espresso tempo. Thirty tracks, thirty artists, one book.",
+   "meta": "In preparation.",
+   "actions": [["Write to hear when it is ready", "mailto:hello@opmetosserpse.com"]],
+   "images": [["[Cover]", "4 / 5"], ["[A spread]", "16 / 9"], ["[In hand]", "4 / 5"], ["[The spine and edges]", "1 / 1"]],
+   "object": "book",
+   "draft": false
+  },
+  {
+   "id": "app",
+   "kind": "digital",
+   "type": "App",
+   "name": "[Name to come]",
+   "line": "[One line on what it does]",
+   "meta": "[Price]",
+   "actions": [["Download", "#"]],
+   "images": [["[Photograph]", "4 / 5"], ["[Detail]", "1 / 1"], ["[In use]", "4 / 5"]],
+   "object": "app",
+   "draft": true
+  },
+  {
+   "id": "print",
+   "kind": "physical",
+   "type": "Print",
+   "name": "[Name to come]",
+   "line": "[Size, paper and edition]",
+   "meta": "[Price]",
+   "actions": [["Buy", "#"]],
+   "images": [["[Photograph]", "4 / 5"], ["[Detail]", "1 / 1"], ["[In use]", "4 / 5"]],
+   "object": "print",
+   "draft": true
+  },
+  {
+   "id": "tool",
+   "kind": "digital",
+   "type": "Tool",
+   "name": "[Name to come]",
+   "line": "[One line on what it does]",
+   "meta": "[Price]",
+   "actions": [["Download", "#"]],
+   "images": [["[Photograph]", "4 / 5"], ["[Detail]", "1 / 1"], ["[In use]", "4 / 5"]],
+   "object": "tool",
+   "draft": true
+  },
+  {
+   "id": "tote",
+   "kind": "physical",
+   "type": "Tote bag",
+   "name": "[Name to come]",
+   "line": "[Material and size]",
+   "meta": "[Price]",
+   "actions": [["Buy", "#"]],
+   "images": [["[Photograph]", "4 / 5"], ["[Detail]", "1 / 1"], ["[In use]", "4 / 5"]],
+   "object": "tote",
+   "draft": true
+  },
+  {
+   "id": "study",
+   "kind": "digital",
+   "type": "Study",
+   "name": "[Title to come]",
+   "line": "[Pages and format]",
+   "meta": "[Price]",
+   "actions": [["Buy", "#"]],
+   "images": [["[Photograph]", "4 / 5"], ["[Detail]", "1 / 1"], ["[In use]", "4 / 5"]],
+   "object": "study",
+   "draft": true
+  }
+ ]
+}
