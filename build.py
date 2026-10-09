@@ -156,8 +156,9 @@ class Media:
         return '/media/%s/og.jpg' % slug
 
 # How wide each block draws, for srcset
-SIZES = {'plate': '(max-width:640px) 100vw, 45vw', 'field': '(max-width:640px) 100vw, 60vw', 'wide': '(max-width:640px) 100vw, 76vw',
-         'pair': '(max-width:640px) 50vw, 30vw', 'full': '100vw', 'tall': '(max-width:640px) 100vw, 30vw'}
+# How wide each block draws, for srcset
+SIZES = {'hero': '(max-width:640px) 100vw, 76vw', 'plate': '(max-width:640px) 100vw, 60vw', 'wide': '(max-width:640px) 100vw, 76vw',
+         'pair': '(max-width:640px) 50vw, 38vw', 'full': '100vw', 'tall': '(max-width:640px) 100vw, 45vw'}
 
 def img_tag(m, sizes, alt, eager=False, extra=''):
     src, srcset, w, h = m
@@ -280,47 +281,54 @@ def load_notes(p, keys):
 def cap(x):
     return x[:1].upper() + x[1:]
 
-def credit_rows(p):
-    """End credits: role, then names. The studio speaks for itself: "Dalton Corr: roles" is credited to Opmet Osserpse.
-    Returns the rows and whether there is a photo credit."""
+def credit_rows(p, notes):
+    """Credits, role then names, set with the facts at the top. Every "Dalton Corr: roles" is credited to
+    "Dalton Corr, Opmet Osserpse". The client is already a fact, so it isn't repeated. Photographers come from the notes
+    file ("photography"); until they're known, the row says [To come]. Returns the rows and whether there is a photo credit."""
     rows, photo = [], False
     for label, names in p['credits']:
         photo = photo or 'photo' in label.lower() or any('photo' in x.lower() for x in names)
+        if label == 'Client': continue
         if label == 'Fonts': rows.append(('Typefaces', names)); continue
-        if label == 'Client': rows.append(('Client', names)); continue
         plain = []
         for x in names:
-            if x.startswith('Dalton Corr: '): rows.append((cap(x[len('Dalton Corr: '):]), ['Opmet Osserpse']))
+            if x.startswith('Dalton Corr: '): rows.append((cap(x[len('Dalton Corr: '):]), ['Dalton Corr, Opmet Osserpse']))
             elif ': ' in x: who, role = x.split(': ', 1); rows.append((cap(role), [who]))
             else: plain.append(x)
         if plain: rows.append((label, plain))
-    if not photo: rows.append(('Photography', None))
+    if notes.get('photography'): rows.append(('Photography', notes['photography'])); photo = True
+    elif not photo: rows.append(('Photography', None))
     return rows, photo
+
+BILLBOARD = re.compile(r'billboard', re.I)
 
 def make_blocks(items, notes):
     """Group the items, in order, into blocks. Two pictures side by side when they sit next to each other in the same
-    gallery on daltoncorr.com and share a shape (both P, or both landscape); a 3D or interactive piece is a block of its own."""
+    gallery on daltoncorr.com and share a shape (both P, or both landscape); a billboard always has its own row; a 3D or
+    interactive piece is a block of its own. The first picture on its own, the poster on most pages, draws largest."""
     out, i = [], 0
     def pairable(x, y):
-        return (y and x['kind'] == y['kind'] == 'img' and x['gallery'] == y['gallery']
-                and x['slot'] == y['slot'] and x['slot'] in ('P', 'L'))
+        return (y and x['kind'] == y['kind'] == 'img' and x['gallery'] == y['gallery'] and x['slot'] == y['slot']
+                and x['slot'] in ('P', 'L') and not BILLBOARD.search(x.get('alt', '')) and not BILLBOARD.search(y.get('alt', '')))
     while i < len(items):
         it = items[i]; nxt = items[i + 1] if i + 1 < len(items) else None
         grp = [it, nxt] if pairable(it, nxt) else [it]
         i += len(grp)
         note = next((notes[x['key']]['text'] for x in grp if x['key'] in notes), None)
         if len(grp) == 2: kind = 'pair'
-        elif it['kind'] == 'widget': kind = 'plate' if it['name'] == 'logo-switch' else 'field'
+        elif not out and it['kind'] != 'widget' and it['slot'] not in ('H', 'F'): kind = 'hero'
+        elif it['kind'] == 'widget': kind = 'plate' if it['name'] == 'logo-switch' else 'wide'
         elif it['kind'] == 'video':
             r = it['w'] / it['h']
-            kind = ('field' if note else 'wide') if r > 1.2 else 'tall' if r < 0.83 else 'plate'
+            kind = 'wide' if r > 1.2 else 'tall' if r < 0.83 else 'plate'
         elif it['slot'] in ('H', 'F'): kind = 'full'
-        elif it['slot'] in ('W', 'L') and it['h'] <= it['w']: kind = 'field' if note else 'wide'
+        elif it['h'] <= it['w']: kind = 'wide'
         else: kind = 'plate'
         out.append(dict(kind=kind, items=grp, note=note))
     return out
 
 def block_html(b, slug):
+    """A block, with its note (if it has one) set below it, at its left edge."""
     kind = b['kind']
     ms = []
     for k, it in enumerate(b['items'], 1):
@@ -333,25 +341,29 @@ def block_html(b, slug):
             if it['sound']: cap_ += ' <a href="#" class="again" data-sound="%s">Play with sound</a>' % it['id']
             cap_ += ' <a href="#" class="again" data-again="%s" hidden>Play again</a>' % it['id']
     cap_ = cap_.strip()
-    if kind == 'full':
+    if kind == 'full':  # a full bleed has no grid of its own: its note sits in one, under it
         fc = '<figcaption class="g fcap"><span class="note">%s</span></figcaption>' % cap_ if cap_ else ''
-        return '<figure class="b b-full"%s>%s%s</figure>' % (' data-read' if cap_ else '', ''.join(ms), fc)
-    fc = '<figcaption class="note">%s</figcaption>' % cap_ if cap_ else ''
-    return '<figure class="b g b-%s"%s>%s%s</figure>' % (kind, ' data-read' if cap_ else '', ''.join(ms), fc)
+    else:
+        fc = '<figcaption class="note">%s</figcaption>' % cap_ if cap_ else ''
+    return '<figure class="b%s b-%s"%s>%s%s</figure>' % ('' if kind == 'full' else ' g', kind, ' data-read' if cap_ else '', ''.join(ms), fc)
 
-def project_body(p, blocks, chapters, nxt, notes, back='Back'):
-    """The opening (title, paragraph, facts), the work in up to four chapters with notes in the margin, the credits, and
-    the next project. One link back to the list for the panel on home."""
+def project_body(p, blocks, chapters, notes, back='Back', all_work='All work', top='Back to top'):
+    """The opening (title; under it the paragraph, and the facts and credits), then the work in up to four chapters,
+    then the way out: back to the top, or to all the work. No next project."""
     facts = [('Client', typo(p['client'])), ('Year', esc(p['year']))]
     if notes.get('work'): facts.append(('Work', typo(notes['work'])))
     facts.append(('Role', typo(p['role'])))
     if p['links']:
         t, u = p['links'][0]; facts.append(('Link', '<a href="%s" rel="noopener">%s</a>' % (esc(u), typo(t))))
+    rows, _ = credit_rows(p, notes)
+    credits = ''.join('<div><dt>%s</dt><dd>%s</dd></div>' % (typo(r), '<br>'.join(typo(x) for x in names) if names else '<span class="ph">[To come]</span>')
+                      for r, names in rows)
     # data-page-only: a page with a 3D or interactive piece opens as its own page from home, so its scripts run
     out = ['<div class="pp"%s>' % (' data-page-only' if p.get('_scripts') else ''),
-           '<section class="open g"><p class="pback"><a href="/#work" data-back>%s</a></p><h1>%s</h1>'
-           '<p class="lede">%s</p><dl class="facts">%s</dl></section>' % (esc(back), typo(p['title']), typo(notes.get('lede') or p['lede']),
-                                                                     ''.join('<div><dt>%s</dt><dd>%s</dd></div>' % x for x in facts))]
+           '<section class="open g"><p class="pback"><a href="/#work" data-back>%s</a></p><h1>%s</h1><p class="lede">%s</p>'
+           '<dl class="facts">%s</dl><div class="credits"><h2 class="lab">Credits</h2><dl class="cr">%s</dl></div></section>' % (
+               esc(back), typo(p['title']), typo(notes.get('lede') or p['lede']),
+               ''.join('<div><dt>%s</dt><dd>%s</dd></div>' % x for x in facts), credits)]
     starts = {c['starts_at']: c for c in chapters}
     open_ch, n = False, 0
     for b in blocks:
@@ -359,16 +371,11 @@ def project_body(p, blocks, chapters, nxt, notes, back='Back'):
         if c:
             if open_ch: out.append('</section>')
             n += 1; open_ch = True
-            out.append('<section class="ch" aria-label="%s"><div class="chl"><h2 class="chap"><span class="n">%d</span>%s</h2></div>'
+            out.append('<section class="ch" aria-label="%s"><div class="chl g"><h2 class="chap"><span class="n">%d</span>%s</h2></div>'
                        % (esc(c['label']), n, typo(c['label'])))
         out.append(block_html(b, p['slug']))
     if open_ch: out.append('</section>')
-    rows, _ = credit_rows(p)
-    out.append('<section class="g end" aria-label="Credits"><h2 class="lab">Credits</h2><dl class="cr">%s</dl></section>' % ''.join(
-        '<div><dt>%s</dt><dd>%s</dd></div>' % (typo(r), '<br>'.join(typo(x) for x in names) if names else '<span class="ph">[To come]</span>')
-        for r, names in rows))
-    out.append('<nav class="g nx" aria-label="Next project"><a class="next" href="/projects/%s"><span class="lab">Next project</span>'
-               '<span class="nt">%s</span><span class="ni">%s</span></a></nav>' % (nxt['slug'], typo(nxt['title']), nxt['_thumb']))
+    out.append('<nav class="g pfoot" aria-label="More"><a href="#main" data-totop>%s</a><a href="/#archive">%s</a></nav>' % (esc(top), esc(all_work)))
     out.append('</div>')
     return '\n'.join(out)
 
@@ -529,14 +536,11 @@ def main():
         p['_blocks'], p['_chapters'], p['_items'] = blocks, chapters, items
         p['_scripts'] = [n for x in items if x['kind'] == 'widget' for n in x['scripts']]
         used_scripts |= set(p['_scripts'])
-        o = next(x for x in items if x['kind'] != 'widget')
-        p['_thumb'] = ('<img src="%s" alt="%s" loading="lazy" decoding="async" width="%d" height="%d">' % (o['v']['poster'], esc(o['alt']), o['w'], o['h'])
-                       if o['kind'] == 'video' else img_tag(o['r'], '(max-width:640px) 100vw, 60vw', o['alt']))
         kinds = [b['kind'] for b in blocks]
         runs = [kinds[k] for k in range(2, len(kinds)) if kinds[k] == kinds[k - 1] == kinds[k - 2]]
         stats[s] = dict(order=[x['key'] for x in items], blocks=kinds, full=kinds.count('full'), runs=sorted(set(runs)),
                         pieces=[x['key'] for x in items if x['kind'] == 'widget'],
-                        lede_words=len((notes.get('lede') or p['lede']).split()), photo=credit_rows(p)[1],
+                        lede_words=len((notes.get('lede') or p['lede']).split()), photo=credit_rows(p, notes)[1],
                         videos=[dict(key=x['key'], block=next(b['kind'] for b in blocks if x in b['items']), rest=x['rest'], sound=x['sound'], bytes=x['v']['bytes'])
                                 for x in items if x['kind'] == 'video'])
 
@@ -554,7 +558,7 @@ def main():
                         for up in re.findall(r"'\.\./([^'/]+\.(?:webp|png|jpe?g))'", open(os.path.join(src_root, 'js', n), encoding='utf-8').read()):
                             media.assets([os.path.normpath(os.path.join(urllib.parse.unquote(base), '..', up))])
 
-    # second pass: write each page, with the next project after it in project_order (the last wraps to the first)
+    # second pass: write each page
     for i, p in enumerate(ordered):
         s = p['slug']
         card = media.image(p['card']['src'], s, 'card', max_w=800) if p['card']['src'] else None
@@ -567,9 +571,7 @@ def main():
                 for n, rel in enumerate(bigs, 1):
                     full = os.path.join(DIST, rel.lstrip('/'))
                     z.write(full, '%s-%02d%s' % (s, n, os.path.splitext(full)[1]))
-        nxt = ordered[(i + 1) % len(ordered)]
-        stats[s]['next'] = nxt['slug']
-        body = project_body(p, p['_blocks'], p['_chapters'], nxt, p['_notes'], site['project_back'])
+        body = project_body(p, p['_blocks'], p['_chapters'], p['_notes'], site['project_back'], site['project_all'], site['project_top'])
         head = ''
         if p['_scripts']:  # a page with a 3D or interactive piece: its styles and scripts, in order
             head = '<link rel="stylesheet" href="/css/work.css?v=%s">\n' % site['_v'] + ''.join(

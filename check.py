@@ -7,7 +7,7 @@ import glob, os, re, sys
 
 D = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'docs')
 ACRONYMS = {'ASCAP', 'BAFTA', 'NYU', 'IMGN', 'LLC', 'SVG', 'EPS', 'PNG', 'PDF', 'TCL', 'LOOK', 'BAM', 'SCL', 'HTML'}
-CHECKS = [(r'\bAI\b', 'the word "AI"'), (r'\bvibes?\b', '"vibes"'), (r'Opmetosserpse', 'the name written as one word'), (r'Dalton Corr', "Dalton's name (the site doesn't name him)"),
+CHECKS = [(r'\bAI\b', 'the word "AI"'), (r'\bvibes?\b', '"vibes"'), (r'Opmetosserpse', 'the name written as one word'), (r'Dalton Corr', "Dalton's name outside the credits"),
           (r'\[D\?|\[DC|\[DB|TODO|Lorem|ipsum', 'a leftover note or placeholder'), (r'\b[A-Z]{4,}\b', 'a word in all caps')]
 
 problems = []
@@ -22,7 +22,9 @@ for f in glob.glob(D + '/**/*.html', recursive=True):
         p = D + u
         if not (os.path.exists(p) or os.path.exists(p + '.html') or os.path.exists(p.rstrip('/') + '/index.html')):
             problems.append('%s: broken link %s' % (rel, u))
-    text = re.sub(r'<[^>]+>', ' ', re.sub(r'<(script|style|svg)[\s\S]*?</\1>', ' ', t))
+    # Dalton's name appears only in a project's credits, as "Dalton Corr, Opmet Osserpse"; anywhere else it's a problem
+    t2 = re.sub(r'<dl class="cr">[\s\S]*?</dl>', lambda m: m.group(0).replace('Dalton Corr, Opmet Osserpse', 'Opmet Osserpse'), t)
+    text = re.sub(r'<[^>]+>', ' ', re.sub(r'<(script|style|svg)[\s\S]*?</\1>', ' ', t2))
     for pat, why in CHECKS:
         for m in re.finditer(pat, text):
             if why == 'a word in all caps' and m.group(0) in ACRONYMS:
@@ -61,13 +63,11 @@ for i, slug in enumerate(order):
     stem = lambda p: re.sub(r'-(600|720|800|1200|1600|2400|sm|lg|xl)$', '', re.sub(r'\.(webp|jpe?g|png|gif|mp4|webm|mov)$', '', os.path.basename(p), flags=re.I))
     hidden = {stem(m['src']) for m in pj['media'] if m['alt'] in hide}
     want = [k for k in record.get(slug, []) if k not in hidden]
-    body = t.split('class="pp"', 1)[-1].split('class="g end"', 1)[0]
+    body = t.split('class="pp"', 1)[-1].split('class="g pfoot"', 1)[0]
     got = [H.unescape(k) for k in re.findall(r'data-i="([^"]+)"', body)]
     if got != want: problems.append('%s: media order differs from daltoncorr.com (%d items, expected %d)' % (rel, len(got), len(want)))
-    nx = re.search(r'<a class="next" href="/projects/([^"]+)"', t)
-    if not nx or nx.group(1) != order[(i + 1) % len(order)]: problems.append('%s: Next project does not follow project_order' % rel)
-for f in glob.glob(D + '/**/*.js', recursive=True) + glob.glob(D + '/**/*.css', recursive=True):
-    if 'Dalton Corr' in open(f, encoding='utf-8', errors='ignore').read(): problems.append('%s: Dalton\'s name' % os.path.relpath(f, D))
+    if 'Next project' in t: problems.append('%s: a "Next project" (pages end on Back to top and All work)' % rel)
+    if 'data-totop' not in t or 'href="/#archive"' not in t: problems.append('%s: no Back to top or All work at the end' % rel)
 # the home list and the projects index list the pages in project_order
 for page_, pat in (('index.html', r'class="work-row[^"]*" data-project="([^"]+)"><?(?:span class="yr">\d+</span>)?<a href'),
                    ('projects/index.html', r'<li id="([^"]+)"><a href="/projects/')):
