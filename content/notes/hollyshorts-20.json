@@ -19,7 +19,7 @@
    "src": "work[1]"
   },
   {
-   "label": "Merchandise and badges",
+   "label": "The merchandise",
    "starts_at": "All-merch-4f20ad",
    "src": "deliverables[1], [2], [3]"
   }
@@ -62,5 +62,7 @@
    "Distinctive Event Solutions"
   ]
  ],
- "credits_src": "D, Oct. 9, 2026 (photography follows from \"photography\")"
+ "credits_src": "D, Oct. 9, 2026 (photography follows from \"photography\")",
+ "kicker": "20th Anniversary",
+ "kicker_src": "D, Oct. 9, 2026: small text above the title"
 }
