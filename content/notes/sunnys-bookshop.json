@@ -1,78 +1,77 @@
 {
  "status": "draft",
- "opener": 1,
  "work": "Book mark, seal, signature, brand bible, announcement film",
  "work_src": "deliverables",
  "chapters": [
   {
    "label": "The book",
-   "starts_at": 3,
+   "starts_at": "sb-03-book-02-4x5",
    "src": "system[0]"
   },
   {
    "label": "Seal and signature",
-   "starts_at": 6,
+   "starts_at": "sb-04-seal-01-16x9",
    "src": "system[1], system[2]"
   },
   {
    "label": "Type and color",
-   "starts_at": 11,
+   "starts_at": "sb-06-system-01-16x9",
    "src": "deliverables[5]"
   },
   {
    "label": "Into the world",
-   "starts_at": 21,
+   "starts_at": "sb-12-bible-01-16x9",
    "src": "work[2]"
   }
  ],
  "notes": {
-  "1": {
+  "sb-00-hero-01-16x9": {
    "text": "The open book was drawn by hand in ink, then cut down to a solid version for small sizes.",
    "src": "work[0]"
   },
-  "3": {
+  "sb-03-book-02-4x5": {
    "text": "Left, the original ink drawing. Right, the solid version, still legible at the size of a favicon.",
    "src": "work[0]"
   },
-  "6": {
+  "sb-04-seal-01-16x9": {
    "text": "“For readers and writers” didn't need writing. It was already stitched into her label.",
    "src": "work[2]"
   },
-  "10": {
+  "sb-05-signature-02-16x9": {
    "text": "Sloop Script, tidied to be read rather than admired, with a custom S. The flourishes were politely declined.",
    "src": "work[0]"
   },
-  "14": {
+  "sb-07-type-01-16x9": {
    "text": "Sailing Club capitals, Sloop Script, Cormorant Garamond italic and EB Garamond.",
    "src": "credits (Fonts), media alt"
   },
-  "15": {
+  "sb-07-colour-02-16x9": {
    "text": "Every color carries Pantone, thread and foil references.",
    "src": "deliverables[5], system[4]"
   },
-  "16": {
+  "sb-08-journal-01-4x5": {
    "text": "A second mark, for Sunny's Journal & Press, in the same world.",
    "src": "work[2]"
   },
-  "21": {
+  "sb-12-bible-01-16x9": {
    "text": "A 24-page brand bible, set like a book because it was for a bookshop. Behind it sit 46 pages of studies.",
    "src": "work[1]"
   },
-  "27": {
+  "sb-14-film-01-9x16": {
    "text": "The announcement film sets the drawing, the type and the studies to the sound of the room.",
    "src": "work[2]"
   }
  },
  "video": {
-  "1": {
+  "sb-00-hero-01-16x9": {
    "rest": "end",
    "sound": false
   },
-  "10": {
+  "sb-05-signature-02-16x9": {
    "rest": 4.5,
    "sound": false
   },
-  "27": {
+  "sb-14-film-01-9x16": {
    "rest": "end",
    "sound": true
   }

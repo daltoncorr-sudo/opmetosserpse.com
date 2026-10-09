@@ -1,56 +1,55 @@
 {
  "status": "draft",
- "opener": 2,
  "work": "Poster, logo, badges, wine labels, festival trophy",
  "work_src": "deliverables",
  "chapters": [
   {
    "label": "The painting",
-   "starts_at": 2,
+   "starts_at": "poster",
    "src": "system[0]"
   },
   {
-   "label": "Across Hollywood",
-   "starts_at": 8,
-   "src": "work[1]"
-  },
-  {
    "label": "Badges and bottles",
-   "starts_at": 14,
+   "starts_at": "w:badge3d",
    "src": "deliverables"
   },
   {
+   "label": "Across Hollywood",
+   "starts_at": "billboard-tower",
+   "src": "work[1]"
+  },
+  {
    "label": "Award night",
-   "starts_at": 22,
+   "starts_at": "award-screen",
    "src": "deliverables[6]"
   }
  ],
  "notes": {
-  "2": {
+  "poster": {
    "text": "Two details from this painting became the whole system: the dancing figures on its screen and the 22.",
    "src": "work[0]"
   },
-  "4": {
+  "w:logo-switch": {
    "text": "The 22 is a film strip, drawn by hand, in white and in black.",
    "src": "work[0], system[1]"
   },
-  "3": {
+  "billboard-tower": {
    "text": "Eleven days across two sites: the TCL Chinese Theatres and Ovation Hollywood.",
    "src": "challenge"
   },
-  "20": {
+  "sign-red-carpet": {
    "text": "The figures do the wayfinding: the Red Carpet sign on Hollywood Boulevard, the walkway towers, the theater signs and the VIP room.",
-   "src": "work[1]"
+   "src": "work[1]; the VIP room from daltoncorr.com"
   },
-  "14": {
+  "wine-lineup-all": {
    "text": "The labels came from the poster. Artiste Winery bottled a Sauvignon Blanc, a Chardonnay and a Cabernet Sauvignon for the festival.",
    "src": "work[2]"
   },
-  "16": {
+  "w:phones-stage": {
    "text": "Online, the campaign ran to hundreds of graphics under the same direction.",
    "src": "work[2]"
   },
-  "12": {
+  "trophy-hand": {
    "text": "The trophy is a film-strip frame that holds the winning film's own poster.",
    "src": "work[2], system[3]"
   }

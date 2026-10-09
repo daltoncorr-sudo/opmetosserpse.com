@@ -1,56 +1,56 @@
 {
  "status": "draft",
- "opener": 2,
  "work": "Poster, animated poster, anniversary logo, badges, merchandise",
  "work_src": "deliverables",
  "chapters": [
   {
    "label": "The set",
-   "starts_at": 2,
+   "starts_at": "poster",
    "src": "system[0]"
   },
   {
-   "label": "On paper first",
-   "starts_at": 9,
-   "src": "work[1]"
-  },
-  {
    "label": "Ninety-one films",
-   "starts_at": 11,
+   "starts_at": "official-selections",
    "src": "work[2]"
   },
   {
    "label": "Award night",
-   "starts_at": 16,
+   "starts_at": "award-best-cringe",
    "src": "deliverables[6]"
+  },
+  {
+   "label": "On paper first",
+   "starts_at": "study-type",
+   "src": "work[1]"
   }
  ],
  "notes": {
-  "2": {
+  "hollyshorts-comedy-10-poster-popcorn": {
    "text": "The brief came down to two words: prestige, but silly. Then the poster was animated for the screen.",
    "src": "challenge, work[0]"
   },
-  "6": {
+  "w:badge-float": {
    "text": "Seven badges, all in the poster's inflated, candy-like type.",
    "src": "deliverables[2], work[0]"
   },
-  "9": {
+  "study-type": {
    "text": "The type was tested on paper first. These printed studies sat on the desk before the finals.",
    "src": "work[1]"
   },
-  "14": {
+  "official-selections": {
    "text": "Ninety-one official selections. The screening schedules also ran on the cinema's own displays.",
    "src": "work[2]"
   },
-  "18": {
+  "tee-take-10": {
    "text": "The tees carry their own jokes. A third one reads “This Is My Red Carpet Outfit.”",
    "src": "work[2]"
   }
  },
  "video": {
-  "2": {
+  "hollyshorts-comedy-10-poster-popcorn": {
    "rest": "end",
-   "sound": false
+   "sound": false,
+   "poster_frame": "first"
   }
  },
  "hide": []
