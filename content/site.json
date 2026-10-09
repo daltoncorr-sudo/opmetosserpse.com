@@ -43,8 +43,10 @@
   ],
   "work": {
    "label": "Work",
-   "archive": "Archive",
-   "close": "Close"
+   "selected": "Selected work",
+   "all": "All work",
+   "more": "See more",
+   "less": "See less"
   }
  },
  "projects": {
@@ -72,13 +74,11 @@
    "Fonts and goods, coming soon."
   ]
  },
- "back": "Studio",
+ "back": "Home",
  "about": {
-  "title": "About",
+  "title": "About Opmet Osserpse",
   "lines": [
-   "Opmet Osserpse is a creative studio based in Venice, California.",
-   "We bring together world-class creators to make incredible work with our partners.",
-   "Our music and sound studio is called espresso tempo.",
+   "Opmet Osserpse is a creative studio based in Venice, California. We bring together world-class creators to make incredible work with our partners: identities, key art, campaigns, print and websites for festivals, films and businesses. Much of it begins by hand, in pencil and paint, and carries through to every poster, screen and storefront it reaches. Since 2023 the studio has art directed the Oscar-qualifying HollyShorts Film Festival and its editions in London, Dubai and comedy, and has made work for Kodak at Cannes, the Polish Film Festival North America, Ritesh Films, Weissman and Sunny's Bookshop. Our music and sound studio is called espresso tempo.",
    "hello@opmetosserpse.com\n@opmetosserpse"
   ],
   "press_title": "Press"

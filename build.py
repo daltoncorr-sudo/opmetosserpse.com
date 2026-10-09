@@ -211,10 +211,11 @@ def work_section(items, w):
         rows.append('<li class="work-row%s" data-project="%s"%s>%s%s%s</li>' % (
             ' extra' if extra else '', e['slug'], ' style="--i:%d"' % i if extra else '', yr, work_title(e), tag_list(e['tags'])))
         if extra: i += 1
-    return ('<section class="work" id="work" tabindex="-1" aria-label="%s"><p class="work-head">'
-            '<button type="button" class="archive-toggle" aria-expanded="false" aria-controls="works" data-open-label="%s" data-close-label="%s">%s</button></p>'
+    return ('<section class="work" id="work" tabindex="-1" aria-label="%s"><div class="work-head">'
+            '<h2 class="work-label" data-closed="%s" data-open="%s">%s</h2>'
+            '<button type="button" class="archive-toggle" aria-expanded="false" aria-controls="works" data-open-label="%s" data-close-label="%s">%s</button></div>'
             '<ul class="works" id="works">%s</ul></section>') % (
-        esc(w['label']), esc(w['archive']), esc(w['close']), esc(w['archive']), ''.join(rows))
+        esc(w['label']), esc(w['selected']), esc(w['all']), esc(w['selected']), esc(w['more']), esc(w['less']), esc(w['more']), ''.join(rows))
 
 def press_list(press):
     """Press, by year, newest first. Plain lines: the outlet, then the headline."""
@@ -328,10 +329,11 @@ def main():
                '<h2 class="side-title" id="foundry-title" tabindex="-1">%s</h2><div class="foundry-body">%s</div>%s</div></section>') % (esc(fd['title']), fd_body, back)
     ap = site['about']
     press = load(os.path.join(CONTENT, 'press.json'))['press']
-    about_panel = ('<section class="panel side about-panel" id="about" aria-labelledby="about-title"><div class="side-inner">'
-                   '<h2 class="side-title" id="about-title" tabindex="-1">%s</h2><div class="about-body">%s</div>'
-                   '<h3 class="press-title">%s</h3>%s%s</div></section>') % (
-        esc(ap['title']), ''.join('<p>%s</p>' % link(typo(x)) for x in ap['lines']), esc(ap['press_title']), press_list(press), back)
+    about_panel = ('<section class="panel side about-panel" id="about" aria-labelledby="about-title">'
+                   '<p class="home-link"><a href="#" data-studio>%s</a></p><div class="about-grid"><div class="about-main">'
+                   '<h2 class="about-title" id="about-title" tabindex="-1">%s</h2><div class="about-body">%s</div></div>'
+                   '<div class="about-press"><h3 class="press-title">%s</h3>%s</div></div></section>') % (
+        esc(site['back']), esc(ap['title']), ''.join('<p>%s</p>' % link(typo(x)) for x in ap['lines']), esc(ap['press_title']), press_list(press))
     cover = ('<section class="cover"><div class="cover-inner"><h1><span class="mark" %s>%s</span><span class="name">%s</span></h1>'
              '<nav class="cover-nav" aria-label="Site">%s</nav><div class="intro">%s</div></div></section>') % (
         moves.mark_attrs(mv), hand + mv['layers'], brand_svg('wordmark.svg', 'wordmark', 'Opmet Osserpse'), nav, about)

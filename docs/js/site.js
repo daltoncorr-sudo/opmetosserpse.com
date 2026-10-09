@@ -169,7 +169,7 @@
 
   // The list opens in place: the rows already showing glide apart to their new places while the rest fade in
   // between them. Closing fades the extras out, then the rest glide back together. Transform and opacity only.
-  var list = $('#works'), toggle = $('.archive-toggle'), rows = $$('.work-row', list), extras = $$('.extra', list), timer = 0;
+  var list = $('#works'), toggle = $('.archive-toggle'), label = $('.work-label'), rows = $$('.work-row', list), extras = $$('.extra', list), timer = 0;
   var tops = function (els) { return els.map(function (r) { return r.getBoundingClientRect().top; }); };
   function glide(els, before) {
     var after = tops(els);
@@ -183,6 +183,7 @@
     clearTimeout(timer); clean();
     toggle.setAttribute('aria-expanded', open);
     toggle.textContent = toggle.getAttribute(open ? 'data-close-label' : 'data-open-label');
+    label.textContent = label.getAttribute(open ? 'data-open' : 'data-closed');
     history.replaceState(history.state, '', url(open ? '#archive' : (location.hash === '#archive' ? '#work' : location.hash)));
     var kept = rows.filter(function (r) { return !r.classList.contains('extra'); });
     if (!animate || reduce) { list.classList.toggle('is-open', open); return; }

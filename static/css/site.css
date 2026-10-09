@@ -75,6 +75,16 @@ html:not(.js) .stage:has(#about:target){transform:translateX(-66.6667%)}
 .press .outlet{font-family:var(--serif);font-size:var(--size-m);margin-right:.35em}
 .press a:hover .outlet{color:inherit}
 .studio-link{margin-top:2.6em;font:italic 400 var(--size-m) var(--serif)}
+/* About: the title and a paragraph at the top left; the press to the right, set a little lower. Home stays at the top right. */
+.home-link{position:sticky;top:0;z-index:1;margin:0;padding:22px 0 10px;text-align:right;background:var(--paper);font:italic 400 var(--size-m) var(--serif)}
+.about-grid{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:clamp(32px,7vw,120px);padding:4vh clamp(8px,calc(4vw - var(--gutter)),56px) 14vh;text-align:left}
+.about-title{font:400 clamp(34px,3.8vw,60px)/1.05 var(--serif);margin:0 0 .7em}
+.about-title:focus{outline:none}
+.about-panel .about-body{font-size:clamp(18px,1.55vw,23px);line-height:1.5;max-width:34em}
+.about-body p{margin:0 0 1.1em}
+.about-press{text-align:right;padding-top:clamp(80px,18vh,200px)}
+.about-press .press-title{margin-top:0}
+@media (max-width:860px){.about-grid{grid-template-columns:1fr}.about-press{padding-top:0}}
 
 /* The cover: centered. The hand and the name side by side, the words below, then three lines in bold. */
 .cover{height:100vh;height:100svh;min-height:420px;display:flex;align-items:center;justify-content:center;text-align:center}
@@ -97,19 +107,20 @@ html:not(.js) .stage:has(#about:target){transform:translateX(-66.6667%)}
 }
 
 /* Work: one list. Collapsed, only the Selected rows show; Archive opens the rest in place. */
-.work{max-width:40rem;margin:0 auto;padding:10vh 0 20vh;scroll-margin-top:6vh}
+.work{max-width:54rem;margin:0 auto;padding:10vh 0 20vh;scroll-margin-top:6vh}
 .work:focus{outline:none}
-.work-head{margin:0 0 1.4em}
-.archive-toggle{font:italic 400 var(--size-m) var(--serif);color:inherit;background:none;border:0;padding:0;cursor:pointer;transition:color var(--t) var(--ease)}
-.archive-toggle:hover{color:var(--graphite)}
-.work-row{position:relative;display:flex;flex-wrap:wrap;align-items:baseline;column-gap:.9em;margin:0 0 .4em}
-.work-row>a,.work-row .plain{font-family:var(--serif);font-size:clamp(17px,1.3vw,19px);line-height:1.55}
+.work-head{display:flex;align-items:baseline;gap:1.2em;margin:0 0 1.6em}
+.work-label{font:italic 400 clamp(20px,1.9vw,28px)/1.2 var(--serif);margin:0}
+.archive-toggle{font:italic 400 clamp(20px,1.9vw,28px)/1.2 var(--serif);color:var(--tag-gray);background:none;border:0;padding:0;cursor:pointer;transition:color var(--t) var(--ease)}
+.archive-toggle:hover{color:var(--ink)}
+.work-row{position:relative;display:flex;flex-wrap:wrap;align-items:baseline;column-gap:.9em;margin:0 0 .8em}
+.work-row>a,.work-row .plain{font-family:var(--serif);font-size:clamp(20px,1.9vw,28px);line-height:1.3}
 .work-row .plain{color:var(--tag-gray)}
-.tags{display:inline-flex;flex-wrap:wrap;gap:.2em .9em;font:400 11.5px/1.4 var(--sans);letter-spacing:.02em;color:var(--tag-gray)}
+.tags{display:inline-flex;flex-wrap:wrap;gap:.2em .9em;font:400 13px/1.4 var(--sans);letter-spacing:.02em;color:var(--tag-gray)}
 .works:not(.is-open) .extra{display:none}
-.yr{position:absolute;right:calc(100% + 1.4rem);top:0;font:italic 400 clamp(15px,1.1vw,17px)/1.55 var(--serif);color:var(--tag-gray);padding-top:.15em;opacity:0;transition:opacity .5s var(--ease)}
+.yr{position:absolute;right:calc(100% + 1.6rem);top:0;font:italic 400 clamp(15px,1.2vw,18px)/1.3 var(--serif);color:var(--tag-gray);padding-top:.35em;opacity:0;transition:opacity .5s var(--ease)}
 .works.is-open .yr{opacity:1}
-@media (max-width:899px){.works{padding-left:3.4rem}.yr{right:auto;left:-3.4rem}}
+@media (max-width:1099px){.works{padding-left:3.6rem}.yr{right:auto;left:-3.6rem}}
 /* The motion: rows already showing glide to their new places while the others fade in between (transform and opacity) */
 .works .glide{transition:transform var(--open) var(--slide-ease)}
 .works .rise{opacity:0;transform:translateY(-4px)}
