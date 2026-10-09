@@ -166,13 +166,20 @@
   $$('[data-studio]').forEach(function (a) { a.addEventListener('click', function (e) { e.preventDefault(); closePanel(); }); });
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && current) closePanel(); });
 
-  // Work: smooth scroll, #work in the address, focus on the list
+  // Work: scroll so the list (its heading and rows) sits in the middle of the screen, #work in the address, focus on it.
+  // If the list is taller than the screen, its top sits a little below the top edge instead.
   var work = $('#work');
+  function centerWork(smooth) {
+    var head = $('.work-head', work).getBoundingClientRect(), rows = $('#works').getBoundingClientRect();
+    var top = head.top, h = rows.bottom - head.top;
+    var y = window.scrollY + top - (h < innerHeight * .9 ? (innerHeight - h) / 2 : innerHeight * .08);
+    window.scrollTo({ top: Math.max(0, y), behavior: smooth && !reduce ? 'smooth' : 'auto' });
+  }
   $$('[data-go="work"]').forEach(function (a) {
     a.addEventListener('click', function (e) {
       e.preventDefault();
       history.pushState(null, '', url('#work'));
-      work.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' });
+      centerWork(true);
       work.focus({ preventScroll: true });
     });
   });
@@ -249,7 +256,12 @@
     ppOpen = open; pp.inert = !open; home.inert = open;
     if (instant) { void pp.offsetWidth; stage.classList.remove('no-anim'); pp.classList.remove('no-anim'); }
     if (open) { var b = $('[data-back]', pp); if (b) b.focus({ preventScroll: true }); }
-    else { document.title = homeTitle; if (ppFrom && animate) ppFrom.focus({ preventScroll: true }); }
+    else {
+      document.title = homeTitle;
+      var r = work.getBoundingClientRect();
+      if (r.bottom < 0 || r.top > innerHeight) centerWork(false);  // back onto the work list, wherever the project came from
+      if (ppFrom && animate) ppFrom.focus({ preventScroll: true });
+    }
   }
   function openProject(slug, animate, push) {
     return fetchProject(slug).then(function (p) {
@@ -301,15 +313,6 @@
   panels.foundry.inert = panels.about.inert = panels.blog.inert = true;
   sync(true);
   if (location.hash === '#archive') work.scrollIntoView();
+  if (location.hash === '#work') { centerWork(false); window.addEventListener('load', function () { centerWork(false); }); }
   window.addEventListener('popstate', function () { pushed = false; sync(false); });
-})();
-
-// Project pages: Back returns to the list you came from (the way back zooms out onto it); straight in, it opens the work list.
-(function () {
-  var back = document.querySelector('[data-back]');
-  if (!back) return;
-  back.addEventListener('click', function (e) {
-    var ref = null; try { ref = document.referrer && new URL(document.referrer); } catch (err) {}
-    if (ref && ref.origin === location.origin && ref.pathname === '/' && history.length > 1) { e.preventDefault(); history.back(); }
-  });
 })();
