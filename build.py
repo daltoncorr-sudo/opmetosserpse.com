@@ -145,7 +145,7 @@ def page(site, title, desc, path, body, og_image=None, current=None, extra_head=
 <meta property="og:url" content="%(url)s">
 <meta property="og:image" content="https://%(domain)s%(og)s">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="theme-color" content="#F3EEE3">
+<meta name="theme-color" content="#F5F1E9">
 <link rel="icon" href="/brand/hand-mark.svg" type="image/svg+xml">
 <link rel="preload" href="/fonts/libre-caslon-text/libre-caslon-text-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/fonts/instrument-sans/instrument-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
@@ -224,14 +224,12 @@ def work_title(e):
     return '<a href="/projects/%s">%s</a>' % (e['slug'], typo(e['title'])) if e['page'] else '<span class="plain">%s</span>' % typo(e['title'])
 
 def work_section(items, w):
-    """One list, newest first. Collapsed it shows only the Selected projects; Archive opens the rest in place."""
-    rows, seen, i = [], set(), 0
+    """One list on a grid: title, tags, year. Collapsed it shows only the Selected projects; See more opens the rest in place."""
+    rows, i = [], 0
     for e in items:
-        yr = '' if e['year'] in seen else '<span class="yr" aria-hidden="true">%s</span>' % e['year']
-        seen.add(e['year'])
         extra = not e['selected']
-        rows.append('<li class="work-row%s" data-project="%s"%s>%s%s%s</li>' % (
-            ' extra' if extra else '', e['slug'], ' style="--i:%d"' % i if extra else '', yr, work_title(e), tag_list(e['tags'])))
+        rows.append('<li class="work-row%s" data-project="%s"%s>%s%s<span class="year">%s</span></li>' % (
+            ' extra' if extra else '', e['slug'], ' style="--i:%d"' % i if extra else '', work_title(e), tag_list(e['tags']), e['year']))
         if extra: i += 1
     return ('<section class="work" id="work" tabindex="-1" aria-label="%s"><div class="work-head">'
             '<h2 class="work-label" data-closed="%s" data-open="%s">%s</h2>'
