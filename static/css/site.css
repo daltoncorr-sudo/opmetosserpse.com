@@ -8,9 +8,12 @@
 @font-face{font-family:"Instrument Sans";font-style:normal;font-weight:500;font-display:swap;src:url(../fonts/instrument-sans/instrument-sans-latin-500-normal.woff2) format("woff2")}
 
 :root{
-  /* Off-white paper, near-black ink. One accent: none. */
-  --paper:#F7F5F0; --paper-deep:#EEEBE4; --ink:#1C1A17; --graphite:#7A756D;
-  --tag-gray:#6B665F; /* 5.22:1 on --paper; --graphite is 4.2:1, too light for small text */
+  /* Warm off-white paper, near-black ink. One accent: none. Contrast on --paper: ink 15.8:1 (13.8:1 on the darkest
+     grain), --graphite 5.55:1, --tag-gray 5.92:1. */
+  --paper:#F3EEE3; --paper-deep:#EAE4D7; --ink:#161512; --graphite:#635E57; --tag-gray:#5E5A53;
+  /* The paper's grain and fibers: a 256px tile of SVG noise (stitched, so no seams), multiplied over the page and
+     fixed to the screen. --grain-opacity tunes it; 0 turns it off. */
+  --grain:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='256' height='256'%3E%3Cfilter id='p' x='0' y='0' width='100%25' height='100%25' color-interpolation-filters='sRGB'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' seed='4' stitchTiles='stitch' result='g'/%3E%3CfeColorMatrix in='g' values='0 0 0 0 .34  0 0 0 0 .29  0 0 0 0 .22  1.0 0 0 0 -0.52' result='grain'/%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.006 .32' numOctaves='2' seed='9' stitchTiles='stitch' result='f'/%3E%3CfeColorMatrix in='f' values='0 0 0 0 .40  0 0 0 0 .35  0 0 0 0 .27  0 1.4 0 0 -1.0' result='fiber'/%3E%3CfeMerge%3E%3CfeMergeNode in='fiber'/%3E%3CfeMergeNode in='grain'/%3E%3C/feMerge%3E%3C/filter%3E%3Crect width='256' height='256' filter='url(%23p)'/%3E%3C/svg%3E"); --grain-size:256px; --grain-opacity:.3;
   /* Two faces. When Opmet Serif ships, put it first in --serif. */
   --serif:"Libre Caslon Text",Georgia,"Times New Roman",serif;
   --sans:"Instrument Sans","Helvetica Neue",Arial,sans-serif;
@@ -29,11 +32,25 @@
 *,*::before,*::after{box-sizing:border-box}
 [hidden]{display:none!important}
 html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+html{background:var(--paper)}
 body{margin:0;min-height:100vh;display:flex;flex-direction:column;background:var(--paper);color:var(--ink);font:400 var(--size-s)/1.55 var(--sans);-webkit-font-smoothing:antialiased}
 img,video{display:block;max-width:100%;height:auto}
 a{color:inherit;text-decoration:none;transition:color var(--t) var(--ease)}
 a:hover{color:var(--graphite)}
 :focus-visible{outline:1px solid var(--ink);outline-offset:3px}
+/* Paper: above the type (multiply only darkens, so ink stays ink) and below images, which stay clean */
+body::after{content:"";position:fixed;inset:0;z-index:1;pointer-events:none;background:var(--grain) 0 0/var(--grain-size) var(--grain-size) repeat;mix-blend-mode:multiply;opacity:var(--grain-opacity)}
+.media figure{position:relative;z-index:2}
+/* Ink: the hand and the name look stamped. Static SVG filters (see INK in build.py); <html data-ink> picks
+   light, medium (default) or heavy. Browsers without filter support show plain ink. */
+.ink-defs{position:absolute;width:0;height:0;overflow:hidden}
+.ink{color:var(--ink)}
+@supports (filter:url("#ink-medium")){
+  .ink{filter:url("#ink-medium");mix-blend-mode:multiply}
+  [data-ink="light"] .ink{filter:url("#ink-light")}
+  [data-ink="heavy"] .ink{filter:url("#ink-heavy")}
+}
+::selection{background:rgba(22,21,18,.16)}
 .vh{position:absolute!important;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 .skip{position:absolute;left:-9999px}.skip:focus{left:var(--gutter);top:8px;background:var(--paper);padding:4px 8px;z-index:20}
 p{margin:0 0 1em}
@@ -95,8 +112,10 @@ html:not(.js) .stage:has(#about:target){transform:translateX(-66.6667%)}
 .cover .mark{position:relative;display:block;flex:none;height:var(--hand-h);width:var(--hand-w);transform-origin:50% 96%}
 .cover .hand{display:block;width:100%;height:100%}
 .cover .pose{position:absolute;left:0;top:0;width:100%;height:auto;opacity:0}
-.cover .name{display:block;color:var(--ink);line-height:0;padding-bottom:calc(var(--hand-h) * .06)}
-.cover .name .wordmark{display:block;width:clamp(220px,28vw,480px);height:auto}
+.cover .name{position:relative;display:block;color:var(--ink);line-height:0;padding-bottom:calc(var(--hand-h) * .06);--wm-w:clamp(220px,28vw,480px)}
+.cover .name .wordmark{display:block;width:var(--wm-w);height:auto}
+/* The name as live, selectable text, laid over the wordmark drawing (the Opmet Serif web font isn't on the site yet) */
+.name-text{position:absolute;left:0;right:0;top:0;bottom:calc(var(--hand-h) * .06);display:flex;align-items:center;justify-content:center;color:transparent;font:italic 400 calc(var(--wm-w) / 7.6)/1 var(--serif);white-space:nowrap;letter-spacing:.01em}
 .cover-nav{display:flex;flex-wrap:wrap;justify-content:center;gap:.35em 1.6em;margin:clamp(18px,3.4vh,34px) 0 0;font:italic 400 var(--size-m)/1.4 var(--serif)}
 /* The intro: 50px against the 14px body at full size, scaled down by width and height so it stays on the first screen */
 .intro{max-width:24em;margin-top:clamp(20px,4vh,44px);font-family:var(--bold-font);font-weight:var(--bold-weight);font-size:clamp(22px,min(3.5vw,5vh),50px);line-height:1.15;text-wrap:balance}
