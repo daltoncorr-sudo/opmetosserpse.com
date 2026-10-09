@@ -513,17 +513,18 @@
   "F-is-for-Film-white-29412d"
  ],
  "hdtracks": [
+  "hdtracks-home-desktop-2026",
+  "hdtracks-album-desktop-2026",
+  "hdtracks-jazz-desktop-2026",
+  "hdtracks-home-desktop-tall-2026",
+  "hdtracks-home-phone-2026",
+  "hdtracks-jazz-phone-2026",
   "HDtrackswide-88945d",
-  "HDtracks-SplashPage-Mock-Up-7144ee",
-  "Screen-Shot-2021-05-10-at-12.58.46-PM-9451e1",
-  "Screen-Shot-2021-05-10-at-1.04.37-PM-f6b0c6",
-  "Screen-Shot-2021-05-10-at-1.06.42-PM-183a61",
-  "Chuck-fa4dcd",
+  "10470178_663675363703231_3821372901395509111_o-2daabe",
   "Screen-Shot-2021-05-10-at-1.18.22-PM-70d2e3",
   "Screen-Shot-2021-05-10-at-1.18.33-PM-884084",
-  "10470178_663675363703231_3821372901395509111_o-2daabe",
-  "65303997_2952501178124033_8095062357006352384_n-7ab985",
-  "Screen-Shot-2020-09-16-at-12.17.22-PM-66d9d9",
-  "Screen-Shot-2021-05-10-at-1.17.14-PM-b58e33"
- ]
+  "Screen-Shot-2021-05-10-at-1.17.14-PM-b58e33",
+  "65303997_2952501178124033_8095062357006352384_n-7ab985"
+ ],
+ "_note": "Each page in the order of its daltoncorr.com page, recorded Oct. 8, 2026. Exception: hdtracks, rebuilt with new pictures on D's word (Oct. 9, 2026); its order is the list in content/notes/hdtracks.json."
 }

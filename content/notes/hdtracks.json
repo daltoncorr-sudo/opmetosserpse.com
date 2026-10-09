@@ -1,25 +1,106 @@
 {
  "status": "draft",
- "work": "Website, database storage, UX and UI design, branding and logos, ad campaigns",
+ "work": "Rebrand, store design, UX and UI, campaigns, email",
  "work_src": "deliverables",
  "chapters": [
+  {
+   "label": "The store",
+   "starts_at": "hdtracks-home-desktop-2026",
+   "src": "system[0]"
+  },
+  {
+   "label": "On a phone",
+   "starts_at": "hdtracks-home-phone-2026",
+   "src": "D, Oct. 9, 2026"
+  },
   {
    "label": "The brand",
    "starts_at": "HDtrackswide-88945d",
    "src": "system[1]"
   },
   {
-   "label": "The store",
-   "starts_at": "HDtracks-SplashPage-Mock-Up-7144ee",
-   "src": "system[0]"
-  },
-  {
-   "label": "Email and ads",
-   "starts_at": "Screen-Shot-2021-05-10-at-1.18.22-PM-70d2e3",
+   "label": "Campaigns and email",
+   "starts_at": "10470178_663675363703231_3821372901395509111_o-2daabe",
    "src": "system[2]"
   }
  ],
  "notes": {},
  "video": {},
- "hide": []
+ "hide": [],
+ "credits": [
+  [
+   "Design and art direction",
+   "Dalton Corr, Opmet Osserpse"
+  ]
+ ],
+ "credits_src": "D, Oct. 9, 2026: HollyShorts 20 pattern",
+ "media_src": "D, Oct. 9, 2026: rebuilt with new pictures. The store captured from hdtracks.com on Oct. 9, 2026 (1440x900 at 2x, phone 390x844 at 3x); the brand and campaign pictures from daltoncorr.com.",
+ "media": [
+  {
+   "src": "content/media/hdtracks/hdtracks-home-desktop-2026.webp",
+   "alt": "The HDtracks store: charts in the sidebar, featured collections and the newest high-resolution albums.",
+   "slot": "W"
+  },
+  {
+   "src": "content/media/hdtracks/hdtracks-album-desktop-2026.webp",
+   "alt": "An album page: each track with its sample rate and bit depth, and the price beside the cover.",
+   "slot": "W"
+  },
+  {
+   "src": "content/media/hdtracks/hdtracks-jazz-desktop-2026.webp",
+   "alt": "The Top 100 Jazz chart, new titles first.",
+   "slot": "W"
+  },
+  {
+   "src": "content/media/hdtracks/hdtracks-home-desktop-tall-2026.webp",
+   "alt": "The store’s home page, top to bottom: featured collections, then rows of new, best-selling and hand-picked albums.",
+   "slot": "P"
+  },
+  {
+   "src": "content/media/hdtracks/hdtracks-home-phone-2026.webp",
+   "alt": "The store on a phone.",
+   "slot": "P",
+   "gallery": 1
+  },
+  {
+   "src": "content/media/hdtracks/hdtracks-jazz-phone-2026.webp",
+   "alt": "The Top 100 Jazz chart on a phone.",
+   "slot": "P",
+   "gallery": 1
+  },
+  {
+   "src": "images/cdn/hdtracks/HDtrackswide-88945d.webp",
+   "alt": "The HDtracks logo in white on blue.",
+   "slot": "H"
+  },
+  {
+   "src": "images/cdn/hdtracks/10470178_663675363703231_3821372901395509111_o-2daabe.webp",
+   "alt": "An ad: the HDtracks logo with a listener in red light.",
+   "slot": "W"
+  },
+  {
+   "src": "images/cdn/hdtracks/Screen-Shot-2021-05-10-at-1.18.22-PM-70d2e3.webp",
+   "alt": "An email: up to 35% off VIP sales and featured new releases.",
+   "slot": "P",
+   "gallery": 2
+  },
+  {
+   "src": "images/cdn/hdtracks/Screen-Shot-2021-05-10-at-1.18.33-PM-884084.webp",
+   "alt": "An email: browse the store by genre.",
+   "slot": "P",
+   "gallery": 2
+  },
+  {
+   "src": "images/cdn/hdtracks/Screen-Shot-2021-05-10-at-1.17.14-PM-b58e33.webp",
+   "alt": "An email for the Grammy winners.",
+   "slot": "P",
+   "gallery": 3
+  },
+  {
+   "src": "images/cdn/hdtracks/65303997_2952501178124033_8095062357006352384_n-7ab985.webp",
+   "alt": "A campaign ad: 25% off top New York artists for New York Music Month.",
+   "slot": "P",
+   "gallery": 3
+  }
+ ]
 }

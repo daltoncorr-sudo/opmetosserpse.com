@@ -1,13 +1,13 @@
 {
  "slug": "hdtracks",
  "title": "HDtracks",
- "deck": "Rebuilding a high-resolution music store from the ground up.",
+ "deck": "A high-resolution music store, rebuilt from the ground up.",
  "client": "HDtracks",
  "year": "2019",
  "role": "Director of marketing and lead designer",
  "sector": "Music",
  "location": "",
- "lede": "In 2019, HDtracks, the high-resolution music store, was rebranded and its website rebuilt from the ground up, from the database to the logo and the campaigns.",
+ "lede": "HDtracks sells high-resolution music to people who care how a recording sounds. In 2019 the store was rebranded and rebuilt from the ground up, from the database to the logo, so a deep catalog reads as clearly as it sounds. Around it runs a year-round line of campaigns and email. Retention and sales rose.",
  "challenge": "HDtracks sells high-resolution music downloads to listeners who care how a recording sounds. In 2019 it took on a complete rebrand and a redesign of its website, which meant making a deep catalog easy to browse and the brand as clear as the audio.",
  "work": [
   "The redesign started under the surface: a new website built from the ground up, with new database storage, then the UX and UI design, updated branding, logos and the ad campaigns.",
@@ -59,7 +59,7 @@
  "press": [],
  "seo": {
   "title": "HDtracks rebrand and store redesign | Opmet Osserpse",
-  "description": "The 2019 rebrand and website rebuild for HDtracks, the high-resolution music store: new branding, logos, UX and UI, campaigns and email."
+  "description": "HDtracks, the high-resolution music store: rebranded and rebuilt from the ground up, from the database to the logo, with year-round campaigns and email. Retention and sales rose."
  },
  "media": [
   {
@@ -124,8 +124,8 @@
   }
  ],
  "card": {
-  "src": "images/cards/hdtracks-lg.webp",
-  "alt": "The HDtracks logo."
+  "src": "content/media/hdtracks/hdtracks-home-desktop-2026.webp",
+  "alt": "The HDtracks store: charts in the sidebar, featured collections and the newest high-resolution albums."
  },
- "og": "images/og/hdtracks.jpg"
+ "og": "content/media/hdtracks/hdtracks-home-desktop-2026.webp"
 }
