@@ -274,6 +274,7 @@
   function openProject(slug, animate, push) {
     return fetchProject(slug).then(function (p) {
       ppInner.innerHTML = p.html; pp.scrollTop = 0; document.title = p.title;
+      if (window.opmetProject) window.opmetProject(ppInner);  // films and notes on the project just dropped in
       $$('video[data-loop]', pp).forEach(function (v) { if (!reduce) { v.preload = 'auto'; var x = v.play(); if (x && x.catch) x.catch(function () {}); } });
       if (push) { history.pushState({ project: slug }, '', '/projects/' + slug); ppPushed = true; }
       showProject(true, animate);
@@ -336,3 +337,41 @@ document.addEventListener('click', function (e) {
   (panel || window).scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' });
   var back = (panel || document).querySelector('[data-back]'); if (back) back.focus({ preventScroll: true });
 });
+
+// A project page: films that play once and rest, and notes that turn from gray to ink on the reading line. The same code
+// runs on a project page and on a project dropped into the panel on home (site.js calls window.opmetProject for it).
+(function () {
+  var reduce = !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches);
+  function films(root) {
+    Array.prototype.forEach.call(root.querySelectorAll('.pp video[data-rest]'), function (v) {
+      var state = 'idle', again = root.querySelector('[data-again="' + v.id + '"]'), sound = root.querySelector('[data-sound="' + v.id + '"]'), r = v.dataset.rest;
+      function rest() { try { v.currentTime = r === 'end' ? Math.max(0, v.duration - 0.05) : parseFloat(r); } catch (e) {} }
+      function offer(t) { if (again) { again.hidden = false; again.textContent = t; } }
+      v.addEventListener('ended', function () { state = 'done'; rest(); offer('Play again'); });
+      if (again) again.addEventListener('click', function (e) { e.preventDefault(); if (state === 'done') v.currentTime = 0; state = 'playing'; again.hidden = true; v.play(); });
+      if (sound) sound.addEventListener('click', function (e) { e.preventDefault(); v.muted = false; v.controls = true; state = 'playing'; sound.hidden = true; if (again) again.hidden = true; v.play(); });
+      if (sound) return;                                    // a film with sound plays only when asked
+      if (reduce || !('IntersectionObserver' in window)) { offer('Play'); return; }  // reduced motion: nothing plays until clicked
+      new IntersectionObserver(function (es) {
+        es.forEach(function (e) {
+          var seen = e.intersectionRect.height >= Math.min(e.boundingClientRect.height * 0.6, innerHeight * 0.35);
+          if (seen && state !== 'done') { if (v.paused) { state = 'playing'; var p = v.play(); if (p && p.catch) p.catch(function () { offer('Play'); }); } }
+          else if (!e.isIntersecting && !v.paused) v.pause();
+        });
+      }, { threshold: [0, .1, .2, .3, .4, .5, .6, .7, .8, .9, 1] }).observe(v);
+    });
+  }
+  var queued = false;
+  function read() {
+    queued = false;
+    var h = innerHeight;
+    Array.prototype.forEach.call(document.querySelectorAll('.pp [data-read]'), function (r) {
+      var b = r.getBoundingClientRect(); r.classList.toggle('on', b.top < h * 0.62 && b.bottom > h * 0.38);
+    });
+  }
+  function soon() { if (!queued) { queued = true; requestAnimationFrame(read); } }
+  window.opmetProject = function (root) { films(root); read(); };
+  if (document.querySelector('.pp')) window.opmetProject(document);
+  document.addEventListener('scroll', soon, { passive: true, capture: true });  // the page, or the project panel on home
+  window.addEventListener('resize', soon);
+})();
