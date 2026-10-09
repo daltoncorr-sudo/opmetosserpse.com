@@ -265,6 +265,7 @@
     if (open) { var b = $('[data-back]', pp); if (b) b.focus({ preventScroll: true }); }
     else {
       document.title = homeTitle;
+      if (list.classList.contains('is-open') && location.hash !== '#archive') history.replaceState(history.state, '', location.pathname + location.search + '#archive');
       var r = work.getBoundingClientRect();
       if (r.bottom < 0 || r.top > innerHeight) centerWork(false);  // back onto the work list, wherever the project came from
       if (ppFrom && animate) ppFrom.focus({ preventScroll: true });
@@ -291,6 +292,8 @@
   pp.addEventListener('click', function (e) {
     var a = e.target.closest('a'); if (!a || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button) return;
     if (a.hasAttribute('data-back') || a.getAttribute('href') === '/#work') { e.preventDefault(); closeProject(); return; }
+    if (a.getAttribute('href') === '/#archive') { e.preventDefault(); setOpen(true, false); closeProject(); return; }  // All work: up to the full list
+    if (a.hasAttribute('data-totop')) return;  // handled below, for the panel and the page alike
     var slug = projectOf(a.href);
     if (slug) { e.preventDefault(); fetchProject(slug).then(function () { openProject(slug, false, false).then(function () { history.replaceState({ project: slug }, '', '/projects/' + slug); }); }); }
   });
@@ -323,3 +326,13 @@
   if (location.hash === '#work') { centerWork(false); window.addEventListener('load', function () { centerWork(false); }); }
   window.addEventListener('popstate', function () { pushed = false; sync(false); });
 })();
+
+// Back to top, at the end of a project: in the panel it scrolls the panel, on a project page the page; focus goes to Back
+document.addEventListener('click', function (e) {
+  var a = e.target.closest('[data-totop]'); if (!a) return;
+  e.preventDefault();
+  var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var panel = a.closest('.project-panel');
+  (panel || window).scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' });
+  var back = (panel || document).querySelector('[data-back]'); if (back) back.focus({ preventScroll: true });
+});

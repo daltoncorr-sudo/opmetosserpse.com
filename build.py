@@ -173,7 +173,7 @@ def write(path, text):
     os.makedirs(os.path.dirname(full), exist_ok=True)
     with open(full, 'w', encoding='utf-8') as f: f.write(text)
 
-def project_body(p, media, prev, nxt, zip_href, back='Back'):
+def project_body(p, media, prev, nxt, zip_href, back='Back', all_work='All work', top='Back to top'):
     """Image first. A title, one line, the images, then a few plain lines. No headers."""
     out = ['<header class="project-head"><p class="back"><a href="/#work" data-back>%s</a></p><h1>%s</h1><p>%s</p></header>' % (esc(back), typo(p['title']), typo(p['deck']))]
     items, html_, i = media[:], [], 0
@@ -183,11 +183,11 @@ def project_body(p, media, prev, nxt, zip_href, back='Back'):
             html_.append('<div class="pair"><figure class="fade">%s</figure><figure class="fade">%s</figure></div>' % (m['html'] if i else m['html_eager'], items[i + 1]['html'])); i += 2; continue
         cls = {'H': 'full', 'F': 'full', 'P': 'narrow', 'S': 'narrow'}.get(m['slot'], 'wide')
         html_.append('<figure class="%s fade">%s</figure>' % (cls, m['html_eager'] if i == 0 else m['html'])); i += 1
-    out.append('<div class="media">%s</div>' % ''.join(html_))
     lines = [p['client'] + ', ' + p['year'], p['role']]
     lines += ['<a href="%s" rel="noopener">%s</a>' % (esc(u), typo(t)) for t, u in p['links']]
-    out.append('<footer class="project-foot"><p>%s</p><p><a href="/projects/%s">%s</a></p><p><a href="/#work">Index</a></p></footer>' % (
-        '<br>'.join(x if x.startswith('<a') else typo(x) for x in lines), nxt['slug'], typo(nxt['title'])))
+    out.append('<p class="project-info">%s</p>' % '<br>'.join(x if x.startswith('<a') else typo(x) for x in lines))
+    out.append('<div class="media">%s</div>' % ''.join(html_))
+    out.append('<footer class="project-foot"><a href="/#archive">%s</a><a href="#main" data-totop>%s</a></footer>' % (esc(all_work), esc(top)))
     return '\n'.join(out)
 
 def list_rows(entries):
@@ -316,7 +316,7 @@ def main():
                     z.write(full, '%s-%02d%s' % (s, n, os.path.splitext(full)[1]))
             zip_href = '/media/%s/%s-images.zip' % (s, s)
         prev, nxt = ordered[i - 1], ordered[(i + 1) % len(ordered)]
-        body = project_body(p, built, prev, nxt, zip_href, site['project_back'])
+        body = project_body(p, built, prev, nxt, zip_href, site['project_back'], site['project_all'], site['project_top'])
         write('/projects/%s.html' % s, page(site, p['seo']['title'], p['seo']['description'], '/projects/%s' % s, body, og, '/projects'))
 
     # projects list: pages and rows, newest first

@@ -203,9 +203,13 @@ html:not(.js) .stage:has(#about:target){transform:translateX(-66.6667%)}
 .pair{display:grid;grid-template-columns:1fr 1fr;gap:var(--gutter);width:min(88%,1400px);margin:0 auto;align-items:start}
 .pair img,.pair video{width:100%}
 @media (max-width:720px){.media .wide,.media .narrow,.pair{width:100%}.pair{grid-template-columns:1fr}}
-.project-foot{text-align:center;color:var(--graphite);margin:4vh auto 16vh;line-height:1.7}
-.project-foot p{margin:0 0 1.6em}
+/* The details, just under the title: client and year, role, links */
+.project-info{text-align:center;color:var(--graphite);line-height:1.7;margin:-8vh auto 12vh;max-width:var(--measure)}
+.project-info a{color:var(--ink)}
+/* At the end of a project: All work and Back to top, set like the options */
+.project-foot{display:flex;justify-content:center;gap:var(--s4);margin:4vh auto 16vh;font:italic 400 clamp(17px,1.35vw,20px)/1.4 var(--serif);letter-spacing:.01em}
 .project-foot a{color:var(--ink)}
+.project-foot a:hover{color:var(--graphite)}
 
 /* Simple pages */
 .index:first-child{padding-top:16vh}
