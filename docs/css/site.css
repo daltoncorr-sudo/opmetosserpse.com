@@ -123,7 +123,7 @@ html:not(.js) .stage:has(#about:target){transform:translateX(-66.6667%)}
 .home-big a:hover,.home-big a:focus-visible{color:var(--ink)}
 .about-title:focus{outline:none}
 .about-title span{display:block}
-.about-panel .about-body{font-family:var(--bold-font);font-weight:var(--bold-weight);font-size:clamp(26px,3.5vw,50px);line-height:1.12;letter-spacing:-.01em;max-width:12.5em}
+.about-panel .about-body{font-family:var(--bold-font);font-weight:var(--bold-weight);font-size:clamp(26px,3.5vw,50px);line-height:1.12;letter-spacing:-.01em;max-width:14.25em}
 .about-body p{margin:0 0 .75em}
 .about-body p.contact{margin-top:.75em}
 .about-press{text-align:left;padding-top:clamp(120px,30vh,320px)}
