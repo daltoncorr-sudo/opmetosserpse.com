@@ -59,16 +59,12 @@ h1{font:inherit;margin:0}
 ul{list-style:none;margin:0;padding:0}
 
 /* Smooth page changes (cross-document View Transitions); other browsers load normally */
-@view-transition{navigation:auto}
-/* Between pages, no fade: a project rises over the list like a sheet; Back slides it down, and the list is underneath
-   where it was. Smooth ease-out, no overshoot. Other page changes simply load. Browsers without cross-page transitions
-   simply load the page. */
-::view-transition{background:var(--paper)}
-::view-transition-old(root),::view-transition-new(root){animation:none;mix-blend-mode:normal}
-.page-project::view-transition-new(root){animation:vt-sheet-up .55s cubic-bezier(.32,.72,0,1) both}
-.page-home::view-transition-old(root){z-index:1;animation:vt-sheet-down .5s cubic-bezier(.32,.72,0,1) both}
-@keyframes vt-sheet-up{from{transform:translateY(100%)}}
-@keyframes vt-sheet-down{to{transform:translateY(100%)}}
+/* A project opens as a screen below home: the view slides down to it, the same motion as the other panels */
+.stage.is-project{transform:translate(-33.3333%,-100vh)}
+.project-panel{position:fixed;inset:0;z-index:1;overflow-y:auto;overscroll-behavior:contain;background:var(--paper);padding:0 var(--gutter);transform:translateY(100vh);visibility:hidden;transition:transform var(--slide) var(--slide-ease),visibility 0s var(--slide)}
+.project-panel.is-open{transform:none;visibility:visible;transition:transform var(--slide) var(--slide-ease),visibility 0s}
+.project-panel.no-anim{transition:none}
+.project-panel .fade{opacity:1}
 
 /* Inner pages: the name only, centered. No menu bar. */
 .site-header{position:relative;display:flex;justify-content:center;padding:28px var(--gutter) 0}
@@ -160,7 +156,7 @@ html:not(.js) .stage:has(#about:target){transform:translateX(-66.6667%)}
 .work:focus{outline:none}
 .work-head{display:flex;align-items:baseline;gap:var(--s3);margin:0 0 var(--s4)}
 .work-label{font:400 clamp(17px,1.3vw,19px)/1.3 var(--serif);margin:0}
-.archive-toggle{font:400 clamp(17px,1.3vw,19px)/1.3 var(--serif);color:var(--tag-gray);background:none;border:0;padding:0;cursor:pointer;transition:color var(--t) var(--ease)}
+.archive-toggle{font:italic 400 clamp(17px,1.3vw,19px)/1.3 var(--serif);color:var(--tag-gray);background:none;border:0;padding:0;cursor:pointer;transition:color var(--t) var(--ease)}
 .archive-toggle:hover{color:var(--ink)}
 .work-row{position:relative;display:flex;flex-wrap:wrap;align-items:baseline;column-gap:.9em;padding:0 0 14px}
 .work-row>a,.work-row .plain{font-family:var(--serif);font-size:clamp(17px,1.3vw,19px);line-height:1.25}
@@ -221,6 +217,5 @@ html:not(.js) .stage:has(#about:target){transform:translateX(-66.6667%)}
 @media (prefers-reduced-motion:reduce){
   .cover-inner,.cover .mark,.cover .mark *{animation:none!important}
   *,*::before,*::after{transition:none!important;animation:none!important}
-  @view-transition{navigation:none}
   .fade{opacity:1}
 }

@@ -160,7 +160,7 @@ def page(site, title, desc, path, body, og_image=None, current=None, extra_head=
 <main id="main"%(main_cls)s>
 %(body)s
 </main>
-<script src="/js/site.js?v=%(v)s" defer blocking="render"></script>
+<script src="/js/site.js?v=%(v)s" defer></script>
 </body>
 </html>
 ''' % dict(title=esc(title), desc=esc(desc), url=url, domain=site['domain'], og=og, nav=nav, tz=site['clock_timezone'],
@@ -373,7 +373,8 @@ def main():
     cover = ('<section class="cover"><div class="cover-inner"><h1><span class="mark" %s>%s</span><span class="name ink">%s<span class="name-text">Opmet Osserpse</span></span></h1>'
              '<nav class="cover-nav" aria-label="Site">%s</nav></div></section>') % (
         moves.mark_attrs(mv), hand + mv['layers'], brand_svg('wordmark.svg', 'wordmark'), nav)
-    body = ('<div class="stage-clip"><div class="stage" data-stage>%s<div class="panel home-panel">%s<div data-home>%s%s</div></div>%s</div></div>') % (
+    body = ('<div class="stage-clip"><div class="stage" data-stage>%s<div class="panel home-panel">%s<div data-home>%s%s</div></div>%s</div></div>'
+            '<section class="project-panel" id="project" aria-label="Project"><div class="project-inner"></div></section>') % (
         foundry, blog, cover, work_section(items, h['work']), about_panel)
     early = '<script>if(/^#(foundry|about|blog)$/.test(location.hash))document.documentElement.classList.add("at-"+location.hash.slice(1))</script>\n'
     write('/index.html', page(site, 'Opmet Osserpse', h['og_description'], '/', body, so, '/', main_cls='home-main',

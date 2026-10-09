@@ -71,9 +71,16 @@
     }, { rootMargin: '200px 0px' });
     Array.prototype.forEach.call(vids, function (v) { io.observe(v); });
 
-    // Quiet fade-in for images and video
+    // Quiet fade-in for images and video further down; what's on screen when the page opens is simply there
+    var opened = performance.now();
     var fio = new IntersectionObserver(function (es) {
-      es.forEach(function (en) { if (en.isIntersecting) { en.target.classList.add('in'); fio.unobserve(en.target); } });
+      var now = performance.now() - opened < 400;
+      es.forEach(function (en) {
+        if (!en.isIntersecting) return;
+        if (now) { en.target.style.transition = 'none'; en.target.classList.add('in'); void en.target.offsetWidth; en.target.style.transition = ''; }
+        else en.target.classList.add('in');
+        fio.unobserve(en.target);
+      });
     }, { rootMargin: '0px 0px -5% 0px' });
     Array.prototype.forEach.call(document.querySelectorAll('.fade'), function (el) { fio.observe(el); });
   } else {
@@ -220,20 +227,60 @@
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(fit);
   var rt; window.addEventListener('resize', function () { clearTimeout(rt); rt = setTimeout(fit, 150); });
 
-  // Back from a project: land on the same list (Selected or all) with the row where it was
-  var KEY = 'oo-return';
+  // A project opens as a screen below home. Its page is fetched once, its content dropped into the panel, and the view
+  // slides down to it; Back, Esc or the browser's back button slide up to the list exactly as it was. The address is the
+  // project's own, so a reload or a shared link simply opens the project page.
+  var pp = $('#project'), ppInner = $('.project-inner', pp), ppOpen = false, ppPushed = false, ppFrom = null, cache = {}, homeTitle = document.title;
+  pp.inert = true;
   var projectOf = function (u) { var m = u && new URL(u, location.href).pathname.match(/^\/projects\/([^\/]+)$/); return m && m[1]; };
+  function fetchProject(slug) {
+    if (cache[slug]) return Promise.resolve(cache[slug]);
+    return fetch('/projects/' + slug).then(function (r) { if (!r.ok) throw new Error(r.status); return r.text(); }).then(function (t) {
+      var d = new DOMParser().parseFromString(t, 'text/html');
+      return (cache[slug] = { html: d.querySelector('main').innerHTML, title: d.title });
+    });
+  }
+  function showProject(open, animate) {
+    var instant = !animate || reduce;
+    if (instant) { stage.classList.add('no-anim'); pp.classList.add('no-anim'); }
+    stage.classList.toggle('is-project', open);
+    pp.classList.toggle('is-open', open);
+    root.classList.toggle('is-locked', open);
+    ppOpen = open; pp.inert = !open; home.inert = open;
+    if (instant) { void pp.offsetWidth; stage.classList.remove('no-anim'); pp.classList.remove('no-anim'); }
+    if (open) { var b = $('[data-back]', pp); if (b) b.focus({ preventScroll: true }); }
+    else { document.title = homeTitle; if (ppFrom && animate) ppFrom.focus({ preventScroll: true }); }
+  }
+  function openProject(slug, animate, push) {
+    return fetchProject(slug).then(function (p) {
+      ppInner.innerHTML = p.html; pp.scrollTop = 0; document.title = p.title;
+      $$('video[data-loop]', pp).forEach(function (v) { if (!reduce) { v.preload = 'auto'; var x = v.play(); if (x && x.catch) x.catch(function () {}); } });
+      if (push) { history.pushState({ project: slug }, '', '/projects/' + slug); ppPushed = true; }
+      showProject(true, animate);
+    }).catch(function () { location.href = '/projects/' + slug; });
+  }
+  function closeProject() {
+    if (ppPushed) history.back();  // popstate slides up
+    else { history.replaceState(null, '', '/' + (list.classList.contains('is-open') ? '#archive' : '#work')); showProject(false, true); }
+  }
   list.addEventListener('click', function (e) {
-    var a = e.target.closest('.work-row a'); if (!a) return;
-    try { sessionStorage.setItem(KEY, JSON.stringify({ slug: a.closest('[data-project]').getAttribute('data-project'), top: a.getBoundingClientRect().top, open: list.classList.contains('is-open') })); } catch (err) {}
+    var a = e.target.closest('.work-row a');
+    if (!a || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button) return;
+    var slug = projectOf(a.href); if (!slug) return;
+    e.preventDefault(); ppFrom = a; openProject(slug, true, true);
   });
-  window.addEventListener('pagereveal', function () {
-    var from = window.navigation && navigation.activation && navigation.activation.from && projectOf(navigation.activation.from.url);
-    var st = null; try { st = JSON.parse(sessionStorage.getItem(KEY)); } catch (err) {}
-    if (!from || !st || st.slug !== from) return;
-    if (st.open) setOpen(true, false);
-    var row = $('.work-row[data-project="' + from + '"] a, .work-row[data-project="' + from + '"] .plain', list);
-    if (row) window.scrollTo(0, window.scrollY + row.getBoundingClientRect().top - st.top);
+  pp.addEventListener('click', function (e) {
+    var a = e.target.closest('a'); if (!a || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button) return;
+    if (a.hasAttribute('data-back') || a.getAttribute('href') === '/#work') { e.preventDefault(); closeProject(); return; }
+    var slug = projectOf(a.href);
+    if (slug) { e.preventDefault(); fetchProject(slug).then(function () { openProject(slug, false, false).then(function () { history.replaceState({ project: slug }, '', '/projects/' + slug); }); }); }
+  });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && ppOpen) closeProject(); });
+  window.addEventListener('popstate', function () {
+    var slug = projectOf(location.href);
+    ppPushed = false;
+    if (slug && !ppOpen) openProject(slug, true, false);
+    else if (!slug && ppOpen) showProject(false, true);
   });
 
   // Hover hook for later: every project row says when the pointer or keyboard focus enters and leaves it
