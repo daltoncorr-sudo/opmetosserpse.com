@@ -102,15 +102,36 @@ def brand_svg(name, cls, label=None):
     return s.replace('<svg ', '<svg class="%s" %s focusable="false" ' % (cls, a11y), 1)
 
 
+# The stamped ink on the hand and the name: a static SVG filter applied at render time, never to the masters.
+# Edge wobble (turbulence into displacement), a light blur re-sharpened into bleed, and a second, low-frequency
+# turbulence that varies the density. Three presets; <html data-ink> picks one (medium by default).
+INK = {  # displacement px, blur px, alpha slope, alpha intercept, density variation
+    'light':  (1.5, 0.4, 2.2, -0.45, 0.25),
+    'medium': (2.2, 0.6, 1.8, -0.25, 0.45),
+    'heavy':  (3.0, 0.8, 1.6, -0.12, 0.7),
+}
+def ink_filters():
+    f = ''.join(
+        '<filter id="ink-%s" x="-10%%" y="-10%%" width="120%%" height="120%%" color-interpolation-filters="sRGB">'
+        '<feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="2" seed="7" result="edge"/>'
+        '<feDisplacementMap in="SourceGraphic" in2="edge" scale="%s" xChannelSelector="R" yChannelSelector="G" result="wobble"/>'
+        '<feGaussianBlur in="wobble" stdDeviation="%s" result="soft"/>'
+        '<feComponentTransfer in="soft" result="bleed"><feFuncA type="linear" slope="%s" intercept="%s"/></feComponentTransfer>'
+        '<feTurbulence type="fractalNoise" baseFrequency="0.03" numOctaves="3" seed="11" result="low"/>'
+        '<feColorMatrix in="low" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  %s 0 0 0 %s" result="density"/>'
+        '<feComposite in="bleed" in2="density" operator="in"/></filter>' % (n, d, b, sl, ic, round(-2 * k, 3), round(1 + k, 3))
+        for n, (d, b, sl, ic, k) in INK.items())
+    return '<svg class="ink-defs" width="0" height="0" aria-hidden="true" focusable="false"><defs>%s</defs></svg>' % f
+
 def page(site, title, desc, path, body, og_image=None, current=None, extra_head='', main_cls=''):
     url = 'https://%s%s' % (site['domain'], path)
     og = og_image or '/media/site/og.jpg'
     # No menu bar. Inner pages carry only the hand and the name, centered, back to the cover.
     header = '' if path == '/' else ('<header class="site-header"><a class="lockup" href="/" aria-label="Opmet Osserpse">%s%s</a></header>'
-                                     % (brand_svg('hand-mark.svg', 'lockup-hand'), brand_svg('wordmark.svg', 'wordmark')))
+                                     % (brand_svg('hand-mark.svg', 'lockup-hand ink'), brand_svg('wordmark.svg', 'wordmark ink')))
     nav = header
     return '''<!doctype html>
-<html lang="en">
+<html lang="en" data-ink="medium">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -124,13 +145,14 @@ def page(site, title, desc, path, body, og_image=None, current=None, extra_head=
 <meta property="og:url" content="%(url)s">
 <meta property="og:image" content="https://%(domain)s%(og)s">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="theme-color" content="#F7F5F0">
+<meta name="theme-color" content="#F3EEE3">
 <link rel="icon" href="/brand/hand-mark.svg" type="image/svg+xml">
 <link rel="preload" href="/fonts/libre-caslon-text/libre-caslon-text-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/fonts/instrument-sans/instrument-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/css/site.css?v=%(v)s">
 %(extra)s</head>
 <body>
+%(ink)s
 <a class="skip" href="#main">Skip to content</a>
 %(nav)s
 <main id="main"%(main_cls)s>
@@ -142,7 +164,7 @@ def page(site, title, desc, path, body, og_image=None, current=None, extra_head=
 ''' % dict(title=esc(title), desc=esc(desc), url=url, domain=site['domain'], og=og, nav=nav, tz=site['clock_timezone'],
            place=esc(site['clock_place']), body=body, name=esc(site['name']), descr=esc(site['description'].rstrip('.')),
            email=site['email'], line=esc(site['line']), copy=esc(site['copyright']), privacy=esc(site['privacy_line']),
-           v=site['_v'], extra=extra_head, main_cls=' class="%s"' % main_cls if main_cls else '')
+           v=site['_v'], extra=extra_head, ink=ink_filters(), main_cls=' class="%s"' % main_cls if main_cls else '')
 
 def write(path, text):
     full = os.path.join(DIST, path.lstrip('/'))
@@ -334,9 +356,9 @@ def main():
                    '<h2 class="about-title" id="about-title" tabindex="-1">%s</h2><div class="about-body">%s</div></div>'
                    '<div class="about-press"><h3 class="press-title">%s</h3>%s</div></div></section>') % (
         esc(site['back']), ' '.join('<span>%s</span>' % esc(x) for x in ap['title'].split()), ''.join('<p>%s</p>' % link(typo(x)) for x in ap['lines']), esc(ap['press_title']), press_list(press))
-    cover = ('<section class="cover"><div class="cover-inner"><h1><span class="mark" %s>%s</span><span class="name">%s</span></h1>'
+    cover = ('<section class="cover"><div class="cover-inner"><h1><span class="mark ink" %s>%s</span><span class="name ink">%s<span class="name-text">Opmet Osserpse</span></span></h1>'
              '<nav class="cover-nav" aria-label="Site">%s</nav><div class="intro">%s</div></div></section>') % (
-        moves.mark_attrs(mv), hand + mv['layers'], brand_svg('wordmark.svg', 'wordmark', 'Opmet Osserpse'), nav, about)
+        moves.mark_attrs(mv), hand + mv['layers'], brand_svg('wordmark.svg', 'wordmark'), nav, about)
     body = ('<div class="stage-clip"><div class="stage" data-stage>%s<div class="panel home-panel" data-home>%s%s</div>%s</div></div>') % (
         foundry, cover, work_section(items, h['work']), about_panel)
     early = '<script>if(/^#(foundry|about)$/.test(location.hash))document.documentElement.classList.add("at-"+location.hash.slice(1))</script>\n'
