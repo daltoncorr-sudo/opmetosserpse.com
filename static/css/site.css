@@ -158,6 +158,9 @@ html:not(.js) .stage:has(#about:target){transform:translateX(-66.6667%)}
 .work-label{font:400 clamp(24px,2.3vw,34px)/1.15 var(--serif);margin:0}
 .archive-toggle{font:italic 400 clamp(17px,1.35vw,20px)/1.4 var(--serif);letter-spacing:.01em;color:var(--ink);background:none;border:0;padding:0;cursor:pointer;transition:color var(--t) var(--ease)}
 .archive-toggle:hover{color:var(--graphite)}
+/* Back, beside See more: up to the top of home */
+.work-back{font:italic 400 clamp(17px,1.35vw,20px)/1.4 var(--serif);letter-spacing:.01em;color:var(--ink)}
+.work-back:hover{color:var(--graphite)}
 .work-row{position:relative;display:flex;flex-wrap:wrap;align-items:baseline;column-gap:.9em;padding:0 0 14px}
 .work-row>a,.work-row .plain{font-family:var(--serif);font-size:clamp(17px,1.3vw,19px);line-height:1.25}
 .work-row .plain{color:var(--tag-gray)}

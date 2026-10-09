@@ -238,9 +238,10 @@ def work_section(items, w):
         if extra: i += 1
     return ('<section class="work" id="work" tabindex="-1" aria-label="%s"><div class="work-head">'
             '<h2 class="work-label" data-closed="%s" data-open="%s">%s</h2>'
-            '<button type="button" class="archive-toggle" aria-expanded="false" aria-controls="works" data-open-label="%s" data-close-label="%s">%s</button></div>'
+            '<button type="button" class="archive-toggle" aria-expanded="false" aria-controls="works" data-open-label="%s" data-close-label="%s">%s</button>'
+            '<a class="work-back" href="#" data-top>%s</a></div>'
             '<ul class="works" id="works">%s</ul></section>') % (
-        esc(w['label']), esc(w['selected']), esc(w['all']), esc(w['selected']), esc(w['more']), esc(w['less']), esc(w['more']), ''.join(rows))
+        esc(w['label']), esc(w['selected']), esc(w['all']), esc(w['selected']), esc(w['more']), esc(w['less']), esc(w['more']), esc(w['back']), ''.join(rows))
 
 def press_list(press):
     """Press, by year, newest first. Plain lines: the outlet, then the headline."""
