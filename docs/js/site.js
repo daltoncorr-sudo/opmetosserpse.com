@@ -220,28 +220,20 @@
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(fit);
   var rt; window.addEventListener('resize', function () { clearTimeout(rt); rt = setTimeout(fit, 150); });
 
-  // Into a project and back. As the page swaps, the clicked title is named project-title (the project page's h1 has the
-  // same name, so the browser zooms one into the other) and the rows on screen are named above or below it, so they
-  // slide away and, coming back, slide in again. The list's state and the row's place are kept for the return.
+  // Into a project and back. As the page swaps, the clicked title is named project-title; the project page's h1 has the
+  // same name, so the browser glides one into the other while the pages crossfade. The list's state and the row's place
+  // are kept for the return.
   var KEY = 'oo-return';
   var projectOf = function (u) { var m = u && new URL(u, location.href).pathname.match(/^\/projects\/([^\/]+)$/); return m && m[1]; };
   function untag() {
-    $$('[data-vt]').forEach(function (el) { el.style.viewTransitionName = ''; el.style.viewTransitionClass = ''; el.removeAttribute('data-vt'); });
+    $$('[data-vt]').forEach(function (el) { el.style.viewTransitionName = ''; el.removeAttribute('data-vt'); });
   }
   function tag(slug) {
     untag();
     var row = $('.work-row[data-project="' + slug + '"]', list);
     if (!row || !row.getClientRects().length) return false;
     var title = row.querySelector('a, .plain');
-    var name = function (el, n, cls) { el.style.viewTransitionName = n; if (cls) el.style.viewTransitionClass = cls; el.setAttribute('data-vt', ''); };
-    name(title, 'project-title');
-    var past = false, n = 0;
-    [$('.work-head')].concat(rows).forEach(function (el) {
-      if (el === row) { past = true; return; }
-      var r = el.getBoundingClientRect();
-      if (!r.height || r.bottom < 0 || r.top > innerHeight) return;
-      name(el, 'vt-' + (n++), past ? 'below' : 'above');
-    });
+    title.style.viewTransitionName = 'project-title'; title.setAttribute('data-vt', '');
     return true;
   }
   list.addEventListener('click', function (e) {
