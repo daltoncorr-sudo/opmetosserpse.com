@@ -5,7 +5,8 @@ The studio site for Opmet Osserpse. A hand-kept static site: plain HTML, one sty
 ## How it works
 - `content/site.json`: every word on the home page (the few lines after the cover and the words that link), the foundry holding page, Privacy and 404, plus the footer and clock.
 - `content/projects/<slug>.json`: one file per project page. The page shows only `title`, `deck`, the images in `media`, and a few plain lines from `client`, `year`, `role` and `links`. The longer copy (`lede`, `challenge`, `work`, `system`, `deliverables`, `credits`, `press`) stays in the file for search descriptions, press and later use. It isn't shown, by design.
-- `content/index.json`: tie-break order for projects from the same year (`home_order`), and the Archive rows that have no page (`rows`).
+- `content/work.json`: the one list of every project (35), with `slug`, `title`, `year`, one or two `tags` from its controlled list, `selected` and `media` (empty for now). It drives Selected works, the Archive on the home page and `/projects/`; the build stops if it drifts from the project pages.
+- `content/index.json`: tie-break order for projects from the same year (`home_order`), used for the project pages' next links.
 - `static/`: CSS, JS, the interim fonts (SIL Open Font License, licenses included) and the hand.
 - `moves/`: the hand's moves on the cover, one folder each. `moves.py` loads them for the build, and `moves_lab.py` writes a workbench page, `_lab/hand.html`. See `moves/README.md`.
 - `build.py`: reads the content, pulls each image from a clone of the daltoncorr.com repo (`daltoncorr-sudo/daltoncorr-porfolio`), resizes it to WebP at 800, 1600 and 2400 px, and writes the finished site to `docs/`.
