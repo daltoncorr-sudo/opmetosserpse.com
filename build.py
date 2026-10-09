@@ -128,7 +128,7 @@ def page(site, title, desc, path, body, og_image=None, current=None, extra_head=
     og = og_image or '/media/site/og.jpg'
     # No menu bar. Inner pages carry only the hand and the name, centered, back to the cover.
     header = '' if path == '/' else ('<header class="site-header"><a class="lockup" href="/" aria-label="Opmet Osserpse">%s%s</a></header>'
-                                     % (brand_svg('hand-mark.svg', 'lockup-hand ink'), brand_svg('wordmark.svg', 'wordmark ink')))
+                                     % (brand_svg('hand-mark.svg', 'lockup-hand'), brand_svg('wordmark.svg', 'wordmark ink')))
     nav = header
     return '''<!doctype html>
 <html lang="en" data-ink="medium">
@@ -363,7 +363,7 @@ def main():
     blog = ('<section class="blog-panel" id="blog" aria-labelledby="blog-title"><div class="blog-inner"><div class="title-row">'
             '<h2 class="vh" id="blog-title">%s</h2><p class="home-big"><a href="#" data-studio>%s</a></p></div>'
             '<div class="blog-body">%s</div></div></section>') % (esc(bl['title']), esc(site['back']), bl_body)
-    cover = ('<section class="cover"><div class="cover-inner"><h1><span class="mark ink" %s>%s</span><span class="name ink">%s<span class="name-text">Opmet Osserpse</span></span></h1>'
+    cover = ('<section class="cover"><div class="cover-inner"><h1><span class="mark" %s>%s</span><span class="name ink">%s<span class="name-text">Opmet Osserpse</span></span></h1>'
              '<nav class="cover-nav" aria-label="Site">%s</nav></div></section>') % (
         moves.mark_attrs(mv), hand + mv['layers'], brand_svg('wordmark.svg', 'wordmark'), nav)
     body = ('<div class="stage-clip"><div class="stage" data-stage>%s<div class="panel home-panel">%s<div data-home>%s%s</div></div>%s</div></div>') % (
