@@ -29,24 +29,24 @@
    "sb-14-film-01-9x16"
   ],
   "blocks": [
-   "field",
+   "hero",
    "pair",
    "full",
    "plate",
-   "field",
+   "wide",
    "wide",
    "plate",
-   "field",
-   "field",
-   "pair",
-   "field",
+   "wide",
    "wide",
    "pair",
-   "field",
+   "wide",
+   "wide",
+   "pair",
+   "wide",
    "full",
    "pair",
    "plate",
-   "field",
+   "wide",
    "wide",
    "pair",
    "tall"
@@ -63,7 +63,7 @@
   "videos": [
    {
     "key": "sb-00-hero-01-16x9",
-    "block": "field",
+    "block": "hero",
     "rest": "end",
     "sound": false,
     "bytes": {
@@ -74,7 +74,7 @@
    },
    {
     "key": "sb-05-signature-02-16x9",
-    "block": "field",
+    "block": "wide",
     "rest": "4.5",
     "sound": false,
     "bytes": {
@@ -94,8 +94,7 @@
      "poster": 136724
     }
    }
-  ],
-  "next": "hollyshorts-22"
+  ]
  },
  "hollyshorts-22": {
   "order": [
@@ -140,9 +139,9 @@
    "summit-podium"
   ],
   "blocks": [
+   "hero",
    "plate",
-   "plate",
-   "field",
+   "wide",
    "plate",
    "plate",
    "pair",
@@ -152,11 +151,11 @@
    "plate",
    "pair",
    "pair",
-   "field",
-   "field",
+   "wide",
+   "wide",
    "pair",
    "pair",
-   "field",
+   "wide",
    "wide",
    "wide",
    "pair",
@@ -171,7 +170,8 @@
   ],
   "full": 1,
   "runs": [
-   "pair"
+   "pair",
+   "wide"
   ],
   "pieces": [
    "w:logo-switch",
@@ -181,8 +181,7 @@
   ],
   "lede_words": 32,
   "photo": false,
-  "videos": [],
-  "next": "hollyshorts-comedy-2026"
+  "videos": []
  },
  "hollyshorts-comedy-2026": {
   "order": [
@@ -225,11 +224,11 @@
    "study-merch"
   ],
   "blocks": [
-   "plate",
+   "hero",
    "tall",
    "plate",
    "wide",
-   "field",
+   "wide",
    "pair",
    "full",
    "pair",
@@ -274,8 +273,7 @@
      "poster": 163494
     }
    }
-  ],
-  "next": "solebury-home-watch"
+  ]
  },
  "solebury-home-watch": {
   "order": [
@@ -287,12 +285,12 @@
    "website-services"
   ],
   "blocks": [
-   "field",
+   "hero",
    "wide",
    "wide",
    "wide",
-   "field",
-   "field"
+   "wide",
+   "wide"
   ],
   "full": 0,
   "runs": [
@@ -301,8 +299,7 @@
   "pieces": [],
   "lede_words": 27,
   "photo": false,
-  "videos": [],
-  "next": "polish-film-festival"
+  "videos": []
  },
  "polish-film-festival": {
   "order": [
@@ -321,7 +318,7 @@
    "poster-la"
   ],
   "blocks": [
-   "plate",
+   "hero",
    "plate",
    "plate",
    "wide",
@@ -333,14 +330,12 @@
   ],
   "full": 0,
   "runs": [
-   "pair",
-   "plate"
+   "pair"
   ],
   "pieces": [],
   "lede_words": 23,
   "photo": false,
-  "videos": [],
-  "next": "weissman-character-edition"
+  "videos": []
  },
  "weissman-character-edition": {
   "order": [
@@ -383,10 +378,10 @@
    "IMG_7700"
   ],
   "blocks": [
-   "field",
-   "field",
-   "plate",
-   "field",
+   "wide",
+   "wide",
+   "wide",
+   "wide",
    "wide",
    "full",
    "wide",
@@ -397,8 +392,8 @@
    "wide",
    "wide",
    "wide",
-   "plate",
-   "field",
+   "wide",
+   "wide",
    "wide",
    "wide",
    "wide",
@@ -425,8 +420,7 @@
   ],
   "lede_words": 26,
   "photo": false,
-  "videos": [],
-  "next": "hollyshorts-21"
+  "videos": []
  },
  "hollyshorts-21": {
   "order": [
@@ -491,13 +485,14 @@
    "IMG_9410"
   ],
   "blocks": [
-   "plate",
+   "hero",
    "wide",
    "pair",
    "plate",
    "plate",
    "plate",
-   "pair",
+   "plate",
+   "plate",
    "wide",
    "plate",
    "pair",
@@ -510,7 +505,7 @@
    "wide",
    "plate",
    "wide",
-   "field",
+   "wide",
    "wide",
    "wide",
    "pair",
@@ -528,7 +523,7 @@
    "wide",
    "plate",
    "plate",
-   "field",
+   "wide",
    "pair",
    "pair",
    "pair",
@@ -537,15 +532,15 @@
   "full": 1,
   "runs": [
    "pair",
-   "plate"
+   "plate",
+   "wide"
   ],
   "pieces": [
    "w:badge-carousel"
   ],
   "lede_words": 31,
   "photo": false,
-  "videos": [],
-  "next": "red-mask"
+  "videos": []
  },
  "red-mask": {
   "order": [
@@ -579,8 +574,7 @@
   "pieces": [],
   "lede_words": 31,
   "photo": false,
-  "videos": [],
-  "next": "hollyshorts-dubai-2025"
+  "videos": []
  },
  "hollyshorts-dubai-2025": {
   "order": [
@@ -597,7 +591,7 @@
    "selection-2"
   ],
   "blocks": [
-   "plate",
+   "hero",
    "plate",
    "wide",
    "wide",
@@ -615,8 +609,7 @@
   "pieces": [],
   "lede_words": 27,
   "photo": false,
-  "videos": [],
-  "next": "dont-let-them-out"
+  "videos": []
  },
  "dont-let-them-out": {
   "order": [
@@ -641,8 +634,7 @@
   "pieces": [],
   "lede_words": 26,
   "photo": false,
-  "videos": [],
-  "next": "hollyshorts-london-2025"
+  "videos": []
  },
  "hollyshorts-london-2025": {
   "order": [
@@ -660,7 +652,7 @@
    "badge"
   ],
   "blocks": [
-   "plate",
+   "hero",
    "wide",
    "full",
    "wide",
@@ -676,8 +668,7 @@
   "pieces": [],
   "lede_words": 29,
   "photo": false,
-  "videos": [],
-  "next": "hollyshorts-comedy-2025"
+  "videos": []
  },
  "hollyshorts-comedy-2025": {
   "order": [
@@ -690,9 +681,9 @@
    "IMG_8077-92bf81"
   ],
   "blocks": [
-   "plate",
-   "field",
-   "field",
+   "hero",
+   "wide",
+   "wide",
    "pair",
    "wide",
    "wide"
@@ -704,8 +695,7 @@
   ],
   "lede_words": 31,
   "photo": false,
-  "videos": [],
-  "next": "hollyshorts-london-2024"
+  "videos": []
  },
  "hollyshorts-london-2024": {
   "order": [
@@ -746,9 +736,9 @@
    "467764830_1108524167295604_4359965425020676631_n-9353cf"
   ],
   "blocks": [
-   "plate",
+   "hero",
    "pair",
-   "field",
+   "wide",
    "wide",
    "pair",
    "wide",
@@ -768,7 +758,7 @@
    "pair",
    "wide",
    "pair",
-   "plate"
+   "wide"
   ],
   "full": 0,
   "runs": [
@@ -777,8 +767,7 @@
   "pieces": [],
   "lede_words": 34,
   "photo": false,
-  "videos": [],
-  "next": "hollyshorts-20"
+  "videos": []
  },
  "hollyshorts-20": {
   "order": [
@@ -875,36 +864,36 @@
    "Screenshot-2024-08-11-at-3.33.15PM-01fe25"
   ],
   "blocks": [
-   "plate",
+   "hero",
    "full",
    "pair",
-   "plate",
-   "field",
+   "wide",
+   "wide",
    "pair",
    "full",
-   "pair",
-   "pair",
-   "pair",
-   "pair",
-   "plate",
-   "wide",
-   "field",
-   "pair",
-   "pair",
-   "wide",
-   "pair",
-   "plate",
-   "wide",
-   "plate",
-   "wide",
    "plate",
    "pair",
    "pair",
    "pair",
    "pair",
    "wide",
+   "wide",
+   "pair",
+   "pair",
+   "wide",
+   "pair",
    "plate",
+   "wide",
    "plate",
+   "wide",
+   "plate",
+   "pair",
+   "pair",
+   "pair",
+   "pair",
+   "wide",
+   "wide",
+   "wide",
    "pair",
    "pair",
    "pair",
@@ -914,13 +903,13 @@
    "plate",
    "wide",
    "pair",
-   "plate",
+   "wide",
    "pair",
    "pair",
    "pair",
    "pair",
    "pair",
-   "plate",
+   "wide",
    "wide",
    "pair",
    "pair",
@@ -937,13 +926,13 @@
   ],
   "full": 2,
   "runs": [
-   "pair"
+   "pair",
+   "wide"
   ],
   "pieces": [],
   "lede_words": 33,
   "photo": false,
-  "videos": [],
-  "next": "cannes-2024"
+  "videos": []
  },
  "cannes-2024": {
   "order": [
@@ -962,8 +951,7 @@
   "pieces": [],
   "lede_words": 26,
   "photo": false,
-  "videos": [],
-  "next": "skyfire-artists"
+  "videos": []
  },
  "skyfire-artists": {
   "order": [
@@ -981,9 +969,9 @@
    "3dgifmaker00298"
   ],
   "blocks": [
-   "plate",
-   "plate",
-   "field",
+   "hero",
+   "wide",
+   "wide",
    "wide",
    "pair",
    "pair",
@@ -993,7 +981,8 @@
   ],
   "full": 0,
   "runs": [
-   "pair"
+   "pair",
+   "wide"
   ],
   "pieces": [],
   "lede_words": 32,
@@ -1021,23 +1010,21 @@
      "poster": 17256
     }
    }
-  ],
-  "next": "survived-by"
+  ]
  },
  "survived-by": {
   "order": [
    "Survived-By---Final-Large-32e9fa"
   ],
   "blocks": [
-   "plate"
+   "hero"
   ],
   "full": 0,
   "runs": [],
   "pieces": [],
   "lede_words": 19,
   "photo": false,
-  "videos": [],
-  "next": "cannes-2023"
+  "videos": []
  },
  "cannes-2023": {
   "order": [
@@ -1052,8 +1039,7 @@
   "pieces": [],
   "lede_words": 28,
   "photo": false,
-  "videos": [],
-  "next": "miles-regis"
+  "videos": []
  },
  "miles-regis": {
   "order": [
@@ -1071,8 +1057,7 @@
   "pieces": [],
   "lede_words": 28,
   "photo": false,
-  "videos": [],
-  "next": "hollyshorts-19"
+  "videos": []
  },
  "hollyshorts-19": {
   "order": [
@@ -1113,10 +1098,11 @@
   ],
   "blocks": [
    "full",
-   "pair",
-   "pair",
+   "plate",
+   "plate",
    "pair",
    "plate",
+   "pair",
    "wide",
    "pair",
    "plate",
@@ -1140,8 +1126,7 @@
   "pieces": [],
   "lede_words": 33,
   "photo": false,
-  "videos": [],
-  "next": "hollyshorts-18"
+  "videos": []
  },
  "hollyshorts-18": {
   "order": [
@@ -1160,8 +1145,8 @@
   ],
   "blocks": [
    "full",
-   "plate",
-   "plate",
+   "wide",
+   "wide",
    "pair",
    "pair",
    "plate",
@@ -1177,8 +1162,7 @@
   "pieces": [],
   "lede_words": 28,
   "photo": false,
-  "videos": [],
-  "next": "hdtracks"
+  "videos": []
  },
  "hdtracks": {
   "order": [
@@ -1198,25 +1182,23 @@
   "blocks": [
    "full",
    "plate",
-   "field",
+   "wide",
    "wide",
    "wide",
    "wide",
    "pair",
    "wide",
    "plate",
-   "plate",
+   "wide",
    "plate"
   ],
   "full": 1,
   "runs": [
-   "plate",
    "wide"
   ],
   "pieces": [],
   "lede_words": 26,
   "photo": false,
-  "videos": [],
-  "next": "sunnys-bookshop"
+  "videos": []
  }
 }
