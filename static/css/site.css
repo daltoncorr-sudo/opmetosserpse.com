@@ -116,12 +116,12 @@ html:not(.js) .stage:has(#about:target){transform:translateX(-66.6667%)}
 .work-label{font:400 clamp(20px,1.9vw,28px)/1.2 var(--serif);margin:0}
 .archive-toggle{font:400 clamp(20px,1.9vw,28px)/1.2 var(--serif);color:var(--tag-gray);background:none;border:0;padding:0;cursor:pointer;transition:color var(--t) var(--ease)}
 .archive-toggle:hover{color:var(--ink)}
-.work-row{position:relative;display:flex;flex-wrap:wrap;align-items:baseline;column-gap:.9em;margin:0 0 .8em}
-.work-row>a,.work-row .plain{font-family:var(--serif);font-size:clamp(20px,1.9vw,28px);line-height:1.3}
+.work-row{position:relative;display:flex;flex-wrap:wrap;align-items:baseline;column-gap:.9em;margin:0 0 clamp(18px,1.75vw,26px)}
+.work-row>a,.work-row .plain{font-family:var(--serif);font-size:clamp(20px,1.9vw,28px);line-height:1.15}
 .work-row .plain{color:var(--tag-gray)}
 .tags{display:inline-flex;flex-wrap:wrap;gap:.2em .9em;font:400 13px/1.4 var(--sans);letter-spacing:.02em;color:var(--tag-gray)}
 .works:not(.is-open) .extra{display:none}
-.yr{position:absolute;right:calc(100% + 1.6rem);top:0;font:italic 400 clamp(15px,1.2vw,18px)/1.3 var(--serif);color:var(--tag-gray);padding-top:.35em;opacity:0;transition:opacity .5s var(--ease)}
+.yr{position:absolute;right:calc(100% + 1.6rem);top:0;font:italic 400 clamp(15px,1.2vw,18px)/1.3 var(--serif);color:var(--tag-gray);padding-top:.2em;opacity:0;transition:opacity .5s var(--ease)}
 .works.is-open .yr{opacity:1}
 @media (max-width:1099px){.works{padding-left:3.6rem}.yr{right:auto;left:-3.6rem}}
 /* The motion: rows already showing glide to their new places while the others fade in between (transform and opacity) */
