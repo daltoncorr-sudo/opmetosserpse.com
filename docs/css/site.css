@@ -103,10 +103,9 @@ html:not(.js) .stage:has(#about:target){transform:translateX(-66.6667%)}
 .panel{flex:none;width:33.3333%;padding:0 var(--gutter)}
 .side{position:sticky;top:0;height:100vh;height:100svh;overflow-y:auto;overscroll-behavior:contain}
 .side-inner{max-width:34rem;margin:0 auto;padding:16vh 0 14vh;text-align:center}
-.foundry-panel .side-inner{min-height:100%;display:flex;flex-direction:column;justify-content:center;padding:0}
 .side-title{font:400 clamp(44px,6vw,96px)/1 var(--serif);margin:0 0 .4em}
 .side-title:focus{outline:none}
-.foundry-body,.about-body{font-size:var(--size-m)}
+.about-body{font-size:var(--size-m)}
 .about-body{font-family:var(--serif);line-height:1.6}
 .about-body a{text-decoration:underline;text-underline-offset:.2em;text-decoration-thickness:1px}
 .press-title{font:italic 400 var(--size-m) var(--serif);margin:3.2em 0 1.2em}
