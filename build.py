@@ -247,7 +247,7 @@ def press_list(press):
         if x['year'] != year:
             if year: out.append('</ul>')
             year = x['year']; out.append('<h4 class="press-year">%s</h4><ul class="press">' % year)
-        line = '<span class="outlet">%s</span> %s' % (typo(x['outlet']), typo(x['title']))
+        line = '<span class="outlet">%s</span> <span class="headline">%s</span>' % (typo(x['outlet']), typo(x['title']))
         out.append('<li>%s</li>' % ('<a href="%s" rel="noopener">%s</a>' % (esc(x['url']), line) if x['url'] else line))
     return ''.join(out) + '</ul>'
 

@@ -101,6 +101,7 @@ html:not(.js) .stage:has(#about:target){transform:translateX(-66.6667%)}
 .press li{margin:0 0 .3em}
 .press{font-size:15px}
 .press .outlet{font-family:var(--serif);font-size:19px;margin-right:.35em}
+.press .headline{color:#747069} /* lighter gray, 4.55:1 on --paper */
 .press a:hover .outlet{color:inherit}
 .studio-link{margin-top:2.6em;font:italic 400 var(--size-m) var(--serif)}
 /* About: the title and a paragraph at the top left; the press to the right, set a little lower. Home stays at the top right. */
@@ -117,7 +118,7 @@ html:not(.js) .stage:has(#about:target){transform:translateX(-66.6667%)}
 .about-panel .about-body{font-size:clamp(20px,2vw,30px);line-height:1.45;max-width:30em}
 .about-body p{margin:0}
 .about-body p.contact{margin-top:1.4em}
-.about-press{text-align:right;padding-top:clamp(40px,9vh,110px)}
+.about-press{text-align:left;padding-top:clamp(120px,30vh,320px)}
 .about-press .press-title{margin-top:0}
 @media (max-width:860px){.about-grid{grid-template-columns:1fr}.about-press{padding-top:0}}
 
