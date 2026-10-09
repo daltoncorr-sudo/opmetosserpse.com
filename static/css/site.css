@@ -259,14 +259,13 @@ html:not(.js) .stage:has(#about:target){transform:translateX(-66.6667%)}
 .pp>.open+.ch,.pp>.open+.b{margin-top:64px}
 .pp>.ch{margin-top:var(--U)}
 .pp .ch>.b+.b,.pp>.b+.ch,.pp>.b+.b{margin-top:var(--u)}.pp .b-cont{margin-top:var(--g)!important}
-.pp .chl{height:0;position:relative;z-index:3}.pp .ch-full>.chl{height:auto;margin-bottom:12px}
+.pp .chl{height:0;position:relative;z-index:3}.pp .ch-above>.chl{height:auto;margin-bottom:12px}
 .pp .chap{grid-column:1/3;margin-left:calc(16px - var(--m));font-size:var(--s);line-height:1.45;padding-right:12px;white-space:nowrap;overflow:hidden}
 .pp .chap .n{color:var(--gray);display:inline-block;min-width:1.8em}
-/* Chapter labels live only in the left margin. Under 1100px it is too narrow for them, so they are left out */
-@media (max-width:1099px){.pp .chl{display:none}}
 .pp .b{align-items:start}
 .pp .b .m,.pp .b .row{grid-column:3/11;grid-row:1}.pp .b-tall .m{grid-column:4/10}
-.pp .b-wide .m,.pp .b-wide .row{grid-column:2/12}  /* nothing beside it: ten columns */
+.pp .b-wide .m,.pp .b-wide .row{grid-column:2/12}  /* rows and landscape pictures: ten columns */
+.pp .b-wide .note{grid-row:2}  /* its note in the right margin, under the picture's corner */
 .pp .row{display:flex;gap:var(--g);align-items:flex-start}.pp .row .m{flex:1 1 0;min-width:0}
 .pp .b-full{display:block}.pp .b-full .fcap{margin-top:10px}
 .pp .b video{background:var(--paper)}
@@ -279,6 +278,13 @@ html:not(.js) .stage:has(#about:target){transform:translateX(-66.6667%)}
 .pp .note .again[hidden]{display:none}
 /* The way out */
 .pp .pfoot{margin-top:var(--U);padding-bottom:120px;display:flex;justify-content:center;gap:var(--s4);font:italic 400 clamp(17px,1.35vw,20px)/1.4 var(--serif);letter-spacing:.01em}
+/* Under 1100px the margins are too narrow for text. Chapter labels are left out; pictures widen (rows and landscape
+   pictures to the full width); a note sits under its picture, on the right */
+@media (min-width:641px) and (max-width:1099px){
+  .pp .chl{display:none}
+  .pp .b .m,.pp .b .row{grid-column:2/12}.pp .b-tall .m{grid-column:3/11}.pp .b-wide .m,.pp .b-wide .row{grid-column:1/13}
+  .pp .note,.pp .b-wide .note{grid-column:8/13;grid-row:2;margin:10px 0 0}.pp .fcap .note{grid-row:1;margin-top:0}
+}
 @media (prefers-reduced-motion:reduce){.pp [data-read] .note{color:var(--ink)}}
 @media (max-width:640px){
   .pp{--m:16px;--g:12px;--u:24px;--U:64px;--t1:34px}

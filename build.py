@@ -374,18 +374,11 @@ def project_body(p, blocks, chapters, notes, back='Back', home='Home', all_work=
            '<section class="open g">%s<h1>%s</h1><p class="lede">%s</p><div class="info">%s%s</div></section>' % (
                '<p class="kicker">%s</p>' % typo(notes['kicker']) if notes.get('kicker') else '', typo(p['title']), typo(notes.get('lede') or p['lede']), dl(facts, 'facts'), dl(credits, 'cr'))]
     starts = {c['starts_at']: c for c in chapters}
-    # Rows and landscape pictures with nothing beside them run across ten columns. A block with a note, or a label beside
-    # it, stays in the eight middle columns, and so does every row of its gallery, so a gallery keeps one width.
-    def texted(b): return bool(b['note']) or (b['items'][0]['key'] in starts and b['kind'] != 'full')
-    def landscape(b): return b['kind'] == 'single' and b['items'][0]['kind'] != 'widget' and b['items'][0]['w'] >= b['items'][0]['h']
-    i = 0
-    while i < len(blocks):
-        j = i + 1
-        while j < len(blocks) and blocks[j].get('cont'): j += 1  # one gallery's rows: blocks[i:j]
-        grp = blocks[i:j]
-        wide = (grp[0]['kind'] == 'row' or (len(grp) == 1 and landscape(grp[0]))) and not any(texted(b) for b in grp)
-        for b in grp: b['wide'] = wide
-        i = j
+    # Rows and landscape pictures always run wide; text never shrinks a picture. (A note on a wide picture sits in the
+    # right margin under its corner; a chapter that opens on one has its label just above it, in the left margin.)
+    for b in blocks:
+        it = b['items'][0]
+        b['wide'] = b['kind'] == 'row' or (b['kind'] == 'single' and it['kind'] != 'widget' and it['w'] >= it['h'])
     open_ch, n = False, 0
     for b in blocks:
         c = starts.get(b['items'][0]['key'])
@@ -394,7 +387,7 @@ def project_body(p, blocks, chapters, notes, back='Back', home='Home', all_work=
             n += 1; open_ch = True
             # the label sits in the left margin beside its first block; above it, on its own line, when that block is a full bleed
             out.append('<section class="ch%s" aria-label="%s"><div class="chl g"><h2 class="chap"><span class="n">%d</span>%s</h2></div>'
-                       % (' ch-full' if b['kind'] == 'full' else '', esc(c['label']), n, typo(c['label'])))
+                       % (' ch-above' if b['kind'] == 'full' or b.get('wide') else '', esc(c['label']), n, typo(c['label'])))
         out.append(block_html(b, p['slug']))
     if open_ch: out.append('</section>')
     out.append('<nav class="g pfoot" aria-label="More"><a href="#main" data-totop>%s</a><a href="/#archive">%s</a></nav>' % (esc(top), esc(all_work)))
