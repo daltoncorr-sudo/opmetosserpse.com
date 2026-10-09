@@ -14,12 +14,12 @@
    "src": "system[1]"
   },
   {
-   "label": "At the Egyptian Theatre",
+   "label": "The Egyptian Theatre",
    "starts_at": "53931937742_326bfa634b_k-copy-a4abd2",
    "src": "work[1]"
   },
   {
-   "label": "Merchandise, badges and award",
+   "label": "Merchandise and badges",
    "starts_at": "All-merch-4f20ad",
    "src": "deliverables[1], [2], [3]"
   }
@@ -47,5 +47,20 @@
   "Jeff Smith",
   "Sir Henry Thompson Jr."
  ],
- "photography_src": "HollyShorts FilmFest albums on Flickr (photographer named in each album title), checked Oct. 9, 2026"
+ "photography_src": "HollyShorts FilmFest albums on Flickr (photographer named in each album title), checked Oct. 9, 2026",
+ "credits": [
+  [
+   "Art direction",
+   "Dalton Corr, Opmet Osserpse"
+  ],
+  [
+   "Award fabrication",
+   "Revello Metal"
+  ],
+  [
+   "Production",
+   "Distinctive Event Solutions"
+  ]
+ ],
+ "credits_src": "D, Oct. 9, 2026 (photography follows from \"photography\")"
 }
