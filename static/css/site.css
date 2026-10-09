@@ -113,8 +113,8 @@ html:not(.js) .stage:has(#about:target){transform:translateX(-66.6667%)}
 .work{max-width:54rem;margin:0 auto;padding:10vh 0 20vh;scroll-margin-top:6vh}
 .work:focus{outline:none}
 .work-head{display:flex;align-items:baseline;gap:1.2em;margin:0 0 1.6em}
-.work-label{font:italic 400 clamp(20px,1.9vw,28px)/1.2 var(--serif);margin:0}
-.archive-toggle{font:italic 400 clamp(20px,1.9vw,28px)/1.2 var(--serif);color:var(--tag-gray);background:none;border:0;padding:0;cursor:pointer;transition:color var(--t) var(--ease)}
+.work-label{font:400 clamp(20px,1.9vw,28px)/1.2 var(--serif);margin:0}
+.archive-toggle{font:400 clamp(20px,1.9vw,28px)/1.2 var(--serif);color:var(--tag-gray);background:none;border:0;padding:0;cursor:pointer;transition:color var(--t) var(--ease)}
 .archive-toggle:hover{color:var(--ink)}
 .work-row{position:relative;display:flex;flex-wrap:wrap;align-items:baseline;column-gap:.9em;margin:0 0 .8em}
 .work-row>a,.work-row .plain{font-family:var(--serif);font-size:clamp(20px,1.9vw,28px);line-height:1.3}
