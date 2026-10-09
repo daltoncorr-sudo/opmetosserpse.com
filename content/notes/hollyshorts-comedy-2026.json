@@ -24,20 +24,7 @@
    "src": "work[1]"
   }
  ],
- "notes": {
-  "hollyshorts-comedy-10-poster-popcorn": {
-   "text": "The brief came down to two words: prestige, but silly. Then the poster was animated for the screen.",
-   "src": "challenge, work[0]"
-  },
-  "study-type": {
-   "text": "The type was tested on paper first. These printed studies sat on the desk before the finals.",
-   "src": "work[1]"
-  },
-  "official-selections": {
-   "text": "Ninety-one official selections. The screening schedules also ran on the cinema's own displays.",
-   "src": "work[2]"
-  }
- },
+ "notes": {},
  "video": {
   "hollyshorts-comedy-10-poster-popcorn": {
    "rest": "end",
@@ -49,5 +36,7 @@
  "photography": [
   "Juan Ramirez"
  ],
- "photography_src": "HollyShorts FilmFest albums on Flickr (photographer named in each album title), checked Oct. 9, 2026"
+ "photography_src": "HollyShorts FilmFest albums on Flickr (photographer named in each album title), checked Oct. 9, 2026",
+ "kicker": "10th Anniversary",
+ "kicker_src": "D, Oct. 9, 2026"
 }
