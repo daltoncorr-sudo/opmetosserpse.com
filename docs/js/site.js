@@ -209,6 +209,17 @@
   }
   toggle.addEventListener('click', function () { setOpen(!list.classList.contains('is-open'), true); });
 
+  // Center the column on its content: as wide as the widest row of the full list, tags included
+  function fit() {
+    list.classList.add('measuring');
+    var w = Math.ceil(list.getBoundingClientRect().width);
+    list.classList.remove('measuring');
+    work.style.setProperty('--work-w', w + 'px');
+  }
+  fit();
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(fit);
+  var rt; window.addEventListener('resize', function () { clearTimeout(rt); rt = setTimeout(fit, 150); });
+
   // Hover hook for later: every project row says when the pointer or keyboard focus enters and leaves it
   rows.forEach(function (r) {
     var fire = function (name) { r.dispatchEvent(new CustomEvent(name, { bubbles: true, detail: { slug: r.getAttribute('data-project') } })); };
