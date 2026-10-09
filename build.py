@@ -333,7 +333,7 @@ def main():
                    '<p class="home-link"><a href="#" data-studio>%s</a></p><div class="about-grid"><div class="about-main">'
                    '<h2 class="about-title" id="about-title" tabindex="-1">%s</h2><div class="about-body">%s</div></div>'
                    '<div class="about-press"><h3 class="press-title">%s</h3>%s</div></div></section>') % (
-        esc(site['back']), esc(ap['title']), ''.join('<p>%s</p>' % link(typo(x)) for x in ap['lines']), esc(ap['press_title']), press_list(press))
+        esc(site['back']), ' '.join('<span>%s</span>' % esc(x) for x in ap['title'].split()), ''.join('<p>%s</p>' % link(typo(x)) for x in ap['lines']), esc(ap['press_title']), press_list(press))
     cover = ('<section class="cover"><div class="cover-inner"><h1><span class="mark" %s>%s</span><span class="name">%s</span></h1>'
              '<nav class="cover-nav" aria-label="Site">%s</nav><div class="intro">%s</div></div></section>') % (
         moves.mark_attrs(mv), hand + mv['layers'], brand_svg('wordmark.svg', 'wordmark', 'Opmet Osserpse'), nav, about)
