@@ -63,12 +63,16 @@ class Media:
     def __init__(self, src_root, out_root):
         self.src_root, self.out_root, self.cache, self.log, self.made = src_root, out_root, {}, [], set()
 
+    def path(self, rel):
+        """A source file: under content/ it's in this repo (pictures made for this site); otherwise in the daltoncorr clone."""
+        return os.path.join(ROOT, rel) if rel.startswith('content/') else os.path.join(self.src_root, rel)
+
     def assets(self, paths):
         """Files the 3D and interactive pieces read, copied as they are into docs/dc/."""
         dc_source.copy_assets(self.src_root, paths, os.path.dirname(self.out_root))
 
     def has_audio(self, rel):
-        src = os.path.join(self.src_root, rel)
+        src = self.path(rel)
         if not rel.lower().endswith(('.mp4', '.mov', '.webm')) or not os.path.exists(src): return False
         r = subprocess.run(['ffprobe', '-v', 'error', '-select_streams', 'a', '-show_entries', 'stream=index', '-of', 'csv=p=0', src],
                            capture_output=True, text=True)
@@ -88,7 +92,7 @@ class Media:
         """Resize one source image into WebP at up to three widths. Returns (src, srcset, w, h)."""
         key = (rel, max_w)
         if key in self.cache: return self.cache[key]
-        src = os.path.join(self.src_root, rel)
+        src = self.path(rel)
         if not os.path.exists(src):
             self.log.append('missing: ' + rel); return None
         out_dir = os.path.join(self.out_root, slug); os.makedirs(out_dir, exist_ok=True)
@@ -111,7 +115,7 @@ class Media:
         self.cache[key] = r; return r
 
     def copy(self, rel, slug, name):
-        src = os.path.join(self.src_root, rel)
+        src = self.path(rel)
         if not os.path.exists(src):
             self.log.append('missing: ' + rel); return None
         out_dir = os.path.join(self.out_root, slug); os.makedirs(out_dir, exist_ok=True)
@@ -121,7 +125,7 @@ class Media:
     def video(self, rel, slug, name, rest='end', sound=False, first=False):
         """One film: a WebM (VP9, Opus when it has sound), the MP4 as fallback, and a WebP poster frame under 200 KB:
         the first frame for an animated poster, otherwise the frame it rests on. Returns a dict, or None."""
-        src = os.path.join(self.src_root, rel)
+        src = self.path(rel)
         if not os.path.exists(src):
             self.log.append('missing: ' + rel); return None
         out_dir = os.path.join(self.out_root, slug); os.makedirs(out_dir, exist_ok=True)
@@ -149,7 +153,7 @@ class Media:
                     bytes={k: os.path.getsize(os.path.join(out_dir, name + x)) for k, x in (('webm', '.webm'), ('mp4', '.mp4'), ('poster', '-poster.webp'))})
 
     def og(self, rel, slug):
-        src = os.path.join(self.src_root, rel)
+        src = self.path(rel or '')
         if not rel or not os.path.exists(src): return None
         im = ImageOps.fit(ImageOps.exif_transpose(Image.open(src)).convert('RGB'), (1200, 630), Image.LANCZOS)
         out_dir = os.path.join(self.out_root, slug); os.makedirs(out_dir, exist_ok=True)
@@ -254,6 +258,11 @@ def write(path, text):
     full = os.path.join(DIST, path.lstrip('/'))
     os.makedirs(os.path.dirname(full), exist_ok=True)
     with open(full, 'w', encoding='utf-8') as f: f.write(text)
+
+def notes_media(p):
+    """The notes file's own list of pictures, when a page doesn't mirror daltoncorr.com (src, alt, slot, gallery)."""
+    fn = os.path.join(CONTENT, 'notes', p['slug'] + '.json')
+    return load(fn).get('media', []) if os.path.exists(fn) else []
 
 def load_notes(p, keys):
     """content/notes/<slug>.json: the Work line, chapter labels, margin notes, how each film rests and plays, and (Sunny's
@@ -628,7 +637,10 @@ def main():
     stats, used_scripts = {}, set()
     for p in ordered:
         s = p['slug']; items = []
-        dc = dc_source.items(src_root, s)
+        if notes_media(p):  # a page rebuilt with pictures made for this site: its list is in the notes file
+            dc = [dict(kind='img', src=m['src'], alt=m['alt'], w=0, h=0, gallery=m.get('gallery', 0), wide=False) for m in notes_media(p)]
+        else:
+            dc = dc_source.items(src_root, s)
         js = {dc_source.stem(m['src']): m for m in p['media']}
         seen = {}
         for x in dc:  # keys: a picture's file name, or w:<piece>; numbered when one repeats
@@ -646,8 +658,8 @@ def main():
                 items.append(dict(key=k, kind='widget', name=x['name'], slot='X', gallery=0, html=lambda sz, h=x['html']: h, scripts=x['scripts']))
                 media.assets(x['assets'])
                 continue
-            src = x['src'] if os.path.exists(os.path.join(src_root, x['src'])) or not jm else jm['src']
-            animated = x['kind'] == 'img' and src.lower().endswith(('.webp', '.gif')) and getattr(Image.open(os.path.join(src_root, src)), 'is_animated', False)
+            src = x['src'] if os.path.exists(media.path(x['src'])) or not jm else jm['src']
+            animated = x['kind'] == 'img' and src.lower().endswith(('.webp', '.gif')) and getattr(Image.open(media.path(src)), 'is_animated', False)
             if x['kind'] == 'video' or animated:  # films, and animated pictures made into films, so nothing loops
                 vn = notes['video'].get(k, {})
                 has_sound = media.has_audio(src)
@@ -662,7 +674,9 @@ def main():
             r = media.image(src, s, name)
             if not r: continue
             # the size: the approved slot when the picture was already on this site; otherwise from daltoncorr.com's layout
-            if jm: slot = jm['slot']
+            nm = next((m for m in notes_media(p) if m['src'] == x['src']), None)
+            if nm and nm.get('slot'): slot = nm['slot']
+            elif jm: slot = jm['slot']
             elif x['wide']: slot = 'W'
             else: slot = 'P' if r[3] > r[2] else 'L'
             items.append(dict(key=k, slot=slot, kind='img', w=r[2], h=r[3], r=r, gallery=x['gallery'], alt=alt,
