@@ -343,7 +343,7 @@ def block_html(b, slug):
         grow = ' style="flex-grow:%.4f"' % (it['w'] / it['h']) if kind == 'row' else ''
         ms.append('<div class="%s" data-i="%s"%s>%s</div>' % (cls, esc(it['key']), grow, it['html'](SIZES[kind])))
     media = '<div class="row">%s</div>' % ''.join(ms) if kind == 'row' else ''.join(ms)
-    cap_ = typo(b['note']) if b['note'] else ''
+    cap_ = '<span class="nt">%s</span>' % typo(b['note']) if b['note'] else ''  # the words; the film links stay apart
     for it in b['items']:
         if it['kind'] == 'video':
             if it['sound']: cap_ += ' <a href="#" class="again" data-sound="%s">Play with sound</a>' % it['id']
