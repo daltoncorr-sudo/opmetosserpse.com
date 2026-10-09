@@ -72,18 +72,19 @@ html:not(.js) .stage:has(#about:target){transform:translateX(-66.6667%)}
 .press-title{font:italic 400 var(--size-m) var(--serif);margin:3.2em 0 1.2em}
 .press-year{font:italic 400 var(--size-s) var(--serif);color:var(--tag-gray);margin:1.8em 0 .4em}
 .press li{margin:0 0 .3em}
-.press .outlet{font-family:var(--serif);font-size:var(--size-m);margin-right:.35em}
+.press{font-size:15px}
+.press .outlet{font-family:var(--serif);font-size:19px;margin-right:.35em}
 .press a:hover .outlet{color:inherit}
 .studio-link{margin-top:2.6em;font:italic 400 var(--size-m) var(--serif)}
 /* About: the title and a paragraph at the top left; the press to the right, set a little lower. Home stays at the top right. */
 .home-link{position:sticky;top:0;z-index:1;margin:0;padding:22px 0 10px;text-align:right;background:var(--paper);font:italic 400 var(--size-m) var(--serif)}
 .about-grid{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:clamp(32px,7vw,120px);padding:4vh clamp(8px,calc(4vw - var(--gutter)),56px) 14vh;text-align:left}
-.about-title{font:400 clamp(34px,3.8vw,60px)/1.05 var(--serif);margin:0 0 .7em}
+.about-title{font:400 clamp(52px,7.5vw,128px)/.98 var(--serif);margin:0 0 .5em}
 .about-title:focus{outline:none}
 .about-title span{display:block}
-.about-panel .about-body{font-size:clamp(18px,1.55vw,23px);line-height:1.5;max-width:34em}
+.about-panel .about-body{font-size:clamp(20px,2vw,30px);line-height:1.45;max-width:30em}
 .about-body p{margin:0 0 1.1em}
-.about-press{text-align:right;padding-top:clamp(80px,18vh,200px)}
+.about-press{text-align:right;padding-top:clamp(120px,26vh,300px)}
 .about-press .press-title{margin-top:0}
 @media (max-width:860px){.about-grid{grid-template-columns:1fr}.about-press{padding-top:0}}
 
