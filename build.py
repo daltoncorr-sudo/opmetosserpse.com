@@ -348,12 +348,12 @@ def main():
     fd_body = open(fd_file, encoding='utf-8').read() if os.path.exists(fd_file) else ''.join('<p>%s</p>' % typo(x) for x in fd['lines'])
     back = '<p class="studio-link"><a href="#" data-studio>%s</a></p>' % esc(site['back'])
     foundry = ('<section class="panel side foundry-panel" id="foundry" aria-labelledby="foundry-title"><div class="side-inner">'
-               '<h2 class="side-title" id="foundry-title" tabindex="-1">%s</h2><div class="foundry-body">%s</div>%s</div></section>') % (esc(fd['title']), fd_body, back)
+               '<h2 class="vh" id="foundry-title">%s</h2><div class="foundry-body">%s</div>%s</div></section>') % (esc(fd['title']), fd_body, back)
     ap = site['about']
     press = load(os.path.join(CONTENT, 'press.json'))['press']
     about_panel = ('<section class="panel side about-panel" id="about" aria-labelledby="about-title">'
                    '<div class="about-grid"><div class="title-row">'
-                   '<h2 class="about-title" id="about-title" tabindex="-1">%s</h2><p class="home-big"><a href="#" data-studio>%s</a></p></div>'
+                   '<h2 class="vh" id="about-title">%s</h2><p class="home-big"><a href="#" data-studio>%s</a></p></div>'
                    '<div class="about-main"><div class="about-body">%s</div></div>'
                    '<div class="about-press"><h3 class="press-title">%s</h3>%s</div></div></section>') % (
         ' '.join('<span>%s</span>' % esc(x) for x in ap['title'].split()), esc(site['back']), ''.join('<p>%s</p>' % link(typo(x)) for x in ap['lines']) + ''.join('<p class="contact">%s</p>' % link(typo(x)) for x in ap['contact']), esc(ap['press_title']), press_list(press))
@@ -361,7 +361,7 @@ def main():
     bl = site['blog']; bl_file = os.path.join(CONTENT, 'blog.html')
     bl_body = open(bl_file, encoding='utf-8').read() if os.path.exists(bl_file) else ''.join('<p>%s</p>' % typo(x) for x in bl['lines'])
     blog = ('<section class="blog-panel" id="blog" aria-labelledby="blog-title"><div class="blog-inner"><div class="title-row">'
-            '<h2 class="about-title" id="blog-title" tabindex="-1">%s</h2><p class="home-big"><a href="#" data-studio>%s</a></p></div>'
+            '<h2 class="vh" id="blog-title">%s</h2><p class="home-big"><a href="#" data-studio>%s</a></p></div>'
             '<div class="blog-body">%s</div></div></section>') % (esc(bl['title']), esc(site['back']), bl_body)
     cover = ('<section class="cover"><div class="cover-inner"><h1><span class="mark ink" %s>%s</span><span class="name ink">%s<span class="name-text">Opmet Osserpse</span></span></h1>'
              '<nav class="cover-nav" aria-label="Site">%s</nav></div></section>') % (

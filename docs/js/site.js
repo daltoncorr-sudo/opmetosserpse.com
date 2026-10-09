@@ -140,7 +140,7 @@
     Object.keys(panels).forEach(function (k) { panels[k].inert = k !== name; });
     home.inert = !!name;
     if (instant) { void stage.offsetWidth; stage.classList.remove('no-anim'); }
-    if (name) { panels[name].scrollTop = 0; $('#' + name + '-title').focus({ preventScroll: true }); }
+    if (name) { panels[name].scrollTop = 0; $('[data-studio]', panels[name]).focus({ preventScroll: true }); }
     else if (was && animate) { var l = $('[data-go="' + was + '"]'); if (l) l.focus({ preventScroll: true }); }
   }
   function closePanel() {
