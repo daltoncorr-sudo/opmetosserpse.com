@@ -99,8 +99,9 @@ html:not(.js) .stage:has(#about:target){transform:translateX(-66.6667%)}
 .cover .name .wordmark{display:block;width:clamp(220px,28vw,480px);height:auto}
 .cover-nav{display:flex;flex-wrap:wrap;justify-content:center;gap:.35em 1.6em;margin:clamp(18px,3.4vh,34px) 0 0;font:italic 400 var(--size-m)/1.4 var(--serif)}
 /* The intro: 50px against the 14px body at full size, scaled down by width and height so it stays on the first screen */
-.intro{max-width:24em;margin-top:clamp(20px,4vh,44px);font-family:var(--bold-font);font-weight:var(--bold-weight);font-size:clamp(24px,min(3.5vw,5.6vh),50px);line-height:1.14;text-wrap:balance}
-.intro p{margin:0 0 .3em}
+.intro{max-width:24em;margin-top:clamp(20px,4vh,44px);font-family:var(--bold-font);font-weight:var(--bold-weight);font-size:clamp(24px,min(3.5vw,5.2vh),50px);line-height:1.3;text-wrap:balance}
+.intro p{margin:0 0 .65em}
+.intro p:last-child{margin-bottom:0}
 /* The hand on the cover. Each move lives in its own folder under moves/; build.py gathers them into /css/moves.css. */
 @keyframes arrive{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
 @media (max-width:719px){
