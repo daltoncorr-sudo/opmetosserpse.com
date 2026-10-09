@@ -93,10 +93,9 @@ html.is-locked{overflow:hidden}
 .blog-inner{padding:12vh clamp(8px,calc(4vw - var(--gutter)),56px) 14vh}
 .blog-body{font:400 clamp(18px,1.55vw,23px)/1.5 var(--serif);max-width:34em}
 .blog-body p{margin:0}
-/* With posts, the list sits at the bottom of the blog's screen, next to home. An article opens above it; once one is
-   open the list simply follows it, with room to breathe. */
-.blog-list{display:flex;flex-direction:column;justify-content:flex-end;min-height:100vh;padding:var(--s6) 0}
-.blog-article:not(:empty)+.blog-list{min-height:0;padding-top:calc(var(--s6) * 2)}
+/* With posts, the list is one screen, centered on it. An article opens above; reading to its end brings the list back
+   to the middle of the screen. The same in both states, so the list never moves when an article comes or goes. */
+.blog-list{display:flex;flex-direction:column;justify-content:center;min-height:100vh;padding:calc(var(--s6) * 2) 0}
 .blog-article{display:flow-root}  /* keeps the title's margin inside, so scrolling to the article lands above its title */
 .article-head h1:focus{outline:none}
 .article-body{max-width:var(--measure);margin:0 auto;font:400 19px/1.6 var(--serif)}
