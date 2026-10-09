@@ -251,6 +251,7 @@
     if (cache[slug]) return Promise.resolve(cache[slug]);
     return fetch('/projects/' + slug).then(function (r) { if (!r.ok) throw new Error(r.status); return r.text(); }).then(function (t) {
       var d = new DOMParser().parseFromString(t, 'text/html');
+      if (d.querySelector('[data-page-only]')) throw new Error('page');  // 3D or interactive pieces: open the page itself
       return (cache[slug] = { html: d.querySelector('main').innerHTML, title: d.title });
     });
   }

@@ -241,16 +241,18 @@ html:not(.js) .stage:has(#about:target){transform:translateX(-66.6667%)}
 .pp .ph{color:var(--gray);font-style:italic}
 .pp .g{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));column-gap:var(--g);padding:0 var(--m)}
 .pp .open{padding-top:84px;align-items:start}
-.pp .pback{grid-column:1/3;grid-row:1;padding-top:14px;font-style:italic}.pp .pback a{color:var(--gray)}.pp .pback a:hover{color:var(--ink)}
-.pp .open .oi{grid-column:3/10;grid-row:1}.pp .open h1{font-size:var(--t1);line-height:1.08;letter-spacing:-.012em}
-.pp .open .lede{width:calc(85.7% - 4px);margin-top:22px;font-size:var(--b);line-height:1.55}
-.pp .open .facts{grid-column:11/13;grid-row:1;margin-top:4px}
-.pp .facts{font-size:var(--s);line-height:1.45}.pp .facts div{display:block;padding:6px 0 7px;border-top:1px solid var(--hair)}
-.pp .facts div:last-child{border-bottom:1px solid var(--hair)}.pp .facts dt{color:var(--gray);margin-bottom:1px}.pp .facts a{border-bottom:1px solid var(--hair)}
+.pp .pback{grid-column:1/3;grid-row:1;padding-top:16px;font-style:italic}.pp .pback a{color:var(--gray)}.pp .pback a:hover{color:var(--ink)}
+.pp .open h1{grid-column:3/11;grid-row:1;text-align:center;font-family:var(--serif);font-size:var(--t1);line-height:1.12;letter-spacing:0}
+/* Under the title, centered as a pair: the paragraph on the left, the facts on the right */
+.pp .open .lede{grid-column:3/8;grid-row:2;margin-top:40px;padding-right:var(--g);font-size:var(--b);line-height:1.55}
+.pp .open .facts{grid-column:8/11;grid-row:2;margin-top:44px}
+.pp .facts{font-size:var(--s);line-height:1.45}.pp .facts div{display:block;padding:0 0 10px}
+.pp .facts dt{color:var(--gray);margin-bottom:1px}.pp .facts a{text-decoration:underline;text-decoration-color:var(--hair);text-underline-offset:3px}
 .pp .chap{font-size:var(--s);line-height:1.45}.pp .chap .n{color:var(--gray);display:inline-block;min-width:2.4em}
 .pp>.ch{margin-top:var(--U)}.pp>.open+.ch,.pp>.open+.b{margin-top:56px}.pp>.ch>.b:first-of-type{margin-top:0}
-.pp .ch>.chl{position:sticky;top:30px;height:0;z-index:2;padding:0 var(--m)}
-.pp .chl .chap{width:var(--lane);padding-top:10px;border-top:1px solid var(--hair)}
+/* A chapter label sits in the left margin on its own line, above its first block: nothing passes over it */
+.pp .ch>.chl{padding:0 var(--m);margin-bottom:28px}
+.pp .chl .chap{width:var(--lane)}
 .pp .ch>.b+.b,.pp>.b+.ch,.pp>.b+.b{margin-top:var(--u)}.pp .ch>.chl+.b{margin-top:0}
 .pp .b{align-items:end;row-gap:12px}
 .pp .b-plate .m{grid-column:4/10}.pp .b-field .m{grid-column:3/11}.pp .b-wide .m{grid-column:2/12}
@@ -258,7 +260,8 @@ html:not(.js) .stage:has(#about:target){transform:translateX(-66.6667%)}
 .pp .b .m{grid-row:1}
 .pp .b-full{display:block}.pp .b-full .fcap{margin-top:12px}
 .pp .b video{background:var(--paper)}
-.pp .b .m,.pp .nx .ni{position:relative;z-index:2}  /* above the grain, like every image */
+.pp .b .m,.pp .nx .ni{position:relative;z-index:2}
+.pp .piece{min-width:0}.pp .piece>*{margin-top:0}  /* above the grain, like every image */
 .pp .note{grid-column:11/13;grid-row:1;align-self:start;position:sticky;top:30px;font-size:var(--s);line-height:1.45;color:var(--gray);transition:color var(--t) var(--ease)}
 .pp [data-read].on .note{color:var(--ink)}
 .pp .b-wide .note,.pp .b-full .note{grid-row:2;position:static}
@@ -270,7 +273,7 @@ html:not(.js) .stage:has(#about:target){transform:translateX(-66.6667%)}
 .pp .cr div:last-child{border-bottom:1px solid var(--hair)}.pp .cr dt{color:var(--gray)}
 .pp .nx{margin-top:var(--U);padding-bottom:120px}
 .pp .nx .next{grid-column:1/11;display:grid;grid-template-columns:repeat(10,minmax(0,1fr));column-gap:var(--g);color:var(--ink)}
-.pp .nx .lab{grid-column:1/3;grid-row:1;padding-top:14px}.pp .nx .nt{grid-column:3/11;grid-row:1;font-size:var(--t1);line-height:1.08;letter-spacing:-.012em;transition:color var(--t) var(--ease)}
+.pp .nx .lab{grid-column:1/3;grid-row:1;padding-top:16px}.pp .nx .nt{grid-column:3/11;grid-row:1;font-family:var(--serif);font-size:var(--t1);line-height:1.12;transition:color var(--t) var(--ease)}
 .pp .nx .next:hover .nt{color:var(--gray)}
 .pp .nx .ni{grid-column:3/11;grid-row:2;margin-top:28px;display:block;overflow:hidden}
 .pp .nx .ni img{aspect-ratio:16/9;object-fit:cover}
@@ -278,13 +281,12 @@ html:not(.js) .stage:has(#about:target){transform:translateX(-66.6667%)}
 @media (max-width:640px){
   .pp{--m:16px;--g:12px;--u:56px;--U:96px;--t1:40px}
   .pp .g{grid-template-columns:1fr 1fr}
-  .pp .g>*,.pp .b .m,.pp .open .oi,.pp .open .facts,.pp .note,.pp .end .lab,.pp .end .cr,.pp .nx .next,.pp .pback{grid-column:1/-1!important;grid-row:auto!important}
+  .pp .g>*,.pp .b .m,.pp .open h1,.pp .open .lede,.pp .open .facts,.pp .note,.pp .end .lab,.pp .end .cr,.pp .nx .next,.pp .pback{grid-column:1/-1!important;grid-row:auto!important}
   .pp .b-pair .m1{grid-column:1/2!important}.pp .b-pair .m2{grid-column:2/3!important}.pp .b-pair .m{grid-row:1!important}
   .pp .pback{padding-top:0;margin-bottom:16px}
-  .pp .open .lede{width:auto}.pp .open{padding-top:40px}.pp .open .facts{margin-top:22px;display:grid;grid-template-columns:1fr 1fr;column-gap:12px}
-  .pp .open .facts div:nth-last-child(2):nth-child(odd){border-bottom:1px solid var(--hair)}
+  .pp .open h1{text-align:left}.pp .open .lede{margin-top:22px;padding-right:0}.pp .open{padding-top:40px}.pp .open .facts{margin-top:22px;display:grid;grid-template-columns:1fr 1fr;column-gap:12px}
   .pp>.open+.ch,.pp>.open+.b{margin-top:32px}
-  .pp .ch>.chl{position:static;height:auto;margin-bottom:14px}.pp .chl .chap{width:auto}
+  .pp .ch>.chl{margin-bottom:14px}.pp .chl .chap{width:auto}
   .pp .note{position:static;margin-top:2px}.pp [data-read].on .note{color:var(--gray)}.pp .end .cr{margin-top:12px}
   .pp .nx .next{grid-template-columns:1fr}.pp .nx .lab,.pp .nx .nt,.pp .nx .ni{grid-column:1/-1!important;grid-row:auto!important}.pp .nx .lab{margin-bottom:8px;padding-top:0}
 }
