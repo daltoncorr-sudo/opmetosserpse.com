@@ -316,7 +316,7 @@
 
   // Arriving at #foundry (or #foundry/<id>) or #about opens that panel at once; #archive opens the list at once
   function sync(first) {
-    var h = location.hash.slice(1).split('/')[0];  // #foundry/<id> is the foundry, with a product open
+    var h = location.hash.slice(1).split(/[\/?]/)[0];  // #foundry/<id> is the foundry with a product open, #foundry?digital filtered
     setPanel(panels[h] ? h : '', !first);
     if (h === 'archive') setOpen(true, false);
   }
@@ -349,6 +349,7 @@ document.addEventListener('click', function (e) {
   var reduce = mq('(prefers-reduced-motion: reduce)');
   var panel = fd.closest('.foundry-panel'), field = $('[data-field]'), space = $('.fd-space'), left = $('[data-left]'), text = $('[data-text]');
   var home = $('.fd-home'), homeV = $('.fd-v', home), homeW = $('.fd-w', home);
+  var filters = $$('[data-filter]');
   var SLOTS = fd.getAttribute('data-slots').split(' ').map(function (t) { var p = t.split(',').map(Number); return { x: p[0], y: p[1], d: p[2] }; });
   var items = $$('.fd-item').map(function (el) {
     return { el: el, id: el.getAttribute('data-id'), kind: el.getAttribute('data-kind'), link: $('.fd-link', el), turn: $('.fd-turn', el), oy: 161 };
@@ -473,10 +474,16 @@ document.addEventListener('click', function (e) {
   // Back, a click on empty space and Esc: step back over the entry this visit added, or rewrite the address
   function leave() {
     if (pushed) history.back();  // popstate closes the view
-    else { history.replaceState(null, '', location.pathname + location.search + '#foundry'); closeView(true); }
+    else { history.replaceState(null, '', fieldUrl()); closeView(true); }
   }
+  // The address: #foundry/<id> for an open product, #foundry?digital or #foundry?physical for a filtered field
+  function fieldUrl() { return location.pathname + location.search + '#foundry' + (st.filter === 'all' ? '' : '?' + st.filter); }
   function fromHash(animate) {
     var m = location.hash.match(/^#foundry\/([\w-]+)$/), id = m && byId[m[1]] ? m[1] : null;
+    if (!m && /^#foundry(\?|$)/.test(location.hash)) {
+      var f = (location.hash.match(/^#foundry\?(\w+)$/) || [])[1];
+      setFilter(filters.some(function (b) { return b.getAttribute('data-filter') === f; }) ? f : 'all', animate);
+    }
     if (id) openView(id, animate);
     else closeView(animate);
   }
@@ -559,13 +566,24 @@ document.addEventListener('click', function (e) {
   window.addEventListener('popstate', function () { pushed = false; fromHash(true); });
 
   // The filter row: All, Digital, Physical. Matching products glide to the first slots; the rest fade, shrink and blur.
-  var filters = $$('[data-filter]');
+  function setFilter(key, animate) {
+    if (key === st.filter) return;
+    var go = function () {
+      st.filter = key; st.hover = null;
+      filters.forEach(function (x) { x.setAttribute('aria-pressed', x.getAttribute('data-filter') === key ? 'true' : 'false'); });
+      render();
+    };
+    animate && !reduce ? go() : still(go);
+  }
   filters.forEach(function (b) {
     b.addEventListener('click', function () {
-      st.filter = b.getAttribute('data-filter'); st.hover = null;
-      filters.forEach(function (x) { x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); });
-      render();
+      setFilter(b.getAttribute('data-filter'), true);
+      history.replaceState(null, '', fieldUrl());
     });
+  });
+  // The Foundry link on home writes #foundry; keep the filter that's showing in the address
+  document.addEventListener('click', function (e) {
+    if (e.target.closest('[data-go="foundry"]') && st.filter !== 'all') history.replaceState(null, '', fieldUrl());
   });
   // Hover: the word's weight follows the cursor across it, 200 at the left to 900 at the right. A hidden copy at 900
   // holds each word's width, so nothing shifts.

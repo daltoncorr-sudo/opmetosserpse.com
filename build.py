@@ -429,7 +429,7 @@ def main():
     body = ('<div class="stage-clip"><div class="stage" data-stage>%s<div class="panel home-panel">%s<div data-home>%s%s</div></div>%s</div></div>'
             '<section class="project-panel" id="project" aria-label="Project"><div class="project-inner"></div></section>') % (
         foundry, blog, cover, work_section(items, h['work']), about_panel)
-    early = '<script>if(/^#(foundry|about|blog)(\\/|$)/.test(location.hash))document.documentElement.classList.add("at-"+location.hash.slice(1).split("/")[0])</script>\n'
+    early = '<script>if(/^#(foundry|about|blog)([\\/?]|$)/.test(location.hash))document.documentElement.classList.add("at-"+location.hash.slice(1).split(/[\\/?]/)[0])</script>\n'
     early += '<link rel="preload" href="/fonts/source-serif-4/source-serif-4-italic-latin.woff2" as="font" type="font/woff2" crossorigin>\n'
     if a.drafts: early += '<meta name="drafts" content="on">\n'  # check.py lets bracketed placeholders pass in a drafts build
     write('/index.html', page(site, 'Opmet Osserpse', h['og_description'], '/', body, so, '/', main_cls='home-main',
