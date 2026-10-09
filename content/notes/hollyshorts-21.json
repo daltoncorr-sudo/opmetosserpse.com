@@ -1,0 +1,55 @@
+{
+ "status": "draft",
+ "work": "Anniversary poster, eight badges, merchandise, award, production design",
+ "work_src": "deliverables",
+ "chapters": [
+  {
+   "label": "The poster art",
+   "starts_at": "Poster-Small-1949f7",
+   "src": "system[0]"
+  },
+  {
+   "label": "The build",
+   "starts_at": "54729116567_902409cbf6_o-fd75f8",
+   "src": "system[3]"
+  },
+  {
+   "label": "Badges, merchandise and award",
+   "starts_at": "w:badge-carousel",
+   "src": "deliverables[1], [2], [3]"
+  },
+  {
+   "label": "From pencil to color",
+   "starts_at": "IMG_8738",
+   "src": "system[0]"
+  }
+ ],
+ "notes": {
+  "Poster-Small-1949f7": {
+   "text": "The poster is original art, drawn in pencil on an easel and worked out in a sketchbook of color studies.",
+   "src": "work[0]"
+  },
+  "54729116567_902409cbf6_o-fd75f8": {
+   "text": "Three events: the festival, the Alta Global Media Film Summit and the award show.",
+   "src": "challenge"
+  },
+  "unisex-staple-t-shirt-white-front-698401c5685d5-7d4233": {
+   "text": "Merchandise ran from tees and a windbreaker to a bucket hat, shorts, socks, mugs and postcards.",
+   "src": "work[2]"
+  },
+  "53934756624_a6f1e28362_o-f88971": {
+   "text": "The award was designed and made with Revello Metal in Long Beach, California.",
+   "src": "work[2]"
+  },
+  "IMG_8582": {
+   "text": "Production design followed the same route: an annotated concept sketch, an electronic proof and printed signage staged for setup.",
+   "src": "work[1]"
+  },
+  "IMG_8739": {
+   "text": "The full composition was tested in a color sketch before the final.",
+   "src": "work[0]"
+  }
+ },
+ "video": {},
+ "hide": []
+}

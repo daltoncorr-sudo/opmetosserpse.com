@@ -1,0 +1,34 @@
+{
+ "status": "draft",
+ "work": "Logo, animated logo, merchandise, website and social graphics",
+ "work_src": "deliverables",
+ "chapters": [
+  {
+   "label": "The mark",
+   "starts_at": "SA-Tall---White-e7838d",
+   "src": "system[0]"
+  },
+  {
+   "label": "Card, caps, tee and tote",
+   "starts_at": "Card-f9461a",
+   "src": "work[1]"
+  },
+  {
+   "label": "In motion",
+   "starts_at": "3dgifmaker24386",
+   "src": "system[1]"
+  }
+ ],
+ "notes": {
+  "SA-Tall---White-e7838d": {
+   "text": "The idea is a bolt that won't stay inside its box.",
+   "src": "work[0]"
+  },
+  "Sign-26a42b": {
+   "text": "Every asset came from that mark.",
+   "src": "work[1]"
+  }
+ },
+ "video": {},
+ "hide": []
+}

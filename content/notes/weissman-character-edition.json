@@ -1,0 +1,46 @@
+{
+ "status": "draft",
+ "work": "136-page catalog, on-set production art, editorial web banners, email design",
+ "work_src": "deliverables",
+ "chapters": [
+  {
+   "label": "The catalog",
+   "starts_at": "w:weissman-hero-catalog",
+   "src": "deliverables[0]"
+  },
+  {
+   "label": "Banners and tiles",
+   "starts_at": "Screenshot 2026-03-24 at 3.57.35 PM",
+   "src": "system[2]"
+  },
+  {
+   "label": "On set",
+   "starts_at": "Screenshot 2026-03-24 at 3.41.00 PM",
+   "src": "work[0]"
+  }
+ ],
+ "notes": {
+  "w:weissman-hero-catalog": {
+   "text": "An annual 136-page catalog, in print and online, for one of the largest dance costume companies in the United States.",
+   "src": "challenge"
+  },
+  "12696_RED-BLACK_36895": {
+   "text": "Shot in two sessions, 14 days in all, at Quixote Studios in Los Angeles.",
+   "src": "challenge"
+  },
+  "Screenshot 2026-03-24 at 2.49.48 PM": {
+   "text": "Six themed sections, each with its own typographic and color identity, held together by one design system.",
+   "src": "challenge, work[1]"
+  },
+  "Screenshot 2026-03-24 at 3.57.35 PM": {
+   "text": "The same sections became the web experience.",
+   "src": "work[2]"
+  },
+  "Screenshot 2026-03-24 at 3.41.00 PM": {
+   "text": "The work started on set, as production artist for both shoots, beside the camera.",
+   "src": "work[0]"
+  }
+ },
+ "video": {},
+ "hide": []
+}

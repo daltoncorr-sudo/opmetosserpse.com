@@ -1,0 +1,22 @@
+{
+ "status": "draft",
+ "work": "13 posters, 1982 to 2007",
+ "work_src": "deliverables",
+ "chapters": [],
+ "notes": {
+  "poster-1": {
+   "text": "Each of the 13 posters is an artifact from a specific year, researched to match the visual language of its era.",
+   "src": "work[0]"
+  },
+  "poster-7": {
+   "text": "The numbering changes the way real franchises do.",
+   "src": "work[1]"
+  },
+  "poster-13": {
+   "text": "Together, the set works as a graphic timeline inside the film's world.",
+   "src": "work[1]"
+  }
+ },
+ "video": {},
+ "hide": []
+}

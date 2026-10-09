@@ -1,5 +1,25 @@
 {
  "status": "draft",
  "lede": "After three years designing the Hollywood Comedy Shorts Film Festival, Opmet Osserpse led its rebrand into HollyShorts Comedy: a new name, closer to the parent festival, with the jokes left in.",
- "lede_src": "lede, with \"Dalton Corr\" credited to Opmet Osserpse as in the credits"
+ "lede_src": "lede, with \"Dalton Corr\" credited to Opmet Osserpse as in the credits",
+ "lede_status": "approved",
+ "work": "New logo, festival poster, official website, AR activations, five badges",
+ "work_src": "deliverables",
+ "chapters": [],
+ "notes": {
+  "Poster_-fae31e": {
+   "text": "In 2025 it became HollyShorts Comedy, with a new identity aligned with the parent HollyShorts brand.",
+   "src": "challenge"
+  },
+  "HSC9-Logo-a872ae": {
+   "text": "The laughter stayed; the old name went. The new mark sits beside the parent festival's.",
+   "src": "work[1]"
+  },
+  "w:badge-float": {
+   "text": "The badges kept the joke, turning each pass into an object, such as a director's chair for filmmakers.",
+   "src": "work[1]"
+  }
+ },
+ "video": {},
+ "hide": []
 }

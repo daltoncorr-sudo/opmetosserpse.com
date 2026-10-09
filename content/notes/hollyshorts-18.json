@@ -1,5 +1,37 @@
 {
  "status": "draft",
  "lede": "The first of five HollyShorts editions. In 2022, as a designer, Opmet Osserpse made the festival's graphics and social media, from the official selection laurel to the podcast.",
- "lede_src": "lede, with \"Dalton Corr\" credited to Opmet Osserpse as in the credits"
+ "lede_src": "lede, with \"Dalton Corr\" credited to Opmet Osserpse as in the credits",
+ "lede_status": "approved",
+ "work": "Graphic design, social media, laurels, podcast graphics",
+ "work_src": "deliverables",
+ "chapters": [
+  {
+   "label": "The laurel",
+   "starts_at": "Hollyshorts18-101aba",
+   "src": "system[0]"
+  },
+  {
+   "label": "The 18th festival",
+   "starts_at": "D3E8F9F0-AE46-4052-B1FB-AFAF48D065CF-864082",
+   "src": "challenge"
+  },
+  {
+   "label": "The podcast",
+   "starts_at": "F-is-for-Film-Black-ec3f5c",
+   "src": "system[2]"
+  }
+ ],
+ "notes": {
+  "Hollyshorts18-101aba": {
+   "text": "The official selection laurel that every selected film carries onto its own poster.",
+   "src": "work[0]"
+  },
+  "D3E8F9F0-AE46-4052-B1FB-AFAF48D065CF-864082": {
+   "text": "It was the first year with the festival, and the start of five.",
+   "src": "work[1]"
+  }
+ },
+ "video": {},
+ "hide": []
 }

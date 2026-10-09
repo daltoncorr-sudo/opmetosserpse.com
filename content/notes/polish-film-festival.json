@@ -1,0 +1,38 @@
+{
+ "status": "draft",
+ "work": "Two poster editions, festival logo, marketing collateral",
+ "work_src": "deliverables",
+ "chapters": [
+  {
+   "label": "The painting",
+   "starts_at": "poster-hollywood-full",
+   "src": "system[0]"
+  },
+  {
+   "label": "The process",
+   "starts_at": "wip-01",
+   "src": "work[1]"
+  },
+  {
+   "label": "Los Angeles edition",
+   "starts_at": "poster-la",
+   "src": "work[2]"
+  }
+ ],
+ "notes": {
+  "poster-hollywood-full": {
+   "text": "A Polish film festival held in Los Angeles: the poster blends mid-century Polish illustration with Hollywood iconography.",
+   "src": "lede, work[0]"
+  },
+  "poster-explained": {
+   "text": "The symbols are explained, from the Polish White Eagle crest to the Lee Strasberg Theatre.",
+   "src": "work[2]"
+  },
+  "wip-01": {
+   "text": "It began with pencil thumbnails, then red-marker studies of the composition.",
+   "src": "work[1]"
+  }
+ },
+ "video": {},
+ "hide": []
+}

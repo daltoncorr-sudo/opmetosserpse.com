@@ -1,0 +1,55 @@
+{
+ "status": "draft",
+ "work": "Poster and illustration, merchandise, 10 badges, award, production design",
+ "work_src": "deliverables",
+ "chapters": [
+  {
+   "label": "The illustration",
+   "starts_at": "HS20-Official-Poster-1-46b7c5",
+   "src": "system[0]"
+  },
+  {
+   "label": "The photo wall",
+   "starts_at": "IMG_4999-aba3b9",
+   "src": "system[1]"
+  },
+  {
+   "label": "At the Egyptian Theatre",
+   "starts_at": "53931937742_326bfa634b_k-copy-a4abd2",
+   "src": "work[1]"
+  },
+  {
+   "label": "Merchandise, badges and award",
+   "starts_at": "All-merch-4f20ad",
+   "src": "deliverables[1], [2], [3]"
+  }
+ ],
+ "notes": {
+  "HS20-Official-Poster-1-46b7c5": {
+   "text": "An anniversary asks for more than the usual set, and for one image strong enough to hold all of it.",
+   "src": "challenge"
+  },
+  "HS20-Artwork-Wide-fd7c8d": {
+   "text": "Used as the poster and as a wide panorama.",
+   "src": "work[0]"
+  },
+  "HS24-Lobby-sketch-53412c": {
+   "text": "The photo wall was drawn first as an annotated sketch, then built and lit.",
+   "src": "work[1]"
+  },
+  "IMG_5145-d71e91": {
+   "text": "Three venues: the TCL Chinese Theatres, the Egyptian Theatre and Japan House.",
+   "src": "challenge"
+  },
+  "53931937742_326bfa634b_k-copy-a4abd2": {
+   "text": "At the Egyptian Theatre, the award show had its own on-screen graphics, photo wall and step-and-repeat, and digital billboards.",
+   "src": "work[1]"
+  },
+  "Group-9-421c45": {
+   "text": "The award, a film reel, was drawn out in technical drawings of the film-strip plaque and placard before it was made.",
+   "src": "work[2]"
+  }
+ },
+ "video": {},
+ "hide": []
+}

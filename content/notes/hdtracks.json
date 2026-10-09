@@ -1,0 +1,42 @@
+{
+ "status": "draft",
+ "work": "Website, database storage, UX and UI design, branding and logos, ad campaigns",
+ "work_src": "deliverables",
+ "chapters": [
+  {
+   "label": "The brand",
+   "starts_at": "HDtrackswide-88945d",
+   "src": "system[1]"
+  },
+  {
+   "label": "The store",
+   "starts_at": "HDtracks-SplashPage-Mock-Up-7144ee",
+   "src": "system[0]"
+  },
+  {
+   "label": "Email and ads",
+   "starts_at": "Screen-Shot-2021-05-10-at-1.18.22-PM-70d2e3",
+   "src": "system[2]"
+  }
+ ],
+ "notes": {
+  "HDtrackswide-88945d": {
+   "text": "The rebrand and redesign increased customer retention and sales.",
+   "src": "work[2]"
+  },
+  "HDtracks-SplashPage-Mock-Up-7144ee": {
+   "text": "The redesign started under the surface: a new website built from the ground up, with new database storage.",
+   "src": "work[0]"
+  },
+  "Screen-Shot-2021-05-10-at-12.58.46-PM-9451e1": {
+   "text": "Making a deep catalog easy to browse and the brand as clear as the audio.",
+   "src": "challenge"
+  },
+  "Screen-Shot-2021-05-10-at-1.18.22-PM-70d2e3": {
+   "text": "A steady line of email and campaigns, from VIP sales and Grammy winners to browsing by genre.",
+   "src": "work[1]"
+  }
+ },
+ "video": {},
+ "hide": []
+}

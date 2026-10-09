@@ -1,0 +1,47 @@
+{
+ "status": "draft",
+ "work": "Festival poster, London branding, motion graphics, badges, merchandise",
+ "work_src": "deliverables",
+ "chapters": [
+  {
+   "label": "The drawing",
+   "starts_at": "465921008_929866422409253_6811404960256833731_n-192da3",
+   "src": "system[0]"
+  },
+  {
+   "label": "Curzon Soho",
+   "starts_at": "472232574_3853868371592674_5703217189292259182_n-7cc96f",
+   "src": "challenge, work[1]"
+  },
+  {
+   "label": "Badges by pass type",
+   "starts_at": "470935988_8709149192525956_7029747810375016340_n-9b6cd1",
+   "src": "system[2]"
+  },
+  {
+   "label": "Under a camera",
+   "starts_at": "467970255_1282304546285408_7499324709300164637_n-353a7e",
+   "src": "work[0]"
+  }
+ ],
+ "notes": {
+  "465921008_929866422409253_6811404960256833731_n-192da3": {
+   "text": "A new visual identity for the festival's international expansion: grounded in the parent brand, with UK cinematic culture and tone.",
+   "src": "challenge"
+  },
+  "472232574_3853868371592674_5703217189292259182_n-7cc96f": {
+   "text": "The inaugural HollyShorts London took place at Curzon Soho in December 2024.",
+   "src": "challenge"
+  },
+  "470935988_8709149192525956_7029747810375016340_n-9b6cd1": {
+   "text": "Each pass type has its own small drawn figure or object, a director's chair for filmmakers among them.",
+   "src": "work[1]"
+  },
+  "467970255_1282304546285408_7499324709300164637_n-353a7e": {
+   "text": "The drawings were shot under a camera on a tripod, so the pencil line could carry into the motion graphics as well as the print.",
+   "src": "work[0]"
+  }
+ },
+ "video": {},
+ "hide": []
+}

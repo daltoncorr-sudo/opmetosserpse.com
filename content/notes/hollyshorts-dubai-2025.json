@@ -1,0 +1,38 @@
+{
+ "status": "draft",
+ "work": "Key art, badges, award show, event signage, step-and-repeat",
+ "work_src": "deliverables",
+ "chapters": [
+  {
+   "label": "The key art",
+   "starts_at": "poster",
+   "src": "system[0]"
+  },
+  {
+   "label": "On site",
+   "starts_at": "poster-welcome",
+   "src": "system[1]"
+  },
+  {
+   "label": "The stage",
+   "starts_at": "award-international",
+   "src": "system[2]"
+  }
+ ],
+ "notes": {
+  "poster": {
+   "text": "Watercolor turns the tallest building in the world into something closer to a postcard: a welcome rather than a monument.",
+   "src": "work[0]"
+  },
+  "poster-welcome": {
+   "text": "The same art carries the welcome signage, the main ballroom sign, the step-and-repeat and the on-screen welcome.",
+   "src": "work[1]"
+  },
+  "flyer": {
+   "text": "As a first edition, everything had to be made new.",
+   "src": "challenge"
+  }
+ },
+ "video": {},
+ "hide": []
+}
