@@ -195,40 +195,37 @@ def load_work(projects):
     items = sorted(w['projects'], key=lambda e: -int(e['year']))  # stable: file order within a year
     return items, vocab
 
-def tag_list(tags, buttons=False):
-    if buttons:
-        t = ''.join('<button type="button" class="tag" data-tag="%s" aria-pressed="false"><span class="vh">Filter by </span>%s</button>' % (esc(x), esc(x)) for x in tags)
-    else:
-        t = ''.join('<span class="tag">%s</span>' % esc(x) for x in tags)
-    return '<span class="tags">%s</span>' % t
+def tag_list(tags):
+    return '<span class="tags">%s</span>' % ''.join('<span class="tag">%s</span>' % esc(x) for x in tags)
 
 def work_title(e):
     return '<a href="/projects/%s">%s</a>' % (e['slug'], typo(e['title'])) if e['page'] else '<span class="plain">%s</span>' % typo(e['title'])
 
-def work_section(items, vocab, w):
-    """Selected works, then the Archive, hidden until opened: by year, newest first, with tag search."""
-    sel = ''.join('<li class="work-row" data-project="%s">%s%s</li>' % (e['slug'], work_title(e), tag_list(e['tags'])) for e in items if e['selected'])
-    years, i = [], 0
-    for y in sorted({e['year'] for e in items}, reverse=True):
-        rows = []
-        first = i
-        for e in (x for x in items if x['year'] == y):
-            rows.append('<li class="work-row" data-project="%s" data-tags="%s" style="--i:%d">%s%s</li>'
-                        % (e['slug'], esc('|'.join(t.lower() for t in e['tags'])), i, work_title(e), tag_list(e['tags'], True)))
-            i += 1
-        years.append('<li class="year" data-year="%s"><h3 class="yr" style="--i:%d">%s</h3><ul>%s</ul></li>' % (y, first, y, ''.join(rows)))
-    tools = ('<div class="archive-tools" style="--i:0"><label class="vh" for="tag-search">%(search)s</label>'
-             '<input id="tag-search" class="tag-search" type="search" placeholder="%(search)s" autocomplete="off" spellcheck="false" list="tag-vocab">'
-             '<datalist id="tag-vocab">%(opts)s</datalist><span class="active-tags" data-active></span>'
-             '<button type="button" class="clear" data-clear hidden>%(clear)s</button></div>'
-             '<p class="empty" data-empty hidden>%(empty)s</p><p class="vh" data-count aria-live="polite"></p>') % dict(
-        search=esc(w['search']), clear=esc(w['clear']), empty=esc(w['empty']), opts=''.join('<option value="%s">' % esc(t) for t in vocab))
-    return ('<section class="work" id="work" aria-labelledby="work-title"><div class="work-head">'
-            '<h2 class="work-title" id="work-title" tabindex="-1">%s</h2>'
-            '<button type="button" class="archive-toggle" aria-expanded="false" aria-controls="archive" data-open-label="%s" data-close-label="%s">%s</button></div>'
-            '<ul class="works">%s</ul>'
-            '<div class="archive" id="archive" role="region" aria-label="%s" hidden>%s<ol class="years">%s</ol></div></section>') % (
-        esc(w['heading']), esc(w['archive']), esc(w['close']), esc(w['archive']), sel, esc(w['archive']), tools, ''.join(years))
+def work_section(items, w):
+    """One list, newest first. Collapsed it shows only the Selected projects; Archive opens the rest in place."""
+    rows, seen, i = [], set(), 0
+    for e in items:
+        yr = '' if e['year'] in seen else '<span class="yr" aria-hidden="true">%s</span>' % e['year']
+        seen.add(e['year'])
+        extra = not e['selected']
+        rows.append('<li class="work-row%s" data-project="%s"%s>%s%s%s</li>' % (
+            ' extra' if extra else '', e['slug'], ' style="--i:%d"' % i if extra else '', yr, work_title(e), tag_list(e['tags'])))
+        if extra: i += 1
+    return ('<section class="work" id="work" tabindex="-1" aria-label="%s"><p class="work-head">'
+            '<button type="button" class="archive-toggle" aria-expanded="false" aria-controls="works" data-open-label="%s" data-close-label="%s">%s</button></p>'
+            '<ul class="works" id="works">%s</ul></section>') % (
+        esc(w['label']), esc(w['archive']), esc(w['close']), esc(w['archive']), ''.join(rows))
+
+def press_list(press):
+    """Press, by year, newest first. Plain lines: the outlet, then the headline."""
+    out, year = [], None
+    for x in press:
+        if x['year'] != year:
+            if year: out.append('</ul>')
+            year = x['year']; out.append('<h4 class="press-year">%s</h4><ul class="press">' % year)
+        line = '<span class="outlet">%s</span> %s' % (typo(x['outlet']), typo(x['title']))
+        out.append('<li>%s</li>' % ('<a href="%s" rel="noopener">%s</a>' % (esc(x['url']), line) if x['url'] else line))
+    return ''.join(out) + '</ul>'
 
 def main():
     ap = argparse.ArgumentParser()
@@ -291,7 +288,7 @@ def main():
         write('/projects/%s.html' % s, page(site, p['seo']['title'], p['seo']['description'], '/projects/%s' % s, body, og, '/projects'))
 
     # projects list: pages and rows, newest first
-    items, vocab = load_work(projects)
+    items, vocab = load_work(projects)  # vocab: the tag list, checked inside load_work
     for e in items:
         if e['page']: e['preview'] = projects[e['slug']].get('preview')
     entries = items
@@ -322,20 +319,25 @@ def main():
         return pat.sub(sub, s).replace('\n', '<br>')
     about = ''.join('<p>%s</p>' % link(typo(x)) for x in h['about'])
     nav = ''.join('<a href="%s"%s>%s</a>' % (esc(u), ' rel="noopener"' if u.startswith('http') else ' data-go="%s"' % u[1:], esc(t)) for t, u in h['nav'])
-    # The foundry panel sits one screen to the left of home. Its content is a placeholder: put real HTML in
-    # content/foundry.html and it replaces the lines from site.json.
+    # Side panels: the foundry one screen to the left of home, About one screen to the right. The foundry is a
+    # placeholder: put real HTML in content/foundry.html and it replaces the lines from site.json.
     fd = site['foundry']; fd_file = os.path.join(CONTENT, 'foundry.html')
     fd_body = open(fd_file, encoding='utf-8').read() if os.path.exists(fd_file) else ''.join('<p>%s</p>' % typo(x) for x in fd['lines'])
-    foundry = ('<section class="panel foundry-panel" id="foundry" aria-labelledby="foundry-title"><div class="foundry-inner">'
-               '<h2 class="foundry-title" id="foundry-title" tabindex="-1">%s</h2><div class="foundry-body">%s</div>'
-               '<p class="studio-link"><a href="#" data-studio>%s</a></p></div></section>') % (esc(fd['title']), fd_body, esc(fd['back']))
-    cover = ('<section class="cover"><div class="cover-lockup"><h1><span class="mark" %s>%s</span><span class="name">%s</span></h1>'
-             '<nav class="cover-nav" aria-label="Site">%s</nav></div></section>') % (
-        moves.mark_attrs(mv), hand + mv['layers'], brand_svg('wordmark.svg', 'wordmark', 'Opmet Osserpse'), nav)
-    body = ('<div class="stage-clip"><div class="stage" data-stage>%s<div class="panel home-panel" data-home>%s%s'
-            '<section class="about" id="about" tabindex="-1" aria-label="About"><div class="lines">%s</div></section></div></div></div>') % (
-        foundry, cover, work_section(items, vocab, h['work']), about)
-    early = '<script>if(location.hash==="#foundry")document.documentElement.classList.add("at-foundry")</script>\n'
+    back = '<p class="studio-link"><a href="#" data-studio>%s</a></p>' % esc(site['back'])
+    foundry = ('<section class="panel side foundry-panel" id="foundry" aria-labelledby="foundry-title"><div class="side-inner">'
+               '<h2 class="side-title" id="foundry-title" tabindex="-1">%s</h2><div class="foundry-body">%s</div>%s</div></section>') % (esc(fd['title']), fd_body, back)
+    ap = site['about']
+    press = load(os.path.join(CONTENT, 'press.json'))['press']
+    about_panel = ('<section class="panel side about-panel" id="about" aria-labelledby="about-title"><div class="side-inner">'
+                   '<h2 class="side-title" id="about-title" tabindex="-1">%s</h2><div class="about-body">%s</div>'
+                   '<h3 class="press-title">%s</h3>%s%s</div></section>') % (
+        esc(ap['title']), ''.join('<p>%s</p>' % link(typo(x)) for x in ap['lines']), esc(ap['press_title']), press_list(press), back)
+    cover = ('<section class="cover"><div class="cover-inner"><h1><span class="mark" %s>%s</span><span class="name">%s</span></h1>'
+             '<nav class="cover-nav" aria-label="Site">%s</nav><div class="intro">%s</div></div></section>') % (
+        moves.mark_attrs(mv), hand + mv['layers'], brand_svg('wordmark.svg', 'wordmark', 'Opmet Osserpse'), nav, about)
+    body = ('<div class="stage-clip"><div class="stage" data-stage>%s<div class="panel home-panel" data-home>%s%s</div>%s</div></div>') % (
+        foundry, cover, work_section(items, h['work']), about_panel)
+    early = '<script>if(/^#(foundry|about)$/.test(location.hash))document.documentElement.classList.add("at-"+location.hash.slice(1))</script>\n'
     write('/index.html', page(site, 'Opmet Osserpse', h['og_description'], '/', body, so, '/', main_cls='home-main',
                               extra_head=early + '<link rel="stylesheet" href="/css/moves.css?v=%s">\n' % site['_v']))
 
