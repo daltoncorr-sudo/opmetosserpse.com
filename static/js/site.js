@@ -273,7 +273,10 @@
     // From an article, step back over its entries too (and the blog's own, if this visit added it)
     var steps = (current === 'blog' && history.state && history.state.depth) || 0;
     if (pushed) steps += 1;
-    if (steps) { leaving = true; history.go(-steps); }  // popstate slides it home
+    if (steps) {
+      leaving = true;
+      history.go(-steps);  // popstate slides it home
+    }
     else { history.replaceState(null, '', url()); setPanel('', true); }
   }
   ['foundry', 'about', 'blog'].forEach(function (name) {
@@ -482,7 +485,17 @@
   if (location.hash === '#archive') work.scrollIntoView();
   if (location.hash === '#work') { centerWork(false); window.addEventListener('load', function () { centerWork(false); }); }
   window.addEventListener('popstate', function () {
-    if (leaving) { leaving = false; pushed = false; if (location.hash || articleOf(location.href)) history.replaceState(null, '', '/'); setPanel('', true); return; }
+    if (leaving) {
+      leaving = false; pushed = false;
+      if (location.hash || articleOf(location.href)) history.replaceState(null, '', '/');
+      // Stepping back can land on an earlier entry such as #work, and the browser then restores that entry's scroll
+      // (just after this event). Home goes to the cover, so hold the page at the top while it does.
+      var hold = function () { if (window.scrollY) window.scrollTo(0, 0); };
+      hold(); setPanel('', true);
+      window.addEventListener('scroll', hold);
+      setTimeout(function () { hold(); window.removeEventListener('scroll', hold); }, 400);
+      return;
+    }
     var slug = articles && articleOf(location.href);
     if (slug) { if (current !== 'blog') setPanel('blog', true); if (slug !== shown) showArticle(slug, false); return; }  // forward onto an article
     if (articles && current === 'blog' && location.hash === '#blog') { hideArticle(); return; }  // back from an article, to the list
