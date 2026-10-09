@@ -25,10 +25,6 @@
   }
  ],
  "notes": {
-  "sb-00-hero-01-16x9": {
-   "text": "The open book was drawn by hand in ink, then cut down to a solid version for small sizes.",
-   "src": "work[0]"
-  },
   "sb-03-book-02-4x5": {
    "text": "Left, the original ink drawing. Right, the solid version, still legible at the size of a favicon.",
    "src": "work[0]"
@@ -41,25 +37,9 @@
    "text": "Sloop Script, tidied to be read rather than admired, with a custom S. The flourishes were politely declined.",
    "src": "work[0]"
   },
-  "sb-07-type-01-16x9": {
-   "text": "Sailing Club capitals, Sloop Script, Cormorant Garamond italic and EB Garamond.",
-   "src": "credits (Fonts), media alt"
-  },
-  "sb-07-colour-02-16x9": {
-   "text": "Every color carries Pantone, thread and foil references.",
-   "src": "deliverables[5], system[4]"
-  },
-  "sb-08-journal-01-4x5": {
-   "text": "A second mark, for Sunny's Journal & Press, in the same world.",
-   "src": "work[2]"
-  },
   "sb-12-bible-01-16x9": {
    "text": "A 24-page brand bible, set like a book because it was for a bookshop. Behind it sit 46 pages of studies.",
    "src": "work[1]"
-  },
-  "sb-14-film-01-9x16": {
-   "text": "The announcement film sets the drawing, the type and the studies to the sound of the room.",
-   "src": "work[2]"
   }
  },
  "video": {
