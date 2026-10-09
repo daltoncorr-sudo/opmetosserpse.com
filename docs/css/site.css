@@ -278,11 +278,12 @@ html:not(.js) .stage:has(#about:target){transform:translateX(-66.6667%)}
 .pp .note .again[hidden]{display:none}
 /* The way out */
 .pp .pfoot{margin-top:var(--U);padding-bottom:120px;display:flex;justify-content:center;gap:var(--s4);font:italic 400 clamp(17px,1.35vw,20px)/1.4 var(--serif);letter-spacing:.01em}
-/* Under 1100px the margins are too narrow for text. Chapter labels are left out; pictures widen (rows and landscape
-   pictures to the full width); a note sits under its picture, on the right */
+/* Under 1100px the margins are too narrow for text. Chapter labels and notes are left out, and pictures widen
+   (rows and landscape pictures to the full width). A film's Play links sit under it, on the right */
 @media (min-width:641px) and (max-width:1099px){
   .pp .chl{display:none}
   .pp .b .m,.pp .b .row{grid-column:2/12}.pp .b-tall .m{grid-column:3/11}.pp .b-wide .m,.pp .b-wide .row{grid-column:1/13}
+  .pp .nt,.pp .note:not(:has(.again)),.pp .fcap:not(:has(.again)){display:none}  /* notes left out, like the labels; a film's Play links stay */
   .pp .note,.pp .b-wide .note{grid-column:8/13;grid-row:2;margin:10px 0 0}.pp .fcap .note{grid-row:1;margin-top:0}
 }
 @media (prefers-reduced-motion:reduce){.pp [data-read] .note{color:var(--ink)}}
@@ -293,6 +294,7 @@ html:not(.js) .stage:has(#about:target){transform:translateX(-66.6667%)}
   .pp .open .kicker{text-align:left}.pp .open h1{grid-row:auto;text-align:left}.pp .open{padding-top:28px}.pp .open .lede{margin-top:16px;padding-right:0}.pp .open .info{margin-top:16px}
   .pp .facts div,.pp .cr div{grid-template-columns:7.6em minmax(0,1fr)}
   .pp>.open+.ch,.pp>.open+.b{margin-top:32px}
-  .pp .note{margin:6px 0 0}.pp [data-read].on .note{color:var(--gray)}
+  .pp .nt,.pp .note:not(:has(.again)),.pp .fcap:not(:has(.again)){display:none}.pp .note{margin:6px 0 0}
+  .pp .chl{display:none}
   .pp .pfoot{justify-content:flex-start}
 }
