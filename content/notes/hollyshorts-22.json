@@ -1,0 +1,60 @@
+{
+ "status": "draft",
+ "opener": 2,
+ "work": "Poster, logo, badges, wine labels, festival trophy",
+ "work_src": "deliverables",
+ "chapters": [
+  {
+   "label": "The painting",
+   "starts_at": 2,
+   "src": "system[0]"
+  },
+  {
+   "label": "Across Hollywood",
+   "starts_at": 8,
+   "src": "work[1]"
+  },
+  {
+   "label": "Badges and bottles",
+   "starts_at": 14,
+   "src": "deliverables"
+  },
+  {
+   "label": "Award night",
+   "starts_at": 22,
+   "src": "deliverables[6]"
+  }
+ ],
+ "notes": {
+  "2": {
+   "text": "Two details from this painting became the whole system: the dancing figures on its screen and the 22.",
+   "src": "work[0]"
+  },
+  "4": {
+   "text": "The 22 is a film strip, drawn by hand, in white and in black.",
+   "src": "work[0], system[1]"
+  },
+  "3": {
+   "text": "Eleven days across two sites: the TCL Chinese Theatres and Ovation Hollywood.",
+   "src": "challenge"
+  },
+  "20": {
+   "text": "The figures do the wayfinding: the Red Carpet sign on Hollywood Boulevard, the walkway towers, the theater signs and the VIP room.",
+   "src": "work[1]"
+  },
+  "14": {
+   "text": "The labels came from the poster. Artiste Winery bottled a Sauvignon Blanc, a Chardonnay and a Cabernet Sauvignon for the festival.",
+   "src": "work[2]"
+  },
+  "16": {
+   "text": "Online, the campaign ran to hundreds of graphics under the same direction.",
+   "src": "work[2]"
+  },
+  "12": {
+   "text": "The trophy is a film-strip frame that holds the winning film's own poster.",
+   "src": "work[2], system[3]"
+  }
+ },
+ "video": {},
+ "hide": []
+}

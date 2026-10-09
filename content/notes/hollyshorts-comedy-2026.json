@@ -1,0 +1,57 @@
+{
+ "status": "draft",
+ "opener": 2,
+ "work": "Poster, animated poster, anniversary logo, badges, merchandise",
+ "work_src": "deliverables",
+ "chapters": [
+  {
+   "label": "The set",
+   "starts_at": 2,
+   "src": "system[0]"
+  },
+  {
+   "label": "On paper first",
+   "starts_at": 9,
+   "src": "work[1]"
+  },
+  {
+   "label": "Ninety-one films",
+   "starts_at": 11,
+   "src": "work[2]"
+  },
+  {
+   "label": "Award night",
+   "starts_at": 16,
+   "src": "deliverables[6]"
+  }
+ ],
+ "notes": {
+  "2": {
+   "text": "The brief came down to two words: prestige, but silly. Then the poster was animated for the screen.",
+   "src": "challenge, work[0]"
+  },
+  "6": {
+   "text": "Seven badges, all in the poster's inflated, candy-like type.",
+   "src": "deliverables[2], work[0]"
+  },
+  "9": {
+   "text": "The type was tested on paper first. These printed studies sat on the desk before the finals.",
+   "src": "work[1]"
+  },
+  "14": {
+   "text": "Ninety-one official selections. The screening schedules also ran on the cinema's own displays.",
+   "src": "work[2]"
+  },
+  "18": {
+   "text": "The tees carry their own jokes. A third one reads “This Is My Red Carpet Outfit.”",
+   "src": "work[2]"
+  }
+ },
+ "video": {
+  "2": {
+   "rest": "end",
+   "sound": false
+  }
+ },
+ "hide": []
+}

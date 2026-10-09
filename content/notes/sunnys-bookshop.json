@@ -1,0 +1,90 @@
+{
+ "status": "draft",
+ "opener": 1,
+ "work": "Book mark, seal, signature, brand bible, announcement film",
+ "work_src": "deliverables",
+ "chapters": [
+  {
+   "label": "The book",
+   "starts_at": 3,
+   "src": "system[0]"
+  },
+  {
+   "label": "Seal and signature",
+   "starts_at": 6,
+   "src": "system[1], system[2]"
+  },
+  {
+   "label": "Type and color",
+   "starts_at": 11,
+   "src": "deliverables[5]"
+  },
+  {
+   "label": "Into the world",
+   "starts_at": 21,
+   "src": "work[2]"
+  }
+ ],
+ "notes": {
+  "1": {
+   "text": "The open book was drawn by hand in ink, then cut down to a solid version for small sizes.",
+   "src": "work[0]"
+  },
+  "3": {
+   "text": "Left, the original ink drawing. Right, the solid version, still legible at the size of a favicon.",
+   "src": "work[0]"
+  },
+  "6": {
+   "text": "“For readers and writers” didn't need writing. It was already stitched into her label.",
+   "src": "work[2]"
+  },
+  "10": {
+   "text": "Sloop Script, tidied to be read rather than admired, with a custom S. The flourishes were politely declined.",
+   "src": "work[0]"
+  },
+  "14": {
+   "text": "Sailing Club capitals, Sloop Script, Cormorant Garamond italic and EB Garamond.",
+   "src": "credits (Fonts), media alt"
+  },
+  "15": {
+   "text": "Every color carries Pantone, thread and foil references.",
+   "src": "deliverables[5], system[4]"
+  },
+  "16": {
+   "text": "A second mark, for Sunny's Journal & Press, in the same world.",
+   "src": "work[2]"
+  },
+  "21": {
+   "text": "A 24-page brand bible, set like a book because it was for a bookshop. Behind it sit 46 pages of studies.",
+   "src": "work[1]"
+  },
+  "27": {
+   "text": "The announcement film sets the drawing, the type and the studies to the sound of the room.",
+   "src": "work[2]"
+  }
+ },
+ "video": {
+  "1": {
+   "rest": "end",
+   "sound": false
+  },
+  "10": {
+   "rest": 4.5,
+   "sound": false
+  },
+  "27": {
+   "rest": "end",
+   "sound": true
+  }
+ },
+ "hide": [
+  "The hand-drawn open book in Library Green on vellum.",
+  "The book at three sizes: hero, digital and tiny.",
+  "The seal in black line on white: the book, the name round the ring and “For readers and writers.”",
+  "The signature in green script on vellum.",
+  "The stacked logo in ink on white.",
+  "The seal with its construction circles.",
+  "The Sunny’s Journal & Press stamp, half inked.",
+  "Brand Bible page: color."
+ ]
+}
