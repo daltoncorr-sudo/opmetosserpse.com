@@ -110,7 +110,7 @@ html:not(.js) .stage:has(#about:target){transform:translateX(-66.6667%)}
 .title-row{display:flex;flex-wrap:wrap;align-items:flex-end;column-gap:.42em;font-size:clamp(17px,1.35vw,20px);margin:0 0 var(--s5)}
 .about-grid .title-row{grid-column:1/-1;margin:0}
 .about-title{font:400 1em/.98 var(--serif);margin:0}
-.home-big{font:400 1em/.98 var(--serif);margin:0}
+.home-big{font:italic 400 1em/1.4 var(--serif);margin:0;letter-spacing:.01em}
 .home-big a{color:var(--tag-gray);transition:color var(--t) var(--ease)}
 .home-big a:hover,.home-big a:focus-visible{color:var(--ink)}
 .about-title:focus{outline:none}

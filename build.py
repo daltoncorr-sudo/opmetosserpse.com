@@ -6,7 +6,7 @@
 
 Needs Python 3.9+ and Pillow (pip install Pillow). No other dependencies, no build tools, no framework.
 """
-import argparse, html, json, os, re, shutil, sys, zipfile
+import argparse, hashlib, html, json, os, re, shutil, sys, zipfile
 import moves
 from datetime import date
 
@@ -259,7 +259,12 @@ def main():
     src_root = os.path.join(os.path.abspath(a.daltoncorr), 'site')
     if not os.path.isdir(src_root): sys.exit('Not found: %s (expected the repo with a site/ folder)' % src_root)
 
-    site = load(os.path.join(CONTENT, 'site.json')); site['_v'] = date.today().strftime('%Y%m%d')
+    site = load(os.path.join(CONTENT, 'site.json'))
+    # Cache-busting: a fingerprint of the stylesheet and script, so every change loads fresh
+    h = hashlib.sha1()
+    for f in ('static/css/site.css', 'static/js/site.js'):
+        with open(os.path.join(ROOT, f), 'rb') as fh: h.update(fh.read())
+    site['_v'] = h.hexdigest()[:10]
     index = load(os.path.join(CONTENT, 'index.json'))
     projects = {}
     for fn in sorted(os.listdir(os.path.join(CONTENT, 'projects'))):
