@@ -314,9 +314,9 @@
     r.addEventListener('focusout', function (e) { if (!r.contains(e.relatedTarget)) fire('project:leave'); });
   });
 
-  // Arriving at #foundry or #about opens that panel at once; #archive opens the list at once
+  // Arriving at #foundry (or #foundry/<id>) or #about opens that panel at once; #archive opens the list at once
   function sync(first) {
-    var h = location.hash.slice(1);
+    var h = location.hash.slice(1).split('/')[0];  // #foundry/<id> is the foundry, with a product open
     setPanel(panels[h] ? h : '', !first);
     if (h === 'archive') setOpen(true, false);
   }
@@ -336,3 +336,256 @@ document.addEventListener('click', function (e) {
   (panel || window).scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' });
   var back = (panel || document).querySelector('[data-back]'); if (back) back.focus({ preventScroll: true });
 });
+
+// The foundry: objects in space. Products float at scattered slots and depths in a field you scroll; the filter row
+// regroups them; a click opens a product in place (#foundry/<id>), with its text on the right and its images below it.
+// Slots come from build.py (data-slots, x and y at 1440 wide, and a depth d); x scales with the panel's width.
+(function () {
+  var fd = document.querySelector('[data-foundry]');
+  if (!fd) return;
+  var $ = function (s, el) { return (el || fd).querySelector(s); };
+  var $$ = function (s, el) { return Array.prototype.slice.call((el || fd).querySelectorAll(s)); };
+  var mq = function (q) { return window.matchMedia && matchMedia(q).matches; };
+  var reduce = mq('(prefers-reduced-motion: reduce)');
+  var panel = fd.closest('.foundry-panel'), field = $('[data-field]'), space = $('.fd-space'), left = $('[data-left]'), text = $('[data-text]');
+  var home = $('.fd-home'), homeV = $('.fd-v', home), homeW = $('.fd-w', home);
+  var SLOTS = fd.getAttribute('data-slots').split(' ').map(function (t) { var p = t.split(',').map(Number); return { x: p[0], y: p[1], d: p[2] }; });
+  var items = $$('.fd-item').map(function (el) {
+    return { el: el, id: el.getAttribute('data-id'), kind: el.getAttribute('data-kind'), link: $('.fd-link', el), turn: $('.fd-turn', el), oy: 161 };
+  });
+  var byId = {}; items.forEach(function (it) { byId[it.id] = it; });
+  var st = { filter: 'all', y: 0, ps: 0, hover: null, open: null, rx: 0, ry: 0 };
+  var W = 1440, H = 900, phone = false, hoverable = false, slots = [], pushed = false, drag = null, dragEl = null, raf = 0;
+
+  function measure() {
+    W = fd.clientWidth || innerWidth; H = fd.clientHeight || innerHeight;
+    phone = mq('(max-width: 720px)');
+    hoverable = !phone && mq('(hover: hover) and (pointer: fine)');
+    var s = W / 1440;
+    // Phones: one column, centered. Not yet designed.
+    slots = phone ? items.map(function (_, i) { return { x: (W - 340) / 2, y: 96 + i * 430, d: .9 }; })
+                  : SLOTS.map(function (p) { return { x: p.x * s, y: p.y, d: p.d }; });
+    fd.style.setProperty('--fd-w', W + 'px');
+    items.forEach(function (it) { it.oy = it.link.offsetHeight * .4; });  // the scale's origin: 50% 40%
+  }
+
+  // The product's own motion (spin, sway, drift, tumble) eases to a new speed over 600 ms (ease-out cubic), through
+  // the Web Animations API, so it never stops dead or jumps. The bob keeps its pace.
+  function ramp(it, target) {
+    var anims = [];
+    $$('.fd-obj', it.el).forEach(function (n) { n.getAnimations().forEach(function (a) { if (a.animationName) anims.push(a); }); });
+    if (!anims.length) return;
+    var start = anims[0].playbackRate, t0 = performance.now();
+    cancelAnimationFrame(it.ramp);
+    var step = function (t) {
+      var k = Math.min(1, (t - t0) / 600), r = start + (target - start) * (1 - Math.pow(1 - k, 3));
+      anims.forEach(function (a) { a.playbackRate = r; });
+      if (k < 1) it.ramp = requestAnimationFrame(step);
+    };
+    it.ramp = requestAnimationFrame(step);
+  }
+
+  function visible() { return items.filter(function (it) { return st.filter === 'all' || it.kind === st.filter; }); }
+
+  // Everything follows from the state: each product's slot, depth, parallax, scale and whether it shows
+  function render() {
+    var vis = visible();
+    items.forEach(function (it, all) {
+      var vi = vis.indexOf(it), on = vi !== -1, slot = slots[on ? vi : all];
+      var dy = reduce || phone ? 0 : Math.round(st.y * (1 - slot.d) * .9);
+      var isOpen = st.open === it.id, shown = st.open ? isOpen : on;
+      var k = (on ? slot.d : slot.d * .6) * (st.hover === it.id ? 1.05 : 1), tf;
+      if (isOpen) {
+        var cx = phone ? W / 2 : W * 470 / 1440, cy = phone ? 230 : H / 2, z = phone ? 1.1 : 1.9;
+        tf = 'translate(' + Math.round(cx - (slot.x + 170)) + 'px, ' + Math.round(cy - (slot.y + dy - st.y + it.oy)) + 'px) scale(' + z + ')';
+      } else tf = 'translate(0px, 0px) scale(' + (st.open ? slot.d * .6 : k) + ')';
+      it.el.style.left = slot.x + 'px';
+      it.el.style.top = slot.y + 'px';
+      it.el.style.transform = 'translate3d(0, ' + (isOpen ? dy - st.ps : dy) + 'px, 0)';
+      it.link.style.transform = tf;
+      it.el.classList.toggle('is-gone', !shown);
+      it.el.classList.toggle('is-open', isOpen);
+      it.link.tabIndex = shown ? 0 : -1;
+      it.turn.style.transform = isOpen && (st.rx || st.ry) ? 'rotateX(' + st.rx + 'deg) rotateY(' + st.ry + 'deg)' : '';
+    });
+    if (!st.open) {
+      var last = slots[Math.max(vis.length, 1) - 1];
+      space.style.height = Math.round(last.y + 420 * last.d + (phone ? 120 : 260)) + 'px';
+    }
+    text.style.transform = phone && st.open ? 'translateY(' + -st.ps + 'px)' : '';
+  }
+  function frame() { if (!raf) raf = requestAnimationFrame(function () { raf = 0; render(); }); }
+  // One frame without transitions: arriving at a product, or a resize
+  function still(fn) { fd.classList.add('no-anim'); fn(); void fd.offsetWidth; fd.classList.remove('no-anim'); }
+
+  // Phones: the product, then the text, then the images, all in one column
+  function stack() {
+    if (!phone) { ['--fd-text-top', '--fd-drag-top', '--fd-spacer-h'].forEach(function (v) { fd.style.removeProperty(v); }); return; }
+    var top = 230 + 179 * 1.1 + 40, d = st.open && $('.fd-detail:not([hidden])', text);
+    fd.style.setProperty('--fd-drag-top', (top - 34) + 'px');
+    fd.style.setProperty('--fd-text-top', top + 'px');
+    fd.style.setProperty('--fd-spacer-h', (top + (d ? d.offsetHeight : 240) + 48) + 'px');
+  }
+
+  // Focus without scrolling; the browser can drop it while it settles a history step, so put it back if so
+  function focus(el) {
+    el.focus({ preventScroll: true });
+    setTimeout(function () { if (!document.activeElement || document.activeElement === document.body) el.focus({ preventScroll: true }); }, 60);
+  }
+  function show(id) {
+    $$('[data-for]').forEach(function (el) { el.hidden = el.getAttribute('data-for') !== id; });
+  }
+  function setHome(open) {
+    var l = home.getAttribute(open ? 'data-back-label' : 'data-home-label');
+    homeV.textContent = homeW.textContent = l;
+  }
+
+  function openView(id, animate) {
+    var it = byId[id]; if (!it || st.open === id) return;
+    var go = function () {
+      if (st.open) closeView(false);
+      left.scrollTop = 0;
+      st.open = id; st.hover = null; st.rx = st.ry = 0; st.ps = 0;
+      show(id); stack();
+      fd.classList.add('is-open');
+      setHome(true);
+      ramp(it, 1);
+      render();
+      focus($('.fd-detail:not([hidden]) .fd-d-name', text));
+    };
+    animate && !reduce ? go() : still(go);
+  }
+  function closeView(animate) {
+    if (!st.open) return;
+    var it = byId[st.open];
+    var go = function () {
+      if (dragEl) { ramp(dragEl, 1); dragEl = null; }
+      drag = null; fd.classList.remove('is-grabbing');
+      left.scrollTop = 0;
+      st.open = null; st.rx = st.ry = 0; st.ps = 0;
+      fd.classList.remove('is-open');
+      setHome(false);
+      render();
+      if (animate) focus(it.link);
+    };
+    animate && !reduce ? go() : still(go);
+  }
+  // Back, a click on empty space and Esc: step back over the entry this visit added, or rewrite the address
+  function leave() {
+    if (pushed) history.back();  // popstate closes the view
+    else { history.replaceState(null, '', location.pathname + location.search + '#foundry'); closeView(true); }
+  }
+  function fromHash(animate) {
+    var m = location.hash.match(/^#foundry\/([\w-]+)$/), id = m && byId[m[1]] ? m[1] : null;
+    if (id) openView(id, animate);
+    else closeView(animate);
+  }
+
+  // The field
+  field.addEventListener('scroll', function () { st.y = field.scrollTop; frame(); }, { passive: true });
+  left.addEventListener('scroll', function () { st.ps = left.scrollTop; frame(); }, { passive: true });
+
+  items.forEach(function (it) {
+    var a = it.link;
+    a.addEventListener('click', function (e) {
+      if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button) return;
+      e.preventDefault();
+      if (st.open) return;
+      history.pushState(null, '', location.pathname + location.search + '#foundry/' + it.id); pushed = true;
+      openView(it.id, true);
+    });
+    // Hover: slow to a fifth, and grow a little. Leaving eases back to full speed.
+    a.addEventListener('pointerenter', function (e) {
+      if (e.pointerType !== 'mouse' || !hoverable || st.open) return;
+      ramp(it, .2); st.hover = it.id; render();
+    });
+    a.addEventListener('pointerleave', function (e) {
+      if (drag && dragEl === it) return;
+      if (e.pointerType === 'mouse') ramp(it, 1);
+      if (st.hover === it.id) { st.hover = null; render(); }
+    });
+    // Drag to rotate, once open: across turns it, up and down tips it (to 70 degrees either way)
+    a.addEventListener('pointerdown', function (e) {
+      if (st.open !== it.id || e.button) return;
+      e.preventDefault();
+      drag = { x: e.clientX, y: e.clientY, rx: st.rx, ry: st.ry }; dragEl = it;
+      try { a.setPointerCapture(e.pointerId); } catch (err) {}
+      ramp(it, 0);
+      fd.classList.add('is-grabbing');
+    });
+    a.addEventListener('pointermove', function (e) {
+      if (!drag || dragEl !== it) return;
+      st.ry = drag.ry + (e.clientX - drag.x) * .5;
+      st.rx = Math.max(-70, Math.min(70, drag.rx - (e.clientY - drag.y) * .4));
+      it.turn.style.transform = 'rotateX(' + st.rx + 'deg) rotateY(' + st.ry + 'deg)';
+    });
+    var release = function (e) {
+      if (!drag || dragEl !== it) return;
+      drag = null; fd.classList.remove('is-grabbing');
+      var r = a.getBoundingClientRect(), inside = e.clientX >= r.left && e.clientX <= r.right && e.clientY >= r.top && e.clientY <= r.bottom;
+      if (e.pointerType !== 'mouse' || !inside) ramp(it, 1);  // the cursor has left (or there was no cursor): back to full speed
+    };
+    a.addEventListener('pointerup', release);
+    a.addEventListener('pointercancel', release);
+    a.addEventListener('dragstart', function (e) { e.preventDefault(); });
+  });
+
+  // While a product is open, wheel and touch scrolling anywhere on the panel scroll the column of images; while the
+  // field shows, they scroll the field (so the page behind never moves).
+  fd.addEventListener('wheel', function (e) {
+    var target = st.open ? left : field;
+    if (target.contains(e.target)) return;
+    e.preventDefault();
+    target.scrollTop += e.deltaY * (e.deltaMode === 1 ? 16 : e.deltaMode === 2 ? H : 1);
+  }, { passive: false });
+  var ty = null;
+  fd.addEventListener('touchstart', function (e) { ty = e.touches.length === 1 ? e.touches[0].clientY : null; }, { passive: true });
+  fd.addEventListener('touchmove', function (e) {
+    if (!st.open || ty === null || drag || left.contains(e.target) || (byId[st.open] && byId[st.open].link.contains(e.target))) return;
+    var y = e.touches[0].clientY;
+    e.preventDefault();
+    left.scrollTop += ty - y; ty = y;
+  }, { passive: false });
+
+  $('[data-veil]').addEventListener('click', function () { if (st.open) leave(); });
+  left.addEventListener('click', function (e) { if (st.open && !e.target.closest('.fd-img')) leave(); });
+  // Back (Home while a product is open) and Esc close the view, before the panel's own handlers see them
+  fd.addEventListener('click', function (e) {
+    if (st.open && e.target.closest('.fd-home')) { e.preventDefault(); e.stopPropagation(); leave(); }
+  }, true);
+  window.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && st.open && !panel.inert) { e.preventDefault(); e.stopImmediatePropagation(); leave(); }
+  }, true);
+  window.addEventListener('popstate', function () { pushed = false; fromHash(true); });
+
+  // The filter row: All, Digital, Physical. Matching products glide to the first slots; the rest fade, shrink and blur.
+  var filters = $$('[data-filter]');
+  filters.forEach(function (b) {
+    b.addEventListener('click', function () {
+      st.filter = b.getAttribute('data-filter'); st.hover = null;
+      filters.forEach(function (x) { x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); });
+      render();
+    });
+  });
+  // Hover: the word's weight follows the cursor across it, 200 at the left to 900 at the right. A hidden copy at 900
+  // holds each word's width, so nothing shifts.
+  filters.concat(home).forEach(function (b) {
+    var v = $('.fd-v', b);
+    b.addEventListener('mousemove', function (e) {
+      if (!hoverable) return;
+      var r = b.getBoundingClientRect(), t = Math.min(1, Math.max(0, (e.clientX - r.left) / r.width));
+      v.style.fontWeight = Math.round(200 + t * 700);
+    });
+    b.addEventListener('mouseleave', function () { v.style.fontWeight = ''; });
+  });
+
+  var rt;
+  window.addEventListener('resize', function () {
+    clearTimeout(rt);
+    rt = setTimeout(function () { still(function () { measure(); stack(); render(); }); }, 120);
+  });
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { still(function () { measure(); stack(); render(); }); });
+
+  still(function () { measure(); render(); });
+  fromHash(false);
+})();
