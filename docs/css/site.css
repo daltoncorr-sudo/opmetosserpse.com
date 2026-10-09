@@ -8,12 +8,10 @@
 @font-face{font-family:"Instrument Sans";font-style:normal;font-weight:500;font-display:swap;src:url(../fonts/instrument-sans/instrument-sans-latin-500-normal.woff2) format("woff2")}
 
 :root{
-  /* Warm off-white paper, near-black ink. One accent: none. Contrast on --paper: ink 15.8:1 (13.8:1 on the darkest
-     grain), --graphite 5.55:1, --tag-gray 5.92:1. */
-  --paper:#F5F1E9; --paper-deep:#ECE7DC; --ink:#161512; --graphite:#635E57; --tag-gray:#5E5A53;
-  /* The paper's grain and fibers: a 256px tile of SVG noise (stitched, so no seams), multiplied over the page and
-     fixed to the screen. --grain-opacity tunes it; 0 turns it off. */
-  --grain:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='256' height='256'%3E%3Cfilter id='p' x='0' y='0' width='100%25' height='100%25' color-interpolation-filters='sRGB'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' seed='4' stitchTiles='stitch' result='g'/%3E%3CfeColorMatrix in='g' values='0 0 0 0 .34  0 0 0 0 .29  0 0 0 0 .22  1.0 0 0 0 -0.52' result='grain'/%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.006 .32' numOctaves='2' seed='9' stitchTiles='stitch' result='f'/%3E%3CfeColorMatrix in='f' values='0 0 0 0 .40  0 0 0 0 .35  0 0 0 0 .27  0 1.4 0 0 -1.0' result='fiber'/%3E%3CfeMerge%3E%3CfeMergeNode in='fiber'/%3E%3CfeMergeNode in='grain'/%3E%3C/feMerge%3E%3C/filter%3E%3Crect width='256' height='256' filter='url(%23p)'/%3E%3C/svg%3E"); --grain-size:256px; --grain-opacity:.24;
+  /* Off-white page, near-black ink, a slight grain. Contrast on --paper: ink 16.6:1, --graphite 5.8:1, --tag-gray 6.2:1. */
+  --paper:#F7F6F2; --paper-deep:#EEEDE8; --ink:#161512; --graphite:#635E57; --tag-gray:#5E5A53;
+  /* The grain: a 256px tile of neutral SVG noise (stitched, no seams), fixed and multiplied. 0 turns it off. */
+  --grain:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='256' height='256'%3E%3Cfilter id='g' x='0' y='0' width='100%25' height='100%25' color-interpolation-filters='sRGB'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' seed='4' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .2  0 0 0 0 .2  0 0 0 0 .2  1 0 0 0 -.52'/%3E%3C/filter%3E%3Crect width='256' height='256' filter='url(%23g)'/%3E%3C/svg%3E"); --grain-size:256px; --grain-opacity:.22;
   /* Two faces. When Opmet Serif ships, put it first in --serif. */
   --serif:"Libre Caslon Text",Georgia,"Times New Roman",serif;
   --sans:"Instrument Sans","Helvetica Neue",Arial,sans-serif;
@@ -25,7 +23,7 @@
   /* The home page's two longer motions: the stage slide and the Archive opening */
   --slide:.9s; --slide-ease:cubic-bezier(.65,0,.35,1); --open:.7s;
   /* The cover */
-  --hand-h:clamp(96px,17vh,200px); --hand-w:calc(var(--hand-h) * .484); --lockup-gap:clamp(18px,2vw,32px);
+  --hand-h:clamp(120px,24vh,260px); --hand-w:calc(var(--hand-h) * .484); --lockup-gap:clamp(18px,2vw,32px);
   /* One spacing scale, used everywhere on home */
   --s1:8px; --s2:16px; --s3:24px; --s4:40px; --s5:64px; --s6:104px;
   --margin:clamp(20px,3.4vw,56px);
@@ -41,7 +39,7 @@ img,video{display:block;max-width:100%;height:auto}
 a{color:inherit;text-decoration:none;transition:color var(--t) var(--ease)}
 a:hover{color:var(--graphite)}
 :focus-visible{outline:1px solid var(--ink);outline-offset:3px}
-/* Paper: above the type (multiply only darkens, so ink stays ink) and below images, which stay clean */
+/* Grain: above the type (multiply only darkens, so ink stays ink) and below images, which stay clean */
 body::after{content:"";position:fixed;inset:0;z-index:1;pointer-events:none;background:var(--grain) 0 0/var(--grain-size) var(--grain-size) repeat;mix-blend-mode:multiply;opacity:var(--grain-opacity)}
 .media figure{position:relative;z-index:2}
 /* Ink: the hand and the name look stamped. Static SVG filters (see INK in build.py); <html data-ink> picks
@@ -77,7 +75,16 @@ main{padding:0 var(--gutter);flex:1}
 .stage{display:flex;align-items:flex-start;width:300%;transform:translateX(-33.3333%);transition:transform var(--slide) var(--slide-ease)}
 .stage.is-foundry,.at-foundry .stage{transform:none}
 .stage.is-about,.at-about .stage{transform:translateX(-66.6667%)}
-.at-foundry .stage,.at-about .stage,.stage.no-anim{transition:none}
+.stage.is-blog,.at-blog .stage{transform:translate(-33.3333%,100vh)}
+.at-foundry .stage,.at-about .stage,.at-blog .stage,.stage.no-anim{transition:none}
+html:not(.js) .stage:has(#blog:target){transform:translate(-33.3333%,100vh)}
+/* The blog: one screen above home. While it's open the page holds still. */
+.home-panel{position:relative}
+.blog-panel{position:absolute;left:calc(var(--gutter) * -1);right:calc(var(--gutter) * -1);top:-100vh;height:100vh;padding:0 var(--gutter);overflow-y:auto;overscroll-behavior:contain}
+html.is-locked{overflow:hidden}
+.blog-inner{padding:12vh clamp(8px,calc(4vw - var(--gutter)),56px) 14vh}
+.blog-body{font:400 clamp(18px,1.55vw,23px)/1.5 var(--serif);max-width:34em}
+.blog-body p{margin:0}
 html:not(.js) .stage:has(#foundry:target){transform:none}
 html:not(.js) .stage:has(#about:target){transform:translateX(-66.6667%)}
 .panel{flex:none;width:33.3333%;padding:0 var(--gutter)}
@@ -88,7 +95,7 @@ html:not(.js) .stage:has(#about:target){transform:translateX(-66.6667%)}
 .side-title:focus{outline:none}
 .foundry-body,.about-body{font-size:var(--size-m)}
 .about-body{font-family:var(--serif);line-height:1.6}
-.about-body a,.intro a{text-decoration:underline;text-underline-offset:.2em;text-decoration-thickness:1px}
+.about-body a{text-decoration:underline;text-underline-offset:.2em;text-decoration-thickness:1px}
 .press-title{font:italic 400 var(--size-m) var(--serif);margin:3.2em 0 1.2em}
 .press-year{font:italic 400 var(--size-s) var(--serif);color:var(--tag-gray);margin:1.8em 0 .4em}
 .press li{margin:0 0 .3em}
@@ -97,57 +104,60 @@ html:not(.js) .stage:has(#about:target){transform:translateX(-66.6667%)}
 .press a:hover .outlet{color:inherit}
 .studio-link{margin-top:2.6em;font:italic 400 var(--size-m) var(--serif)}
 /* About: the title and a paragraph at the top left; the press to the right, set a little lower. Home stays at the top right. */
-.home-link{position:sticky;top:0;z-index:1;margin:0;padding:22px 0 10px;text-align:right;background:var(--paper);font:italic 400 var(--size-m) var(--serif)}
-.about-grid{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:clamp(32px,7vw,120px);padding:4vh clamp(8px,calc(4vw - var(--gutter)),56px) 14vh;text-align:left}
-.about-title{font:400 clamp(52px,7.5vw,128px)/.98 var(--serif);margin:0 0 .5em}
+.about-grid{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:clamp(32px,7vw,120px);padding:12vh clamp(8px,calc(4vw - var(--gutter)),56px) 14vh;text-align:left}
+/* The title, with Home beside its last line at the same size */
+.title-row{display:flex;flex-wrap:wrap;align-items:flex-end;column-gap:.42em;font-size:clamp(34px,7.5vw,128px);margin:0 0 .5em}
+.about-grid .title-row{grid-column:1/-1;margin:0}
+.about-title{font:400 1em/.98 var(--serif);margin:0}
+.home-big{font:400 1em/.98 var(--serif);margin:0}
+.home-big a{color:var(--tag-gray);transition:color var(--t) var(--ease)}
+.home-big a:hover,.home-big a:focus-visible{color:var(--ink)}
 .about-title:focus{outline:none}
 .about-title span{display:block}
 .about-panel .about-body{font-size:clamp(20px,2vw,30px);line-height:1.45;max-width:30em}
-.about-body p{margin:0 0 1.1em}
-.about-press{text-align:right;padding-top:clamp(120px,26vh,300px)}
+.about-body p{margin:0}
+.about-body p.contact{margin-top:1.4em}
+.about-press{text-align:right;padding-top:clamp(40px,9vh,110px)}
 .about-press .press-title{margin-top:0}
 @media (max-width:860px){.about-grid{grid-template-columns:1fr}.about-press{padding-top:0}}
 
 /* The cover: centered. The hand and the name side by side, the words below, then three lines in bold. */
 .cover{height:100vh;height:100svh;min-height:420px;display:flex;align-items:center;justify-content:center;text-align:center}
 .cover-inner{display:flex;flex-direction:column;align-items:center;animation:arrive 1.6s var(--ease) both}
-.cover h1{display:flex;align-items:flex-end;gap:var(--lockup-gap)}
+.cover h1{display:flex;flex-direction:column;align-items:center;gap:var(--s3)}
 .cover .mark{position:relative;display:block;flex:none;height:var(--hand-h);width:var(--hand-w);transform-origin:50% 96%}
 .cover .hand{display:block;width:100%;height:100%}
 .cover .pose{position:absolute;left:0;top:0;width:100%;height:auto;opacity:0}
-.cover .name{position:relative;display:block;color:var(--ink);line-height:0;padding-bottom:calc(var(--hand-h) * .06);--wm-w:clamp(230px,33vw,560px)}
+.cover .name{position:relative;display:block;color:var(--ink);line-height:0;--wm-w:clamp(230px,33vw,560px)}
 .cover .name .wordmark{display:block;width:var(--wm-w);height:auto}
 /* The name as live, selectable text, laid over the wordmark drawing (the Opmet Serif web font isn't on the site yet) */
-.name-text{position:absolute;left:0;right:0;top:0;bottom:calc(var(--hand-h) * .06);display:flex;align-items:center;justify-content:center;color:transparent;font:italic 400 calc(var(--wm-w) / 7.6)/1 var(--serif);white-space:nowrap;letter-spacing:.01em}
+.name-text{position:absolute;left:0;right:0;top:0;bottom:0;display:flex;align-items:center;justify-content:center;color:transparent;font:italic 400 calc(var(--wm-w) / 7.6)/1 var(--serif);white-space:nowrap;letter-spacing:.01em}
 .cover-nav{display:flex;flex-wrap:wrap;justify-content:center;gap:var(--s1) var(--s4);margin:var(--s4) 0 0;font:italic 400 clamp(17px,1.35vw,20px)/1.4 var(--serif);letter-spacing:.01em}
-/* The intro: 50px against the 14px body at full size, scaled down by width and height so it stays on the first screen */
-.intro{max-width:23em;margin-top:clamp(var(--s4),8vh,var(--s6));font-family:var(--bold-font);font-weight:var(--bold-weight);font-size:clamp(22px,min(3vw,4.4vh),44px);line-height:1.12;letter-spacing:-.012em;text-wrap:balance}
-.intro p{margin:0 0 .9em}
-.intro a{text-decoration-thickness:1px;text-underline-offset:.14em;text-decoration-color:rgba(22,21,18,.3);transition:text-decoration-color var(--t) var(--ease)}
-.intro a:hover,.intro a:focus-visible{color:var(--ink);text-decoration-color:var(--ink)}
-.intro p:last-child{margin-bottom:0}
 /* The hand on the cover. Each move lives in its own folder under moves/; build.py gathers them into /css/moves.css. */
 @keyframes arrive{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
 @media (max-width:719px){
   :root{--hand-h:clamp(100px,18vh,160px)}
-  .cover .name .wordmark{width:min(50vw,240px)}
+  .cover .name{--wm-w:min(50vw,240px)}
 }
 
 /* Work: one list on a grid (title, tags, year). Collapsed, only the Selected rows show; See more opens the rest in place. */
-.work{max-width:1200px;margin:0 auto;padding:var(--s6) var(--margin) 20vh;scroll-margin-top:0}
-.home-panel>.work{padding-left:0;padding-right:0}
+.work{max-width:44rem;margin:0 auto;padding:var(--s6) 0 20vh;scroll-margin-top:0}
 .work:focus{outline:none}
-.work-head{display:flex;align-items:baseline;gap:var(--s3);margin:0 0 var(--s5)}
-.work-label{font:400 clamp(20px,1.9vw,28px)/1.2 var(--serif);margin:0}
-.archive-toggle{font:400 clamp(20px,1.9vw,28px)/1.2 var(--serif);color:var(--tag-gray);background:none;border:0;padding:0;cursor:pointer;transition:color var(--t) var(--ease)}
+.work-head{display:flex;align-items:baseline;gap:var(--s3);margin:0 0 var(--s4)}
+.work-label{font:400 clamp(17px,1.3vw,19px)/1.3 var(--serif);margin:0}
+.archive-toggle{font:400 clamp(17px,1.3vw,19px)/1.3 var(--serif);color:var(--tag-gray);background:none;border:0;padding:0;cursor:pointer;transition:color var(--t) var(--ease)}
 .archive-toggle:hover{color:var(--ink)}
-.work-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(9rem,15rem) 3.5rem;column-gap:var(--s4);align-items:baseline;padding:0 0 var(--s3)}
-.work-row>a,.work-row .plain{font-family:var(--serif);font-size:clamp(20px,1.9vw,28px);line-height:1.15}
+.work-row{position:relative;display:flex;flex-wrap:wrap;align-items:baseline;column-gap:.9em;padding:0 0 14px}
+.work-row>a,.work-row .plain{font-family:var(--serif);font-size:clamp(17px,1.3vw,19px);line-height:1.25}
 .work-row .plain{color:var(--tag-gray)}
-.tags{display:flex;flex-wrap:wrap;gap:.15em .9em;font:400 13px/1.4 var(--sans);letter-spacing:.02em;color:var(--tag-gray)}
-.year{font:400 13px/1.4 var(--sans);letter-spacing:.02em;color:var(--tag-gray);text-align:right;font-variant-numeric:tabular-nums}
+.tags{display:inline-flex;flex-wrap:wrap;gap:.15em .8em;font:400 11.5px/1.4 var(--sans);letter-spacing:.02em;color:var(--tag-gray)}
+/* The year, once per year, in the left margin */
+.yr{position:absolute;right:calc(100% + var(--s4));top:0;font:400 11.5px/1.4 var(--sans);letter-spacing:.02em;color:var(--tag-gray);font-variant-numeric:tabular-nums;padding-top:.45em}
+/* Tags and years only once the list is open: they fade in with the rest */
+.tags,.yr{opacity:0;visibility:hidden;transition:opacity .5s var(--ease) .15s,visibility 0s .65s}
+.works.is-open .tags,.works.is-open .yr{opacity:1;visibility:visible;transition:opacity .5s var(--ease) .15s,visibility 0s}
 .works:not(.is-open) .extra{display:none}
-@media (max-width:719px){.work-row{grid-template-columns:minmax(0,1fr) auto;row-gap:var(--s1)}.work-row .tags{grid-row:2;grid-column:1}.work-row .year{grid-row:1;grid-column:2}}
+@media (max-width:899px){.works{padding-left:3.2rem}.yr{right:auto;left:-3.2rem}}
 /* The motion: rows already showing glide to their new places while the others fade in between (transform and opacity) */
 .works .glide{transition:transform var(--open) var(--slide-ease)}
 .works .rise{opacity:0;transform:translateY(-4px)}

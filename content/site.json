@@ -12,12 +12,6 @@
  "home": {
   "og_title": "Opmet Osserpse",
   "og_description": "A creative studio in Venice, California: identities, key art and campaigns for festivals, films and businesses.",
-  "about": [
-   "Opmet Osserpse is a creative studio based in Venice, California.",
-   "We bring together world-class creators to make incredible work with our partners.",
-   "Our music and sound studio is called espresso tempo.",
-   "Say hello at hello@opmetosserpse.com"
-  ],
   "all_link": "Archive",
   "links": {
    "espresso tempo": "https://espressotempo.com/",
@@ -39,6 +33,10 @@
    [
     "About",
     "#about"
+   ],
+   [
+    "Blog",
+    "#blog"
    ]
   ],
   "work": {
@@ -78,9 +76,21 @@
  "about": {
   "title": "About Opmet Osserpse",
   "lines": [
-   "Opmet Osserpse is a creative studio based in Venice, California. We bring together world-class creators to make incredible work with our partners: identities, key art, campaigns, print and websites for festivals, films and businesses. Much of it begins by hand, in pencil and paint, and carries through to every poster, screen and storefront it reaches. Since 2023 the studio has art directed the Oscar-qualifying HollyShorts Film Festival and its editions in London, Dubai and comedy, and has made work for Kodak at Cannes, the Polish Film Festival North America, Ritesh Films, Weissman and Sunny's Bookshop. Our music and sound studio is called espresso tempo.",
-   "hello@opmetosserpse.com\n@opmetosserpse"
+   "Opmet Osserpse is a creative studio based in Venice, California.",
+   "We bring together world-class creators to make incredible work with our partners.",
+   "We make identities, key art, campaigns, print and websites for festivals, films and businesses.",
+   "Much of it begins by hand, in pencil and paint.",
+   "Our music and sound studio is called espresso tempo."
   ],
-  "press_title": "Press"
+  "press_title": "Press",
+  "contact": [
+   "Say hello at hello@opmetosserpse.com\n@opmetosserpse"
+  ]
+ },
+ "blog": {
+  "title": "Blog",
+  "lines": [
+   "Notes from the studio, coming soon."
+  ]
  }
 }

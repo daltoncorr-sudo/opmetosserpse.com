@@ -120,7 +120,7 @@
   var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
   var $ = function (s, el) { return (el || document).querySelector(s); };
   var $$ = function (s, el) { return Array.prototype.slice.call((el || document).querySelectorAll(s)); };
-  var home = $('[data-home]'), panels = { foundry: $('#foundry'), about: $('#about') };
+  var home = $('[data-home]'), panels = { foundry: $('#foundry'), about: $('#about'), blog: $('#blog') };
   var url = function (hash) { return location.pathname + location.search + (hash || ''); };
   var current = '', pushed = false;  // pushed: this visit added the panel's entry, so closing can step back over it
 
@@ -129,10 +129,13 @@
     var was = current;
     if (name === was && !root.classList.contains('at-' + name)) return;
     var instant = !animate || reduce;
+    if (name === 'blog' && window.scrollY) window.scrollTo(0, 0);  // the blog sits above the top of the page
+    root.classList.toggle('is-locked', name === 'blog');
     if (instant) stage.classList.add('no-anim');
     stage.classList.toggle('is-foundry', name === 'foundry');
     stage.classList.toggle('is-about', name === 'about');
-    root.classList.remove('at-foundry', 'at-about');
+    stage.classList.toggle('is-blog', name === 'blog');
+    root.classList.remove('at-foundry', 'at-about', 'at-blog');
     current = name;
     Object.keys(panels).forEach(function (k) { panels[k].inert = k !== name; });
     home.inert = !!name;
@@ -144,7 +147,7 @@
     if (pushed) history.back();  // popstate slides it home
     else { history.replaceState(null, '', url()); setPanel('', true); }
   }
-  ['foundry', 'about'].forEach(function (name) {
+  ['foundry', 'about', 'blog'].forEach(function (name) {
     $$('[data-go="' + name + '"]').forEach(function (a) {
       a.addEventListener('click', function (e) {
         e.preventDefault();
@@ -221,7 +224,7 @@
     setPanel(panels[h] ? h : '', !first);
     if (h === 'archive') setOpen(true, false);
   }
-  panels.foundry.inert = panels.about.inert = true;
+  panels.foundry.inert = panels.about.inert = panels.blog.inert = true;
   sync(true);
   if (location.hash === '#archive') work.scrollIntoView();
   window.addEventListener('popstate', function () { pushed = false; sync(false); });

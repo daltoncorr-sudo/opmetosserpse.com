@@ -145,7 +145,7 @@ def page(site, title, desc, path, body, og_image=None, current=None, extra_head=
 <meta property="og:url" content="%(url)s">
 <meta property="og:image" content="https://%(domain)s%(og)s">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="theme-color" content="#F5F1E9">
+<meta name="theme-color" content="#F7F6F2">
 <link rel="icon" href="/brand/hand-mark.svg" type="image/svg+xml">
 <link rel="preload" href="/fonts/libre-caslon-text/libre-caslon-text-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/fonts/instrument-sans/instrument-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
@@ -224,12 +224,15 @@ def work_title(e):
     return '<a href="/projects/%s">%s</a>' % (e['slug'], typo(e['title'])) if e['page'] else '<span class="plain">%s</span>' % typo(e['title'])
 
 def work_section(items, w):
-    """One list on a grid: title, tags, year. Collapsed it shows only the Selected projects; See more opens the rest in place."""
-    rows, i = [], 0
+    """One list, newest first. Collapsed: the Selected titles only. See more opens the rest in place, with tags beside
+    each name and the year in the left margin, once per year."""
+    rows, seen, i = [], set(), 0
     for e in items:
+        yr = '' if e['year'] in seen else '<span class="yr">%s</span>' % e['year']
+        seen.add(e['year'])
         extra = not e['selected']
-        rows.append('<li class="work-row%s" data-project="%s"%s>%s%s<span class="year">%s</span></li>' % (
-            ' extra' if extra else '', e['slug'], ' style="--i:%d"' % i if extra else '', work_title(e), tag_list(e['tags']), e['year']))
+        rows.append('<li class="work-row%s" data-project="%s"%s>%s%s%s</li>' % (
+            ' extra' if extra else '', e['slug'], ' style="--i:%d"' % i if extra else '', yr, work_title(e), tag_list(e['tags'])))
         if extra: i += 1
     return ('<section class="work" id="work" tabindex="-1" aria-label="%s"><div class="work-head">'
             '<h2 class="work-label" data-closed="%s" data-open="%s">%s</h2>'
@@ -338,7 +341,6 @@ def main():
             ext = links[k].startswith('http')
             return '<a href="%s"%s>%s</a>' % (links[k], ' rel="noopener"' if ext else '', k)
         return pat.sub(sub, s).replace('\n', '<br>')
-    about = ''.join('<p>%s</p>' % link(typo(x)) for x in h['about'])
     nav = ''.join('<a href="%s"%s>%s</a>' % (esc(u), ' rel="noopener"' if u.startswith('http') else ' data-go="%s"' % u[1:], esc(t)) for t, u in h['nav'])
     # Side panels: the foundry one screen to the left of home, About one screen to the right. The foundry is a
     # placeholder: put real HTML in content/foundry.html and it replaces the lines from site.json.
@@ -350,16 +352,23 @@ def main():
     ap = site['about']
     press = load(os.path.join(CONTENT, 'press.json'))['press']
     about_panel = ('<section class="panel side about-panel" id="about" aria-labelledby="about-title">'
-                   '<p class="home-link"><a href="#" data-studio>%s</a></p><div class="about-grid"><div class="about-main">'
-                   '<h2 class="about-title" id="about-title" tabindex="-1">%s</h2><div class="about-body">%s</div></div>'
+                   '<div class="about-grid"><div class="title-row">'
+                   '<h2 class="about-title" id="about-title" tabindex="-1">%s</h2><p class="home-big"><a href="#" data-studio>%s</a></p></div>'
+                   '<div class="about-main"><div class="about-body">%s</div></div>'
                    '<div class="about-press"><h3 class="press-title">%s</h3>%s</div></div></section>') % (
-        esc(site['back']), ' '.join('<span>%s</span>' % esc(x) for x in ap['title'].split()), ''.join('<p>%s</p>' % link(typo(x)) for x in ap['lines']), esc(ap['press_title']), press_list(press))
+        ' '.join('<span>%s</span>' % esc(x) for x in ap['title'].split()), esc(site['back']), ''.join('<p>%s</p>' % link(typo(x)) for x in ap['lines']) + ''.join('<p class="contact">%s</p>' % link(typo(x)) for x in ap['contact']), esc(ap['press_title']), press_list(press))
+    # The blog sits one screen above home. Posts can go in content/blog.html later; until then, the lines from site.json.
+    bl = site['blog']; bl_file = os.path.join(CONTENT, 'blog.html')
+    bl_body = open(bl_file, encoding='utf-8').read() if os.path.exists(bl_file) else ''.join('<p>%s</p>' % typo(x) for x in bl['lines'])
+    blog = ('<section class="blog-panel" id="blog" aria-labelledby="blog-title"><div class="blog-inner"><div class="title-row">'
+            '<h2 class="about-title" id="blog-title" tabindex="-1">%s</h2><p class="home-big"><a href="#" data-studio>%s</a></p></div>'
+            '<div class="blog-body">%s</div></div></section>') % (esc(bl['title']), esc(site['back']), bl_body)
     cover = ('<section class="cover"><div class="cover-inner"><h1><span class="mark ink" %s>%s</span><span class="name ink">%s<span class="name-text">Opmet Osserpse</span></span></h1>'
-             '<nav class="cover-nav" aria-label="Site">%s</nav><div class="intro">%s</div></div></section>') % (
-        moves.mark_attrs(mv), hand + mv['layers'], brand_svg('wordmark.svg', 'wordmark'), nav, about)
-    body = ('<div class="stage-clip"><div class="stage" data-stage>%s<div class="panel home-panel" data-home>%s%s</div>%s</div></div>') % (
-        foundry, cover, work_section(items, h['work']), about_panel)
-    early = '<script>if(/^#(foundry|about)$/.test(location.hash))document.documentElement.classList.add("at-"+location.hash.slice(1))</script>\n'
+             '<nav class="cover-nav" aria-label="Site">%s</nav></div></section>') % (
+        moves.mark_attrs(mv), hand + mv['layers'], brand_svg('wordmark.svg', 'wordmark'), nav)
+    body = ('<div class="stage-clip"><div class="stage" data-stage>%s<div class="panel home-panel">%s<div data-home>%s%s</div></div>%s</div></div>') % (
+        foundry, blog, cover, work_section(items, h['work']), about_panel)
+    early = '<script>if(/^#(foundry|about|blog)$/.test(location.hash))document.documentElement.classList.add("at-"+location.hash.slice(1))</script>\n'
     write('/index.html', page(site, 'Opmet Osserpse', h['og_description'], '/', body, so, '/', main_cls='home-main',
                               extra_head=early + '<link rel="stylesheet" href="/css/moves.css?v=%s">\n' % site['_v']))
 
