@@ -31,7 +31,7 @@ def typo(s):
     s = esc(s)
     s = re.sub(r'(^|[\s(\[\u2014])&#x27;', '\\1\u2018', s).replace('&#x27;', '\u2019')
     s = re.sub(r'(^|[\s(\[\u2014])&quot;', '\\1\u201c', s).replace('&quot;', '\u201d')
-    return s
+    return s.replace('Venice, California', 'Venice,\u00a0California')  # keep the place on one line
 
 class Media:
     def __init__(self, src_root, out_root):
