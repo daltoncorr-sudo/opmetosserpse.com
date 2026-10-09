@@ -367,8 +367,8 @@ def project_body(p, blocks, chapters, notes, back='Back', home='Home', all_work=
     # data-page-only: a page with a 3D or interactive piece opens as its own page from home, so its scripts run
     out = ['<div class="pp"%s>' % (' data-page-only' if p.get('_scripts') else ''),
            '<nav class="pnav" aria-label="Back"><a href="/#work" data-back>%s</a><a href="/">%s</a></nav>' % (esc(back), esc(home)),
-           '<section class="open g"><h1>%s</h1><p class="lede">%s</p><div class="info">%s%s</div></section>' % (
-               typo(p['title']), typo(notes.get('lede') or p['lede']), dl(facts, 'facts'), dl(credits, 'cr'))]
+           '<section class="open g">%s<h1>%s</h1><p class="lede">%s</p><div class="info">%s%s</div></section>' % (
+               '<p class="kicker">%s</p>' % typo(notes['kicker']) if notes.get('kicker') else '', typo(p['title']), typo(notes.get('lede') or p['lede']), dl(facts, 'facts'), dl(credits, 'cr'))]
     starts = {c['starts_at']: c for c in chapters}
     open_ch, n = False, 0
     for b in blocks:
