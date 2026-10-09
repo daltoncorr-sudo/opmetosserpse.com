@@ -220,39 +220,20 @@
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(fit);
   var rt; window.addEventListener('resize', function () { clearTimeout(rt); rt = setTimeout(fit, 150); });
 
-  // Into a project and back. As the page swaps, the clicked title is named project-title; the project page's h1 has the
-  // same name, so the browser glides one into the other while the pages crossfade. The list's state and the row's place
-  // are kept for the return.
+  // Back from a project: land on the same list (Selected or all) with the row where it was
   var KEY = 'oo-return';
   var projectOf = function (u) { var m = u && new URL(u, location.href).pathname.match(/^\/projects\/([^\/]+)$/); return m && m[1]; };
-  function untag() {
-    $$('[data-vt]').forEach(function (el) { el.style.viewTransitionName = ''; el.removeAttribute('data-vt'); });
-  }
-  function tag(slug) {
-    untag();
-    var row = $('.work-row[data-project="' + slug + '"]', list);
-    if (!row || !row.getClientRects().length) return false;
-    var title = row.querySelector('a, .plain');
-    title.style.viewTransitionName = 'project-title'; title.setAttribute('data-vt', '');
-    return true;
-  }
   list.addEventListener('click', function (e) {
     var a = e.target.closest('.work-row a'); if (!a) return;
     try { sessionStorage.setItem(KEY, JSON.stringify({ slug: a.closest('[data-project]').getAttribute('data-project'), top: a.getBoundingClientRect().top, open: list.classList.contains('is-open') })); } catch (err) {}
   });
-  window.addEventListener('pageswap', function (e) {
-    var to = e.activation && e.activation.entry && projectOf(e.activation.entry.url);
-    if (e.viewTransition && to && !reduce) tag(to);
-  });
-  window.addEventListener('pagereveal', function (e) {
-    untag();
+  window.addEventListener('pagereveal', function () {
     var from = window.navigation && navigation.activation && navigation.activation.from && projectOf(navigation.activation.from.url);
     var st = null; try { st = JSON.parse(sessionStorage.getItem(KEY)); } catch (err) {}
     if (!from || !st || st.slug !== from) return;
-    if (st.open) setOpen(true, false);  // back onto the same list
-    var row = $('.work-row[data-project="' + from + '"]', list);
-    if (row) { var a = row.querySelector('a, .plain'); window.scrollTo(0, window.scrollY + a.getBoundingClientRect().top - st.top); }
-    if (e.viewTransition && !reduce && tag(from)) e.viewTransition.finished.finally(untag);
+    if (st.open) setOpen(true, false);
+    var row = $('.work-row[data-project="' + from + '"] a, .work-row[data-project="' + from + '"] .plain', list);
+    if (row) window.scrollTo(0, window.scrollY + row.getBoundingClientRect().top - st.top);
   });
 
   // Hover hook for later: every project row says when the pointer or keyboard focus enters and leaves it

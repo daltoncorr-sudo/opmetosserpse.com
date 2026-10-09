@@ -60,14 +60,9 @@ ul{list-style:none;margin:0;padding:0}
 
 /* Smooth page changes (cross-document View Transitions); other browsers load normally */
 @view-transition{navigation:auto}
-/* Opening a project from the list: the pages crossfade and the clicked title glides into place as the project's title.
-   Back does the reverse. Quiet on purpose. site.js names the title as the page swaps; browsers without cross-page
-   transitions simply load the page. */
+/* Between pages: a short, soft crossfade on paper, nothing else moving. Browsers without cross-page transitions simply load the page. */
 ::view-transition{background:var(--paper)}
-::view-transition-old(root),::view-transition-new(root){animation-duration:.45s;animation-timing-function:ease}
-::view-transition-group(project-title){animation-duration:.45s;animation-timing-function:ease}
-::view-transition-old(project-title),::view-transition-new(project-title){height:100%;object-fit:contain;animation-duration:.45s}
-.page-project .project-head h1{view-transition-name:project-title;width:fit-content;margin:0 auto}
+::view-transition-old(root),::view-transition-new(root){animation-duration:.3s;animation-timing-function:ease-out}
 
 /* Inner pages: the name only, centered. No menu bar. */
 .site-header{position:relative;display:flex;justify-content:center;padding:28px var(--gutter) 0}
