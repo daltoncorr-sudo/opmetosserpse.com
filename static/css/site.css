@@ -60,9 +60,15 @@ ul{list-style:none;margin:0;padding:0}
 
 /* Smooth page changes (cross-document View Transitions); other browsers load normally */
 @view-transition{navigation:auto}
-/* Between pages: a short, soft crossfade on paper, nothing else moving. Browsers without cross-page transitions simply load the page. */
+/* Between pages, no fade: a project rises over the list like a sheet; Back slides it down, and the list is underneath
+   where it was. Smooth ease-out, no overshoot. Other page changes simply load. Browsers without cross-page transitions
+   simply load the page. */
 ::view-transition{background:var(--paper)}
-::view-transition-old(root),::view-transition-new(root){animation-duration:.3s;animation-timing-function:ease-out}
+::view-transition-old(root),::view-transition-new(root){animation:none;mix-blend-mode:normal}
+.page-project::view-transition-new(root){animation:vt-sheet-up .55s cubic-bezier(.32,.72,0,1) both}
+.page-home::view-transition-old(root){z-index:1;animation:vt-sheet-down .5s cubic-bezier(.32,.72,0,1) both}
+@keyframes vt-sheet-up{from{transform:translateY(100%)}}
+@keyframes vt-sheet-down{to{transform:translateY(100%)}}
 
 /* Inner pages: the name only, centered. No menu bar. */
 .site-header{position:relative;display:flex;justify-content:center;padding:28px var(--gutter) 0}
