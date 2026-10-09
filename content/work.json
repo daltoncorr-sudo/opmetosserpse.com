@@ -1,0 +1,404 @@
+{
+ "_note": "One entry per project, newest first; order within a year is the display order. tags: one or two from \"tags\" below. selected: shown in Selected works. media: for later. line: the old description, kept for rows without a page.",
+ "tags": [
+  "Art direction",
+  "Artwork",
+  "Book design",
+  "Brand design",
+  "Identity",
+  "Key art",
+  "Packaging",
+  "Print",
+  "Social",
+  "Web design"
+ ],
+ "projects": [
+  {
+   "slug": "sunnys-bookshop",
+   "title": "Sunny's Bookshop",
+   "year": "2026",
+   "tags": [
+    "Brand design",
+    "Identity"
+   ],
+   "selected": true,
+   "media": []
+  },
+  {
+   "slug": "hollyshorts-22",
+   "title": "Oscar®-Qualifying HollyShorts Film Festival 2026",
+   "year": "2026",
+   "tags": [
+    "Art direction",
+    "Artwork"
+   ],
+   "selected": true,
+   "media": []
+  },
+  {
+   "slug": "hollyshorts-comedy-2026",
+   "title": "HollyShorts Comedy 2026",
+   "year": "2026",
+   "tags": [
+    "Art direction",
+    "Identity"
+   ],
+   "selected": true,
+   "media": []
+  },
+  {
+   "slug": "solebury-home-watch",
+   "title": "Solebury Home Watch Services",
+   "year": "2026",
+   "tags": [
+    "Brand design",
+    "Web design"
+   ],
+   "selected": false,
+   "media": []
+  },
+  {
+   "slug": "creatives-for-ukraine",
+   "title": "Design for a nonprofit campaign",
+   "year": "2026",
+   "tags": [
+    "Social"
+   ],
+   "selected": false,
+   "media": [],
+   "line": "Design for a nonprofit campaign."
+  },
+  {
+   "slug": "polish-film-festival",
+   "title": "Polish Film Festival North America",
+   "year": "2025",
+   "tags": [
+    "Art direction",
+    "Artwork"
+   ],
+   "selected": true,
+   "media": []
+  },
+  {
+   "slug": "weissman-character-edition",
+   "title": "Weissman Character Edition",
+   "year": "2025",
+   "tags": [
+    "Print",
+    "Book design"
+   ],
+   "selected": true,
+   "media": []
+  },
+  {
+   "slug": "hollyshorts-21",
+   "title": "Oscar®-Qualifying HollyShorts Film Festival 2025",
+   "year": "2025",
+   "tags": [
+    "Art direction",
+    "Artwork"
+   ],
+   "selected": false,
+   "media": []
+  },
+  {
+   "slug": "red-mask",
+   "title": "Red Mask",
+   "year": "2025",
+   "tags": [
+    "Key art",
+    "Print"
+   ],
+   "selected": true,
+   "media": []
+  },
+  {
+   "slug": "hollyshorts-dubai-2025",
+   "title": "HollyShorts Dubai 2025",
+   "year": "2025",
+   "tags": [
+    "Identity",
+    "Art direction"
+   ],
+   "selected": false,
+   "media": []
+  },
+  {
+   "slug": "dont-let-them-out",
+   "title": "Don't Let Them Out",
+   "year": "2025",
+   "tags": [
+    "Key art",
+    "Artwork"
+   ],
+   "selected": true,
+   "media": []
+  },
+  {
+   "slug": "hollyshorts-london-2025",
+   "title": "BAFTA®-Qualifying HollyShorts London 2025",
+   "year": "2025",
+   "tags": [
+    "Art direction",
+    "Key art"
+   ],
+   "selected": false,
+   "media": []
+  },
+  {
+   "slug": "hollyshorts-comedy-2025",
+   "title": "HollyShorts Comedy 2025",
+   "year": "2025",
+   "tags": [
+    "Brand design",
+    "Identity"
+   ],
+   "selected": false,
+   "media": []
+  },
+  {
+   "slug": "jeff-black",
+   "title": "Brand identity for a private client",
+   "year": "2025",
+   "tags": [
+    "Identity"
+   ],
+   "selected": false,
+   "media": [],
+   "line": "Brand identity for a private client."
+  },
+  {
+   "slug": "tremor-house",
+   "title": "Key art and pitch decks for a production company",
+   "year": "2025",
+   "tags": [
+    "Key art"
+   ],
+   "selected": false,
+   "media": [],
+   "line": "Key art and pitch decks for a production company."
+  },
+  {
+   "slug": "hollyshorts-london-2024",
+   "title": "BAFTA®-Qualifying HollyShorts London 2024",
+   "year": "2024",
+   "tags": [
+    "Art direction",
+    "Artwork"
+   ],
+   "selected": true,
+   "media": []
+  },
+  {
+   "slug": "hollyshorts-20",
+   "title": "Oscar®-Qualifying HollyShorts Film Festival 2024",
+   "year": "2024",
+   "tags": [
+    "Art direction",
+    "Artwork"
+   ],
+   "selected": false,
+   "media": []
+  },
+  {
+   "slug": "cannes-2024",
+   "title": "Cannes 2024",
+   "year": "2024",
+   "tags": [
+    "Artwork"
+   ],
+   "selected": false,
+   "media": []
+  },
+  {
+   "slug": "skyfire-artists",
+   "title": "Skyfire Artists",
+   "year": "2024",
+   "tags": [
+    "Brand design",
+    "Identity"
+   ],
+   "selected": false,
+   "media": []
+  },
+  {
+   "slug": "survived-by",
+   "title": "Survived By",
+   "year": "2024",
+   "tags": [
+    "Key art",
+    "Artwork"
+   ],
+   "selected": false,
+   "media": []
+  },
+  {
+   "slug": "little-issues",
+   "title": "“LiTTLE iSSUES”",
+   "year": "2024",
+   "tags": [
+    "Key art"
+   ],
+   "selected": false,
+   "media": [],
+   "line": "Poster for an award-winning short."
+  },
+  {
+   "slug": "kimberla-lawson-roby",
+   "title": "Branding and packaging for a best-selling author",
+   "year": "2024",
+   "tags": [
+    "Brand design",
+    "Packaging"
+   ],
+   "selected": false,
+   "media": [],
+   "line": "Branding and packaging for a best-selling author."
+  },
+  {
+   "slug": "anonymous-poetry",
+   "title": "Book design for a private client",
+   "year": "2024",
+   "tags": [
+    "Book design"
+   ],
+   "selected": false,
+   "media": [],
+   "line": "Book design for a private client."
+  },
+  {
+   "slug": "cannes-2023",
+   "title": "Cannes 2023",
+   "year": "2023",
+   "tags": [
+    "Artwork",
+    "Print"
+   ],
+   "selected": false,
+   "media": []
+  },
+  {
+   "slug": "miles-regis",
+   "title": "Miles Regis",
+   "year": "2023",
+   "tags": [
+    "Artwork",
+    "Book design"
+   ],
+   "selected": false,
+   "media": []
+  },
+  {
+   "slug": "hollyshorts-19",
+   "title": "Oscar®-Qualifying HollyShorts Film Festival 2023",
+   "year": "2023",
+   "tags": [
+    "Art direction",
+    "Artwork"
+   ],
+   "selected": false,
+   "media": []
+  },
+  {
+   "slug": "nice-knives",
+   "title": "“Nice Knives”",
+   "year": "2023",
+   "tags": [
+    "Key art"
+   ],
+   "selected": false,
+   "media": [],
+   "line": "Poster for a short film, distributed by BAM In Motion."
+  },
+  {
+   "slug": "let-this-feeling-go",
+   "title": "“Let This Feeling Go”",
+   "year": "2023",
+   "tags": [
+    "Artwork",
+    "Key art"
+   ],
+   "selected": false,
+   "media": [],
+   "line": "Original artwork and poster."
+  },
+  {
+   "slug": "hollyshorts-website",
+   "title": "HollyShorts.com",
+   "year": "2023",
+   "tags": [
+    "Web design"
+   ],
+   "selected": false,
+   "media": [],
+   "line": "Website design for the festival."
+  },
+  {
+   "slug": "hallelujah",
+   "title": "“Hallelujah”",
+   "year": "2023",
+   "tags": [
+    "Key art",
+    "Social"
+   ],
+   "selected": false,
+   "media": [],
+   "line": "Award campaign and social graphics for a short film."
+  },
+  {
+   "slug": "hollyshorts-18",
+   "title": "Oscar®-Qualifying HollyShorts Film Festival 2022",
+   "year": "2022",
+   "tags": [
+    "Social"
+   ],
+   "selected": false,
+   "media": []
+  },
+  {
+   "slug": "welcome-home",
+   "title": "“Welcome Home”",
+   "year": "2022",
+   "tags": [
+    "Key art"
+   ],
+   "selected": false,
+   "media": [],
+   "line": "Poster for a short film."
+  },
+  {
+   "slug": "timewriter",
+   "title": "“Timewriter”",
+   "year": "2021",
+   "tags": [
+    "Art direction"
+   ],
+   "selected": false,
+   "media": [],
+   "line": "Art department for a short film."
+  },
+  {
+   "slug": "hdtracks",
+   "title": "HDtracks",
+   "year": "2019",
+   "tags": [
+    "Brand design",
+    "Web design"
+   ],
+   "selected": false,
+   "media": []
+  },
+  {
+   "slug": "chop-suey-club",
+   "title": "Chop Suey Club",
+   "year": "2016",
+   "tags": [
+    "Web design",
+    "Social"
+   ],
+   "selected": false,
+   "media": [],
+   "line": "Web and social for a Manhattan gallery."
+  }
+ ]
+}
