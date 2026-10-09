@@ -158,7 +158,7 @@ class Media:
 
 # How wide each block draws, for srcset
 # How wide each block draws, for srcset
-SIZES = {'single': '(max-width:640px) 100vw, 62vw', 'row': '(max-width:640px) 50vw, 31vw', 'full': '100vw',
+SIZES = {'single': '(max-width:640px) 100vw, 77vw', 'row': '(max-width:640px) 50vw, 38vw', 'full': '100vw',
          'tall': '(max-width:640px) 100vw, 46vw'}
 
 def img_tag(m, sizes, alt, eager=False, extra=''):
@@ -282,28 +282,31 @@ def load_notes(p, keys):
 def cap(x):
     return x[:1].upper() + x[1:]
 
+MAKERS = re.compile(r'fabrication|production|print', re.I)
+
 def credit_rows(p, notes):
-    """Credits, short: our credit as its first role ("Art direction: Dalton Corr, Opmet Osserpse"), each partner as role
-    and name, typefaces, then photography. A "credits" list in the notes file replaces the derived rows. Photographers
-    come from the notes file ("photography"); until they're known, the row says [To come]. Returns (rows, has photo)."""
-    rows, photo = [], False
+    """Credits, as on HollyShorts 20: our credit under its first role ("Art direction: Dalton Corr, Opmet Osserpse"), the
+    partners who made or produced something (fabrication, production, print), then photography. Nothing else: no
+    client (it's a fact already), no event partners, no typefaces. A "credits" list in the notes file replaces the
+    derived rows. Photographers come from the notes file ("photography"), or are us when our roles include photography;
+    until they're known, the row says [To come]. Returns (rows, has photo)."""
+    rows, ours_photo = [], False
     if notes.get('credits'):
         rows = [(r, [n]) for r, n in notes['credits']]
     else:
         for label, names in p['credits']:
-            photo = photo or 'photo' in label.lower() or any('photo' in x.lower() for x in names)
-            if label == 'Client': continue
-            if label == 'Fonts': rows.append(('Typefaces', names)); continue
-            plain = []
             for x in names:
                 if x.startswith('Dalton Corr: '):
-                    rows.append((cap(re.split(r', | and ', x[len('Dalton Corr: '):])[0]), ['Dalton Corr, Opmet Osserpse']))
-                elif ': ' in x: who, role = x.split(': ', 1); rows.append((cap(role), [who]))
-                else: plain.append(x)
-            if plain: rows.append((label, plain))
-    if notes.get('photography'): rows.append(('Photography', [', '.join(notes['photography'])])); photo = True
-    elif not photo: rows.append(('Photography', None))
-    return rows, photo
+                    roles = x[len('Dalton Corr: '):]
+                    rows.append((cap(roles.split(', ')[0]), ['Dalton Corr, Opmet Osserpse']))
+                    ours_photo = ours_photo or 'photograph' in roles.lower()
+                elif ': ' in x:
+                    who, role = x.split(': ', 1)
+                    if MAKERS.search(role): rows.append((cap(role), [who]))
+    if notes.get('photography'): rows.append(('Photography', [', '.join(notes['photography'])]))
+    elif ours_photo: rows.append(('Photography', ['Dalton Corr, Opmet Osserpse']))
+    else: rows.append(('Photography', None))
+    return rows, bool(notes.get('photography') or ours_photo)
 
 BILLBOARD = re.compile(r'billboard', re.I)
 
@@ -350,7 +353,8 @@ def block_html(b, slug):
         fc = '<figcaption class="g fcap"><span class="note">%s</span></figcaption>' % cap_ if cap_ else ''
         return '<figure class="b b-full"%s>%s%s</figure>' % (' data-read' if cap_ else '', media, fc)
     fc = '<figcaption class="note">%s</figcaption>' % cap_ if cap_ else ''
-    return '<figure class="b g b-%s%s"%s>%s%s</figure>' % (kind, ' b-cont' if b.get('cont') else '', ' data-read' if cap_ else '', media, fc)
+    return '<figure class="b g b-%s%s%s"%s>%s%s</figure>' % (kind, ' b-cont' if b.get('cont') else '', ' b-wide' if b.get('wide') else '',
+                                                           ' data-read' if cap_ else '', media, fc)
 
 def project_body(p, blocks, chapters, notes, back='Back', home='Home', all_work='All work', top='Back to top'):
     """Back and Home under the name; the title; under it the paragraph, and one list of facts and credits. Then the
@@ -370,6 +374,18 @@ def project_body(p, blocks, chapters, notes, back='Back', home='Home', all_work=
            '<section class="open g">%s<h1>%s</h1><p class="lede">%s</p><div class="info">%s%s</div></section>' % (
                '<p class="kicker">%s</p>' % typo(notes['kicker']) if notes.get('kicker') else '', typo(p['title']), typo(notes.get('lede') or p['lede']), dl(facts, 'facts'), dl(credits, 'cr'))]
     starts = {c['starts_at']: c for c in chapters}
+    # Rows and landscape pictures with nothing beside them run across ten columns. A block with a note, or a label beside
+    # it, stays in the eight middle columns, and so does every row of its gallery, so a gallery keeps one width.
+    def texted(b): return bool(b['note']) or (b['items'][0]['key'] in starts and b['kind'] != 'full')
+    def landscape(b): return b['kind'] == 'single' and b['items'][0]['kind'] != 'widget' and b['items'][0]['w'] >= b['items'][0]['h']
+    i = 0
+    while i < len(blocks):
+        j = i + 1
+        while j < len(blocks) and blocks[j].get('cont'): j += 1  # one gallery's rows: blocks[i:j]
+        grp = blocks[i:j]
+        wide = (grp[0]['kind'] == 'row' or (len(grp) == 1 and landscape(grp[0]))) and not any(texted(b) for b in grp)
+        for b in grp: b['wide'] = wide
+        i = j
     open_ch, n = False, 0
     for b in blocks:
         c = starts.get(b['items'][0]['key'])
