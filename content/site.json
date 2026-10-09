@@ -68,10 +68,7 @@
  "foundry": {
   "og_title": "Foundry | Opmet Osserpse",
   "og_description": "The Opmet Osserpse foundry: type and things to keep. Opening soon.",
-  "title": "Foundry",
-  "lines": [
-   "Fonts and goods, coming soon."
-  ]
+  "title": "Foundry"
  },
  "back": "Home",
  "about": {
@@ -80,7 +77,7 @@
    "Opmet Osserpse is a creative studio based in Venice, California.",
    "We bring together world-class creators to make incredible work with our partners.",
    "We are designers, musicians, filmmakers, writers, developers, artists.",
-   "Our work starts by hand, with pencils, paint and physical tools.",
+   "Our work starts by hand, with pencils, paper and physical tools.",
    "Our music and sound studio is called espresso tempo."
   ],
   "press_title": "Press",
@@ -92,7 +89,13 @@
   "title": "Blog",
   "lines": [
    "Notes from the studio, coming soon."
-  ]
+  ],
+  "label": "Blog",
+  "selected": "Selected articles",
+  "all": "All articles",
+  "more": "See more",
+  "less": "See less",
+  "back": "Home"
  },
  "project_back": "Back",
  "project_all": "All work",

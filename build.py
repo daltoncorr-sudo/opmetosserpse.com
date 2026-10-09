@@ -289,7 +289,7 @@ def credit_rows(p, notes):
     partners who made or produced something (fabrication, production, print), then photography. Nothing else: no
     client (it's a fact already), no event partners, no typefaces. A "credits" list in the notes file replaces the
     derived rows. Photographers come from the notes file ("photography"), or are us when our roles include photography;
-    until they're known, the row says [To come]. Returns (rows, has photo)."""
+    until they're known, there is no Photography row. Returns (rows, has photo)."""
     rows, ours_photo = [], False
     if notes.get('credits'):
         rows = [(r, [n]) for r, n in notes['credits']]
@@ -305,7 +305,7 @@ def credit_rows(p, notes):
                     if MAKERS.search(role): rows.append((cap(role), [who]))
     if notes.get('photography'): rows.append(('Photography', [', '.join(notes['photography'])]))
     elif ours_photo: rows.append(('Photography', ['Dalton Corr, Opmet Osserpse']))
-    else: rows.append(('Photography', None))
+    # no photographer known: no Photography row (the live site never shows a bracketed placeholder)
     return rows, bool(notes.get('photography') or ours_photo)
 
 BILLBOARD = re.compile(r'billboard', re.I)
@@ -447,6 +447,76 @@ def work_section(items, w):
             '<ul class="works" id="works">%s</ul></section>') % (
         esc(w['label']), esc(w['selected']), esc(w['all']), esc(w['selected']), esc(w['more']), esc(w['less']), esc(w['more']), esc(w['back']), ''.join(rows))
 
+AP_MONTHS = ('Jan.', 'Feb.', 'March', 'April', 'May', 'June', 'July', 'Aug.', 'Sept.', 'Oct.', 'Nov.', 'Dec.')
+
+def ap_date(d):
+    """2026-03-15 -> March 15, 2026 (AP style)."""
+    return '%s %d, %d' % (AP_MONTHS[d.month - 1], d.day, d.year)
+
+def load_blog():
+    """content/blog.json: every post, newest first, with its tags and whether it is Selected. The text of each post is
+    content/blog/<slug>.txt, one paragraph per block, blocks separated by a blank line. Fails on drift."""
+    b = load(os.path.join(CONTENT, 'blog.json')); vocab = b['tags']; seen = set(); errs = []
+    folder = os.path.join(CONTENT, 'blog')
+    for e in b['posts']:
+        s = e['slug']
+        if s in seen: errs.append('%s: listed twice' % s)
+        seen.add(s)
+        try:
+            if not re.fullmatch(r'\d{4}-\d{2}-\d{2}', e.get('date', '')): raise ValueError
+            e['_date'] = date.fromisoformat(e['date'])
+        except ValueError:
+            errs.append('%s: date must be ISO, like 2026-03-15' % s); e['_date'] = date.min
+        if not 1 <= len(e.get('tags', [])) <= 2: errs.append('%s: needs one or two tags' % s)
+        errs += ['%s: "%s" is not in the tag list' % (s, t) for t in e.get('tags', []) if t not in vocab]
+        fn = os.path.join(folder, s + '.txt')
+        if not os.path.exists(fn): errs.append('%s: content/blog/%s.txt is missing' % (s, s)); continue
+        with open(fn, encoding='utf-8') as f: text = f.read().strip()
+        e['paras'] = [' '.join(x.split()) for x in re.split(r'\n\s*\n', text) if x.strip()]
+        if not e['paras']: errs.append('%s: content/blog/%s.txt is empty' % (s, s))
+    if os.path.isdir(folder):
+        errs += ['%s: has a .txt but is missing from blog.json' % fn[:-4] for fn in sorted(os.listdir(folder)) if fn.endswith('.txt') and fn[:-4] not in seen]
+    if errs: sys.exit('Fix content/blog.json first:\n  ' + '\n  '.join(errs))
+    return sorted(b['posts'], key=lambda e: e['_date'], reverse=True), vocab
+
+def blog_section(posts, vocab, w, current=None):
+    """The blog list: the work list turned upside down, with the same markup, so the same CSS and motion apply. See more
+    also reveals a row of topics that filter it."""
+    rows, seen, i = [], set(), 0
+    for e in posts:
+        y = str(e['_date'].year)
+        yr = '' if y in seen else '<span class="yr">%s</span>' % y
+        seen.add(y)
+        extra = not e['selected']
+        cur = e['slug'] == current
+        rows.append('<li class="work-row%s%s" data-slug="%s" data-tags="%s" data-year="%s"%s>%s<a href="/blog/%s"%s>%s</a>%s</li>' % (
+            ' extra' if extra else '', ' is-current' if cur else '', e['slug'], esc('|'.join(e['tags'])), y,
+            ' style="--i:%d"' % i if extra else '', yr, e['slug'], ' aria-current="page"' if cur else '', typo(e['title']), tag_list(e['tags'])))
+        if extra: i += 1
+    topics = ''.join('<button type="button" data-topic="%s" aria-pressed="%s">%s</button>' % (esc(t), 'true' if t == 'All' else 'false', esc(t))
+                     for t in ['All'] + vocab)
+    return ('<section class="blog-list" id="articles" aria-label="%s"><div class="work-head">'
+            '<h2 class="work-label" data-closed="%s" data-open="%s">%s</h2>'
+            '<button type="button" class="archive-toggle" aria-expanded="false" aria-controls="article-rows" data-open-label="%s" data-close-label="%s">%s</button>'
+            '<a class="work-back" href="/" data-studio>%s</a></div>'
+            '<div class="blog-topics" role="group" aria-label="Topics" hidden>%s</div>'
+            '<p class="vh" aria-live="polite" data-count data-one="article" data-many="articles"></p>'
+            '<ul class="works" id="article-rows">%s</ul></section>') % (
+        esc(w['label']), esc(w['selected']), esc(w['all']), esc(w['selected']), esc(w['more']), esc(w['less']), esc(w['more']), esc(w['back']),
+        topics, ''.join(rows))
+
+def article(e):
+    """One post: the title, the date, the text. Nothing else."""
+    return ('<article class="article"><header class="article-head"><h1 tabindex="-1">%s</h1>'
+            '<p class="article-date"><time datetime="%s">%s</time></p></header>'
+            '<div class="article-body">%s</div></article>') % (
+        typo(e['title']), e['date'], ap_date(e['_date']), ''.join('<p>%s</p>' % typo(x) for x in e['paras']))
+
+def blurb(s, n=155):
+    """A search description: the first paragraph, trimmed at a word break."""
+    if len(s) <= n: return s
+    return s[:n].rsplit(' ', 1)[0].rstrip(' ,;:.—') + '…'
+
 def press_list(press):
     """Press, by year, newest first. Plain lines: the outlet, then the headline."""
     out, year = [], None
@@ -458,10 +528,65 @@ def press_list(press):
         out.append('<li>%s</li>' % ('<a href="%s" rel="noopener">%s</a>' % (esc(x['url']), line) if x['url'] else line))
     return ''.join(out) + '</ul>'
 
+# The foundry: a field of objects one screen to the left of home. Each product in content/foundry.json floats at a
+# slot (x and y at 1440 wide, and a depth d); its object is an HTML partial in content/foundry/objects/<object>.html,
+# so a real render can replace any one of them later. Each partial starts with a comment holding its bob, e.g.
+# <!-- {"bob": [7.4, -1.2]} --> (seconds, delay), and "align": "end" to sit it at the bottom of its box.
+FOUNDRY_SLOTS = [(200, 110, 1.12), (880, 300, .86), (470, 720, 1.0), (1000, 930, 1.14), (190, 1300, .92), (800, 1520, 1.04), (330, 1900, .96)]
+
+def foundry_object(name):
+    t = open(os.path.join(CONTENT, 'foundry', 'objects', name + '.html'), encoding='utf-8').read()
+    m = re.match(r'\s*<!--\s*(\{.*?\})\s*-->', t)
+    opts = json.loads(m.group(1)) if m else {}
+    return t[m.end():] if m else t, opts
+
+def foundry_panel(fd, title, drafts):
+    """The field, the product view (text on the right, images on the left) and the filter row."""
+    lb = fd['labels']
+    items = [p for p in fd['products'] if drafts or not p.get('draft')]
+    if len(items) > len(FOUNDRY_SLOTS): sys.exit('The foundry has %d slots; add more to FOUNDRY_SLOTS.' % len(FOUNDRY_SLOTS))
+    ph = lambda s: ' is-ph' if s.startswith('[') else ''
+    field, texts, images = [], [], []
+    for i, p in enumerate(items):
+        x, y, d = FOUNDRY_SLOTS[i]
+        obj, opts = foundry_object(p['object'])
+        bob = opts.get('bob', [7.5, 0])
+        field.append(
+            '<div class="fd-item" data-id="%(id)s" data-kind="%(kind)s" style="left:%(left)s%%;top:%(top)dpx">'
+            '<a class="fd-link" href="#foundry/%(id)s" draggable="false"><span class="fd-box%(end)s" aria-hidden="true"><span class="fd-turn">'
+            '<span class="fd-bob" style="animation-duration:%(bd)ss;animation-delay:%(bl)ss">%(obj)s</span></span></span>'
+            '<span class="fd-label"><span class="fd-name%(ph)s">%(name)s</span><span class="fd-type">%(type)s</span></span></a></div>' % dict(
+                id=esc(p['id']), kind=esc(p['kind']), left=round(x / 14.4, 4), top=y, end=' fd-box-end' if opts.get('align') == 'end' else '',
+                bd=bob[0], bl=bob[1], obj=obj.strip(), name=typo(p['name']), type=typo(p['type']), ph=ph(p['name'])))
+        acts = ''.join('<a href="%s"%s>%s</a>' % (esc(u), ' rel="noopener"' if u.startswith('http') else '', typo(t)) for t, u in p['actions'])
+        texts.append(
+            '<article class="fd-detail" data-for="%s" hidden><p class="fd-d-type">%s</p><h3 class="fd-d-name%s" tabindex="-1">%s</h3>'
+            '<p class="fd-d-line%s">%s</p><p class="fd-d-meta">%s</p><p class="fd-d-actions">%s</p></article>' % (
+                esc(p['id']), typo(p['type']), ph(p['name']), typo(p['name']), ph(p['line']), typo(p['line']), typo(p['meta']), acts))
+        images.append('<div class="fd-images" data-for="%s" hidden>%s</div>' % (esc(p['id']), ''.join(
+            '<div class="fd-img" data-placeholder style="aspect-ratio:%s">%s</div>' % (esc(r), typo(l)) for l, r in p['images'])))
+    x, y, d = FOUNDRY_SLOTS[max(len(items), 1) - 1]
+    word = lambda s: '<span class="fd-w" aria-hidden="true">%s</span><span class="fd-v">%s</span>' % (esc(s), esc(s))
+    filters = ''.join('<button type="button" class="fd-f" data-filter="%s" aria-pressed="%s">%s</button>' % (
+        esc(k), 'true' if k == 'all' else 'false', word(t)) for k, t in lb['filters'])
+    return ('<section class="panel side foundry-panel" id="foundry" aria-labelledby="foundry-title">'
+            '<div class="fd" data-foundry data-slots="%(slots)s"><h2 class="vh" id="foundry-title">%(title)s</h2>'
+            '<div class="fd-field" data-field><div class="fd-space" style="height:%(fh)dpx">%(field)s</div></div>'
+            '<div class="fd-veil" data-veil></div>'
+            '<div class="fd-text" data-text>%(texts)s</div>'
+            '<div class="fd-left" data-left><div class="fd-spacer"><span class="fd-drag">%(drag)s</span></div>%(images)s</div>'
+            '<nav class="fd-nav" aria-label="%(title)s"><span class="fd-filters" data-fd-filters>%(filters)s</span>'
+            '<a class="fd-f fd-home" href="#" data-studio data-home-label="%(home)s" data-back-label="%(back)s">%(homeword)s</a></nav>'
+            '</div></section>') % dict(
+        slots=' '.join('%g,%g,%g' % s for s in FOUNDRY_SLOTS), title=esc(title), fh=round(y + 420 * d + 260), field=''.join(field),
+        texts=''.join(texts), drag=esc(lb['drag']), images=''.join(images), filters=filters, home=esc(lb['home']), back=esc(lb['back']),
+        homeword=word(lb['home']))
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('--daltoncorr', required=True, help='path to a clone of daltoncorr-sudo/daltoncorr-porfolio')
     ap.add_argument('--zip', action='store_true', help='also write a zip of each project images, for press')
+    ap.add_argument('--drafts', action='store_true', help='also build foundry products marked draft (a preview; never ship it)')
     a = ap.parse_args()
     src_root = os.path.join(os.path.abspath(a.daltoncorr), 'site')
     if not os.path.isdir(src_root): sys.exit('Not found: %s (expected the repo with a site/ folder)' % src_root)
@@ -634,13 +759,10 @@ def main():
             return '<a href="%s"%s>%s</a>' % (links[k], ' rel="noopener"' if ext else '', k)
         return pat.sub(sub, s).replace('\n', '<br>')
     nav = ''.join('<a href="%s"%s>%s</a>' % (esc(u), ' rel="noopener"' if u.startswith('http') else ' data-go="%s"' % u[1:], esc(t)) for t, u in h['nav'])
-    # Side panels: the foundry one screen to the left of home, About one screen to the right. The foundry is a
-    # placeholder: put real HTML in content/foundry.html and it replaces the lines from site.json.
-    fd = site['foundry']; fd_file = os.path.join(CONTENT, 'foundry.html')
-    fd_body = open(fd_file, encoding='utf-8').read() if os.path.exists(fd_file) else ''.join('<p>%s</p>' % typo(x) for x in fd['lines'])
-    back = '<p class="studio-link"><a href="#" data-studio>%s</a></p>' % esc(site['back'])
-    foundry = ('<section class="panel side foundry-panel" id="foundry" aria-labelledby="foundry-title"><div class="side-inner">'
-               '<h2 class="vh" id="foundry-title">%s</h2><div class="foundry-body">%s</div>%s</div></section>') % (esc(fd['title']), fd_body, back)
+    # Side panels: the foundry one screen to the left of home (a field of objects, from content/foundry.json),
+    # About one screen to the right.
+    fd = site['foundry']
+    foundry = foundry_panel(load(os.path.join(CONTENT, 'foundry.json')), fd['title'], a.drafts)
     ap = site['about']
     press = load(os.path.join(CONTENT, 'press.json'))['press']
     about_panel = ('<section class="panel side about-panel" id="about" aria-labelledby="about-title">'
@@ -649,19 +771,32 @@ def main():
                    '<div class="about-main"><div class="about-body">%s</div></div>'
                    '<div class="about-press"><h3 class="press-title">%s</h3>%s</div></div></section>') % (
         ' '.join('<span>%s</span>' % esc(x) for x in ap['title'].split()), esc(site['back']), ''.join('<p>%s</p>' % link(typo(x)) for x in ap['lines']) + ''.join('<p class="contact">%s</p>' % link(typo(x)) for x in ap['contact']), esc(ap['press_title']), press_list(press))
-    # The blog sits one screen above home. Posts can go in content/blog.html later; until then, the lines from site.json.
-    bl = site['blog']; bl_file = os.path.join(CONTENT, 'blog.html')
-    bl_body = open(bl_file, encoding='utf-8').read() if os.path.exists(bl_file) else ''.join('<p>%s</p>' % typo(x) for x in bl['lines'])
-    blog = ('<section class="blog-panel" id="blog" aria-labelledby="blog-title"><div class="blog-inner"><div class="title-row">'
-            '<h2 class="vh" id="blog-title">%s</h2><p class="home-big"><a href="#" data-studio>%s</a></p></div>'
-            '<div class="blog-body">%s</div></div></section>') % (esc(bl['title']), esc(site['back']), bl_body)
+    # The blog sits one screen above home: an empty slot for an article, then the list at the bottom of the screen,
+    # next to home. Until there are posts, the lines from site.json (or content/blog.html).
+    bl = site['blog']
+    posts, blog_tags = load_blog()
+    if posts:
+        blog = ('<section class="blog-panel" id="blog" aria-labelledby="blog-title"><h2 class="vh" id="blog-title">%s</h2>'
+                '<div class="blog-article" data-article></div>%s</section>') % (esc(bl['title']), blog_section(posts, blog_tags, bl))
+    else:
+        bl_file = os.path.join(CONTENT, 'blog.html')
+        bl_body = open(bl_file, encoding='utf-8').read() if os.path.exists(bl_file) else ''.join('<p>%s</p>' % typo(x) for x in bl['lines'])
+        blog = ('<section class="blog-panel" id="blog" aria-labelledby="blog-title"><div class="blog-inner"><div class="title-row">'
+                '<h2 class="vh" id="blog-title">%s</h2><p class="home-big"><a href="#" data-studio>%s</a></p></div>'
+                '<div class="blog-body">%s</div></div></section>') % (esc(bl['title']), esc(site['back']), bl_body)
+    # One page per post, so a reload or a shared link lands on the article and still ends at the list
+    for e in posts:
+        body = '<div class="blog-article" data-article>%s</div>%s' % (article(e), blog_section(posts, blog_tags, bl, e['slug']))
+        write('/blog/%s.html' % e['slug'], page(site, '%s | %s' % (e['full_title'], site['name']), blurb(e['paras'][0]), '/blog/%s' % e['slug'], body, so))
     cover = ('<section class="cover"><div class="cover-inner"><h1><span class="mark" %s>%s</span><span class="name ink">%s<span class="name-text">Opmet Osserpse</span></span></h1>'
              '<nav class="cover-nav" aria-label="Site">%s</nav></div></section>') % (
         moves.mark_attrs(mv), hand + mv['layers'], brand_svg('wordmark.svg', 'wordmark'), nav)
     body = ('<div class="stage-clip"><div class="stage" data-stage>%s<div class="panel home-panel">%s<div data-home>%s%s</div></div>%s</div></div>'
             '<section class="project-panel" id="project" aria-label="Project"><div class="project-inner"></div></section>') % (
         foundry, blog, cover, work_section(items, h['work']), about_panel)
-    early = '<script>if(/^#(foundry|about|blog)$/.test(location.hash))document.documentElement.classList.add("at-"+location.hash.slice(1))</script>\n'
+    early = '<script>if(/^#(foundry|about|blog)([\\/?]|$)/.test(location.hash))document.documentElement.classList.add("at-"+location.hash.slice(1).split(/[\\/?]/)[0])</script>\n'
+    early += '<link rel="preload" href="/fonts/source-serif-4/source-serif-4-italic-latin.woff2" as="font" type="font/woff2" crossorigin>\n'
+    if a.drafts: early += '<meta name="drafts" content="on">\n'  # check.py lets bracketed placeholders pass in a drafts build
     write('/index.html', page(site, 'Opmet Osserpse', h['og_description'], '/', body, so, '/', main_cls='home-main',
                               extra_head=early + '<link rel="stylesheet" href="/css/moves.css?v=%s">\n' % site['_v']))
 
@@ -682,12 +817,12 @@ def main():
     write('/CNAME', site['domain'] + '\n')
     write('/.nojekyll', '')
     write('/robots.txt', 'User-agent: *\nAllow: /\nSitemap: https://%s/sitemap.xml\n' % site['domain'])
-    urls = ['/', '/projects/', '/privacy'] + ['/projects/%s' % p['slug'] for p in ordered]
+    urls = ['/', '/projects/', '/privacy'] + ['/projects/%s' % p['slug'] for p in ordered] + ['/blog/%s' % e['slug'] for e in posts]
     write('/sitemap.xml', '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n%s</urlset>\n' % ''.join(
         '  <url><loc>https://%s%s</loc></url>\n' % (site['domain'], u) for u in urls))
 
     size = sum(os.path.getsize(os.path.join(dp, f)) for dp, _, fs in os.walk(DIST) for f in fs)
-    print('Built %d project pages, %d list rows, into %s (%.0f MB).' % (len(ordered), len(entries), DIST, size / 1e6))
+    print('Built %d project pages, %d list rows, %d articles, into %s (%.0f MB).' % (len(ordered), len(entries), len(posts), DIST, size / 1e6))
     if media.log: print('\n'.join(media.log))
 
 if __name__ == '__main__':
