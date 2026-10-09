@@ -113,7 +113,7 @@ html:not(.js) .stage:has(#about:target){transform:translateX(-66.6667%)}
 .press a:hover .outlet{color:inherit}
 .studio-link{margin-top:2.6em;font:italic 400 var(--size-m) var(--serif)}
 /* About: the title and a paragraph at the top left; the press to the right, set a little lower. Home stays at the top right. */
-.about-grid{display:grid;grid-template-columns:minmax(0,1.9fr) minmax(0,1fr);gap:clamp(32px,7vw,120px);padding:12vh clamp(8px,calc(4vw - var(--gutter)),56px) 14vh;text-align:left}
+.about-grid{display:grid;grid-template-columns:minmax(0,2.4fr) minmax(0,1fr);gap:clamp(32px,7vw,120px);padding:12vh clamp(8px,calc(4vw - var(--gutter)),56px) 14vh;text-align:left}
 /* Home, small, at the top of the panel */
 .title-row{display:flex;flex-wrap:wrap;align-items:flex-end;column-gap:.42em;font-size:clamp(17px,1.35vw,20px);margin:0 0 var(--s5)}
 .about-grid .title-row{grid-column:1/-1;margin:0}
@@ -123,7 +123,7 @@ html:not(.js) .stage:has(#about:target){transform:translateX(-66.6667%)}
 .home-big a:hover,.home-big a:focus-visible{color:var(--ink)}
 .about-title:focus{outline:none}
 .about-title span{display:block}
-.about-panel .about-body{font-family:var(--bold-font);font-weight:var(--bold-weight);font-size:clamp(26px,3.5vw,50px);line-height:1.12;letter-spacing:-.01em;max-width:14.25em}
+.about-panel .about-body{font-family:var(--bold-font);font-weight:var(--bold-weight);font-size:clamp(26px,3.5vw,50px);line-height:1.12;letter-spacing:-.01em;max-width:16em}
 .about-body p{margin:0 0 .75em}
 .about-body p.contact{margin-top:.75em}
 .about-press{text-align:left;padding-top:clamp(120px,30vh,320px)}
