@@ -10,6 +10,8 @@
 :root{
   /* Off-white paper, near-black ink. One accent: none. */
   --paper:#F7F5F0; --paper-deep:#EEEBE4; --ink:#1C1A17; --graphite:#7A756D;
+  --tag-gray:#6B665F; /* 5.22:1 on --paper; --graphite is 4.2:1, too light for small text */
+  --hair:rgba(28,26,23,.14); --tick:rgba(28,26,23,.5);
   /* Two faces. When Opmet Serif ships, put it first in --serif. */
   --serif:"Libre Caslon Text",Georgia,"Times New Roman",serif;
   --sans:"Instrument Sans","Helvetica Neue",Arial,sans-serif;
@@ -18,6 +20,11 @@
   --gutter:clamp(16px,3.2vw,40px); --measure:34rem;
   /* One motion value, as on Porto Rocha. */
   --t:.5s; --ease:ease;
+  /* The home page's two longer motions: the stage slide and the Archive opening */
+  --slide:.9s; --slide-ease:cubic-bezier(.65,0,.35,1); --open:.7s;
+  /* The cover: the hand's center sits this far up the screen, measured from the bottom */
+  --hand-y:75%; --hand-h:clamp(150px,30vh,320px); --hand-w:calc(var(--hand-h) * .484);
+  --lockup-gap:clamp(16px,2.2vw,34px);
 }
 *,*::before,*::after{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
@@ -26,6 +33,7 @@ img,video{display:block;max-width:100%;height:auto}
 a{color:inherit;text-decoration:none;transition:color var(--t) var(--ease)}
 a:hover{color:var(--graphite)}
 :focus-visible{outline:1px solid var(--ink);outline-offset:3px}
+.vh{position:absolute!important;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 .skip{position:absolute;left:-9999px}.skip:focus{left:var(--gutter);top:8px;background:var(--paper);padding:4px 8px;z-index:20}
 p{margin:0 0 1em}
 h1{font:inherit;margin:0}
@@ -42,27 +50,90 @@ ul{list-style:none;margin:0;padding:0}
 .lockup .wordmark{display:block;width:168px;height:auto;margin-bottom:4px}
 main{padding:0 var(--gutter);flex:1}
 
-/* The cover: the hand and the name, alone */
-.cover{min-height:100vh;min-height:100svh;display:flex;align-items:center;justify-content:center;text-align:center}
-.cover h1{display:flex;flex-direction:column;align-items:center;gap:clamp(22px,3vw,36px);animation:arrive 1.6s var(--ease) both}
-.cover .mark{position:relative;display:block;width:clamp(44px,4.6vw,70px);transform-origin:50% 96%;will-change:transform}
-.cover .hand{display:block;width:100%;height:auto}
+/* Home: a stage of two panels, the foundry one screen to the left of home */
+.home-main{padding:0}
+.stage-clip{overflow-x:hidden;overflow-x:clip}
+.stage{display:flex;align-items:flex-start;width:200%;transform:translateX(-50%);transition:transform var(--slide) var(--slide-ease)}
+.stage.is-foundry,.at-foundry .stage{transform:none}
+.at-foundry .stage,.stage.no-anim{transition:none}
+html:not(.js) .stage:has(#foundry:target){transform:none}
+.panel{flex:none;width:50%;padding:0 var(--gutter)}
+.foundry-panel{position:sticky;top:0;height:100vh;height:100svh;display:flex;align-items:center}
+.foundry-inner{padding-left:clamp(8px,calc(7vw - var(--gutter)),96px)}
+.foundry-title{font:400 clamp(44px,6vw,96px)/1 var(--serif);margin:0 0 .35em}
+.foundry-body{font-size:var(--size-m)}
+.studio-link{margin-top:2.4em;font:italic 400 var(--size-m) var(--serif)}
+
+/* The cover: the hand at the left, the name beside it, a row of words below */
+.cover{position:relative;height:100vh;height:100svh;min-height:400px}
+.cover-lockup{position:absolute;left:clamp(8px,calc(7vw - var(--gutter)),96px);top:calc(100% - var(--hand-y) - var(--hand-h) / 2);animation:arrive 1.6s var(--ease) both}
+.cover h1{display:flex;align-items:flex-end;gap:var(--lockup-gap)}
+.cover .mark{position:relative;display:block;flex:none;height:var(--hand-h);width:var(--hand-w);transform-origin:50% 96%}
+.cover .hand{display:block;width:100%;height:100%}
 .cover .pose{position:absolute;left:0;top:0;width:100%;height:auto;opacity:0}
-.cover .name{display:block;color:var(--ink);line-height:0}
-.cover .name .wordmark{display:block;width:clamp(200px,24vw,360px);height:auto}
+.cover .name{display:block;color:var(--ink);line-height:0;padding-bottom:calc(var(--hand-h) * .06)}
+.cover .name .wordmark{display:block;width:clamp(220px,30vw,520px);height:auto}
+.cover-nav{display:flex;flex-wrap:wrap;gap:.35em 1.4em;margin:clamp(16px,3vh,30px) 0 0 calc(var(--hand-w) + var(--lockup-gap));font:italic 400 var(--size-m)/1.4 var(--serif)}
 /* The hand on the cover. Each move lives in its own folder under moves/; build.py gathers them into /css/moves.css. */
 @keyframes arrive{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+@media (max-width:719px){
+  :root{--hand-h:clamp(110px,22vh,180px)}
+  .cover .name .wordmark{width:min(52vw,260px)}
+  .cover-nav{margin-left:0}
+}
 
-/* After the scroll: the studio in a few lines, then the index */
-.about{max-width:30rem;margin:0 auto;padding:18vh 0 16vh;font-family:var(--serif);font-size:clamp(18px,1.45vw,21px);line-height:1.6}
-.about p{margin:0 0 1.1em}
+/* Work: Selected works, and the Archive that opens in place */
+.work{max-width:40rem;margin:0 auto;padding:12vh 0 0;scroll-margin-top:6vh}
+.work-head{display:flex;align-items:baseline;gap:1.4em;margin:0 0 1.5em}
+.work-title{font:italic 400 clamp(20px,1.7vw,24px)/1.2 var(--serif);margin:0}
+.archive-toggle,.tag,.clear,.chip{font:inherit;color:inherit;background:none;border:0;padding:0;margin:0;cursor:pointer;transition:color var(--t) var(--ease)}
+.archive-toggle{font:italic 400 var(--size-m) var(--serif)}
+.archive-toggle:hover,.tag:hover,.clear:hover,.chip:hover{color:var(--graphite)}
+.work-row{display:flex;flex-wrap:wrap;align-items:baseline;column-gap:.9em;margin:0 0 .4em}
+.work-row>a,.work-row .plain{font-family:var(--serif);font-size:clamp(17px,1.3vw,19px);line-height:1.55}
+.work-row .plain{color:var(--tag-gray)}
+.tags{display:inline-flex;flex-wrap:wrap;gap:.2em .9em;font:400 11.5px/1.4 var(--sans);letter-spacing:.02em;color:var(--tag-gray)}
+.tag[aria-pressed="true"]{color:var(--ink);text-decoration:underline;text-underline-offset:.25em;text-decoration-thickness:1px}
+.archive{position:relative;margin:3.5em 0 0}
+.archive-tools{display:flex;flex-wrap:wrap;align-items:baseline;gap:.6em 1.2em;margin:0 0 2.4em}
+.tag-search{font:italic 400 var(--size-m)/1.4 var(--serif);color:var(--ink);background:transparent;border:0;border-bottom:1px solid var(--hair);border-radius:0;padding:4px 0;width:13em;-webkit-appearance:none;appearance:none}
+.tag-search::placeholder{color:var(--tag-gray);font-style:italic;opacity:1}
+.tag-search:focus-visible{outline-offset:4px}
+.active-tags{display:inline-flex;flex-wrap:wrap;gap:.4em 1em;font:400 12px/1.4 var(--sans)}
+.chip{text-decoration:underline;text-underline-offset:.25em;text-decoration-thickness:1px}
+.clear{font:italic 400 var(--size-m) var(--serif);color:var(--tag-gray)}
+.empty{font:italic 400 var(--size-m) var(--serif);color:var(--tag-gray)}
+/* By year, newest first: the numeral in the left margin, a tick, and a faint rule joining the years */
+.years{--pad:0px;--rule-x:1.25rem;position:relative;list-style:none;margin:0;padding:0 0 0 var(--pad)}
+.years::before{content:"";position:absolute;left:calc(var(--pad) - var(--rule-x));top:.8em;bottom:.8em;width:1px;background:var(--hair)}
+.year{position:relative;margin:0 0 1.9em}
+.yr{position:absolute;right:calc(100% + var(--rule-x) + 12px + .5rem);top:0;margin:0;font:italic 400 clamp(17px,1.3vw,19px)/1.55 var(--serif)}
+.yr::after{content:"";position:absolute;left:calc(100% + .5rem);top:.82em;width:12px;height:1px;background:var(--tick)}
+@media (max-width:899px){.years{--pad:5.25rem}}
+/* Opening: rows rise 8px and fade in, 18 ms apart, while what follows slides down (transform only) */
+.archive.is-opening .work-row,.archive.is-opening .yr,.archive.is-opening .archive-tools{opacity:0;transform:translateY(8px)}
+.archive.is-opening.go .work-row,.archive.is-opening.go .yr,.archive.is-opening.go .archive-tools{opacity:1;transform:none;transition:opacity .45s var(--ease),transform .45s var(--slide-ease);transition-delay:calc(var(--i) * 18ms)}
+.archive.is-closing{position:absolute;left:0;right:0;opacity:0;transition:opacity .3s var(--ease)}
+.about.is-sliding{transition:transform var(--open) var(--slide-ease)}
+.about.is-sliding::after{content:"";position:absolute;left:0;right:0;top:100%;height:var(--cover,0px);background:var(--paper)}
+
+/* About: three lines, each on one line from 768px up */
+.about{position:relative;z-index:1;background:var(--paper);margin:0 calc(var(--gutter) * -1);padding:18vh var(--gutter) 22vh;font-family:var(--serif);font-size:clamp(18px,1.45vw,21px);line-height:1.6;scroll-margin-top:0}
+.about:focus{outline:none}
+.about .lines{max-width:30rem;margin:0 auto}
+.about p{margin:0 0 .5em}
 .about a{text-decoration:underline;text-underline-offset:.2em;text-decoration-thickness:1px}
+@media (min-width:768px){
+  .about{font-size:clamp(17px,2.45vw,26px)}
+  .about .lines{max-width:none;width:max-content}
+  .about p{white-space:nowrap}
+}
+
+/* The Archive page */
 .index{max-width:30rem;margin:0 auto;padding:0 0 18vh}
-.index .archive{margin-top:3em;color:var(--graphite)}
 .list li{margin:0 0 .35em}
 .list a,.list .plain{font-family:var(--serif);font-size:clamp(17px,1.3vw,19px)}
 .list .plain{color:var(--graphite)}
-.list .yr{color:var(--graphite);font-family:var(--sans);font-size:var(--size-s);margin-left:.5em}
 .preview{position:fixed;top:50%;right:var(--gutter);width:min(24vw,360px,calc((100vw - 30rem) / 2 - var(--gutter) * 2));aspect-ratio:4/5;transform:translateY(-50%);pointer-events:none;z-index:30}
 .preview img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity var(--t) var(--ease)}
 .preview img.on{opacity:1}
@@ -98,7 +169,7 @@ main{padding:0 var(--gutter);flex:1}
 
 .fade{opacity:0;transition:opacity var(--t) var(--ease)}.fade.in{opacity:1}
 @media (prefers-reduced-motion:reduce){
-  .cover h1,.cover .mark,.cover .mark *{animation:none!important}
+  .cover-lockup,.cover .mark,.cover .mark *{animation:none!important}
   *,*::before,*::after{transition:none!important;animation:none!important}
   @view-transition{navigation:none}
   .fade{opacity:1}

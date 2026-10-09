@@ -14,19 +14,43 @@
   "og_description": "A creative studio in Venice, California: identities, key art and campaigns for festivals, films and businesses.",
   "about": [
    "Opmet Osserpse is a creative studio based in Venice, California.",
-   "We bring together world-class creators to make incredible work with our partners.",
    "Our music and sound studio is called espresso tempo.",
-   "Visit our foundry to discover fonts, creative tools, books, prints and merchandise.",
-   "hello@opmetosserpse.com\n@opmetosserpse"
+   "Say hello at hello@opmetosserpse.com"
   ],
   "all_link": "Archive",
   "links": {
    "espresso tempo": "https://espressotempo.com/",
-   "portfolio": "#index",
-   "foundry": "/foundry",
+   "portfolio": "#work",
+   "foundry": "#foundry",
    "say hi": "mailto:hello@opmetosserpse.com",
    "hello@opmetosserpse.com": "mailto:hello@opmetosserpse.com",
    "@opmetosserpse": "https://www.instagram.com/opmetosserpse/"
+  },
+  "nav": [
+   [
+    "Work",
+    "#work"
+   ],
+   [
+    "Foundry",
+    "#foundry"
+   ],
+   [
+    "espresso tempo",
+    "https://espressotempo.com/"
+   ],
+   [
+    "About",
+    "#about"
+   ]
+  ],
+  "work": {
+   "heading": "Selected works",
+   "archive": "Archive",
+   "close": "Close",
+   "search": "Search by tag",
+   "clear": "Clear",
+   "empty": "No projects with that tag."
   }
  },
  "projects": {
@@ -49,9 +73,10 @@
  "foundry": {
   "og_title": "Foundry | Opmet Osserpse",
   "og_description": "The Opmet Osserpse foundry: type and things to keep. Opening soon.",
+  "title": "Foundry",
   "lines": [
-   "The foundry opens soon, with type and things to keep.",
-   "Write to hello@opmetosserpse.com to hear when it does."
-  ]
+   "Fonts and goods, coming soon."
+  ],
+  "back": "Studio"
  }
 }

@@ -102,7 +102,7 @@ def brand_svg(name, cls, label=None):
     return s.replace('<svg ', '<svg class="%s" %s focusable="false" ' % (cls, a11y), 1)
 
 
-def page(site, title, desc, path, body, og_image=None, current=None, extra_head=''):
+def page(site, title, desc, path, body, og_image=None, current=None, extra_head='', main_cls=''):
     url = 'https://%s%s' % (site['domain'], path)
     og = og_image or '/media/site/og.jpg'
     # No menu bar. Inner pages carry only the hand and the name, centered, back to the cover.
@@ -133,7 +133,7 @@ def page(site, title, desc, path, body, og_image=None, current=None, extra_head=
 <body>
 <a class="skip" href="#main">Skip to content</a>
 %(nav)s
-<main id="main">
+<main id="main"%(main_cls)s>
 %(body)s
 </main>
 <script src="/js/site.js?v=%(v)s" defer></script>
@@ -142,7 +142,7 @@ def page(site, title, desc, path, body, og_image=None, current=None, extra_head=
 ''' % dict(title=esc(title), desc=esc(desc), url=url, domain=site['domain'], og=og, nav=nav, tz=site['clock_timezone'],
            place=esc(site['clock_place']), body=body, name=esc(site['name']), descr=esc(site['description'].rstrip('.')),
            email=site['email'], line=esc(site['line']), copy=esc(site['copyright']), privacy=esc(site['privacy_line']),
-           v=site['_v'], extra=extra_head)
+           v=site['_v'], extra=extra_head, main_cls=' class="%s"' % main_cls if main_cls else '')
 
 def write(path, text):
     full = os.path.join(DIST, path.lstrip('/'))
@@ -162,7 +162,7 @@ def project_body(p, media, prev, nxt, zip_href):
     out.append('<div class="media">%s</div>' % ''.join(html_))
     lines = [p['client'] + ', ' + p['year'], p['role']]
     lines += ['<a href="%s" rel="noopener">%s</a>' % (esc(u), typo(t)) for t, u in p['links']]
-    out.append('<footer class="project-foot"><p>%s</p><p><a href="/projects/%s">%s</a></p><p><a href="/#index">Index</a></p></footer>' % (
+    out.append('<footer class="project-foot"><p>%s</p><p><a href="/projects/%s">%s</a></p><p><a href="/#work">Index</a></p></footer>' % (
         '<br>'.join(x if x.startswith('<a') else typo(x) for x in lines), nxt['slug'], typo(nxt['title'])))
     return '\n'.join(out)
 
@@ -170,13 +170,65 @@ def list_rows(entries):
     """A plain list of names. No years, numbers or rules."""
     li = []
     for e in entries:
-        if e.get('slug'):
-            li.append('<li data-sector="%s" id="%s"><a href="/projects/%s"%s>%s</a></li>'
-                      % (esc(e['sector']), e['slug'], e['slug'], ' data-preview="%s"' % e['preview'] if e.get('preview') else '', typo(e['title'])))
+        if e.get('page'):
+            li.append('<li id="%s"><a href="/projects/%s"%s>%s</a></li>'
+                      % (e['slug'], e['slug'], ' data-preview="%s"' % e['preview'] if e.get('preview') else '', typo(e['title'])))
         else:
-            t = e['title'] or e['line'].rstrip('.')
-            li.append('<li data-sector="%s" id="%s" class="plain">%s</li>' % (esc(e['sector']), e['id'], typo(t)))
+            li.append('<li id="%s" class="plain">%s</li>' % (e['slug'], typo(e['title'])))
     return '<ul class="list">%s</ul>' % ''.join(li)
+
+def load_work(projects):
+    """content/work.json: every project, newest first, with its tags and whether it is Selected. Fails on drift."""
+    w = load(os.path.join(CONTENT, 'work.json')); vocab = w['tags']; seen = set(); errs = []
+    for e in w['projects']:
+        s = e['slug']
+        if s in seen: errs.append('%s: listed twice' % s)
+        seen.add(s)
+        if not re.fullmatch(r'\d{4}', e.get('year', '')): errs.append('%s: year must be four digits' % s)
+        if not 1 <= len(e['tags']) <= 2: errs.append('%s: needs one or two tags' % s)
+        errs += ['%s: "%s" is not in the tag list' % (s, t) for t in e['tags'] if t not in vocab]
+        p = projects.get(s); e['page'] = bool(p)
+        if p and p['year'][-4:] != e['year']: errs.append('%s: year %s here, %s on its page' % (s, e['year'], p['year']))
+        if e['selected'] and not p: errs.append('%s: Selected needs a project page' % s)
+    errs += ['%s: has a page but is missing from work.json' % s for s in projects if s not in seen]
+    if errs: sys.exit('Fix content/work.json first:\n  ' + '\n  '.join(errs))
+    items = sorted(w['projects'], key=lambda e: -int(e['year']))  # stable: file order within a year
+    return items, vocab
+
+def tag_list(tags, buttons=False):
+    if buttons:
+        t = ''.join('<button type="button" class="tag" data-tag="%s" aria-pressed="false"><span class="vh">Filter by </span>%s</button>' % (esc(x), esc(x)) for x in tags)
+    else:
+        t = ''.join('<span class="tag">%s</span>' % esc(x) for x in tags)
+    return '<span class="tags">%s</span>' % t
+
+def work_title(e):
+    return '<a href="/projects/%s">%s</a>' % (e['slug'], typo(e['title'])) if e['page'] else '<span class="plain">%s</span>' % typo(e['title'])
+
+def work_section(items, vocab, w):
+    """Selected works, then the Archive, hidden until opened: by year, newest first, with tag search."""
+    sel = ''.join('<li class="work-row" data-project="%s">%s%s</li>' % (e['slug'], work_title(e), tag_list(e['tags'])) for e in items if e['selected'])
+    years, i = [], 0
+    for y in sorted({e['year'] for e in items}, reverse=True):
+        rows = []
+        first = i
+        for e in (x for x in items if x['year'] == y):
+            rows.append('<li class="work-row" data-project="%s" data-tags="%s" style="--i:%d">%s%s</li>'
+                        % (e['slug'], esc('|'.join(t.lower() for t in e['tags'])), i, work_title(e), tag_list(e['tags'], True)))
+            i += 1
+        years.append('<li class="year" data-year="%s"><h3 class="yr" style="--i:%d">%s</h3><ul>%s</ul></li>' % (y, first, y, ''.join(rows)))
+    tools = ('<div class="archive-tools" style="--i:0"><label class="vh" for="tag-search">%(search)s</label>'
+             '<input id="tag-search" class="tag-search" type="search" placeholder="%(search)s" autocomplete="off" spellcheck="false" list="tag-vocab">'
+             '<datalist id="tag-vocab">%(opts)s</datalist><span class="active-tags" data-active></span>'
+             '<button type="button" class="clear" data-clear hidden>%(clear)s</button></div>'
+             '<p class="empty" data-empty hidden>%(empty)s</p><p class="vh" data-count aria-live="polite"></p>') % dict(
+        search=esc(w['search']), clear=esc(w['clear']), empty=esc(w['empty']), opts=''.join('<option value="%s">' % esc(t) for t in vocab))
+    return ('<section class="work" id="work" aria-labelledby="work-title"><div class="work-head">'
+            '<h2 class="work-title" id="work-title" tabindex="-1">%s</h2>'
+            '<button type="button" class="archive-toggle" aria-expanded="false" aria-controls="archive" data-open-label="%s" data-close-label="%s">%s</button></div>'
+            '<ul class="works">%s</ul>'
+            '<div class="archive" id="archive" role="region" aria-label="%s" hidden>%s<ol class="years">%s</ol></div></section>') % (
+        esc(w['heading']), esc(w['archive']), esc(w['close']), esc(w['archive']), sel, esc(w['archive']), tools, ''.join(years))
 
 def main():
     ap = argparse.ArgumentParser()
@@ -239,9 +291,10 @@ def main():
         write('/projects/%s.html' % s, page(site, p['seo']['title'], p['seo']['description'], '/projects/%s' % s, body, og, '/projects'))
 
     # projects list: pages and rows, newest first
-    entries = [dict(slug=p['slug'], title=p['title'], deck=p['deck'], sector=p['sector'], year=p['year'][-4:], preview=p.get('preview')) for p in ordered]
-    for r in index['rows']: entries.append(r)
-    entries.sort(key=lambda e: -int(e['year']))
+    items, vocab = load_work(projects)
+    for e in items:
+        if e['page']: e['preview'] = projects[e['slug']].get('preview')
+    entries = items
     pr = site['projects']
     body = '<section class="index">%s</section><div class="preview" aria-hidden="true"><img alt=""></div>' % list_rows(entries)
     write('/projects/index.html', page(site, pr['og_title'], pr['og_description'], '/projects/', body, so, '/projects'))
@@ -268,19 +321,30 @@ def main():
             return '<a href="%s"%s>%s</a>' % (links[k], ' rel="noopener"' if ext else '', k)
         return pat.sub(sub, s).replace('\n', '<br>')
     about = ''.join('<p>%s</p>' % link(typo(x)) for x in h['about'])
-    home_entries = [dict(slug=p['slug'], title=p['title'], deck=p['deck'], sector=p['sector'], year=p['year'][-4:], preview=p.get('preview')) for p in ordered]
-    body = ('<section class="cover"><h1><span class="mark" %s>%s</span><span class="name">%s</span></h1></section>'
-            '<section class="about">%s</section>'
-            '<section class="index" id="index" aria-label="Index">%s<p class="archive"><a href="/projects/">%s</a></p></section>'
-            '<div class="preview" aria-hidden="true"><img alt=""></div>') % (moves.mark_attrs(mv), hand + mv['layers'], brand_svg('wordmark.svg', 'wordmark', 'Opmet Osserpse'), about, list_rows(home_entries), esc(h['all_link']))
-    write('/index.html', page(site, 'Opmet Osserpse', h['og_description'], '/', body, so, '/',
-                              extra_head='<link rel="stylesheet" href="/css/moves.css?v=%s">\n' % site['_v']))
+    nav = ''.join('<a href="%s"%s>%s</a>' % (esc(u), ' rel="noopener"' if u.startswith('http') else ' data-go="%s"' % u[1:], esc(t)) for t, u in h['nav'])
+    # The foundry panel sits one screen to the left of home. Its content is a placeholder: put real HTML in
+    # content/foundry.html and it replaces the lines from site.json.
+    fd = site['foundry']; fd_file = os.path.join(CONTENT, 'foundry.html')
+    fd_body = open(fd_file, encoding='utf-8').read() if os.path.exists(fd_file) else ''.join('<p>%s</p>' % typo(x) for x in fd['lines'])
+    foundry = ('<section class="panel foundry-panel" id="foundry" aria-labelledby="foundry-title"><div class="foundry-inner">'
+               '<h2 class="foundry-title" id="foundry-title" tabindex="-1">%s</h2><div class="foundry-body">%s</div>'
+               '<p class="studio-link"><a href="#" data-studio>%s</a></p></div></section>') % (esc(fd['title']), fd_body, esc(fd['back']))
+    cover = ('<section class="cover"><div class="cover-lockup"><h1><span class="mark" %s>%s</span><span class="name">%s</span></h1>'
+             '<nav class="cover-nav" aria-label="Site">%s</nav></div></section>') % (
+        moves.mark_attrs(mv), hand + mv['layers'], brand_svg('wordmark.svg', 'wordmark', 'Opmet Osserpse'), nav)
+    body = ('<div class="stage-clip"><div class="stage" data-stage>%s<div class="panel home-panel" data-home>%s%s'
+            '<section class="about" id="about" tabindex="-1" aria-label="About"><div class="lines">%s</div></section></div></div></div>') % (
+        foundry, cover, work_section(items, vocab, h['work']), about)
+    early = '<script>if(location.hash==="#foundry")document.documentElement.classList.add("at-foundry")</script>\n'
+    write('/index.html', page(site, 'Opmet Osserpse', h['og_description'], '/', body, so, '/', main_cls='home-main',
+                              extra_head=early + '<link rel="stylesheet" href="/css/moves.css?v=%s">\n' % site['_v']))
 
     # foundry (a holding page until the shop opens), privacy, 404
-    fd = site['foundry']
-    mail = lambda s: s.replace(site['email'], '<a href="mailto:%s">%s</a>' % (site['email'], site['email']))
-    body = '<section class="single">%s</section>' % ''.join('<p>%s</p>' % mail(typo(x)) for x in fd['lines'])
-    write('/foundry.html', page(site, fd['og_title'], fd['og_description'], '/foundry', body, so))
+    # /foundry is now a panel on the home page: send the old address there, inside this site
+    body = '<section class="single"><p><a href="/#foundry">%s</a></p></section>' % esc(fd['title'])
+    write('/foundry.html', page(site, fd['og_title'], fd['og_description'], '/foundry', body, so,
+                                extra_head='<meta http-equiv="refresh" content="0; url=/#foundry">\n<meta name="robots" content="noindex">\n'
+                                           '<script>location.replace("/#foundry")</script>\n'))
     pv = site['privacy']
     body = '<article class="page">%s</article>' % ''.join('<p>%s</p>' % typo(x) for x in pv['lines'])
     write('/privacy.html', page(site, pv['og_title'], pv['og_description'], '/privacy', body, so))
@@ -292,7 +356,7 @@ def main():
     write('/CNAME', site['domain'] + '\n')
     write('/.nojekyll', '')
     write('/robots.txt', 'User-agent: *\nAllow: /\nSitemap: https://%s/sitemap.xml\n' % site['domain'])
-    urls = ['/', '/projects/', '/foundry', '/privacy'] + ['/projects/%s' % p['slug'] for p in ordered]
+    urls = ['/', '/projects/', '/privacy'] + ['/projects/%s' % p['slug'] for p in ordered]
     write('/sitemap.xml', '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n%s</urlset>\n' % ''.join(
         '  <url><loc>https://%s%s</loc></url>\n' % (site['domain'], u) for u in urls))
 
