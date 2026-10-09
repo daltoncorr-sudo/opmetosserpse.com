@@ -180,7 +180,7 @@
    "w:phones-stage"
   ],
   "lede_words": 32,
-  "photo": false,
+  "photo": true,
   "videos": []
  },
  "hollyshorts-comedy-2026": {
@@ -260,7 +260,7 @@
    "w:badge-float"
   ],
   "lede_words": 33,
-  "photo": false,
+  "photo": true,
   "videos": [
    {
     "key": "hollyshorts-comedy-10-poster-popcorn",
@@ -539,7 +539,7 @@
    "w:badge-carousel"
   ],
   "lede_words": 31,
-  "photo": false,
+  "photo": true,
   "videos": []
  },
  "red-mask": {
@@ -694,7 +694,7 @@
    "w:badge-float"
   ],
   "lede_words": 31,
-  "photo": false,
+  "photo": true,
   "videos": []
  },
  "hollyshorts-london-2024": {
@@ -766,7 +766,7 @@
   ],
   "pieces": [],
   "lede_words": 34,
-  "photo": false,
+  "photo": true,
   "videos": []
  },
  "hollyshorts-20": {
@@ -931,7 +931,7 @@
   ],
   "pieces": [],
   "lede_words": 33,
-  "photo": false,
+  "photo": true,
   "videos": []
  },
  "cannes-2024": {
@@ -1125,7 +1125,7 @@
   ],
   "pieces": [],
   "lede_words": 33,
-  "photo": false,
+  "photo": true,
   "videos": []
  },
  "hollyshorts-18": {
@@ -1161,7 +1161,7 @@
   ],
   "pieces": [],
   "lede_words": 28,
-  "photo": false,
+  "photo": true,
   "videos": []
  },
  "hdtracks": {
