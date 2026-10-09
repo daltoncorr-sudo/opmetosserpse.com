@@ -310,7 +310,7 @@ html:not(.js) .stage:has(#about:target){transform:translateX(-66.6667%)}
 .fd.is-open .fd-filters{max-width:0;opacity:0;visibility:hidden}
 .fd-f{display:inline-grid;font:inherit;background:none;border:0;padding:12px 14px;margin:0;cursor:pointer;color:var(--graphite);pointer-events:auto;transition:color .5s ease}
 .fd-f:hover{color:var(--graphite)}
-.fd-f[aria-pressed="true"]{color:#000}
+.fd-f[aria-pressed="true"]{color:var(--ink)}
 .fd-w,.fd-v{grid-area:1/1}
 .fd-w{visibility:hidden;font-weight:900}
 .fd-v{justify-self:center;font-weight:400;transition:font-weight .3s ease}
