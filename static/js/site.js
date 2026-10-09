@@ -222,7 +222,7 @@
     }
   }
   toggle.addEventListener('click', function () { setOpen(!list.classList.contains('is-open'), true); });
-  // Back, beside See more: up to the top of home, focus on the Work option
+  // Home, beside See more: up to the top of home, focus on the Work option
   $('[data-top]').addEventListener('click', function (e) {
     e.preventDefault();
     history.replaceState(history.state, '', location.pathname + location.search);
