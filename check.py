@@ -116,6 +116,7 @@ for i, slug in enumerate(order):
     if not re.search(r'class="g pfoot"[^>]*><a class="ctl" href="/#archive" data-all-work>', t): problems.append('%s: no All work at the end' % rel)
     foot = t.split('class="g pfoot"', 1)[-1].split('</nav>', 1)[0]
     if 'data-top>' not in foot: problems.append('%s: no Back to top at the end' % rel)
+    if 'href="/" data-cover>' not in foot: problems.append('%s: no Home at the end' % rel)
     for m in re.finditer(r'<(a|button)\b[^>]*>([\s\S]*?)</\1>', t):
         words = ' '.join(re.sub(r'<span class="ctl-w"[^>]*>[^<]*</span>', ' ', m.group(2)).split())
         words = ' '.join(re.sub(r'<[^>]+>', ' ', words).split())

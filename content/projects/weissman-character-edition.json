@@ -7,7 +7,7 @@
  "role": "Production artist and catalog designer",
  "sector": "Fashion",
  "location": "Quixote Studios, Los Angeles",
- "lede": "Weissman's annual Character Edition runs to 136 pages and six themed sections. Its layouts began on set, beside the shoot, over 14 days in Los Angeles.",
+ "lede": "The Weissman 2025/2026 Catalog runs to 136 pages and six themed sections. Its layouts began on set, beside the shoot, over 14 days in Los Angeles.",
  "challenge": "Weissman is one of the largest dance costume companies in the United States, and its Character Edition is an annual 136-page catalog, in print and online. The 2025/2026 edition was shot in two sessions, 14 days in all, at Quixote Studios in Los Angeles. Its six themed sections each needed a character of their own, and the catalog, website and email all had to read as one system.",
  "work": [
   "The work started on set, as production artist for both shoots, beside the camera: a multi-screen workstation in front of the cyclorama, layouts taking shape next to the live shot and the shot list taped to the wall. The catalog was then designed in InDesign for print and digital, with editorial banners for the website.",
@@ -68,7 +68,7 @@
   {
    "slot": "S",
    "src": "images/design/Weissmans/catalog-pages/Screenshot 2026-03-24 at 2.49.37 PM.webp",
-   "alt": "The front cover of the 2025/2026 Character Edition catalog."
+   "alt": "The front cover of the Weissman 2025/2026 Catalog."
   },
   {
    "slot": "W",
@@ -113,7 +113,7 @@
   {
    "slot": "W",
    "src": "images/design/Weissmans/website-banners/Screenshot 2026-03-24 at 3.57.35 PM.webp",
-   "alt": "The Character Edition homepage, with a cabaret silhouette hero and category tiles."
+   "alt": "The catalog's homepage, with a cabaret silhouette hero and category tiles."
   },
   {
    "slot": "W",
@@ -148,7 +148,7 @@
  ],
  "card": {
   "src": "images/cards/weissman-lg.webp",
-  "alt": "The cover of the Weissman Character Edition 2025/2026 catalog."
+  "alt": "The cover of the Weissman 2025/2026 Catalog."
  },
  "og": "images/og/weissman.jpg"
 }

@@ -505,9 +505,9 @@ def project_body(p, blocks, chapters, notes, all_work='All work', top='Back to t
                        % (' ch-above' if b['kind'] == 'full' or b.get('wide') else '', esc(c['label']), n, typo(c['label'])))
         out.append(block_html(b, p['slug']))
     if open_ch: out.append('</section>')
-    # At the end: All work, and Back to top beside it (D, Oct. 9)
-    out.append('<nav class="g pfoot" aria-label="%s"><a class="ctl" href="/#archive" data-all-work>%s</a> <a class="ctl" href="#main" data-top>%s</a></nav>'
-               % (esc(all_work), ctl(all_work), ctl(top)))
+    # At the end: All work, Home and Back to top (D, Oct. 9)
+    out.append('<nav class="g pfoot" aria-label="%s"><a class="ctl" href="/#archive" data-all-work>%s</a> <a class="ctl" href="/" data-cover>%s</a> <a class="ctl" href="#main" data-top>%s</a></nav>'
+               % (esc(all_work), ctl(all_work), ctl(home), ctl(top)))
     out.append('</div>')
     return '\n'.join(out)
 
