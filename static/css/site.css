@@ -59,10 +59,12 @@ a:hover{color:var(--graphite)}
    less, Home, All work, All articles, the cover's options) and every filter (the Journal's topics, the foundry's row)
    is a .ctl: the serif italic at one size, in ink. Hover sweeps the word's weight with the cursor, thin at its left to
    black at its right; a hidden copy at 900 holds the width, so nothing moves. A filter is a .ctl.filter: tag gray, the
-   chosen one pure black and bold. Every control is at least 44px square to touch, without taking more room in its line. */
-.ctl{display:inline-grid;align-items:center;justify-items:center;min-width:44px;min-height:44px;margin-block:calc((1.4em - 44px) / 2);padding:0;
+   chosen one pure black and bold. Every control is at least 44px square to touch: an invisible target around the word,
+   so it takes no more room in its line and a short word (All) still lines up with the words around it. */
+.ctl{position:relative;display:inline-grid;align-items:center;justify-items:center;padding:0;
   font:italic 400 var(--ctl-size)/1.4 var(--ctl-font);font-optical-sizing:auto;letter-spacing:.01em;color:var(--ink);background:none;border:0;border-radius:0;
   cursor:pointer;text-decoration:none;-webkit-tap-highlight-color:transparent}
+.ctl::before{content:"";position:absolute;left:50%;top:50%;width:max(100%,44px);height:max(100%,44px);transform:translate(-50%,-50%)}
 .ctl:hover,.pp .ctl:hover{color:var(--ink)}
 .ctl-w,.ctl-v{grid-area:1/1;white-space:nowrap}
 .ctl-w{visibility:hidden;font-weight:900}
@@ -472,11 +474,11 @@ html:not(.js) .stage:has(#about:target){transform:translateX(-66.6667%)}
 .fd.is-open .fd-img{pointer-events:auto}
 /* The filter row: All, Digital, Physical, then Home (Back while a product is open) */
 .fd-nav{position:absolute;top:28px;left:0;right:0;z-index:4;display:flex;justify-content:center;align-items:center;pointer-events:none}
-.fd-filters{flex-wrap:nowrap;column-gap:0;overflow:hidden;white-space:nowrap;max-width:640px;transition:opacity .4s ease,visibility .4s,max-width .7s var(--slide-ease)}
-.fd-filters .ctl{margin:0 var(--s3) 0 0}  /* a row of its own, which folds away: full-height targets, the gap inside the fold */
+/* The filters fold away while a product is open: the gap after each is inside the fold, and so is room for the targets */
+.fd-filters{flex-wrap:nowrap;column-gap:0;overflow:hidden;white-space:nowrap;max-width:640px;padding:8px 10px;margin:0 -10px;transition:opacity .4s ease,visibility .4s,max-width .7s var(--slide-ease)}
+.fd-filters .ctl{margin-right:var(--s3)}
 .fd.is-open .fd-filters{max-width:0;opacity:0;visibility:hidden}
 .fd-f{pointer-events:auto}
-.fd-home{margin-block:0}
 /* No transitions for one frame: arriving at #foundry/<id>, or on resize */
 .fd.no-anim *{transition:none!important}
 /* Phones: one column, no hover, and the product view stacks (the product, the text, the images). Not yet designed. */
