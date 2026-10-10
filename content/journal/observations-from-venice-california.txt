@@ -1,0 +1,19 @@
+Placeholder text for the design checkpoint, not an article. This paragraph stands where the first lines of the essay will go, so the measure, the leading and the space around the pictures can be judged at reading length. It will be replaced before anything is published.
+
+note: stand-in-note.png | Stand-in for a handwritten margin note (a festival laurel, not handwriting) | -4
+
+Placeholder text, second paragraph. The picture in the margin beside the paragraph above is a stand-in for a scan of a handwritten note; the real notes will be transparent scans set straight on the paper, in the same place. On a phone the note drops below its paragraph, a little smaller.
+
+image: sample-column.webp | Placeholder picture at the width of the text column | column | Placeholder caption, in small sans and gray.
+
+Placeholder text, third paragraph. Below are two pictures set as a pair, side by side at one height across the text and its margin, and then one wide picture across the whole column. Every picture opens in the lightbox.
+
+image: sample-pair-a.webp | Placeholder picture, the left of a pair | pair
+
+image: sample-pair-b.webp | Placeholder picture, the right of a pair | pair | Placeholder caption for the pair.
+
+Placeholder text, fourth paragraph, short.
+
+image: sample-wide.webp | Placeholder picture across the whole column | wide
+
+Placeholder text, last paragraph. The last paragraph of every article ends on a tiny hand, as this one does.

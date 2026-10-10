@@ -52,6 +52,8 @@ The standard is a top agency, not a template. Image first. Very few words, only 
 - **Text:** `content/journal/<slug>.txt`, one paragraph per block, blocks separated by a blank line. Pictures live in `content/journal/images/<slug>/`. Two kinds of block are pictures, not text:
   - `image: <file> | <alt text> | <size> | <caption>`: size is `column` (the text's width, the default), `pair` (two pair lines in a row sit side by side, at one height) or `wide` (the whole column); the caption is optional. `image: <file> | <alt text>` still works.
   - `note: <file> | <what the note says> | <degrees>`: a handwritten note (a transparent PNG scan) in the margin beside the paragraph it follows, turned by the optional degrees (up to 15 either way). Under 1280 px, where the margin doesn't fit, it drops below its paragraph, a little smaller.
+  - A `<file>` written `../<slug>/<file>` is a picture from another post's folder, built once, in that post's folder.
+- **For now** all nine posts are live, dated 2026-10-10, each with the design checkpoint's sample: placeholder text and pictures, the pictures from the Venice post's folder (`../observations-from-venice-california/`). D's call, Oct. 10. Replace each `.txt` with its article (and its pictures) as it is written.
 - The last paragraph ends on a tiny hand. "AI" and all caps are allowed only inside the article body.
 
 ## The controls

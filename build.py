@@ -489,7 +489,8 @@ def load_blog(media, drafts=False):
     content/journal/<slug>.txt, one paragraph per block, blocks separated by a blank line; a block that is just
     "image: <file> | <alt text> | <size> | <caption>" is a picture from content/journal/images/<slug>/ (size column, wide
     or pair, column if left out; the caption is optional), and "note: <file> | <alt text> | <rotate>" is a handwritten
-    margin note (a transparent PNG) beside the paragraph before it. A post marked "draft" is left out
+    margin note (a transparent PNG) beside the paragraph before it. A file named "../<slug>/<file>" is a picture
+    from another post's folder, built once (every post shows the Venice sample's pictures for now). A post marked "draft" is left out
     (no page, no row, not in the sitemap) unless the build runs with --drafts; only a draft may be empty or undated.
     Fails on drift."""
     b = load(os.path.join(CONTENT, 'journal.json')); vocab = b['tags']; seen = set(); errs = []; posts = []
@@ -521,21 +522,25 @@ def load_blog(media, drafts=False):
                 kind, parts = m.group(1), [y.strip() for y in m.group(2).split('|')]
                 fname, alt, opt = parts[0], parts[1] if len(parts) > 1 else '', parts[2] if len(parts) > 2 else ''
                 if not alt: errs.append('%s: %s %s needs alt text' % (s, kind, fname)); continue
-                rel = 'content/journal/images/%s/%s' % (s, fname)
-                name = re.sub(r'[^a-z0-9]+', '-', os.path.splitext(fname)[0].lower())
+                # "../<slug>/<file>" borrows a picture from another post's folder; it is built once, in that post's folder
+                rel = os.path.normpath('content/journal/images/%s/%s' % (s, fname)).replace(os.sep, '/')
+                if not re.fullmatch(r'content/journal/images/[^/]+/[^/]+', rel):
+                    errs.append('%s: %s %s must be in content/journal/images/<slug>/' % (s, kind, fname)); continue
+                pics = 'journal-' + rel.split('/')[3]
+                name = re.sub(r'[^a-z0-9]+', '-', os.path.splitext(os.path.basename(rel))[0].lower())
                 if kind == 'image':
                     size = opt or 'column'
                     if size not in ('column', 'wide', 'pair'): errs.append('%s: image %s: size is column, wide or pair, not "%s"' % (s, fname, size)); continue
-                    r = media.image(rel, 'journal-' + s, name)
+                    r = media.image(rel, pics, name)
                     if not r: errs.append('%s: image %s is missing' % (s, rel)); continue
                     e['blocks'].append(('img', r, alt, size, '|'.join(parts[3:]).strip()))
-                    e['_og'] = e['_og'] or media.og(rel, 'journal-' + s)
+                    e['_og'] = e['_og'] or media.og(rel, pics)
                 else:
                     try: rot = float(opt or 0)
                     except ValueError: errs.append('%s: note %s: rotate is a number of degrees, not "%s"' % (s, fname, opt)); continue
                     if not e['blocks'] or e['blocks'][-1][0] not in ('p', 'note'):
                         errs.append('%s: note %s must follow a paragraph (it sits beside it)' % (s, fname)); continue
-                    r = media.image(rel, 'journal-' + s, 'note-' + name, max_w=800)  # a scan of handwriting, shown about 260px wide
+                    r = media.image(rel, pics, 'note-' + name, max_w=800)  # a scan of handwriting, shown about 260px wide
                     if not r: errs.append('%s: note %s is missing' % (s, rel)); continue
                     e['blocks'].append(('note', r, alt, max(-15.0, min(15.0, rot))))
             else:
