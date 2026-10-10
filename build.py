@@ -357,15 +357,24 @@ def make_blocks(items, notes):
     return out
 
 def block_html(b, slug):
-    """A block, with its note (if it has one) in the right margin, beside its top."""
+    """A block, with its note (if it has one) in the right margin, beside its top. Every picture shows whole: a portrait
+    picture or film (.cap) and a row are never taller than about 85vh, centered in their columns (--ar, its width over
+    its height; a row's is the sum of its pictures', so they keep one height)."""
     kind = b['kind']
     ms = []
     for it in b['items']:
         cls = 'm' + (' piece' if it['kind'] == 'widget' else '')
-        grow = ' style="flex-grow:%.4f"' % (it['w'] / it['h']) if kind == 'row' else ''
+        style = 'flex-grow:%.4f' % (it['w'] / it['h']) if kind == 'row' else ''
+        if kind in ('single', 'tall') and it['kind'] != 'widget' and it['h'] > it['w']:
+            cls += ' cap'; style = '--ar:%.4f' % (it['w'] / it['h'])
+        style = ' style="%s"' % style if style else ''
         skip = ' data-lightbox-skip' if it['kind'] == 'widget' else ''  # a 3D or interactive piece stays out of the lightbox
-        ms.append('<div class="%s" data-i="%s"%s%s>%s</div>' % (cls, esc(it['key']), grow, skip, it['html'](SIZES[kind])))
-    media = '<div class="row">%s</div>' % ''.join(ms) if kind == 'row' else ''.join(ms)
+        ms.append('<div class="%s" data-i="%s"%s%s>%s</div>' % (cls, esc(it['key']), style, skip, it['html'](SIZES[kind])))
+    if kind == 'row':
+        ar = sum(it['w'] / it['h'] for it in b['items'])
+        media = '<div class="row" style="--ar:%.4f;--n:%d">%s</div>' % (ar, len(b['items']), ''.join(ms))
+    else:
+        media = ''.join(ms)
     cap_ = '<span class="nt">%s</span>' % typo(b['note']) if b['note'] else ''  # the words; the film links stay apart
     for it in b['items']:
         if it['kind'] == 'video':

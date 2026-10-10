@@ -398,6 +398,12 @@ html:not(.js) .stage:has(#about:target){transform:translateX(-66.6667%)}
 .pp .b{align-items:start}
 .pp .b .m,.pp .b .row{grid-column:3/11;grid-row:1}.pp .b-tall .m{grid-column:4/10}
 .pp .b-wide .m,.pp .b-wide .row{grid-column:2/12}  /* rows and landscape pictures: ten columns */
+/* Whole pictures, never cropped: a portrait picture or film (.cap) and a row are never taller than about 85vh (--cap),
+   centered in their columns, so a poster shows whole without scrolling. --ar is the width over the height (build.py). */
+.pp{--cap:85vh}
+@supports (height:1svh){.pp{--cap:85svh}}
+.pp .b .m.cap{width:100%;max-width:calc(var(--cap) * var(--ar));margin-inline:auto}
+.pp .b .row{width:100%;max-width:calc(var(--cap) * var(--ar) + var(--g) * (var(--n) - 1));margin-inline:auto}
 .pp .b-wide .note{grid-row:2}  /* its note in the right margin, under the picture's corner */
 .pp .row{display:flex;gap:var(--g);align-items:flex-start}.pp .row .m{flex:1 1 0;min-width:0}
 .pp .b-full{display:block}.pp .b-full .fcap{margin-top:10px}
