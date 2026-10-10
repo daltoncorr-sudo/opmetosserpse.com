@@ -217,9 +217,9 @@ def ink_filters():
 def page(site, title, desc, path, body, og_image=None, current=None, extra_head='', main_cls='', header=True, og_type='website'):
     url = 'https://%s%s' % (site['domain'], path)
     og = og_image or '/media/site/og.jpg'
-    # No menu bar. Inner pages carry only the hand and the name, centered, back to the cover.
-    header = '' if path == '/' or not header else ('<header class="site-header"><a class="lockup" href="/" aria-label="Opmet Osserpse">%s%s</a></header>'
-                                     % (brand_svg('hand-mark.svg', 'lockup-hand'), brand_svg('wordmark.svg', 'wordmark ink')))
+    # No menu bar. Inner pages carry only the hand and the name (live text, in Opmet Serif), centered, back to the cover.
+    header = '' if path == '/' or not header else ('<header class="site-header"><a class="lockup" href="/">%s<span class="wordmark ink">%s</span></a></header>'
+                                     % (brand_svg('hand-mark.svg', 'lockup-hand'), esc(site['name'])))
     # Which way the page flips: forward onto a project, back onto home
     page_cls = ' class="page-home"' if path == '/' else ' class="page-project"' if path.startswith('/projects/') and path != '/projects/' else ''
     nav = header
@@ -246,6 +246,7 @@ def page(site, title, desc, path, body, og_image=None, current=None, extra_head=
 <link rel="preload" href="/fonts/libre-caslon-text/libre-caslon-text-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/fonts/instrument-sans/instrument-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/fonts/source-serif-4/source-serif-4-italic-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/opmet-serif/opmet-serif-title.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/css/site.css?v=%(v)s">
 %(extra)s</head>
 <body>
@@ -626,11 +627,13 @@ NAME = ('Opmet', 'Osserpse')
 
 def masthead(words, hand, hook='', line=None, link=None, last_attr=''):
     """One nameplate, for the Journal (design v2) and every project page: the words in the big type, one a line, each
-    centered, the hand just right of the last word (outside the centering), all one link to the studio home. Under it,
-    the Journal's small line, or a project's All work. hook: how the panels on home take the link (data-studio slides
-    the Journal's panel back to the cover; data-cover closes a project to the cover); without it, a plain link to /."""
-    first = ' '.join('<span>%s</span>' % esc(x) for x in words[:-1])
-    last = '<span class="mast-last"><span class="mast-word"%s>%s</span>%s</span>' % (last_attr, esc(words[-1]), hand)
+    centered, the hand just right of the last word (outside the centering), all one link to the studio home. The name
+    is set in Opmet Serif (.mast-os); a word it has no letters for yet ("Journal") keeps the bold serif. Under it, the
+    Journal's small line, or a project's All work. hook: how the panels on home take the link (data-studio slides the
+    Journal's panel back to the cover; data-cover closes a project to the cover); without it, a plain link to /."""
+    word = lambda x: '<span class="mast-os">%s</span>' % esc(x) if x in NAME else esc(x)
+    first = ' '.join('<span>%s</span>' % word(x) for x in words[:-1])
+    last = '<span class="mast-last"><span class="mast-word"%s>%s</span>%s</span>' % (last_attr, word(words[-1]), hand)
     under = '<p class="journal-line">%s</p>' % typo(line) if line else ''
     if link: under += '<p class="mast-link"><a class="ctl" href="%s" data-all-work>%s</a></p>' % (link[0], ctl(link[1]))
     return '<header class="mast"><a class="mast-name" href="/"%s>%s %s</a>%s</header>' % (hook, first, last, under)
@@ -932,9 +935,10 @@ def main():
           '<link rel="canonical" href="https://%s/journal/"><meta http-equiv="refresh" content="0; url=/journal/">'
           '<meta name="robots" content="noindex"><script>location.replace("/journal/")</script></head>'
           '<body><p><a href="/journal/">%s</a></p></body></html>\n' % (esc(jtitle), site['domain'], esc(jw['title'])))
-    cover = ('<section class="cover"><div class="cover-inner"><h1><span class="mark" %s>%s</span><span class="name ink">%s<span class="name-text">Opmet Osserpse</span></span></h1>'
+    # The hand and the name: the name is live text in Opmet Serif (static/fonts/opmet-serif/opmet-serif-title.woff2)
+    cover = ('<section class="cover"><div class="cover-inner"><h1><span class="mark" %s>%s</span><span class="name ink">%s</span></h1>'
              '<nav class="cover-nav" aria-label="Site">%s</nav></div></section>') % (
-        moves.mark_attrs(mv), hand + mv['layers'], brand_svg('wordmark.svg', 'wordmark'), nav)
+        moves.mark_attrs(mv), hand + mv['layers'], esc(site['name']), nav)
     body = ('<div class="stage-clip"><div class="stage" data-stage>%s<div class="panel home-panel">%s<div data-home>%s%s</div></div>%s</div></div>'
             '<section class="project-panel" id="project" aria-label="Project"><div class="project-inner"></div></section>') % (
         foundry, blog, cover, work_section(items, h['work']), about_panel)

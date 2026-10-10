@@ -7,8 +7,11 @@
 @font-face{font-family:"Instrument Sans";font-style:normal;font-weight:400;font-display:swap;src:url(../fonts/instrument-sans/instrument-sans-latin-ext-400-normal.woff2) format("woff2");unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+1E00-1E9F,U+A720-A7FF}
 @font-face{font-family:"Instrument Sans";font-style:italic;font-weight:400;font-display:swap;src:url(../fonts/instrument-sans/instrument-sans-latin-400-italic.woff2) format("woff2")}
 @font-face{font-family:"Instrument Sans";font-style:italic;font-weight:400;font-display:swap;src:url(../fonts/instrument-sans/instrument-sans-latin-ext-400-italic.woff2) format("woff2");unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+1E00-1E9F,U+A720-A7FF}
-/* The foundry: Opmet Serif cut to O and a only (it isn't released). Source Serif 4 italic: the controls' face, for its
-   weight axis (the hover sweep), standing in until Opmet Serif has capitals */
+/* Opmet Serif (it isn't released), from its newest build (v48), each file cut to the letters it sets, weight axis kept:
+   the name ("Opmet Osserpse", the italic: the cover, the masthead, the inner pages' header) and the foundry's O and a
+   (the upright). Source Serif 4 italic: the controls' face, for its weight axis (the hover sweep), standing in until
+   Opmet Serif has capitals */
+@font-face{font-family:"Opmet Serif Title";font-style:italic;font-weight:100 900;font-display:block;src:url(../fonts/opmet-serif/opmet-serif-title.woff2) format("woff2")}
 @font-face{font-family:"Opmet Serif Oa";font-style:normal;font-weight:100 900;font-display:block;src:url(../fonts/opmet-serif/opmet-serif-oa.woff2) format("woff2")}
 @font-face{font-family:"Source Serif 4";font-style:italic;font-weight:200 900;font-display:swap;src:url(../fonts/source-serif-4/source-serif-4-italic-latin.woff2) format("woff2")}
 @font-face{font-family:"Instrument Sans";font-style:normal;font-weight:500;font-display:swap;src:url(../fonts/instrument-sans/instrument-sans-latin-500-normal.woff2) format("woff2")}
@@ -37,6 +40,9 @@
   --mh:clamp(48px,6.5vw,96px); --mast-top:clamp(40px,9vh,104px);
   /* Placeholder for the bold face: the serif at 700 (synthesized) until the custom font arrives */
   --bold-font:var(--serif); --bold-weight:700;
+  /* The name, Opmet Osserpse, in Opmet Serif's italic: Medium on the cover and in the inner pages' header (the
+     wordmark's style and weight), Bold in the masthead (the masthead's weight) */
+  --title-font:"Opmet Serif Title",var(--serif); --title-weight:500; --mast-name-weight:700;
   /* Controls: one face and size for every list link, toggle and filter; pure black only for the chosen filter */
   --ctl-font:"Source Serif 4",var(--serif); --ctl-size:clamp(17px,1.35vw,20px); --black:#000;
 }
@@ -95,7 +101,7 @@ ul{list-style:none;margin:0;padding:0}
 .site-header{position:relative;display:flex;justify-content:center;padding:28px var(--gutter) 0}
 .lockup{display:flex;align-items:flex-end;gap:13px;color:var(--ink)}
 .lockup-hand{display:block;height:42px;width:auto}
-.lockup .wordmark{display:block;width:168px;height:auto;margin-bottom:4px}
+.lockup .wordmark{display:block;margin-bottom:4px;font:italic var(--title-weight) calc(168px / 6.9)/1.17 var(--title-font);white-space:nowrap}
 main{padding:0 var(--gutter);flex:1}
 
 /* Home: a stage of three panels. The foundry is one screen to the left of home, About one screen to the right. */
@@ -125,14 +131,16 @@ html.is-locked{overflow:hidden}
 .journal-page{width:100%}
 @media (max-width:599px){.journal{padding:0 var(--gutter)}}  /* phones: the year sits in the list's own margin */
 /* The masthead: one component (build.py masthead()), on the Journal and on every project page. Its words one a line,
-   each centered, in the About page's big type, bigger; the hand just right of the last word, outside the centering:
-   the writing hand beside "Journal" (static for now; [data-journal-hand] and [data-journal-word] are kept as hooks),
-   the studio's hand mark beside "Osserpse" on a project page. It links to the studio home. Under it, the Journal's
-   small line in the serif italic, or a project's All work. */
+   each centered, in the About page's big type, bigger, the name (Opmet, Osserpse) in Opmet Serif's italic; the hand
+   just right of the last word, outside the centering: the writing hand beside "Journal" (static for now;
+   [data-journal-hand] and [data-journal-word] are kept as hooks), the studio's hand mark beside "Osserpse" on a
+   project page. It links to the studio home. Under it, the Journal's small line in the serif italic, or a project's
+   All work. */
 .mast{padding-top:var(--mast-top);text-align:center}
 .mast .mast-name{display:block;width:max-content;max-width:100%;margin:0 auto;text-align:center;font-family:var(--bold-font);font-weight:var(--bold-weight);font-size:var(--mh);line-height:1.04;letter-spacing:-.01em;color:var(--ink)}
 .mast .mast-name:hover{color:var(--graphite)}
 .mast-name>span{display:block}
+.mast-os{font-family:var(--title-font);font-style:italic;font-weight:var(--mast-name-weight);letter-spacing:0}
 .mast-last{position:relative;width:max-content;margin:0 auto}
 .mast-word{display:inline-block}
 /* The hand: the writing hand's nib (its lower left) at the end of the word, near the baseline. The hand mark sits in
@@ -240,10 +248,9 @@ html:not(.js) .stage:has(#about:target){transform:translateX(-66.6667%)}
 .cover .mark{position:relative;display:block;flex:none;height:var(--hand-h);width:var(--hand-w);transform-origin:50% 96%}
 .cover .hand{display:block;width:100%;height:100%}
 .cover .pose{position:absolute;left:0;top:0;width:100%;height:auto;opacity:0}
-.cover .name{position:relative;display:block;color:var(--ink);line-height:0;--wm-w:clamp(230px,33vw,560px)}
-.cover .name .wordmark{display:block;width:var(--wm-w);height:auto}
-/* The name as live, selectable text, laid over the wordmark drawing (the Opmet Serif web font isn't on the site yet) */
-.name-text{position:absolute;left:0;right:0;top:0;bottom:0;display:flex;align-items:center;justify-content:center;color:transparent;font:italic 400 calc(var(--wm-w) / 7.6)/1 var(--serif);white-space:nowrap;letter-spacing:.01em}
+/* The name: live text in Opmet Serif's Medium Italic (the wordmark's style and weight), as wide as the wordmark was
+   (--wm-w: the name is 6.9em at that weight) and in a box as tall (1.17em) */
+.cover .name{display:block;color:var(--ink);--wm-w:clamp(230px,33vw,560px);font:italic var(--title-weight) calc(var(--wm-w) / 6.9)/1.17 var(--title-font);white-space:nowrap}
 .cover-nav{display:flex;flex-wrap:wrap;justify-content:center;gap:var(--s1) var(--s4);margin:var(--s4) 0 0}
 /* The hand on the cover. Each move lives in its own folder under moves/; build.py gathers them into /css/moves.css. */
 @keyframes arrive{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
