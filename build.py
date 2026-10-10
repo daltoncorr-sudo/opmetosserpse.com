@@ -611,13 +611,13 @@ def article_body(blocks):
     return ''.join(out)
 
 def article(e, w):
-    """One post, under the masthead: All articles (back to the list), then the date and topic, the title and the text.
+    """One post, under the masthead: All articles (back to the list) and Home beside it (D, Oct. 10), then the date and topic, the title and the text.
     The text's pictures open in the site lightbox (data-lightbox)."""
     when = '<time datetime="%s">%s</time>' % (e['date'], ap_date(e['_date'])) if e['_date'] else ''
     meta = '<p class="article-meta">%s%s</p>' % (when, ''.join('<span>%s</span>' % esc(t) for t in e['tags']))
-    return ('<p class="journal-all"><a class="ctl" href="/journal/" data-all>%s</a></p>'
+    return ('<p class="journal-all"><a class="ctl" href="/journal/" data-all>%s</a> <a class="ctl" href="/" data-studio>%s</a></p>'
             '<article class="article"><header class="article-head">%s<h1 tabindex="-1">%s</h1></header>'
-            '<div class="article-body" data-lightbox>%s</div></article>') % (ctl(w['all']), meta, typo(e['title']), article_body(e['blocks']))
+            '<div class="article-body" data-lightbox>%s</div></article>') % (ctl(w['all']), ctl(w['back']), meta, typo(e['title']), article_body(e['blocks']))
 
 # The hand just right of the masthead's last word. On the Journal, the writing hand (static/brand/writing-hand.svg); if
 # that file is ever removed, the hand mark stands in, turned to write. A hook for the later "write Journal" move:
