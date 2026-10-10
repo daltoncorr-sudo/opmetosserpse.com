@@ -10,7 +10,7 @@
   },
   {
    "label": "Seal and signature",
-   "starts_at": "sb-04-seal-01-16x9",
+   "starts_at": "SB-Monogram-Circle-Green",
    "src": "system[1], system[2]"
   },
   {
@@ -20,7 +20,7 @@
   },
   {
    "label": "Into the world",
-   "starts_at": "sb-12-bible-01-16x9",
+   "starts_at": "sb-12-bible-page-01",
    "src": "work[2]"
   }
  ],
@@ -32,21 +32,153 @@
   },
   "sb-05-signature-02-16x9": {
    "rest": 4.5,
-   "sound": false
+   "sound": false,
+   "loop": true
   },
   "sb-14-film-01-9x16": {
    "rest": "end",
    "sound": true
   }
  },
- "hide": [
-  "The hand-drawn open book in Library Green on vellum.",
-  "The book at three sizes: hero, digital and tiny.",
-  "The seal in black line on white: the book, the name round the ring and “For readers and writers.”",
-  "The signature in green script on vellum.",
-  "The stacked logo in ink on white.",
-  "The seal with its construction circles.",
-  "The Sunny’s Journal & Press stamp, half inked.",
-  "Brand Bible page: color."
+ "hide": [],
+ "hide_src": "D, Oct. 10, 2026: the page's own media list (below) replaces the hide list; the eight repeats it hid stay out, with the rest D cut.",
+ "media_src": "D, Oct. 10, 2026 (his picks at Checkpoint 3): the signature film first, looping, resting on its finished script; then the hero film; the seal as cut-outs in one row (content/media/sunnys-bookshop/, copied from the asset inbox: D's final package, Final Assets/Logos); the announcement film where the signature film was, playing once; two or three pages from each study; a few pieces from the package; the Brand Bible's first two pages, without the full-bleed cover.",
+ "media": [
+  {
+   "src": "media/sunnys-bookshop/sb-05-signature-02-16x9.mp4"
+  },
+  {
+   "src": "media/sunnys-bookshop/sb-00-hero-01-16x9.mp4"
+  },
+  {
+   "src": "images/design/sunnys-bookshop/sb-03-book-01-16x9-2400.jpg"
+  },
+  {
+   "src": "images/design/sunnys-bookshop/sb-03-book-02-4x5-2400.jpg"
+  },
+  {
+   "src": "images/design/sunnys-bookshop/sb-03-book-03-4x5-2400.jpg"
+  },
+  {
+   "src": "content/media/sunnys-bookshop/SB-Monogram-Circle-Green.png",
+   "alt": "The SB monogram in the seal’s two rings, in Library Green.",
+   "cut": "small",
+   "row": "seal"
+  },
+  {
+   "src": "content/media/sunnys-bookshop/SB-Logo-Hero-Seal-Green.png",
+   "alt": "The seal with the hand-drawn book, in Library Green.",
+   "cut": "large",
+   "row": "seal"
+  },
+  {
+   "src": "content/media/sunnys-bookshop/SB-Logo-Digital-Seal-Black.png",
+   "alt": "The seal with the simplified book, in black.",
+   "cut": "medium",
+   "row": "seal"
+  },
+  {
+   "src": "media/sunnys-bookshop/sb-14-film-01-9x16.mp4"
+  },
+  {
+   "src": "images/design/sunnys-bookshop/sb-06-system-01-16x9-2400.jpg"
+  },
+  {
+   "src": "images/design/sunnys-bookshop/sb-06-system-02-4x5-2400.jpg"
+  },
+  {
+   "src": "images/design/sunnys-bookshop/sb-07-type-01-16x9-2400.jpg"
+  },
+  {
+   "src": "images/design/sunnys-bookshop/sb-07-colour-02-16x9-2400.jpg"
+  },
+  {
+   "src": "images/design/sunnys-bookshop/sb-08-journal-01-4x5-2400.jpg"
+  },
+  {
+   "src": "images/design/sunnys-bookshop/sb-08-journal-02-4x5-2400.jpg"
+  },
+  {
+   "src": "images/design/sunnys-bookshop/sb-10-studies-page-06-1600.webp",
+   "alt": "The studies, page 3: Bookseller tickets II: Britain, Europe, America.",
+   "row": "studies-research"
+  },
+  {
+   "src": "images/design/sunnys-bookshop/sb-10-studies-page-09-1600.webp",
+   "alt": "The studies, page 6: Trademarks & symbols.",
+   "row": "studies-research"
+  },
+  {
+   "src": "images/design/sunnys-bookshop/sb-10-studies-page-15-1600.webp",
+   "alt": "The studies, page 12: From sketch to solid.",
+   "row": "studies-book"
+  },
+  {
+   "src": "images/design/sunnys-bookshop/sb-10-studies-page-18-1600.webp",
+   "alt": "The studies, page 15: Book variations III: solid and distance.",
+   "row": "studies-book"
+  },
+  {
+   "src": "images/design/sunnys-bookshop/sb-10-studies-page-23-1600.webp",
+   "alt": "The studies, page 20: The book, sketchbook.",
+   "row": "studies-book"
+  },
+  {
+   "src": "images/design/sunnys-bookshop/sb-10-studies-page-24-1600.webp",
+   "alt": "The studies, page 21: Signature studies I.",
+   "row": "studies-signature"
+  },
+  {
+   "src": "images/design/sunnys-bookshop/sb-10-studies-page-27-1600.webp",
+   "alt": "The studies, page 24: The S.",
+   "row": "studies-signature"
+  },
+  {
+   "src": "images/design/sunnys-bookshop/sb-10-studies-page-32-1600.webp",
+   "alt": "The studies, page 29: The pen path.",
+   "row": "studies-signature"
+  },
+  {
+   "src": "images/design/sunnys-bookshop/sb-10-studies-page-33-1600.webp",
+   "alt": "The studies, page 30: The serif monogram.",
+   "row": "studies-seal"
+  },
+  {
+   "src": "images/design/sunnys-bookshop/sb-10-studies-page-37-1600.webp",
+   "alt": "The studies, page 34: Half inked.",
+   "row": "studies-seal"
+  },
+  {
+   "src": "images/design/sunnys-bookshop/sb-11-assets-01-16x9-2400.jpg"
+  },
+  {
+   "src": "images/design/sunnys-bookshop/sb-11-sheets-page-02-2200.webp",
+   "alt": "Final delivery sheets, page 2: Identity.",
+   "row": "package"
+  },
+  {
+   "src": "images/design/sunnys-bookshop/sb-11-sheets-page-03-2200.webp",
+   "alt": "Final delivery sheets, page 3: Signature.",
+   "row": "package"
+  },
+  {
+   "src": "images/design/sunnys-bookshop/sb-12-bible-page-01-1600.webp",
+   "alt": "The Brand Bible, page 1: Cover.",
+   "row": "bible"
+  },
+  {
+   "src": "images/design/sunnys-bookshop/sb-12-bible-page-02-1600.webp",
+   "alt": "The Brand Bible, page 2: Welcome.",
+   "row": "bible"
+  },
+  {
+   "src": "images/design/sunnys-bookshop/sb-13-world-01-16x9-2400.jpg"
+  },
+  {
+   "src": "images/design/sunnys-bookshop/sb-13-world-02-4x5-2400.jpg"
+  },
+  {
+   "src": "images/design/sunnys-bookshop/sb-13-world-03-4x5-2400.jpg"
+  }
  ]
 }
