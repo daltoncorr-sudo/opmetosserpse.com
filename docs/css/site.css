@@ -171,6 +171,15 @@ html.is-locked{overflow:hidden}
    same left edge (D, Oct. 10). The writing hand stays just right of Journal, outside the block. */
 .journal .mast{width:max-content;max-width:100%;margin-left:auto;margin-right:auto;text-align:left}
 .journal .mast .mast-name,.journal .mast-last{margin-left:0;margin-right:0;text-align:left}
+/* With an article open (its own page, or read in the list), the masthead is small, like a project page's nameplate
+   (D, Oct. 10): the writing hand to the left of the three words, which stay left-justified, the block centered, no
+   line under it. Opening or closing an article sets .is-reading (site.js, inside holdList(), so the list doesn't jump; build.py on an article's own page). */
+.journal.is-reading .mast{--mh:clamp(22px,2.2vw,30px);padding-top:clamp(28px,5vh,56px)}
+.journal.is-reading .mast-name{display:grid;grid-template-columns:auto auto;column-gap:.24em;align-items:end}
+.journal.is-reading .mast-name>span,.journal.is-reading .mast-word{grid-column:2}
+.journal.is-reading .mast-last{display:contents}
+.journal.is-reading .mast-hand{position:static;grid-column:1;grid-row:1/span 3;align-self:end;height:2.4em;margin-bottom:.16em}
+.journal.is-reading .journal-line{display:none}
 /* An article: All articles about 40px under the masthead; the date and topic in small sans, the title in bold, then the
    text at the measure with a margin to its right (about 260px) for handwritten notes. */
 .journal-all{margin:40px 0 0;text-align:center}
