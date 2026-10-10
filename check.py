@@ -8,7 +8,7 @@ import glob, json, os, re, sys
 ROOT = os.path.dirname(os.path.abspath(__file__))
 D = os.path.join(ROOT, 'docs')
 ACRONYMS = {'ASCAP', 'BAFTA', 'NYU', 'IMGN', 'LLC', 'SVG', 'EPS', 'PNG', 'PDF', 'TCL', 'LOOK', 'BAM', 'SCL', 'HTML'}
-CHECKS = [(r'\bAI\b', 'the word "AI"'), (r'\bvibes?\b', '"vibes"'), (r'Opmetosserpse', 'the name written as one word'), (r'Dalton Corr', "Dalton's name outside the credits"),
+CHECKS = [(r'\bAI\b', 'the word "AI"'), (r'\bBlog\b', 'the word "Blog" (it is the Journal)'), (r'\bvibes?\b', '"vibes"'), (r'Opmetosserpse', 'the name written as one word'), (r'Dalton Corr', "Dalton's name outside the credits"),
           (r'\[D\?|\[DC|\[DB|TODO|Lorem|ipsum', 'a leftover note or placeholder'), (r'\b[A-Z]{4,}\b', 'a word in all caps')]
 
 # Bracketed placeholders, like "[Name to come]": flagged in a normal build, let through in a drafts build
@@ -16,6 +16,11 @@ CHECKS = [(r'\bAI\b', 'the word "AI"'), (r'\bvibes?\b', '"vibes"'), (r'Opmetosse
 # placeholders by design until the photographs exist.
 BRACKETS = r'\[[A-Z][^\]<>\n]{0,60}\]'
 ALLOWED = set()
+
+# The 14 posts imported from daltoncorr.com: removed on Oct. 10, 2026, and never to come back
+OLD_POSTS = ['sigils-in-the-grid', 'venice-food-tramps', 'venice-as-sacred-ground', 'line-and-gesture', 'dada-as-spell-casting',
+             'color-as-landscape', 'color-theory-as-divination', 'folk-magic-and-textile-art', 'a-conversation-with-light',
+             'rooftop-color', 'the-alchemy-of-printmaking', 'the-death-of-touch', 'this-was-the-dream', 'dreams-as-design-briefs']
 
 problems = []
 if not os.path.isdir(D):
@@ -35,20 +40,22 @@ for f in glob.glob(D + '/**/*.html', recursive=True):
     t2 = re.sub(r'<dl class="cr">[\s\S]*?</dl>', lambda m: m.group(0).replace('Dalton Corr, Opmet Osserpse', 'Opmet Osserpse'), t)
     strip = lambda h: re.sub(r'<[^>]+>', ' ', re.sub(r'<(script|style|svg)[\s\S]*?</\1>', ' ', h))
     text = strip(t2)
-    # All caps is allowed in editorial writing: the paragraphs of an article are left out of that one check
+    # "AI" and all caps are allowed in editorial writing: the body of a Journal article is left out of those two checks,
+    # and only that. Everywhere else on the site (work pages, home, the Journal's own chrome) they still fail.
     plain = strip(re.sub(r'<div class="article-body">[\s\S]*?</div>', ' ', t2))
     if not drafts:
         bare = strip(re.sub(r'<div class="fd-img" data-placeholder[^>]*>[^<]*</div>', ' ', t))
         problems += ['%s: a bracketed placeholder (%s)' % (rel, m.group(0)) for m in re.finditer(BRACKETS, bare) if m.group(0) not in ALLOWED]
     for pat, why in CHECKS:
-        for m in re.finditer(pat, plain if why == 'a word in all caps' else text):
+        for m in re.finditer(pat, plain if why in ('a word in all caps', 'the word "AI"') else text):
             if why == 'a word in all caps' and m.group(0) in ACRONYMS:
                 continue
             problems.append('%s: %s (%s)' % (rel, why, m.group(0)))
-    # Every blog row links to a page that exists
+    # Every Journal row links to a page that exists; the old imported posts are gone for good
     for slug in re.findall(r'<li class="work-row[^"]*" data-slug="([^"]+)"', t):
-        if not os.path.exists(os.path.join(D, 'blog', slug + '.html')):
-            problems.append('%s: the blog row %s has no page' % (rel, slug))
+        if not os.path.exists(os.path.join(D, 'journal', slug + '.html')):
+            problems.append('%s: the Journal row %s has no page' % (rel, slug))
+    problems += ['%s: an old imported post (%s)' % (rel, x) for x in OLD_POSTS if x in t]
 
 # Project pages (v02): alt text, no looping video, notes and chapters within limits, media order, project order
 import html as H, json
@@ -93,16 +100,25 @@ for page_, pat in (('index.html', r'class="work-row[^"]*" data-project="([^"]+)"
     t = open(os.path.join(D, page_), encoding='utf-8').read()
     got = [x for x in re.findall(r'data-project="([^"]+)"[^>]*>(?:<span class="yr">\d+</span>)?<a href', t)] if page_ == 'index.html' else re.findall(pat, t)
     if got != order: problems.append('%s: the project list does not follow project_order' % page_)
-# The blog: every post in blog.json has its page, and every article page is in the sitemap
-blog = os.path.join(ROOT, 'content', 'blog.json')
+# The Journal: every published post has its page and is in the sitemap; a draft has neither (in a drafts build its
+# page is a preview, never shipped); /journal/ is in the sitemap once a post is published; /blog/ sends to /journal/
+journal = json.load(open(os.path.join(ROOT, 'content', 'journal.json'), encoding='utf-8'))
 sitemap = open(os.path.join(D, 'sitemap.xml'), encoding='utf-8').read() if os.path.exists(os.path.join(D, 'sitemap.xml')) else ''
-if os.path.exists(blog):
-    for e in json.load(open(blog, encoding='utf-8'))['posts']:
-        if not os.path.exists(os.path.join(D, 'blog', e['slug'] + '.html')):
-            problems.append('blog.json: %s has no page in docs/blog/' % e['slug'])
-for f in glob.glob(D + '/blog/*.html'):
-    u = '/blog/' + os.path.basename(f)[:-5]
-    if '<loc>https://opmetosserpse.com%s</loc>' % u not in sitemap:
-        problems.append('sitemap.xml: %s is missing' % u)
+loc = lambda u: '<loc>https://opmetosserpse.com%s</loc>' % u in sitemap
+live = [e for e in journal['posts'] if not e.get('draft')]
+for e in journal['posts']:
+    built = os.path.exists(os.path.join(D, 'journal', e['slug'] + '.html'))
+    if not e.get('draft') and not built: problems.append('journal.json: %s has no page in docs/journal/' % e['slug'])
+    if e.get('draft') and built and not drafts: problems.append('docs/journal/%s.html: a draft was built' % e['slug'])
+    if e.get('draft') and loc('/journal/' + e['slug']): problems.append('sitemap.xml: the draft %s is listed' % e['slug'])
+for e in live:
+    if not loc('/journal/' + e['slug']): problems.append('sitemap.xml: /journal/%s is missing' % e['slug'])
+if live != [] and not loc('/journal/'): problems.append('sitemap.xml: /journal/ is missing')
+if not live and loc('/journal/'): problems.append('sitemap.xml: /journal/ is listed with nothing published')
+if not os.path.exists(os.path.join(D, 'journal', 'index.html')): problems.append('docs/journal/index.html is missing')
+stub = os.path.join(D, 'blog', 'index.html')
+if not (os.path.exists(stub) and 'url=/journal/' in open(stub, encoding='utf-8').read()): problems.append('docs/blog/index.html does not send to /journal/')
+problems += ['docs/blog/: an old page is still there (%s)' % os.path.basename(f) for f in glob.glob(D + '/blog/*.html') if not f.endswith('index.html')]
+problems += ['sitemap.xml: an old /blog/ address' for _ in [0] if '/blog/' in sitemap]
 print('\n'.join(sorted(set(problems))) or 'All clear: no broken links and no house-style problems%s.' % (' (a drafts build: placeholders let through)' if drafts else ''))
 sys.exit(1 if problems else 0)
