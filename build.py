@@ -374,10 +374,10 @@ def block_html(b, slug):
     return '<figure class="b g b-%s%s%s"%s>%s%s</figure>' % (kind, ' b-cont' if b.get('cont') else '', ' b-wide' if b.get('wide') else '',
                                                            ' data-read' if cap_ else '', media, fc)
 
-def project_body(p, blocks, chapters, notes, back='Back', home='Home', all_work='All work', top='Back to top'):
-    """Back and Home under the name; the title; under it the paragraph, and one list of facts and credits. Then the
-    work, centered, with chapter labels in the left margin and notes in the right one. At the end: Back to top and
-    All work. No next project."""
+def project_body(p, blocks, chapters, notes, all_work='All work'):
+    """The masthead (the Journal's, without "Journal": Opmet and Osserpse with the hand mark, to the studio home) and
+    All work under it; the title; under it the paragraph, and one list of facts and credits. Then the work, centered,
+    with chapter labels in the left margin and notes in the right one. At the end, All work again. No next project."""
     facts = [('Client', typo(p['client'])), ('Year', esc(p['year']))]
     if notes.get('work'): facts.append(('Work', typo(notes['work'])))
     facts.append(('Role', typo(p['role'])))
@@ -388,7 +388,7 @@ def project_body(p, blocks, chapters, notes, back='Back', home='Home', all_work=
     dl = lambda xs, cls: '<dl class="%s">%s</dl>' % (cls, ''.join('<div><dt>%s</dt><dd>%s</dd></div>' % x for x in xs))
     # data-page-only: a page with a 3D or interactive piece opens as its own page from home, so its scripts run
     out = ['<div class="pp"%s>' % (' data-page-only' if p.get('_scripts') else ''),
-           '<nav class="pnav" aria-label="Back"><a href="/#work" data-back>%s</a><a href="/">%s</a></nav>' % (esc(back), esc(home)),
+           masthead(list(NAME), studio_hand(), ' data-cover', link=('/#archive', all_work)),
            '<section class="open g">%s<h1>%s</h1><p class="lede">%s</p><div class="info">%s%s</div></section>' % (
                '<p class="kicker">%s</p>' % typo(notes['kicker']) if notes.get('kicker') else '', typo(p['title']), typo(notes.get('lede') or p['lede']), dl(facts, 'facts'), dl(credits, 'cr'))]
     starts = {c['starts_at']: c for c in chapters}
@@ -408,7 +408,7 @@ def project_body(p, blocks, chapters, notes, back='Back', home='Home', all_work=
                        % (' ch-above' if b['kind'] == 'full' or b.get('wide') else '', esc(c['label']), n, typo(c['label'])))
         out.append(block_html(b, p['slug']))
     if open_ch: out.append('</section>')
-    out.append('<nav class="g pfoot" aria-label="More"><a href="#main" data-totop>%s</a><a href="/#archive">%s</a></nav>' % (esc(top), esc(all_work)))
+    out.append('<nav class="g pfoot" aria-label="%s"><a class="ctl" href="/#archive" data-all-work>%s</a></nav>' % (esc(all_work), ctl(all_work)))
     out.append('</div>')
     return '\n'.join(out)
 
@@ -610,21 +610,36 @@ def article(e, w):
             '<article class="article"><header class="article-head">%s<h1 tabindex="-1">%s</h1></header>'
             '<div class="article-body" data-lightbox>%s</div></article>') % (ctl(w['all']), meta, typo(e['title']), article_body(e['blocks']))
 
-# The hand beside "Journal" in the masthead: the writing hand (static/brand/writing-hand.svg, pending D's OK); if that
-# file is ever removed, the hand mark stands in, turned to write. A hook for the later "write Journal" move:
-# [data-journal-hand] is the hand, [data-journal-word] the word it writes.
+# The hand just right of the masthead's last word. On the Journal, the writing hand (static/brand/writing-hand.svg); if
+# that file is ever removed, the hand mark stands in, turned to write. A hook for the later "write Journal" move:
+# [data-journal-hand] is the hand, [data-journal-word] the word it writes. On a project page, the studio's hand mark,
+# upright, in the same place beside "Osserpse" (pending D's OK).
 def journal_hand():
     pose = 'writing' if os.path.exists(os.path.join(ROOT, 'static', 'brand', 'writing-hand.svg')) else 'stand-in'
-    art = brand_svg('writing-hand.svg' if pose == 'writing' else 'hand-mark.svg', 'journal-hand-art')
-    return '<span class="journal-hand" data-journal-hand data-pose="%s" aria-hidden="true">%s</span>' % (pose, art)
+    art = brand_svg('writing-hand.svg' if pose == 'writing' else 'hand-mark.svg', 'mast-hand-art')
+    return '<span class="mast-hand" data-journal-hand data-pose="%s" aria-hidden="true">%s</span>' % (pose, art)
 
-def masthead(w, panel=False):
-    """The Journal's nameplate (design v2): Opmet, Osserpse, Journal, one word a line, in the About page's big type, the
-    hand writing the last word; then a small line. It links to the studio home."""
-    home = ' data-studio' if panel else ''  # in the panel above home, it slides back to the cover
-    return ('<header class="journal-mast"><a class="journal-name" href="/"%s><span>Opmet</span> <span>Osserpse</span> '
-            '<span class="journal-last"><span class="journal-word" data-journal-word>%s</span>%s</span></a>'
-            '<p class="journal-line">%s</p></header>') % (home, esc(w['title']), journal_hand(), typo(w['line']))
+def studio_hand():
+    return '<span class="mast-hand" data-pose="mark" aria-hidden="true">%s</span>' % brand_svg('hand-mark.svg', 'mast-hand-art')
+
+NAME = ('Opmet', 'Osserpse')
+
+def masthead(words, hand, hook='', line=None, link=None, last_attr=''):
+    """One nameplate, for the Journal (design v2) and every project page: the words in the big type, one a line, each
+    centered, the hand just right of the last word (outside the centering), all one link to the studio home. Under it,
+    the Journal's small line, or a project's All work. hook: how the panels on home take the link (data-studio slides
+    the Journal's panel back to the cover; data-cover closes a project to the cover); without it, a plain link to /."""
+    first = ' '.join('<span>%s</span>' % esc(x) for x in words[:-1])
+    last = '<span class="mast-last"><span class="mast-word"%s>%s</span>%s</span>' % (last_attr, esc(words[-1]), hand)
+    under = '<p class="journal-line">%s</p>' % typo(line) if line else ''
+    if link: under += '<p class="mast-link"><a class="ctl" href="%s" data-all-work>%s</a></p>' % (link[0], ctl(link[1]))
+    return '<header class="mast"><a class="mast-name" href="/"%s>%s %s</a>%s</header>' % (hook, first, last, under)
+
+def journal_mast(w, panel=False):
+    """The Journal's: Opmet, Osserpse, Journal and the writing hand, then its line. In the panel above home it slides
+    back to the cover."""
+    return masthead(list(NAME) + [w['title']], journal_hand(), ' data-studio' if panel else '', line=w['line'],
+                    last_attr=' data-journal-word')
 
 def blurb(s, n=155):
     """A search description: the first paragraph, trimmed at a word break."""
@@ -829,13 +844,14 @@ def main():
                 for n, rel in enumerate(bigs, 1):
                     full = os.path.join(DIST, rel.lstrip('/'))
                     z.write(full, '%s-%02d%s' % (s, n, os.path.splitext(full)[1]))
-        body = project_body(p, p['_blocks'], p['_chapters'], p['_notes'], site['project_back'], site['back'], site['project_all'], site['project_top'])
+        body = project_body(p, p['_blocks'], p['_chapters'], p['_notes'], site['project_all'])
         head = ''
         if p['_scripts']:  # a page with a 3D or interactive piece: its styles and scripts, in order
             head = '<link rel="stylesheet" href="/css/work.css?v=%s">\n' % site['_v'] + ''.join(
                 '<script src="/js/%s?v=%s" defer></script>\n' % (n if n.startswith('vendor/') else 'work/' + n, site['_v'])
                 for n in dict.fromkeys(p['_scripts']))
-        write('/projects/%s.html' % s, page(site, p['seo']['title'], p['seo']['description'], '/projects/%s' % s, body, og, '/projects', extra_head=head))
+        write('/projects/%s.html' % s, page(site, p['seo']['title'], p['seo']['description'], '/projects/%s' % s, body, og, '/projects', extra_head=head,
+                                            header=False))  # the masthead, in the page, replaces the header
     os.makedirs(os.path.join(ROOT, '_review'), exist_ok=True)
     with open(os.path.join(ROOT, '_review', 'build-stats.json'), 'w', encoding='utf-8') as fh:
         json.dump(stats, fh, indent=1)
@@ -900,10 +916,10 @@ def main():
     empty_lines = '<div class="journal-empty">%s</div>' % ''.join('<p>%s</p>' % typo(x) for x in jw['lines'])
     listing = lambda cur=None: blog_section(posts, blog_tags, jw, cur) if posts else empty_lines
     blog = ('<section class="blog-panel journal" id="blog" aria-labelledby="blog-title" data-title="%s"><h2 class="vh" id="blog-title">%s</h2>%s'
-            '<div class="blog-article" data-article></div>%s</section>') % (esc(jtitle), esc(jw['title']), masthead(jw, True), listing())
+            '<div class="blog-article" data-article></div>%s</section>') % (esc(jtitle), esc(jw['title']), journal_mast(jw, True), listing())
     noindex = '' if posts else '<meta name="robots" content="noindex">\n'
     jpage = lambda inner, cur=None: '<div class="journal-page journal" data-journal data-title="%s">%s<div class="blog-article" data-article>%s</div>%s</div>' % (
-        esc(jtitle), masthead(jw), inner, listing(cur))
+        esc(jtitle), journal_mast(jw), inner, listing(cur))
     write('/journal/index.html', page(site, jtitle, jw['description'], '/journal/', jpage(''), so, header=False, extra_head=noindex, main_cls='journal-main'))
     # One page per post, so a reload or a shared link lands on the article (at its top) and still ends at the list
     for e in posts:

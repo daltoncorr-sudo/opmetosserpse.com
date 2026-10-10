@@ -93,8 +93,19 @@ for i, slug in enumerate(order):
     body = t.split('class="pp"', 1)[-1].split('class="g pfoot"', 1)[0]
     got = [H.unescape(k) for k in re.findall(r'data-i="([^"]+)"', body)]
     if got != want: problems.append('%s: media order differs from daltoncorr.com (%d items, expected %d)' % (rel, len(got), len(want)))
-    if 'Next project' in t: problems.append('%s: a "Next project" (pages end on Back to top and All work)' % rel)
-    if 'data-totop' not in t or 'href="/#archive"' not in t: problems.append('%s: no Back to top or All work at the end' % rel)
+    if 'Next project' in t: problems.append('%s: a "Next project" (pages end on All work)' % rel)
+    # The masthead (the Journal's component), linking home, with All work under it; All work at the end; no Back or Home
+    mast = re.search(r'<header class="mast"><a class="mast-name" href="/" data-cover>([\s\S]*?)</header>', t)
+    if not mast: problems.append('%s: no masthead linking home' % rel)
+    elif not re.search(r'<a class="ctl" href="/#archive" data-all-work>', mast.group(1)): problems.append('%s: no All work under the masthead' % rel)
+    if not re.search(r'class="g pfoot"[^>]*><a class="ctl" href="/#archive" data-all-work>', t): problems.append('%s: no All work at the end' % rel)
+    for m in re.finditer(r'<(a|button)\b[^>]*>([\s\S]*?)</\1>', t):
+        words = ' '.join(re.sub(r'<span class="ctl-w"[^>]*>[^<]*</span>', ' ', m.group(2)).split())
+        words = ' '.join(re.sub(r'<[^>]+>', ' ', words).split())
+        if words in ('Back', 'Home', 'Back to top'): problems.append('%s: a "%s" control (project pages have the masthead and All work)' % (rel, words))
+# All work resolves to the work list: /#archive opens the full list on home
+home_t = open(os.path.join(D, 'index.html'), encoding='utf-8').read()
+if not ('id="work"' in home_t and 'id="works"' in home_t and 'class="ctl archive-toggle"' in home_t): problems.append('index.html: no work list for All work (/#archive) to open')
 # the home list and the projects index list the pages in project_order
 for page_, pat in (('index.html', r'class="work-row[^"]*" data-project="([^"]+)"><?(?:span class="yr">\d+</span>)?<a href'),
                    ('projects/index.html', r'<li id="([^"]+)"><a href="/projects/')):

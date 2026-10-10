@@ -117,26 +117,32 @@ html.is-locked{overflow:hidden}
 /* The Journal (design v2, Oct. 10, 2026, centered at D's checkpoint), on its own pages and in the panel: a column of
    about 980px, centered. The masthead is centered; the list is centered like the work list (sized to its widest row),
    left-aligned inside, the year in its left margin; an article's text column is centered, its note margin to the right. */
-.journal{--col:980px;--yr-room:76px;--mh:clamp(48px,6.5vw,96px);--mast-top:clamp(40px,9vh,104px);--note-w:260px;--note-gap:56px;
+.journal{--col:980px;--yr-room:76px;--note-w:260px;--note-gap:56px;
   --text:calc(var(--measure) + var(--note-gap) + var(--note-w));
   --mast:calc(var(--mast-top) + var(--mh) * 3.12 + 46px);  /* the masthead's height: three lines of the name, then the line */
   padding:0 max(calc(var(--gutter) + var(--yr-room)),calc((100% - var(--col)) / 2));container-type:inline-size}
 .journal-main{padding:0}
 .journal-page{width:100%}
 @media (max-width:599px){.journal{padding:0 var(--gutter)}}  /* phones: the year sits in the list's own margin */
-/* The masthead: Opmet, Osserpse, Journal, one word a line, each centered, in the About page's big type, bigger; the
-   writing hand sits beside the last word, outside the centering (static for now; [data-journal-hand] and
-   [data-journal-word] are kept as hooks). Then one small line in the serif italic. To the studio home. */
-.journal-mast{padding-top:var(--mast-top);text-align:center}
-.journal-name{display:block;width:max-content;max-width:100%;margin:0 auto;text-align:center;font-family:var(--bold-font);font-weight:var(--bold-weight);font-size:var(--mh);line-height:1.04;letter-spacing:-.01em;color:var(--ink)}
-.journal-name>span{display:block}
-.journal-last{position:relative;width:max-content;margin:0 auto}
-.journal-word{display:inline-block}
-/* The writing hand: its nib (lower left) at the end of the word, near the baseline */
-.journal-hand{position:absolute;left:calc(100% + .04em);bottom:.06em;height:1.18em;line-height:0;pointer-events:none}
-.journal-hand-art{display:block;height:100%;width:auto}
-.journal-hand[data-pose="stand-in"]{height:1em;transform:rotate(-24deg);transform-origin:0 100%}
+/* The masthead: one component (build.py masthead()), on the Journal and on every project page. Its words one a line,
+   each centered, in the About page's big type, bigger; the hand just right of the last word, outside the centering:
+   the writing hand beside "Journal" (static for now; [data-journal-hand] and [data-journal-word] are kept as hooks),
+   the studio's hand mark beside "Osserpse" on a project page. It links to the studio home. Under it, the Journal's
+   small line in the serif italic, or a project's All work. */
+.mast{padding-top:var(--mast-top);text-align:center}
+.mast .mast-name{display:block;width:max-content;max-width:100%;margin:0 auto;text-align:center;font-family:var(--bold-font);font-weight:var(--bold-weight);font-size:var(--mh);line-height:1.04;letter-spacing:-.01em;color:var(--ink)}
+.mast .mast-name:hover{color:var(--graphite)}
+.mast-name>span{display:block}
+.mast-last{position:relative;width:max-content;margin:0 auto}
+.mast-word{display:inline-block}
+/* The hand: the writing hand's nib (its lower left) at the end of the word, near the baseline. The hand mark sits in
+   the same place, upright, a hair's breadth from the word */
+.mast-hand{position:absolute;left:calc(100% + .04em);bottom:.06em;height:1.18em;line-height:0;pointer-events:none}
+.mast-hand-art{display:block;height:100%;width:auto}
+.mast-hand[data-pose="stand-in"]{height:1em;transform:rotate(-24deg);transform-origin:0 100%}
+.mast-hand[data-pose="mark"]{left:calc(100% + .1em)}
 .journal-line{margin:18px 0 0;font:italic 400 20px/1.4 var(--serif);letter-spacing:.01em;color:var(--tag-gray)}
+.mast .mast-link{margin:var(--s3) 0 0}
 @media (max-width:599px){.journal-line{font-size:18px}}
 /* The list: the same list and behavior, with more air (masthead to label about 160px, label row to topics 48px, topics
    to the first title 64px), the label at the column's left edge. The list fills the screen below the masthead. */
@@ -314,10 +320,10 @@ html:not(.js) .stage:has(#about:target){transform:translateX(-66.6667%)}
   .fade{opacity:1}
 }
 
-/* A project page (v02): a 12-column grid. Back and Home under the name; the title, centered, in the serif; under it
-   the paragraph, and one list of facts and credits. Then the work in the eight middle columns, pictures from one
-   gallery in even rows; chapter labels in the left margin, notes in the right one, beside their picture. At the end,
-   Back to top and All work. Scoped to .pp, so home and the other pages can't change. Pictures never move. */
+/* A project page (v02): a 12-column grid. The masthead (the Journal's, see .mast) and All work under it; the title,
+   centered, in the serif; under it the paragraph, and one list of facts and credits. Then the work in the eight middle
+   columns, pictures from one gallery in even rows; chapter labels in the left margin, notes in the right one, beside
+   their picture. At the end, All work. Scoped to .pp, so home and the other pages can't change. Pictures never move. */
 .pp{--m:clamp(16px,2.8vw,40px);--g:clamp(12px,1.6667vw,24px);--u:56px;--U:120px;--t1:44px;--b:16px;--s:13px;
   --gray:#6B665E;--hair:rgba(22,21,18,.16);
   width:100%;font:400 var(--s)/1.45 var(--sans);color:var(--ink)}
@@ -326,9 +332,6 @@ html:not(.js) .stage:has(#about:target){transform:translateX(-66.6667%)}
 .pp figure,.pp h1,.pp h2,.pp p,.pp dl,.pp dd{margin:0}.pp h1,.pp h2{font-weight:400}
 .pp .ph{color:var(--gray);font-style:italic}
 .pp .g{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));column-gap:var(--g);padding:0 var(--m)}
-/* Back and Home under the name, set like the site's other options (the cover's links, See more) */
-.pp .pnav{display:flex;justify-content:center;gap:var(--s4);padding-top:10px;font:italic 400 clamp(17px,1.35vw,20px)/1.4 var(--serif);letter-spacing:.01em}
-.pp .pnav a,.pp .pfoot a{color:var(--ink)}.pp .pnav a:hover,.pp .pfoot a:hover{color:var(--graphite)}
 /* The opening: the title; under it, across the eight middle columns, the paragraph and one list */
 .pp .open{padding-top:48px;align-items:start}
 /* A line above the title, when a project has one ("20th Anniversary"), set as the title */
@@ -362,7 +365,7 @@ html:not(.js) .stage:has(#about:target){transform:translateX(-66.6667%)}
 .pp .note .again{display:block;margin-top:4px;font-style:italic;color:var(--ink);border-bottom:1px solid var(--hair);width:max-content}
 .pp .note .again[hidden]{display:none}
 /* The way out */
-.pp .pfoot{margin-top:var(--U);padding-bottom:120px;display:flex;justify-content:center;gap:var(--s4);font:italic 400 clamp(17px,1.35vw,20px)/1.4 var(--serif);letter-spacing:.01em}
+.pp .pfoot{margin-top:var(--U);padding-bottom:120px;display:flex;justify-content:center}
 /* Under 1100px the margins are too narrow for text. Chapter labels and notes are left out, and pictures widen
    (rows and landscape pictures to the full width). A film's Play links sit under it, on the right */
 @media (min-width:641px) and (max-width:1099px){

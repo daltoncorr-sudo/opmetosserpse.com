@@ -470,9 +470,12 @@
   });
 
   // A project opens as a screen below home. Its page is fetched once, its content dropped into the panel, and the view
-  // slides down to it; Back, Esc or the browser's back button slide up to the list exactly as it was. The address is the
-  // project's own, so a reload or a shared link simply opens the project page.
-  var pp = $('#project'), ppInner = $('.project-inner', pp), ppOpen = false, ppPushed = false, ppFrom = null, cache = {};
+  // slides down to it; Esc or the browser's back button slide up to the list exactly as it was. In the panel the
+  // masthead (data-cover) slides up to the cover, and All work (data-all-work, under the masthead and at the end) to
+  // the full list, centered; on a project page loaded by itself they are plain links to / and /#archive. The address
+  // is the project's own, so a reload or a shared link simply opens the project page.
+  //   ppThen: where closing leads: '' the list as it was, 'cover' the cover, 'archive' the full list
+  var pp = $('#project'), ppInner = $('.project-inner', pp), ppOpen = false, ppPushed = false, ppFrom = null, ppThen = '', cache = {};
   pp.inert = true;
   var projectOf = function (u) { var m = u && new URL(u, location.href).pathname.match(/^\/projects\/([^\/]+)$/); return m && m[1]; };
   function fetchProject(slug) {
@@ -491,14 +494,18 @@
     root.classList.toggle('is-locked', open);
     ppOpen = open; pp.inert = !open; home.inert = open;
     if (instant) { void pp.offsetWidth; stage.classList.remove('no-anim'); pp.classList.remove('no-anim'); }
-    if (open) { var b = $('[data-back]', pp); if (b) place(b); }
-    else {
-      document.title = homeTitle;
-      if (list.classList.contains('is-open') && location.hash !== '#archive') history.replaceState(history.state, '', location.pathname + location.search + '#archive');
-      var r = work.getBoundingClientRect();
-      if (r.bottom < 0 || r.top > innerHeight) centerWork(false);  // back onto the work list, wherever the project came from
-      if (ppFrom && animate) place(ppFrom);
-    }
+    if (open) { var b = $('.mast-name', pp); if (b) place(b); return; }
+    var then = ppThen; ppThen = '';
+    document.title = homeTitle;
+    if (then === 'cover') { toCover(); return; }
+    if (then === 'archive') setOpen(true, false);
+    if (list.classList.contains('is-open') && location.hash !== '#archive') history.replaceState(history.state, '', location.pathname + location.search + '#archive');
+    // Back onto the work list, as it was; centered if it's off screen (wherever the project came from), and always for
+    // All work, which lands on the full list
+    var r = work.getBoundingClientRect();
+    if (then === 'archive' || r.bottom < 0 || r.top > innerHeight) centerWork(false);
+    if (then === 'archive') place(work);
+    else if (ppFrom && animate) place(ppFrom);
   }
   function openProject(slug, animate, push) {
     return fetchProject(slug).then(function (p) {
@@ -509,9 +516,19 @@
       showProject(true, animate);
     }).catch(function () { location.href = '/projects/' + slug; });
   }
-  function closeProject() {
+  function closeProject(then) {
+    ppThen = then || '';
     if (ppPushed) history.back();  // popstate slides up
     else { history.replaceState(null, '', '/' + (list.classList.contains('is-open') ? '#archive' : '#work')); showProject(false, true); }
+  }
+  // The cover: the top of home, the address plain /, focus on the Work option. Stepping back in the history can make the
+  // browser restore that entry's scroll just after; hold the page at the top while it would.
+  function toCover() {
+    history.replaceState(history.state, '', location.pathname + location.search);
+    var hold = function () { if (window.scrollY) window.scrollTo(0, 0); };
+    hold(); window.addEventListener('scroll', hold);
+    setTimeout(function () { hold(); window.removeEventListener('scroll', hold); }, 400);
+    var w = $('[data-go="work"]'); if (w) place(w);
   }
   list.addEventListener('click', function (e) {
     var a = e.target.closest('.work-row a');
@@ -521,9 +538,8 @@
   });
   pp.addEventListener('click', function (e) {
     var a = e.target.closest('a'); if (!a || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button) return;
-    if (a.hasAttribute('data-back') || a.getAttribute('href') === '/#work') { e.preventDefault(); closeProject(); return; }
-    if (a.getAttribute('href') === '/#archive') { e.preventDefault(); setOpen(true, false); closeProject(); return; }  // All work: up to the full list
-    if (a.hasAttribute('data-totop')) return;  // handled below, for the panel and the page alike
+    if (a.hasAttribute('data-cover')) { e.preventDefault(); closeProject('cover'); return; }  // the masthead: up to the cover
+    if (a.hasAttribute('data-all-work')) { e.preventDefault(); closeProject('archive'); return; }  // All work: up to the full list
     var slug = projectOf(a.href);
     if (slug) { e.preventDefault(); fetchProject(slug).then(function () { openProject(slug, false, false).then(function () { history.replaceState({ project: slug }, '', '/projects/' + slug); }); }); }
   });
@@ -579,16 +595,6 @@
     pushed = false; sync(false);
   });
 })();
-
-// Back to top, at the end of a project: in the panel it scrolls the panel, on a project page the page; focus goes to Back
-document.addEventListener('click', function (e) {
-  var a = e.target.closest('[data-totop]'); if (!a) return;
-  e.preventDefault();
-  var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
-  var panel = a.closest('.project-panel');
-  (panel || window).scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' });
-  var back = (panel || document).querySelector('[data-back]'); if (back) back.focus({ preventScroll: true });
-});
 
 // A project page: films that play once and rest, and notes that turn from gray to ink on the reading line. The same code
 // runs on a project page and on a project dropped into the panel on home (site.js calls window.opmetProject for it).
