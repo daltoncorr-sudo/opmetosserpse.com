@@ -434,7 +434,7 @@ html:not(.js) .stage:has(#about:target){transform:translateX(-66.6667%)}
 .pp .note .again[hidden]{display:none}
 .pp .film-ctl{grid-column:1/-1;grid-row:3;margin-top:10px;text-align:center}  /* a looping film's Play with sound, right under it */
 /* The way out */
-.pp .pfoot{margin-top:var(--U);padding-bottom:120px;display:flex;justify-content:center}
+.pp .pfoot{margin-top:var(--U);padding-bottom:120px;display:flex;flex-wrap:wrap;justify-content:center;gap:0 var(--s3)}  /* All work and Back to top */
 /* Under 1100px the margins are too narrow for text. Chapter labels and notes are left out, and pictures widen
    (rows and landscape pictures to the full width). A film's Play links sit under it, on the right */
 @media (min-width:641px) and (max-width:1099px){

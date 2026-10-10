@@ -113,10 +113,12 @@ for i, slug in enumerate(order):
     if not mast: problems.append('%s: no masthead linking home' % rel)
     elif not re.search(r'<a class="ctl" href="/#archive" data-all-work>', mast.group(1)): problems.append('%s: no All work under the masthead' % rel)
     if not re.search(r'class="g pfoot"[^>]*><a class="ctl" href="/#archive" data-all-work>', t): problems.append('%s: no All work at the end' % rel)
+    foot = t.split('class="g pfoot"', 1)[-1].split('</nav>', 1)[0]
+    if 'data-top>' not in foot: problems.append('%s: no Back to top at the end' % rel)
     for m in re.finditer(r'<(a|button)\b[^>]*>([\s\S]*?)</\1>', t):
         words = ' '.join(re.sub(r'<span class="ctl-w"[^>]*>[^<]*</span>', ' ', m.group(2)).split())
         words = ' '.join(re.sub(r'<[^>]+>', ' ', words).split())
-        if words in ('Back', 'Home', 'Back to top'): problems.append('%s: a "%s" control (project pages have the masthead and All work)' % (rel, words))
+        if words in ('Back', 'Home') or (words == 'Back to top' and 'data-top' not in m.group(0)): problems.append('%s: a "%s" control (project pages have the masthead, All work and, at the end, Back to top)' % (rel, words))
 # Whole pictures: nothing styles a project page's picture (or the lightbox's) to crop. In site.css, no rule for .pp or
 # .lightbox uses object-fit other than contain, clip-path or object-view-box, and no picture's frame (.m, .row, .cut,
 # .cuts, a block .b) hides what spills over; on the pages, no inline style does either.

@@ -469,7 +469,7 @@ def block_html(b, slug):
     return '<figure class="b g b-%s%s%s"%s>%s%s</figure>' % (kind, ' b-cont' if b.get('cont') else '', ' b-wide' if b.get('wide') else '',
                                                            ' data-read' if cap_ else '', media, fc)
 
-def project_body(p, blocks, chapters, notes, all_work='All work'):
+def project_body(p, blocks, chapters, notes, all_work='All work', top='Back to top'):
     """The masthead (the Journal's, without "Journal": Opmet and Osserpse with the hand mark, to the studio home) and
     All work under it; the title; under it the paragraph, and one list of facts and credits. Then the work, centered,
     with chapter labels in the left margin and notes in the right one. At the end, All work again. No next project."""
@@ -505,7 +505,9 @@ def project_body(p, blocks, chapters, notes, all_work='All work'):
                        % (' ch-above' if b['kind'] == 'full' or b.get('wide') else '', esc(c['label']), n, typo(c['label'])))
         out.append(block_html(b, p['slug']))
     if open_ch: out.append('</section>')
-    out.append('<nav class="g pfoot" aria-label="%s"><a class="ctl" href="/#archive" data-all-work>%s</a></nav>' % (esc(all_work), ctl(all_work)))
+    # At the end: All work, and Back to top beside it (D, Oct. 9)
+    out.append('<nav class="g pfoot" aria-label="%s"><a class="ctl" href="/#archive" data-all-work>%s</a> <a class="ctl" href="#main" data-top>%s</a></nav>'
+               % (esc(all_work), ctl(all_work), ctl(top)))
     out.append('</div>')
     return '\n'.join(out)
 
@@ -949,7 +951,7 @@ def main():
                 for n, rel in enumerate(bigs, 1):
                     full = os.path.join(DIST, rel.lstrip('/'))
                     z.write(full, '%s-%02d%s' % (s, n, os.path.splitext(full)[1]))
-        body = project_body(p, p['_blocks'], p['_chapters'], p['_notes'], site['project_all'])
+        body = project_body(p, p['_blocks'], p['_chapters'], p['_notes'], site['project_all'], site['project_top'])
         head = ''
         if p['_scripts']:  # a page with a 3D or interactive piece: its styles and scripts, in order
             head = '<link rel="stylesheet" href="/css/work.css?v=%s">\n' % site['_v'] + ''.join(
