@@ -156,7 +156,7 @@ html.is-locked{overflow:hidden}
 .mast-hand[data-pose="stand-in"]{height:1em;transform:rotate(-24deg);transform-origin:0 100%}
 .mast-hand[data-pose="mark"]{left:calc(100% + .1em)}
 .journal-line{margin:18px 0 0;font:italic 400 20px/1.4 var(--serif);letter-spacing:.01em;color:var(--tag-gray)}
-.mast .mast-link{margin:var(--s3) 0 0}
+.mast .mast-link{display:flex;flex-wrap:wrap;justify-content:center;gap:0 var(--s3);margin:var(--s3) 0 0}  /* All work, and Home beside it */
 @media (max-width:599px){.journal-line{font-size:18px}}
 /* The list: the same list and behavior, with more air (masthead to label about 160px, label row to topics 48px, topics
    to the first title 64px), the label at the column's left edge. The list fills the screen below the masthead. */
