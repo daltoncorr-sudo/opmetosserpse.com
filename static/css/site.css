@@ -420,6 +420,7 @@ html:not(.js) .stage:has(#about:target){transform:translateX(-66.6667%)}
 .pp [data-read].on .note{color:var(--ink)}
 .pp .note .again{display:block;margin-top:4px;font-style:italic;color:var(--ink);border-bottom:1px solid var(--hair);width:max-content}
 .pp .note .again[hidden]{display:none}
+.pp .film-ctl{grid-column:1/-1;grid-row:3;margin-top:10px;text-align:center}  /* a looping film's Play with sound, right under it */
 /* The way out */
 .pp .pfoot{margin-top:var(--U);padding-bottom:120px;display:flex;justify-content:center}
 /* Under 1100px the margins are too narrow for text. Chapter labels and notes are left out, and pictures widen

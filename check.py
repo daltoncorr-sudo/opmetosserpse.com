@@ -66,16 +66,20 @@ for f in glob.glob(D + '/**/*.html', recursive=True):
     text = re.sub(r'<[^>]+>', ' ', re.sub(r'<(script|style|svg)[\s\S]*?</\1>', ' ', body))
     problems += ['%s: an ordinal that is not superscripted (%s)' % (rel, m.group(0)) for m in re.finditer(r'\b\d+(?:st|nd|rd|th)\b', text)]
 
-# Project pages (v02): alt text, no looping video, notes and chapters within limits, media order, project order
+# Project pages (v02): alt text, no looping video (but two), notes and chapters within limits, media order, project order
+LOOPS = ('sb-14-film-01-9x16', 'hollyshorts-comedy-10-poster-popcorn')
 import html as H, json
 ROOT = os.path.dirname(os.path.abspath(__file__))
 for f in glob.glob(D + '/**/*.html', recursive=True):
     t = open(f, encoding='utf-8').read(); rel = os.path.relpath(f, D)
     for tag in re.findall(r'<img\b[^>]*>', t):
         if not re.search(r'\salt="', tag): problems.append('%s: an <img> without alt' % rel)
-    for tag in re.findall(r'<video\b[^>]*>', t):
+    for tag, inner in re.findall(r'(<video\b[^>]*>)([\s\S]*?)</video>', t):
         if not re.search(r'\saria-label="[^"]+"', tag): problems.append('%s: a <video> without aria-label' % rel)
-        if re.search(r'\sloop(?=[\s>=])', tag): problems.append('%s: a <video> that loops' % rel)
+        # Films never loop, except the two D chose (Oct. 10, 2026): Sunny's announcement film and Comedy 10's animated poster
+        srcs = re.findall(r'src="([^"]+)"', inner)
+        if re.search(r'\sloop(?=[\s>=])', tag) and not (srcs and all(re.search(r'/(%s)\.(webm|mp4)$' % '|'.join(LOOPS), x) for x in srcs)):
+            problems.append('%s: a <video> that loops (only %s may)' % (rel, ' and '.join(LOOPS)))
 order = json.load(open(os.path.join(ROOT, 'content', 'index.json'), encoding='utf-8')).get('project_order', [])
 # The order of each project's daltoncorr.com page, as recorded on Oct. 8, 2026: the pages must show it, item for item
 record = json.load(open(os.path.join(ROOT, '_review', '2026-10-08_media-order-record_v02.json'), encoding='utf-8'))

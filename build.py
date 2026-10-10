@@ -175,8 +175,14 @@ def img_tag(m, sizes, alt, eager=False, extra=''):
     ss = ' srcset="%s" sizes="%s"' % (srcset, sizes) if srcset else ''
     return '<img src="%s"%s width="%d" height="%d" alt="%s"%s%s>' % (src, ss, w, h, esc(alt), lazy, extra)
 
-def video_tag(v, vid, alt, rest, sound, eager=False):
-    """Shows its poster frame, plays once (muted, on screen) and rests; a film with sound waits for a click. Never loops."""
+def video_tag(v, vid, alt, rest, sound, eager=False, loop=False):
+    """Shows its poster frame, plays once (muted, on screen) and rests; a film with sound waits for a click. Never loops,
+    except the two films D chose to (loop, set in the notes file: Sunny's announcement film and Comedy 10's animated
+    poster): muted, round and round while on screen (site.js), from its first frame."""
+    if loop:
+        return ('<video id="%s" poster="%s" width="%d" height="%d" playsinline muted loop preload="%s" aria-label="%s">'
+                '<source src="%s" type="video/webm"><source src="%s" type="video/mp4"></video>') % (
+            vid, v['poster'], v['w'], v['h'], 'auto' if eager else 'metadata', esc(alt), v['webm'], v['mp4'])
     once = '' if sound else ' data-once'
     return ('<video id="%s" poster="%s" width="%d" height="%d" playsinline muted preload="%s" data-rest="%s"%s aria-label="%s">'
             '<source src="%s" type="video/webm"><source src="%s" type="video/mp4"></video>') % (
@@ -430,7 +436,11 @@ def block_html(b, slug):
         media = ''.join(ms)
     cap_ = '<span class="nt">%s</span>' % typo(b['note']) if b['note'] else ''  # the words; the film links stay apart
     for it in b['items']:
-        if it['kind'] == 'video':
+        if it['kind'] == 'video' and it.get('loop'):  # a looping film: with sound, its control sits right under it;
+            if not it['sound']: cap_ += ' <a href="#" class="again" data-again="%s" hidden>Play</a>' % it['id']  # Play: reduced motion
+            else: media += ('<p class="film-ctl"><button type="button" class="ctl" data-unmute="%s" data-off="Play with sound" data-on="Mute">%s</button></p>'
+                            % (it['id'], ctl('Play with sound')))
+        elif it['kind'] == 'video':
             if it['sound']: cap_ += ' <a href="#" class="again" data-sound="%s">Play with sound</a>' % it['id']
             cap_ += ' <a href="#" class="again" data-again="%s" hidden>Play again</a>' % it['id']
     cap_ = cap_.strip()
@@ -856,12 +866,13 @@ def main():
             if x['kind'] == 'video' or animated:  # films, and animated pictures made into films, so nothing loops
                 vn = notes['video'].get(k, {})
                 has_sound = media.has_audio(src)
-                rest, sound = str(vn.get('rest', 'end')), bool(vn.get('sound', has_sound))
-                v = media.video(src, s, name, rest, sound, first=vn.get('poster_frame') == 'first')
+                rest, sound, loop = str(vn.get('rest', 'end')), bool(vn.get('sound', has_sound)), bool(vn.get('loop'))
+                v = media.video(src, s, name, rest, sound, first=loop or vn.get('poster_frame') == 'first')
                 if not v: continue
                 vid = 'v-%s-%s' % (s, name)
                 items.append(dict(key=k, slot='V', kind='video', w=v['w'], h=v['h'], id=vid, sound=sound, v=v, rest=rest, gallery=x['gallery'], alt=alt,
-                                  row=x.get('row'), html=lambda sz, v=v, vid=vid, alt=alt, rest=rest, sound=sound, e=eager: video_tag(v, vid, alt, rest, sound, e)))
+                                  row=x.get('row'), loop=loop,
+                                  html=lambda sz, v=v, vid=vid, alt=alt, rest=rest, sound=sound, e=eager, loop=loop: video_tag(v, vid, alt, rest, sound, e, loop)))
                 p.setdefault('_bigs', []).append(v['mp4'])
                 continue
             r = media.image(src, s, name, max_w=1600 if x.get('cut') else 2400)  # a cut-out is never wider than 440 px
