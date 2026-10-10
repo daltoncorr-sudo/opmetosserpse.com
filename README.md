@@ -46,11 +46,11 @@ The standard is a top agency, not a template. Image first. Very few words, only 
 - Copy: AP style, sentence case, no serial comma, the name as two words (*Opmet Osserpse*), espresso tempo in lowercase, no all caps, never "vibes," and never "AI" except inside a Journal article's body.
 
 ## The Journal
-`/journal/` and `/journal/<slug>`: the studio's articles, as their own pages and as a panel above home (the cover menu's Journal, which appears once a post is published). The masthead is Opmet, Osserpse, Journal in the big type, with the writing hand (`static/brand/writing-hand.svg`; `[data-journal-hand]` and `[data-journal-word]` are the hooks for a later "write Journal" move), then the line from `site.json`.
+`/journal/` and `/journal/<slug>`: the studio's articles, as their own pages and as a panel above home (the cover menu's Journal, which appears once a post is published). The masthead is Opmet, Osserpse, Journal in the big type, each line centered, with the writing hand beside the last word (`static/brand/writing-hand.svg`, static: no animation for now; `[data-journal-hand]` and `[data-journal-word]` are kept as hooks, unused), then the line from `site.json`. The list is centered like the work list; an article's text column is centered, its note margin to the right.
 - **Posts:** `content/journal.json` lists them, newest first by `date` (ISO), with one or two tags from `tags` and `selected`. `"draft": true` keeps a post off the site (no page, no row, not in the sitemap); `python3 build.py --drafts` builds drafts for a local preview (never ship it). Only a draft may be undated or have an empty `.txt`.
 - **Text:** `content/journal/<slug>.txt`, one paragraph per block, blocks separated by a blank line. Pictures live in `content/journal/images/<slug>/`. Two kinds of block are pictures, not text:
   - `image: <file> | <alt text> | <size> | <caption>`: size is `column` (the text's width, the default), `pair` (two pair lines in a row sit side by side, at one height) or `wide` (the whole column); the caption is optional. `image: <file> | <alt text>` still works.
-  - `note: <file> | <what the note says> | <degrees>`: a handwritten note (a transparent PNG scan) in the margin beside the paragraph it follows, turned by the optional degrees (up to 15 either way). Under 1100 px it drops below its paragraph, a little smaller.
+  - `note: <file> | <what the note says> | <degrees>`: a handwritten note (a transparent PNG scan) in the margin beside the paragraph it follows, turned by the optional degrees (up to 15 either way). Under 1280 px, where the margin doesn't fit, it drops below its paragraph, a little smaller.
 - The last paragraph ends on a tiny hand. "AI" and all caps are allowed only inside the article body.
 
 ## The lightbox
