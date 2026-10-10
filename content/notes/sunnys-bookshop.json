@@ -14,14 +14,39 @@
    "src": "Brand Bible, III · The marks"
   },
   {
+   "label": "The type",
+   "starts_at": "sb-type-sailing-club",
+   "src": "Brand Bible, V · Type"
+  },
+  {
    "label": "The colors",
    "starts_at": "sb-colour-library-green",
    "src": "Brand Bible, IV · Colour"
   },
   {
+   "label": "Journal & Press",
+   "starts_at": "SB-Journal-and-Press-Wordmark-Navy",
+   "src": "Brand Bible, VI · Sunny’s Journal & Press"
+  },
+  {
+   "label": "Stationery and the shop",
+   "starts_at": "sb-stationery-business-card",
+   "src": "Brand Bible, VII · In use: Stationery and the shop"
+  },
+  {
+   "label": "The studies",
+   "starts_at": "sb-10-studies-page-06",
+   "src": "D, Oct. 10: the studies back, the Checkpoint 3 picks"
+  },
+  {
    "label": "In use",
    "starts_at": "sb-13-world-01-16x9",
    "src": "Brand Bible, VII · In use"
+  },
+  {
+   "label": "The delivery",
+   "starts_at": "sb-11-assets-01-16x9",
+   "src": "D, Oct. 10: the delivery sheets back"
   }
  ],
  "notes": {},
@@ -42,7 +67,7 @@
  },
  "hide": [],
  "hide_src": "D, Oct. 10, 2026: the page's own media list (below) replaces the hide list; the eight repeats it hid stay out, with the rest D cut.",
- "media_src": "D, Oct. 10, 2026 (Checkpoint 3b): the page rebuilt after the Brand Bible, the work straight on the paper. The signature written on, first, looping (Final Assets/Video/SB-Video-Logo-Script-16x9-White.mp4, 7.5 to 13 s: the book, then the script, before the film's closing credit; cropped, its white mapped to the paper, no sound); the book drawn by hand (03 Source/Sketches/Hand drawing/SB-Book-Drawing-Timelapse.mov, cut before its last clean frame and fade, cropped to the drawing, twice the speed, its white mapped to the site's paper and under the grain); the fourteen marks, numbered and labeled with the Bible's words and sizes (transparent PNGs from 01 Deliverables/Final Assets/Logos, copied at 1600 px); the six colors as plain swatches with the Bible's names and roles; in use, the tote, the cap and the tags, then the announcement film.",
+ "media_src": "D, Oct. 10, 2026 (Checkpoint 3b): the page rebuilt after the Brand Bible, the work straight on the paper. The signature written on, first, looping (Final Assets/Video/SB-Video-Logo-Script-16x9-White.mp4, 7.5 to 13 s: the book, then the script, before the film's closing credit; cropped, its white mapped to the paper, no sound); the book drawn by hand (03 Source/Sketches/Hand drawing/SB-Book-Drawing-Timelapse.mov, cut before its last clean frame and fade, cropped to the drawing, twice the speed, its white mapped to the site's paper and under the grain); the fourteen marks, numbered and labeled with the Bible's words and sizes (transparent PNGs from 01 Deliverables/Final Assets/Logos, copied at 1600 px); the six colors as plain swatches with the Bible's names and roles; in use, the tote, the cap and the tags, then the announcement film. Then (D, Oct. 10, more room and order after the Bible): the type, five faces and the hierarchy, as transparent specimens rendered once from the package's fonts with the Bible's own lines (never shipped as fonts); Journal & Press on its own; stationery and the shop, each piece cut on its own from the Bible's page source at its real relative size; the studies and the delivery sheets back. The client's name and email are censored (D, Oct. 10): on the business card and the email signature (re-cut with solid bars in place of the text) and on study page 30 (a copy, its first word under a bar).",
  "media": [
   {
    "src": "content/media/sunnys-bookshop/sb-signature-script.mp4",
@@ -163,22 +188,70 @@
    "note": "12 mm · 48 px minimum"
   },
   {
-   "src": "content/media/sunnys-bookshop/SB-Journal-and-Press-Wordmark-Navy.png",
-   "alt": "The Sunny’s Journal & Press wordmark, in Ink Navy.",
+   "src": "content/media/sunnys-bookshop/sb-type-sailing-club.png",
+   "alt": "Sailing Club: Sunny’s Bookshop in spaced capitals, and for readers and writers in its italic.",
    "cut": "xl",
-   "row": "press",
-   "n": "13",
-   "label": "Journal & Press · wordmark",
-   "note": "35 mm · 160 px minimum"
+   "row": "type-sailing-club",
+   "label": "Sailing Club",
+   "note": [
+    "Regular and Italic. Titles, the name, the slogan.",
+    "20–48 pt; capitals tracked +120 to +200. Jen Wagner Co."
+   ]
   },
   {
-   "src": "content/media/sunnys-bookshop/SB-Journal-and-Press-Stamp-Navy.png",
-   "alt": "The Sunny’s Journal & Press stamp, in Ink Navy.",
-   "cut": "small",
-   "row": "press",
-   "n": "14",
-   "label": "Journal & Press · stamp",
-   "note": "20 mm · 96 px minimum"
+   "src": "content/media/sunnys-bookshop/sb-type-sloop-script.png",
+   "alt": "Sloop Script: Sunny’s Bookshop, with the drawn S.",
+   "cut": "xl",
+   "row": "type-sloop-script",
+   "label": "Sloop Script",
+   "note": [
+    "Bold. The signature only, placed as artwork, 24 pt and up.",
+    "New script words take the drawn S, never the font’s. Richard Lipton."
+   ]
+  },
+  {
+   "src": "content/media/sunnys-bookshop/sb-type-cormorant-garamond.png",
+   "alt": "Cormorant Garamond: author evenings, Thursdays at seven; an evening of readings in the back room.",
+   "cut": "xl",
+   "row": "type-cormorant-garamond",
+   "label": "Cormorant Garamond",
+   "note": [
+    "Medium and SemiBold. Statements, subheads, shelf talkers.",
+    "14–24 pt. Free, OFL."
+   ]
+  },
+  {
+   "src": "content/media/sunnys-bookshop/sb-type-eb-garamond.png",
+   "alt": "EB Garamond: a paragraph about a reading in the back room, then small capitals, figures and an italic title.",
+   "cut": "xl",
+   "row": "type-eb-garamond",
+   "label": "EB Garamond",
+   "note": [
+    "Everything meant to be read. 9–12 pt, leading 140%.",
+    "Italic for titles; true small capitals; old-style figures. Free, OFL."
+   ]
+  },
+  {
+   "src": "content/media/sunnys-bookshop/sb-type-jost.png",
+   "alt": "Jost: events, gift cards, open until eight; fiction, $18, Tarzana and the NoHo Arts District.",
+   "cut": "xl",
+   "row": "type-jost",
+   "label": "Jost",
+   "note": [
+    "Medium and Regular. Labels, prices, dates, captions.",
+    "7–10 pt, capitals tracked +120 to +200; lining figures. Free, OFL."
+   ]
+  },
+  {
+   "src": "content/media/sunnys-bookshop/sb-type-hierarchy.png",
+   "alt": "The hierarchy: new this week, a lead line, a line of text and a label.",
+   "cut": "xl",
+   "row": "type-hierarchy",
+   "label": "The hierarchy",
+   "note": [
+    "Title 22 pt · 29 px, +200 · Lead 16 pt · 21 px",
+    "Text 10.5 pt · 14 px, leading 140% · Label 7.5 pt · 10 px, caps +180"
+   ]
   },
   {
    "src": "content/media/sunnys-bookshop/sb-colour-library-green.png",
@@ -235,6 +308,162 @@
    "note": "#E3D7BD · Quiet panels and backgrounds."
   },
   {
+   "src": "content/media/sunnys-bookshop/SB-Journal-and-Press-Wordmark-Navy.png",
+   "alt": "The Sunny’s Journal & Press wordmark, in Ink Navy.",
+   "cut": "xl",
+   "row": "press",
+   "n": "13",
+   "label": "Journal & Press · wordmark",
+   "note": [
+    "The shop’s own press, in its own color, Ink Navy.",
+    "35 mm · 160 px minimum"
+   ]
+  },
+  {
+   "src": "content/media/sunnys-bookshop/SB-Journal-and-Press-Stamp-Navy.png",
+   "alt": "The Sunny’s Journal & Press stamp, in Ink Navy.",
+   "cut": "medium",
+   "row": "press",
+   "n": "14",
+   "label": "Journal & Press · stamp",
+   "note": [
+    "Its marks stand alone: never beside the book or the signature.",
+    "20 mm · 96 px minimum · Ink Navy, and Green, Vellum, Black, White",
+    "Cormorant Garamond, with its italic ampersand"
+   ]
+  },
+  {
+   "src": "content/media/sunnys-bookshop/sb-stationery-business-card.png",
+   "alt": "The business card, front and back: the Digital logo on Vellum, and the owner’s card.",
+   "cut": "true",
+   "w": 266,
+   "row": "stat-1",
+   "label": "Business card",
+   "note": "3.5 × 2 in · front and back"
+  },
+  {
+   "src": "content/media/sunnys-bookshop/sb-stationery-envelope.png",
+   "alt": "The envelope, the SB monogram as its return mark.",
+   "cut": "true",
+   "w": 205,
+   "row": "stat-1",
+   "label": "Envelope",
+   "note": "No. 10 · the monogram as return mark"
+  },
+  {
+   "src": "content/media/sunnys-bookshop/sb-stationery-letterhead.png",
+   "alt": "The letterhead: the Digital logo at the top, the shop’s lines at the foot.",
+   "cut": "true",
+   "w": 153,
+   "row": "stat-1",
+   "label": "Letterhead",
+   "note": "US Letter · white or natural"
+  },
+  {
+   "src": "content/media/sunnys-bookshop/sb-stationery-email-signature.png",
+   "alt": "The email signature, with the Digital logo.",
+   "cut": "true",
+   "w": 266,
+   "row": "stat-2",
+   "label": "Email signature",
+   "note": "the Digital logo at 160 px · Georgia where the brand fonts aren’t installed"
+  },
+  {
+   "src": "content/media/sunnys-bookshop/sb-stationery-gift-card.png",
+   "alt": "The gift card: the SB monogram in Vellum on Library Green.",
+   "cut": "true",
+   "w": 146,
+   "row": "stat-2",
+   "label": "Gift card",
+   "note": "3.375 × 2.125 in"
+  },
+  {
+   "src": "content/media/sunnys-bookshop/sb-stationery-bag-sticker.png",
+   "alt": "The bag sticker, the seal on Vellum.",
+   "cut": "true",
+   "w": 100,
+   "row": "stat-2",
+   "label": "Bag sticker",
+   "note": "50 mm round · the Seal"
+  },
+  {
+   "src": "content/media/sunnys-bookshop/sb-stationery-event-card.png",
+   "alt": "An event card: poetry night, an open mic for readers and writers.",
+   "cut": "true",
+   "w": 124,
+   "row": "stat-3",
+   "label": "Event card",
+   "note": "A6 · one per event"
+  },
+  {
+   "src": "content/media/sunnys-bookshop/sb-stationery-bookmark.png",
+   "alt": "The bookmark: the book and Sunny’s in Vellum on Library Green.",
+   "cut": "true",
+   "w": 56,
+   "row": "stat-3",
+   "label": "Bookmark",
+   "note": "2 × 7 in · Green stock, Vellum ink"
+  },
+  {
+   "src": "content/media/sunnys-bookshop/sb-stationery-receipt-header.png",
+   "alt": "The receipt header, the Black logo.",
+   "cut": "true",
+   "w": 153,
+   "row": "stat-3",
+   "label": "Receipt header",
+   "note": "80 mm · the Black logo"
+  },
+  {
+   "src": "images/design/sunnys-bookshop/sb-10-studies-page-06-1600.webp",
+   "alt": "The studies, page 3: Bookseller tickets II: Britain, Europe, America.",
+   "row": "studies-research"
+  },
+  {
+   "src": "images/design/sunnys-bookshop/sb-10-studies-page-09-1600.webp",
+   "alt": "The studies, page 6: Trademarks & symbols.",
+   "row": "studies-research"
+  },
+  {
+   "src": "images/design/sunnys-bookshop/sb-10-studies-page-15-1600.webp",
+   "alt": "The studies, page 12: From sketch to solid.",
+   "row": "studies-book"
+  },
+  {
+   "src": "images/design/sunnys-bookshop/sb-10-studies-page-18-1600.webp",
+   "alt": "The studies, page 15: Book variations III: solid and distance.",
+   "row": "studies-book"
+  },
+  {
+   "src": "images/design/sunnys-bookshop/sb-10-studies-page-23-1600.webp",
+   "alt": "The studies, page 20: The book, sketchbook.",
+   "row": "studies-book"
+  },
+  {
+   "src": "images/design/sunnys-bookshop/sb-10-studies-page-24-1600.webp",
+   "alt": "The studies, page 21: Signature studies I.",
+   "row": "studies-signature"
+  },
+  {
+   "src": "images/design/sunnys-bookshop/sb-10-studies-page-27-1600.webp",
+   "alt": "The studies, page 24: The S.",
+   "row": "studies-signature"
+  },
+  {
+   "src": "images/design/sunnys-bookshop/sb-10-studies-page-32-1600.webp",
+   "alt": "The studies, page 29: The pen path.",
+   "row": "studies-signature"
+  },
+  {
+   "src": "content/media/sunnys-bookshop/sb-10-studies-page-33.png",
+   "alt": "The studies, page 30: The serif monogram.",
+   "row": "studies-seal"
+  },
+  {
+   "src": "images/design/sunnys-bookshop/sb-10-studies-page-37-1600.webp",
+   "alt": "The studies, page 34: Half inked.",
+   "row": "studies-seal"
+  },
+  {
    "src": "images/design/sunnys-bookshop/sb-13-world-01-16x9-2400.jpg"
   },
   {
@@ -245,6 +474,20 @@
   },
   {
    "src": "media/sunnys-bookshop/sb-14-film-01-9x16.mp4"
+  },
+  {
+   "src": "images/design/sunnys-bookshop/sb-11-assets-01-16x9-2400.jpg"
+  },
+  {
+   "src": "images/design/sunnys-bookshop/sb-11-sheets-page-02-2200.webp",
+   "alt": "Final delivery sheets, page 2: Identity.",
+   "row": "delivery"
+  },
+  {
+   "src": "images/design/sunnys-bookshop/sb-11-sheets-page-03-2200.webp",
+   "alt": "Final delivery sheets, page 3: Signature.",
+   "row": "delivery"
   }
- ]
+ ],
+ "air": true
 }
