@@ -391,7 +391,7 @@ def project_body(p, blocks, chapters, notes, all_work='All work'):
     dl = lambda xs, cls: '<dl class="%s">%s</dl>' % (cls, ''.join('<div><dt>%s</dt><dd>%s</dd></div>' % x for x in xs))
     # data-page-only: a page with a 3D or interactive piece opens as its own page from home, so its scripts run
     out = ['<div class="pp"%s>' % (' data-page-only' if p.get('_scripts') else ''),
-           masthead(list(NAME), studio_hand(), ' data-cover', link=('/#archive', all_work)),
+           masthead(list(NAME), studio_hand(), ' data-cover', link=('/#archive', all_work), lockup=True),
            '<section class="open g">%s<h1>%s</h1><p class="lede">%s</p><div class="info">%s%s</div></section>' % (
                '<p class="kicker">%s</p>' % typo(notes['kicker']) if notes.get('kicker') else '', typo(p['title']), typo(notes.get('lede') or p['lede']), dl(facts, 'facts'), dl(credits, 'cr'))]
     starts = {c['starts_at']: c for c in chapters}
@@ -627,18 +627,22 @@ def studio_hand():
 
 NAME = ('Opmet', 'Osserpse')
 
-def masthead(words, hand, hook='', line=None, link=None, last_attr=''):
-    """One nameplate, for the Journal (design v2) and every project page: the words in the big type, one a line, each
-    centered, the hand just right of the last word (outside the centering), all one link to the studio home. The name
-    is set in Opmet Serif (.mast-os); a word it has no letters for yet ("Journal") keeps the bold serif. Under it, the
-    Journal's small line, or a project's All work. hook: how the panels on home take the link (data-studio slides the
-    Journal's panel back to the cover; data-cover closes a project to the cover); without it, a plain link to /."""
-    word = lambda x: '<span class="mast-os">%s</span>' % esc(x) if x in NAME else esc(x)
+def masthead(words, hand, hook='', line=None, link=None, last_attr='', lockup=False):
+    """One nameplate, for the Journal (design v2) and every project page: the words in the big type (all of them plain
+    bold, the name too: D, Oct. 10), one a line, the hand just right of the last word, all one link to the studio home.
+    On the Journal the lines are left-justified on each other and the block is centered. Under it,
+    the Journal's small line, or a project's All work. hook: how the panels on home take the link (data-studio slides the
+    Journal's panel back to the cover; data-cover closes a project to the cover); without it, a plain link to /.
+    lockup: the studio's nameplate (a project page): the hand first, to the left of the words, which are left-justified
+    on each other, the pair centered, and small (D, Oct. 10)."""
+    word = esc
     first = ' '.join('<span>%s</span>' % word(x) for x in words[:-1])
     last = '<span class="mast-last"><span class="mast-word"%s>%s</span>%s</span>' % (last_attr, word(words[-1]), hand)
+    if lockup:  # the hand, then the words, one a line
+        first, last = hand, '<span class="mast-words">%s</span>' % ''.join('<span>%s</span>' % word(x) for x in words)
     under = '<p class="journal-line">%s</p>' % typo(line) if line else ''
     if link: under += '<p class="mast-link"><a class="ctl" href="%s" data-all-work>%s</a></p>' % (link[0], ctl(link[1]))
-    return '<header class="mast"><a class="mast-name" href="/"%s>%s %s</a>%s</header>' % (hook, first, last, under)
+    return '<header class="mast"><a class="mast-name%s" href="/"%s>%s %s</a>%s</header>' % (' mast-lockup' if lockup else '', hook, first, last, under)
 
 def journal_mast(w, panel=False):
     """The Journal's: Opmet, Osserpse, Journal and the writing hand, then its line. In the panel above home it slides

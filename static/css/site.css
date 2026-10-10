@@ -40,9 +40,9 @@
   --mh:clamp(48px,6.5vw,96px); --mast-top:clamp(40px,9vh,104px);
   /* Placeholder for the bold face: the serif at 700 (synthesized) until the custom font arrives */
   --bold-font:var(--serif); --bold-weight:700;
-  /* The name, Opmet Osserpse, in Opmet Serif's italic: Medium on the cover and in the inner pages' header (the
-     wordmark's style and weight), Bold in the masthead (the masthead's weight) */
-  --title-font:"Opmet Serif Title",var(--serif); --title-weight:500; --mast-name-weight:700;
+  /* The name, Opmet Osserpse, in Opmet Serif's italic, Medium, on the cover and in the inner pages' header (the
+     wordmark's style and weight). The masthead sets it in the plain bold (D, Oct. 10) */
+  --title-font:"Opmet Serif Title",var(--serif); --title-weight:500;
   /* Controls: one face and size for every list link, toggle and filter; pure black only for the chosen filter */
   --ctl-font:"Source Serif 4",var(--serif); --ctl-size:clamp(17px,1.35vw,20px); --black:#000;
 }
@@ -136,16 +136,15 @@ html.is-locked{overflow:hidden}
 .journal-page{width:100%}
 @media (max-width:599px){.journal{padding:0 var(--gutter)}}  /* phones: the year sits in the list's own margin */
 /* The masthead: one component (build.py masthead()), on the Journal and on every project page. Its words one a line,
-   each centered, in the About page's big type, bigger, the name (Opmet, Osserpse) in Opmet Serif's italic; the hand
-   just right of the last word, outside the centering: the writing hand beside "Journal" (static for now;
-   [data-journal-hand] and [data-journal-word] are kept as hooks), the studio's hand mark beside "Osserpse" on a
-   project page. It links to the studio home. Under it, the Journal's small line in the serif italic, or a project's
-   All work. */
+   in the About page's big type, bigger, all plain bold. On the Journal, a centered block of left-justified lines, the
+   writing hand just right of "Journal", outside the block (static for now; [data-journal-hand] and
+   [data-journal-word] are kept as hooks). On a project page, the studio's nameplate, small: the hand mark to the left
+   of the name (.mast-lockup, below). It links to the studio home. Under it, the Journal's small line in the serif
+   italic, or a project's All work. */
 .mast{padding-top:var(--mast-top);text-align:center}
 .mast .mast-name{display:block;width:max-content;max-width:100%;margin:0 auto;text-align:center;font-family:var(--bold-font);font-weight:var(--bold-weight);font-size:var(--mh);line-height:1.04;letter-spacing:-.01em;color:var(--ink)}
 .mast .mast-name:hover{color:var(--graphite)}
 .mast-name>span{display:block}
-.mast-os{font-family:var(--title-font);font-style:italic;font-weight:var(--mast-name-weight);letter-spacing:0}
 .mast-last{position:relative;width:max-content;margin:0 auto}
 .mast-word{display:inline-block}
 /* The hand: the writing hand's nib (its lower left) at the end of the word, near the baseline. The hand mark sits in
@@ -166,6 +165,10 @@ html.is-locked{overflow:hidden}
 .journal-empty{min-height:calc(100vh - var(--mast));text-align:center;padding:160px 0 var(--s6);font:400 clamp(18px,1.55vw,23px)/1.5 var(--serif)}
 .journal-empty p{margin:0}
 @media (max-width:599px){.journal .blog-list,.journal-empty{padding-top:112px}}
+/* On the Journal the masthead is centered as a block, its lines left-justified on each other, the small line on the
+   same left edge (D, Oct. 10). The writing hand stays just right of Journal, outside the block. */
+.journal .mast{width:max-content;max-width:100%;margin-left:auto;margin-right:auto;text-align:left}
+.journal .mast .mast-name,.journal .mast-last{margin-left:0;margin-right:0;text-align:left}
 /* An article: All articles about 40px under the masthead; the date and topic in small sans, the title in bold, then the
    text at the measure with a margin to its right (about 260px) for handwritten notes. */
 .journal-all{margin:40px 0 0;text-align:center}
@@ -343,16 +346,24 @@ html:not(.js) .stage:has(#about:target){transform:translateX(-66.6667%)}
   width:100%;font:400 var(--s)/1.45 var(--sans);color:var(--ink)}
 .pp img,.pp video{display:block;width:100%;height:auto;max-width:none}
 .pp a:hover{color:var(--gray)}
+/* The masthead on a project page is the studio's nameplate, small (D, Oct. 10): the hand mark to the left of Opmet
+   Osserpse, the two words left-justified on each other, the pair centered. The project's title is the focus. */
+.pp .mast{--mh:clamp(22px,2.2vw,30px);padding-top:clamp(28px,5vh,56px)}
+.mast .mast-lockup{display:flex;align-items:flex-end;gap:.24em;width:max-content;max-width:100%;margin:0 auto;text-align:left}
+.mast-lockup .mast-words>span{display:block}
+.mast-lockup .mast-hand{position:static;flex:none;height:1.9em;margin-bottom:.16em}
+.pp .mast .mast-link{margin-top:14px}
 .pp figure,.pp h1,.pp h2,.pp p,.pp dl,.pp dd{margin:0}.pp h1,.pp h2{font-weight:400}
 .pp .ph{color:var(--gray);font-style:italic}
 .pp .g{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));column-gap:var(--g);padding:0 var(--m)}
 /* The opening: the title; under it, across the eight middle columns, the paragraph and one list */
-.pp .open{padding-top:48px;align-items:start}
+.pp{--pt:clamp(30px,5.6vw,84px)}  /* the project's title: the focus */
+.pp .open{padding-top:clamp(72px,12vh,140px);align-items:start}
 /* A line above the title, when a project has one ("20th Anniversary"), set as the title */
-.pp .open .kicker{grid-column:3/11;grid-row:1;text-align:center;font-family:var(--bold-font);font-weight:var(--bold-weight);font-size:var(--t1);line-height:1.12;text-wrap:balance}
-.pp .open h1{grid-column:3/11;grid-row:2;text-align:center;font-family:var(--bold-font);font-weight:var(--bold-weight);font-size:var(--t1);line-height:1.12;letter-spacing:0;text-wrap:balance}
-.pp .open .lede{grid-column:3/7;grid-row:3;margin-top:36px;padding-right:var(--g);font-size:var(--b);line-height:1.55}
-.pp .open .info{grid-column:7/11;grid-row:3;margin-top:40px}
+.pp .open .kicker{grid-column:2/12;grid-row:1;text-align:center;font-family:var(--bold-font);font-weight:var(--bold-weight);font-size:var(--pt);line-height:1.04;letter-spacing:-.01em;text-wrap:balance;overflow-wrap:break-word}
+.pp .open h1{grid-column:2/12;grid-row:2;text-align:center;font-family:var(--bold-font);font-weight:var(--bold-weight);font-size:var(--pt);line-height:1.04;letter-spacing:-.01em;text-wrap:balance;overflow-wrap:break-word}
+.pp .open .lede{grid-column:3/7;grid-row:3;margin-top:64px;padding-right:var(--g);font-size:var(--b);line-height:1.55}
+.pp .open .info{grid-column:7/11;grid-row:3;margin-top:68px}
 .pp .facts,.pp .cr{font-size:var(--s);line-height:1.45}
 .pp .facts div,.pp .cr div{display:grid;grid-template-columns:8.6em minmax(0,1fr);column-gap:12px;padding:0 0 5px}
 .pp .cr{margin-top:14px}
@@ -393,7 +404,7 @@ html:not(.js) .stage:has(#about:target){transform:translateX(-66.6667%)}
   .pp{--m:16px;--g:12px;--u:24px;--U:64px;--t1:34px}
   .pp .g{grid-template-columns:1fr 1fr}
   .pp .g>*,.pp .b .m,.pp .b .row,.pp .open h1,.pp .open .lede,.pp .open .info,.pp .note,.pp .chap{grid-column:1/-1!important;grid-row:auto!important}
-  .pp .open .kicker{text-align:left}.pp .open h1{grid-row:auto;text-align:left}.pp .open{padding-top:28px}.pp .open .lede{margin-top:16px;padding-right:0}.pp .open .info{margin-top:16px}
+  .pp .open .kicker{text-align:left}.pp .open h1{grid-row:auto;text-align:left}.pp .open{padding-top:56px}.pp .open .lede{margin-top:28px;padding-right:0}.pp .open .info{margin-top:16px}
   .pp .facts div,.pp .cr div{grid-template-columns:7.6em minmax(0,1fr)}
   .pp>.open+.ch,.pp>.open+.b{margin-top:32px}
   .pp .nt,.pp .note:not(:has(.again)),.pp .fcap:not(:has(.again)){display:none}.pp .note{margin:6px 0 0}

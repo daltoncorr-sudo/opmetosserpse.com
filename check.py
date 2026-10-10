@@ -103,7 +103,7 @@ for i, slug in enumerate(order):
     if got != want: problems.append('%s: media order differs from daltoncorr.com (%d items, expected %d)' % (rel, len(got), len(want)))
     if 'Next project' in t: problems.append('%s: a "Next project" (pages end on All work)' % rel)
     # The masthead (the Journal's component), linking home, with All work under it; All work at the end; no Back or Home
-    mast = re.search(r'<header class="mast"><a class="mast-name" href="/" data-cover>([\s\S]*?)</header>', t)
+    mast = re.search(r'<header class="mast"><a class="mast-name[^"]*" href="/" data-cover>([\s\S]*?)</header>', t)
     if not mast: problems.append('%s: no masthead linking home' % rel)
     elif not re.search(r'<a class="ctl" href="/#archive" data-all-work>', mast.group(1)): problems.append('%s: no All work under the masthead' % rel)
     if not re.search(r'class="g pfoot"[^>]*><a class="ctl" href="/#archive" data-all-work>', t): problems.append('%s: no All work at the end' % rel)
