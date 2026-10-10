@@ -7,6 +7,7 @@ The studio site for Opmet Osserpse. A hand-kept static site: plain HTML, one sty
 - `content/projects/<slug>.json`: one file per project page. The page shows `title`, `lede`, the images of its daltoncorr.com page (`media` gives the alt text and size of the ones that were already here), the facts from `client`, `year`, `role` and `links`, and the end credits from `credits`. `deck` stays in the file for search descriptions; `challenge`, `work`, `system`, `deliverables` and `press` are the source of the notes, for press and later use.
 - `content/notes/<slug>.json`: the new words for each project page, for D's approval: its opener, the "Work" fact, chapter labels, notes, photographers, how each film rests and plays, and (Sunny's only) the items it hides. Every word comes from the project's own file. `_review/` lists them all in one page.
 - `content/work.json`: the one list of every project (35), with `slug`, `title`, `year`, one or two `tags` from its controlled list, `selected` and `media` (empty for now). It drives Selected works, the Archive on the home page and `/projects/`; the build stops if it drifts from the project pages.
+- `content/journal.json` and `content/journal/<slug>.txt`: the Journal (see "The Journal" below).
 - `content/index.json`: `project_order`, the one list that sets the order of the projects on home and on `/projects/`. `home_order` is kept for now but unused.
 - `static/`: CSS, JS, the interim fonts (SIL Open Font License, licenses included) and the hand.
 - `moves/`: the hand's moves on the cover, one folder each. `moves.py` loads them for the build, and `moves_lab.py` writes a workbench page, `_lab/hand.html`. See `moves/README.md`.
@@ -42,7 +43,18 @@ The standard is a top agency, not a template. Image first. Very few words, only 
   - Films show a poster frame, play once (muted) when on screen, and rest on a chosen frame, with "Play again" in the note. A film with sound plays only when asked. Nothing loops. Pictures never move; the 3D models and interactive pieces move only as they do on daltoncorr.com.
 - One motion value, 0.5 seconds, for fades and page changes. The one exception is the hand on the cover: after it arrives it waves, then plays one move about every 10 seconds, at random and never twice in a row, only while the cover is on screen: wave, spin, shrug, mirror, high five, a watch check, and thumbs up once its drawing exists. Each move has anticipation, overshoot and a settle. Reduced motion turns all of it off.
 - **Hand moves:** each move is a folder in `moves/`, with its drawings in the same folder. See `moves/README.md`. The thumbs-up move waits for `moves/thumbs/thumbs-up.svg`.
-- Copy: AP style, sentence case, no serial comma, the name as two words (*Opmet Osserpse*), espresso tempo in lowercase, no all caps, never "AI" or "vibes."
+- Copy: AP style, sentence case, no serial comma, the name as two words (*Opmet Osserpse*), espresso tempo in lowercase, no all caps, never "vibes," and never "AI" except inside a Journal article's body.
+
+## The Journal
+`/journal/` and `/journal/<slug>`: the studio's articles, as their own pages and as a panel above home (the cover menu's Journal, which appears once a post is published). The masthead is Opmet, Osserpse, Journal in the big type, with the writing hand (`static/brand/writing-hand.svg`; `[data-journal-hand]` and `[data-journal-word]` are the hooks for a later "write Journal" move), then the line from `site.json`.
+- **Posts:** `content/journal.json` lists them, newest first by `date` (ISO), with one or two tags from `tags` and `selected`. `"draft": true` keeps a post off the site (no page, no row, not in the sitemap); `python3 build.py --drafts` builds drafts for a local preview (never ship it). Only a draft may be undated or have an empty `.txt`.
+- **Text:** `content/journal/<slug>.txt`, one paragraph per block, blocks separated by a blank line. Pictures live in `content/journal/images/<slug>/`. Two kinds of block are pictures, not text:
+  - `image: <file> | <alt text> | <size> | <caption>`: size is `column` (the text's width, the default), `pair` (two pair lines in a row sit side by side, at one height) or `wide` (the whole column); the caption is optional. `image: <file> | <alt text>` still works.
+  - `note: <file> | <what the note says> | <degrees>`: a handwritten note (a transparent PNG scan) in the margin beside the paragraph it follows, turned by the optional degrees (up to 15 either way). Under 1100 px it drops below its paragraph, a little smaller.
+- The last paragraph ends on a tiny hand. "AI" and all caps are allowed only inside the article body.
+
+## The lightbox
+One site component (site.js and site.css). Any `<img>` inside an element marked `data-lightbox` opens full size on the paper; that element's pictures are its group (a Journal article marks its body). A click, Esc or the back button closes it; the arrow keys and a swipe step through the group; focus stays inside and returns to the picture. Fades only, instant with reduced motion. Pictures added later (an article in the panel) work too. `data-lightbox-skip` on an `<img>` leaves it out. No frame, buttons or new color.
 
 ## Publishing
 GitHub Pages, from the `docs/` folder on `main`. daltoncorr.com stays live as it is: both sites run side by side, with no redirects. `docs/CNAME` already says `opmetosserpse.com`. D publishes; nobody else pushes.

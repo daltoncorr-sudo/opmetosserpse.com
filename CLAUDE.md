@@ -10,7 +10,7 @@ Read `README.md` first. D (Dalton Corr) is the creative director and makes every
 - Dalton Corr's name doesn't appear on the site, except in a project's credits, as "Dalton Corr, Opmet Osserpse".
 - No analytics, cookies, trackers or third-party embeds. The privacy page promises none.
 - No frameworks, bundlers or npm. Python 3 and Pillow only, plus ffmpeg for video and three.js (r128, served from the site) for the 3D pieces.
-- Never mention AI anywhere on the site.
+- "AI" never appears on the site except inside Journal article bodies, where the studio may write about it. `check.py` skips only `.article-body` for that word (and for all caps); anywhere else it fails.
 - daltoncorr.com stays live as it is. Never change, redirect or push anything in the daltoncorr repo; the clone in `_sources/` is read-only, for images.
 - Be light on usage: no exploratory browsing; check pages with the local server and `check.py`.
 
