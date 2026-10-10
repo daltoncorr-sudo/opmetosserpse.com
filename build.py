@@ -178,6 +178,11 @@ def video_tag(v, vid, alt, rest, sound, eager=False):
             '<source src="%s" type="video/webm"><source src="%s" type="video/mp4"></video>') % (
         vid, v['poster'], v['w'], v['h'], 'auto' if eager else 'metadata', rest, once, esc(alt), v['webm'], v['mp4'])
 
+def ctl(text):
+    """A control's words (site.css .ctl): the visible word, and a hidden copy at the heaviest weight that holds its
+    width, so the hover sweep (site.js) never moves its neighbors. Every list link, toggle and filter uses it."""
+    return '<span class="ctl-w" aria-hidden="true">%s</span><span class="ctl-v">%s</span>' % (esc(text), esc(text))
+
 def brand_svg(name, cls, label=None):
     """Inline one of static/brand/*.svg in ink (currentColor), sized by CSS."""
     with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'static', 'brand', name), encoding='utf-8') as f:
@@ -240,6 +245,7 @@ def page(site, title, desc, path, body, og_image=None, current=None, extra_head=
 <link rel="icon" href="/brand/hand-mark.svg" type="image/svg+xml">
 <link rel="preload" href="/fonts/libre-caslon-text/libre-caslon-text-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/fonts/instrument-sans/instrument-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/source-serif-4/source-serif-4-italic-latin.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/css/site.css?v=%(v)s">
 %(extra)s</head>
 <body>
@@ -463,10 +469,10 @@ def work_section(items, w):
     rows = [r for _, r in sorted(rows)]
     return ('<section class="work" id="work" tabindex="-1" aria-label="%s"><div class="work-head">'
             '<h2 class="work-label" data-closed="%s" data-open="%s">%s</h2>'
-            '<button type="button" class="archive-toggle" aria-expanded="false" aria-controls="works" data-open-label="%s" data-close-label="%s">%s</button>'
-            '<a class="work-back" href="#" data-top>%s</a></div>'
+            '<button type="button" class="ctl archive-toggle" aria-expanded="false" aria-controls="works" data-open-label="%s" data-close-label="%s">%s</button>'
+            '<a class="ctl work-back" href="#" data-top>%s</a></div>'
             '<ul class="works" id="works">%s</ul></section>') % (
-        esc(w['label']), esc(w['selected']), esc(w['all']), esc(w['selected']), esc(w['more']), esc(w['less']), esc(w['more']), esc(w['back']), ''.join(rows))
+        esc(w['label']), esc(w['selected']), esc(w['all']), esc(w['selected']), esc(w['more']), esc(w['less']), ctl(w['more']), ctl(w['back']), ''.join(rows))
 
 AP_MONTHS = ('Jan.', 'Feb.', 'March', 'April', 'May', 'June', 'July', 'Aug.', 'Sept.', 'Oct.', 'Nov.', 'Dec.')
 
@@ -553,16 +559,16 @@ def blog_section(posts, vocab, w, current=None):
             ' extra' if extra else '', ' is-current' if cur else '', e['slug'], esc('|'.join(e['tags'])), y,
             ' style="--i:%d"' % i if extra else '', yr, e['slug'], ' aria-current="page"' if cur else '', typo(e['title']), tag_list(e['tags'])))
         if extra: i += 1
-    topics = ''.join('<button type="button" data-topic="%s" aria-pressed="%s">%s</button>' % (esc(t), 'true' if t == 'All' else 'false', esc(t))
+    topics = ''.join('<button type="button" class="ctl filter" data-filter="%s" aria-pressed="%s">%s</button>' % (esc(t), 'true' if t == 'All' else 'false', ctl(t))
                      for t in ['All'] + vocab)
     return ('<section class="blog-list" id="articles" aria-label="%s"><div class="work-head">'
             '<h2 class="work-label" data-closed="%s" data-open="%s">%s</h2>'
-            '<button type="button" class="archive-toggle" aria-expanded="false" aria-controls="article-rows" data-open-label="%s" data-close-label="%s">%s</button>'
-            '<a class="work-back" href="/" data-studio>%s</a></div>'
-            '<div class="blog-topics" role="group" aria-label="Topics" hidden>%s</div>'
+            '<button type="button" class="ctl archive-toggle" aria-expanded="false" aria-controls="article-rows" data-open-label="%s" data-close-label="%s">%s</button>'
+            '<a class="ctl work-back" href="/" data-studio>%s</a></div>'
+            '<div class="filters blog-topics" role="group" aria-label="Topics" hidden>%s</div>'
             '<p class="vh" aria-live="polite" data-count data-one="article" data-many="articles"></p>'
             '<ul class="works" id="article-rows">%s</ul></section>') % (
-        esc(w['label']), esc(w['selected']), esc(w['all']), esc(w['selected']), esc(w['more']), esc(w['less']), esc(w['more']), esc(w['back']),
+        esc(w['label']), esc(w['selected']), esc(w['all']), esc(w['selected']), esc(w['more']), esc(w['less']), ctl(w['more']), ctl(w['back']),
         topics, ''.join(rows))
 
 def article_body(blocks):
@@ -600,9 +606,9 @@ def article(e, w):
     The text's pictures open in the site lightbox (data-lightbox)."""
     when = '<time datetime="%s">%s</time>' % (e['date'], ap_date(e['_date'])) if e['_date'] else ''
     meta = '<p class="article-meta">%s%s</p>' % (when, ''.join('<span>%s</span>' % esc(t) for t in e['tags']))
-    return ('<p class="journal-all"><a href="/journal/" data-all>%s</a></p>'
+    return ('<p class="journal-all"><a class="ctl" href="/journal/" data-all>%s</a></p>'
             '<article class="article"><header class="article-head">%s<h1 tabindex="-1">%s</h1></header>'
-            '<div class="article-body" data-lightbox>%s</div></article>') % (esc(w['all']), meta, typo(e['title']), article_body(e['blocks']))
+            '<div class="article-body" data-lightbox>%s</div></article>') % (ctl(w['all']), meta, typo(e['title']), article_body(e['blocks']))
 
 # The hand beside "Journal" in the masthead: the writing hand (static/brand/writing-hand.svg, pending D's OK); if that
 # file is ever removed, the hand mark stands in, turned to write. A hook for the later "write Journal" move:
@@ -674,21 +680,20 @@ def foundry_panel(fd, title, drafts):
         images.append('<div class="fd-images" data-for="%s" hidden>%s</div>' % (esc(p['id']), ''.join(
             '<div class="fd-img" data-placeholder style="aspect-ratio:%s">%s</div>' % (esc(r), typo(l)) for l, r in p['images'])))
     x, y, d = FOUNDRY_SLOTS[max(len(items), 1) - 1]
-    word = lambda s: '<span class="fd-w" aria-hidden="true">%s</span><span class="fd-v">%s</span>' % (esc(s), esc(s))
-    filters = ''.join('<button type="button" class="fd-f" data-filter="%s" aria-pressed="%s">%s</button>' % (
-        esc(k), 'true' if k == 'all' else 'false', word(t)) for k, t in lb['filters'])
+    filters = ''.join('<button type="button" class="ctl filter fd-f" data-filter="%s" aria-pressed="%s">%s</button>' % (
+        esc(k), 'true' if k == 'all' else 'false', ctl(t)) for k, t in lb['filters'])
     return ('<section class="panel side foundry-panel" id="foundry" aria-labelledby="foundry-title">'
             '<div class="fd" data-foundry data-slots="%(slots)s"><h2 class="vh" id="foundry-title">%(title)s</h2>'
             '<div class="fd-field" data-field><div class="fd-space" style="height:%(fh)dpx">%(field)s</div></div>'
             '<div class="fd-veil" data-veil></div>'
             '<div class="fd-text" data-text>%(texts)s</div>'
             '<div class="fd-left" data-left><div class="fd-spacer"><span class="fd-drag">%(drag)s</span></div>%(images)s</div>'
-            '<nav class="fd-nav" aria-label="%(title)s"><span class="fd-filters" data-fd-filters>%(filters)s</span>'
-            '<a class="fd-f fd-home" href="#" data-studio data-home-label="%(home)s" data-back-label="%(back)s">%(homeword)s</a></nav>'
+            '<nav class="fd-nav" aria-label="%(title)s"><span class="filters fd-filters" role="group" aria-label="%(title)s" data-fd-filters>%(filters)s</span>'
+            '<a class="ctl fd-f fd-home" href="#" data-studio data-home-label="%(home)s" data-back-label="%(back)s">%(homeword)s</a></nav>'
             '</div></section>') % dict(
         slots=' '.join('%g,%g,%g' % s for s in FOUNDRY_SLOTS), title=esc(title), fh=round(y + 420 * d + 260), field=''.join(field),
         texts=''.join(texts), drag=esc(lb['drag']), images=''.join(images), filters=filters, home=esc(lb['home']), back=esc(lb['back']),
-        homeword=word(lb['home']))
+        homeword=ctl(lb['home']))
 
 def main():
     ap = argparse.ArgumentParser()
@@ -873,7 +878,7 @@ def main():
         return pat.sub(sub, s).replace('\n', '<br>')
     go = lambda u: 'blog' if u.startswith('/journal') else u[1:]
     published = any(not e.get('draft') for e in load(os.path.join(CONTENT, 'journal.json'))['posts'])
-    nav = ''.join('<a href="%s"%s>%s</a>' % (esc(u), ' rel="noopener"' if u.startswith('http') else ' data-go="%s"' % go(u), esc(t))
+    nav = ''.join('<a class="ctl" href="%s"%s>%s</a>' % (esc(u), ' rel="noopener"' if u.startswith('http') else ' data-go="%s"' % go(u), ctl(t))
                   for t, u in h['nav'] if published or not u.startswith('/journal'))
     # Side panels: the foundry one screen to the left of home (a field of objects, from content/foundry.json),
     # About one screen to the right.
@@ -883,10 +888,10 @@ def main():
     press = load(os.path.join(CONTENT, 'press.json'))['press']
     about_panel = ('<section class="panel side about-panel" id="about" aria-labelledby="about-title">'
                    '<div class="about-grid"><div class="title-row">'
-                   '<h2 class="vh" id="about-title">%s</h2><p class="home-big"><a href="#" data-studio>%s</a></p></div>'
+                   '<h2 class="vh" id="about-title">%s</h2><p class="home-big"><a class="ctl" href="#" data-studio>%s</a></p></div>'
                    '<div class="about-main"><div class="about-body">%s</div></div>'
                    '<div class="about-press"><h3 class="press-title">%s</h3>%s</div></div></section>') % (
-        ' '.join('<span>%s</span>' % esc(x) for x in ap['title'].split()), esc(site['back']), ''.join('<p>%s</p>' % link(typo(x)) for x in ap['lines']) + ''.join('<p class="contact">%s</p>' % link(typo(x)) for x in ap['contact']), esc(ap['press_title']), press_list(press))
+        ' '.join('<span>%s</span>' % esc(x) for x in ap['title'].split()), ctl(site['back']), ''.join('<p>%s</p>' % link(typo(x)) for x in ap['lines']) + ''.join('<p class="contact">%s</p>' % link(typo(x)) for x in ap['contact']), esc(ap['press_title']), press_list(press))
     # The Journal: a panel one screen above home, and its own pages at /journal/ and /journal/<slug>, all with the same
     # masthead, slot and list. Until a post is published it's out of the menu and the sitemap, and /journal/ is noindex.
     jw = site['journal']
@@ -918,7 +923,6 @@ def main():
             '<section class="project-panel" id="project" aria-label="Project"><div class="project-inner"></div></section>') % (
         foundry, blog, cover, work_section(items, h['work']), about_panel)
     early = '<script>if(/^#(foundry|about|blog)([\\/?]|$)/.test(location.hash))document.documentElement.classList.add("at-"+location.hash.slice(1).split(/[\\/?]/)[0])</script>\n'
-    early += '<link rel="preload" href="/fonts/source-serif-4/source-serif-4-italic-latin.woff2" as="font" type="font/woff2" crossorigin>\n'
     if a.drafts: early += '<meta name="drafts" content="on">\n'  # check.py lets bracketed placeholders pass in a drafts build
     write('/index.html', page(site, 'Opmet Osserpse', h['og_description'], '/', body, so, '/', main_cls='home-main',
                               extra_head=early + '<link rel="stylesheet" href="/css/moves.css?v=%s">\n' % site['_v']))

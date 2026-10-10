@@ -1,4 +1,41 @@
-// Opmet Osserpse: clock, filters, hover previews, quiet video. No tracking, no cookies.
+// Opmet Osserpse: controls, clock, hover previews, quiet video. No tracking, no cookies.
+
+// Controls: one system for every list link, toggle and filter (build.py ctl(), site.css .ctl). The hover sweeps the
+// word's weight with the cursor, thin at its left edge to black at its right; a hidden copy at the heaviest weight holds
+// the width, so nothing moves. Only with a fine pointer that hovers; with reduced motion the word simply turns bold.
+//   opmetCtl.label(el, text): change a control's words (both copies)
+//   opmetFilters(group, pick): one filter row (buttons with data-filter and aria-pressed); pick(key) on a click;
+//     returns set(key), which marks the chosen one
+(function () {
+  var mq = function (q) { return !!(window.matchMedia && matchMedia(q).matches); };
+  var fine = mq('(hover: hover) and (pointer: fine)'), reduce = mq('(prefers-reduced-motion: reduce)'), cur = null;
+  window.opmetCtl = {
+    label: function (el, text) {
+      var w = el.querySelector('.ctl-w'), v = el.querySelector('.ctl-v');
+      if (w && v) { w.textContent = v.textContent = text; } else el.textContent = text;
+    }
+  };
+  function rest(c) { var v = c && c.querySelector('.ctl-v'); if (v) v.style.fontWeight = ''; }
+  if (fine) {
+    document.addEventListener('mousemove', function (e) {
+      var c = e.target.closest ? e.target.closest('.ctl') : null;
+      if (c !== cur) { rest(cur); cur = c; }
+      var v = c && c.querySelector('.ctl-v'); if (!v) return;
+      var r = c.getBoundingClientRect(), t = Math.min(1, Math.max(0, (e.clientX - r.left) / r.width));
+      v.style.fontWeight = reduce ? 700 : Math.round(200 + t * 700);
+    }, { passive: true });
+    document.addEventListener('mouseout', function (e) { if (cur && !(e.relatedTarget && cur.contains(e.relatedTarget))) { rest(cur); cur = null; } });
+  }
+  window.opmetFilters = function (group, pick) {
+    var buttons = Array.prototype.slice.call(group.querySelectorAll('button[data-filter]'));
+    group.addEventListener('click', function (e) {
+      var b = e.target.closest('button[data-filter]');
+      if (b && group.contains(b)) pick(b.getAttribute('data-filter'));
+    });
+    return { set: function (key) { buttons.forEach(function (b) { b.setAttribute('aria-pressed', b.getAttribute('data-filter') === key ? 'true' : 'false'); }); } };
+  };
+})();
+
 (function () {
   var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -20,21 +57,6 @@
       clock.textContent = (place ? place + ', ' : '') + parts.weekday + ', ' + MON[+parts.month - 1] + ' ' + parts.day + ', ' + time;
     };
     tick(); setInterval(tick, 15000);
-  }
-
-  // Sector filters on the projects list
-  var filters = document.querySelector('[data-filters]');
-  if (filters) {
-    var rows = Array.prototype.slice.call(document.querySelectorAll('[data-sector]'));
-    filters.addEventListener('click', function (e) {
-      var b = e.target.closest('button'); if (!b) return;
-      var s = b.getAttribute('data-filter');
-      Array.prototype.forEach.call(filters.querySelectorAll('button'), function (x) { x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); });
-      rows.forEach(function (r) { r.hidden = !(s === 'All' || r.getAttribute('data-sector') === s); });
-      try { history.replaceState(null, '', s === 'All' ? location.pathname : location.pathname + '?sector=' + encodeURIComponent(s)); } catch (err) {}
-    });
-    var q = new URLSearchParams(location.search).get('sector');
-    if (q) { var btn = filters.querySelector('[data-filter="' + q.replace(/"/g, '') + '"]'); if (btn) btn.click(); }
   }
 
   // Hover preview: one fixed place to the right of the list, crossfading between projects
@@ -186,9 +208,9 @@
       if (st.open === was.open && st.topic === was.topic) return;
       clearTimeout(L.timer); L.clean();
       L.toggle.setAttribute('aria-expanded', st.open);
-      L.toggle.textContent = L.toggle.getAttribute(st.open ? 'data-close-label' : 'data-open-label');
+      opmetCtl.label(L.toggle, L.toggle.getAttribute(st.open ? 'data-close-label' : 'data-open-label'));
       L.label.textContent = L.label.getAttribute(st.open ? 'data-open' : 'data-closed');
-      if (L.topics) $$('button', L.topics).forEach(function (b) { b.setAttribute('aria-pressed', b.getAttribute('data-topic') === st.topic); });
+      if (L.filters) L.filters.set(st.topic);
       if (o.address) o.address(st);
       var leaving = L.rows.filter(function (r) { return L.shows(r, was) && !L.shows(r, st); }),
           arriving = (openOrder ? (st.open ? openOrder : closedOrder) : L.rows).filter(function (r) { return !L.shows(r, was) && L.shows(r, st); }),
@@ -223,11 +245,7 @@
       if (o.wait && L.busy) return;
       L.set({ open: !L.state.open, topic: 'All' }, true);  // See less also resets the topic to All
     });
-    if (L.topics) L.topics.addEventListener('click', function (e) {
-      var b = e.target.closest('button[data-topic]');
-      if (!b || L.busy) return;
-      L.set({ open: true, topic: b.getAttribute('data-topic') }, true);
-    });
+    if (L.topics) L.filters = opmetFilters(L.topics, function (key) { if (!L.busy) L.set({ open: true, topic: key }, true); });
     // Center the column on its content: as wide as the widest row of the full list, tags included
     L.fit = function () {
       L.list.classList.add('measuring'); L.head.style.width = 'max-content';
@@ -621,8 +639,11 @@ document.addEventListener('click', function (e) {
   var mq = function (q) { return window.matchMedia && matchMedia(q).matches; };
   var reduce = mq('(prefers-reduced-motion: reduce)');
   var panel = fd.closest('.foundry-panel'), field = $('[data-field]'), space = $('.fd-space'), left = $('[data-left]'), text = $('[data-text]');
-  var home = $('.fd-home'), homeV = $('.fd-v', home), homeW = $('.fd-w', home);
-  var filters = $$('[data-filter]');
+  var home = $('.fd-home');
+  var filters = $$('[data-filter]'), filterRow = opmetFilters($('[data-fd-filters]'), function (key) {
+    setFilter(key, true);
+    history.replaceState(null, '', fieldUrl());
+  });
   var SLOTS = fd.getAttribute('data-slots').split(' ').map(function (t) { var p = t.split(',').map(Number); return { x: p[0], y: p[1], d: p[2] }; });
   var items = $$('.fd-item').map(function (el) {
     return { el: el, id: el.getAttribute('data-id'), kind: el.getAttribute('data-kind'), link: $('.fd-link', el), turn: $('.fd-turn', el), oy: 161 };
@@ -710,8 +731,7 @@ document.addEventListener('click', function (e) {
     $$('[data-for]').forEach(function (el) { el.hidden = el.getAttribute('data-for') !== id; });
   }
   function setHome(open) {
-    var l = home.getAttribute(open ? 'data-back-label' : 'data-home-label');
-    homeV.textContent = homeW.textContent = l;
+    opmetCtl.label(home, home.getAttribute(open ? 'data-back-label' : 'data-home-label'));
   }
 
   function openView(id, animate) {
@@ -843,31 +863,14 @@ document.addEventListener('click', function (e) {
     if (key === st.filter) return;
     var go = function () {
       st.filter = key; st.hover = null;
-      filters.forEach(function (x) { x.setAttribute('aria-pressed', x.getAttribute('data-filter') === key ? 'true' : 'false'); });
+      filterRow.set(key);
       render();
     };
     animate && !reduce ? go() : still(go);
   }
-  filters.forEach(function (b) {
-    b.addEventListener('click', function () {
-      setFilter(b.getAttribute('data-filter'), true);
-      history.replaceState(null, '', fieldUrl());
-    });
-  });
   // The Foundry link on home writes #foundry; keep the filter that's showing in the address
   document.addEventListener('click', function (e) {
     if (e.target.closest('[data-go="foundry"]') && st.filter !== 'all') history.replaceState(null, '', fieldUrl());
-  });
-  // Hover: the word's weight follows the cursor across it, 200 at the left to 900 at the right. A hidden copy at 900
-  // holds each word's width, so nothing shifts.
-  filters.concat(home).forEach(function (b) {
-    var v = $('.fd-v', b);
-    b.addEventListener('mousemove', function (e) {
-      if (!hoverable) return;
-      var r = b.getBoundingClientRect(), t = Math.min(1, Math.max(0, (e.clientX - r.left) / r.width));
-      v.style.fontWeight = Math.round(200 + t * 700);
-    });
-    b.addEventListener('mouseleave', function () { v.style.fontWeight = ''; });
   });
 
   var rt;
