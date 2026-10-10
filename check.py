@@ -182,6 +182,18 @@ journal = json.load(open(os.path.join(ROOT, 'content', 'journal.json'), encoding
 sitemap = open(os.path.join(D, 'sitemap.xml'), encoding='utf-8').read() if os.path.exists(os.path.join(D, 'sitemap.xml')) else ''
 loc = lambda u: '<loc>https://opmetosserpse.com%s</loc>' % u in sitemap
 live = [e for e in journal['posts'] if not e.get('draft')]
+# A hidden section (site.json "hidden"): not in the cover menu; the hidden Journal is out of the sitemap and every page of
+# it is noindex
+hidden = json.load(open(os.path.join(ROOT, 'content', 'site.json'), encoding='utf-8')).get('hidden', [])
+home_html = open(os.path.join(D, 'index.html'), encoding='utf-8').read()
+nav_html = (re.search(r'<nav class="cover-nav"[\s\S]*?</nav>', home_html) or [''])[0]
+for sec, href in (('foundry', 'href="#foundry"'), ('journal', 'href="/journal/"')):
+    if sec in hidden and href in nav_html: problems.append('index.html: %s is hidden but in the menu' % sec)
+if 'journal' in hidden:
+    if '/journal/' in sitemap: problems.append('sitemap.xml: the Journal is hidden but listed')
+    problems += ['docs/journal/%s: the Journal is hidden but this page is indexable' % os.path.basename(f)
+                 for f in glob.glob(D + '/journal/*.html') if '<meta name="robots" content="noindex">' not in open(f, encoding='utf-8').read()]
+    live = []  # the checks below expect nothing in the sitemap
 for e in journal['posts']:
     built = os.path.exists(os.path.join(D, 'journal', e['slug'] + '.html'))
     if not e.get('draft') and not built: problems.append('journal.json: %s has no page in docs/journal/' % e['slug'])

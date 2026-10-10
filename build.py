@@ -987,19 +987,23 @@ def main():
     print('Hand moves: %s%s' % (', '.join(x['name'] for x in mv['moves']),
           ''.join('; %s off (%s)' % s for s in mv['skipped'])))
     links = h['links']
+    # Sections hidden until they're built (site.json "hidden", D, Oct. 9): out of the menu, not linked from the text, and
+    # (the Journal) out of the sitemap and noindex. Their panels and pages still build, reachable only by address.
+    hidden = set(site.get('hidden', []))
+    section = lambda u: 'journal' if u.startswith('/journal') else u.lstrip('#') if u.startswith('#') else None
     pat = re.compile('|'.join(re.escape(k) for k in sorted(links, key=len, reverse=True)))
     def link(s, used=None):
         used = set()
         def sub(m):
             k = m.group(0)
-            if k in used: return k
+            if k in used or section(links[k]) in hidden: return k
             used.add(k)
             ext = links[k].startswith('http')
             return '<a href="%s"%s>%s</a>' % (links[k], ' rel="noopener"' if ext else '', k)
         return pat.sub(sub, s).replace('\n', '<br>')
     go = lambda u: 'blog' if u.startswith('/journal') else u[1:]
     nav = ''.join('<a class="ctl" href="%s"%s>%s</a>' % (esc(u), ' rel="noopener"' if u.startswith('http') else ' data-go="%s"' % go(u), ctl(t))
-                  for t, u in h['nav'])  # the Journal is in the menu now, before its first post (D, Oct. 10)
+                  for t, u in h['nav'] if section(u) not in hidden)
     # Side panels: the foundry one screen to the left of home (a field of objects, from content/foundry.json),
     # About one screen to the right.
     fd = site['foundry']
@@ -1021,7 +1025,7 @@ def main():
     listing = lambda cur=None: blog_section(posts, blog_tags, jw, cur) if posts else empty_lines
     blog = ('<section class="blog-panel journal" id="blog" aria-labelledby="blog-title" data-title="%s"><h2 class="vh" id="blog-title">%s</h2>%s'
             '<div class="blog-article" data-article></div>%s</section>') % (esc(jtitle), esc(jw['title']), journal_mast(jw, True), listing())
-    noindex = '' if posts else '<meta name="robots" content="noindex">\n'
+    noindex = '' if posts and 'journal' not in hidden else '<meta name="robots" content="noindex">\n'
     jpage = lambda inner, cur=None: '<div class="journal-page journal%s" data-journal data-title="%s">%s<div class="blog-article" data-article>%s</div>%s</div>' % (
         ' is-reading' if inner else '', esc(jtitle), journal_mast(jw), inner, listing(cur))  # is-reading: the small masthead
     write('/journal/index.html', page(site, jtitle, jw['description'], '/journal/', jpage(''), so, header=False, extra_head=noindex, main_cls='journal-main'))
@@ -1030,7 +1034,7 @@ def main():
         write('/journal/%s.html' % e['slug'], page(site, '%s | %s' % (e['full_title'], site['name']),
                                                    blurb(e['paras'][0]) if e['paras'] else jw['description'], '/journal/%s' % e['slug'],
                                                    jpage(article(e, jw), e['slug']), e['_og'] or so, header=False, og_type='article',
-                                                   main_cls='journal-main'))
+                                                   main_cls='journal-main', extra_head=noindex if 'journal' in hidden else ''))
     # The old address: /blog/ goes to the Journal (its old articles are gone)
     write('/blog/index.html', '<!doctype html>\n<html lang="en"><head><meta charset="utf-8"><title>%s</title>'
           '<link rel="canonical" href="https://%s/journal/"><meta http-equiv="refresh" content="0; url=/journal/">'
@@ -1065,7 +1069,7 @@ def main():
     write('/CNAME', site['domain'] + '\n')
     write('/.nojekyll', '')
     write('/robots.txt', 'User-agent: *\nAllow: /\nSitemap: https://%s/sitemap.xml\n' % site['domain'])
-    published = [e for e in posts if not e.get('draft')]
+    published = [e for e in posts if not e.get('draft')] if 'journal' not in hidden else []
     urls = ['/', '/projects/', '/privacy'] + ['/projects/%s' % p['slug'] for p in ordered] + (
         ['/journal/'] + ['/journal/%s' % e['slug'] for e in published] if published else [])
     write('/sitemap.xml', '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n%s</urlset>\n' % ''.join(

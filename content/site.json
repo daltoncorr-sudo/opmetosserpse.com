@@ -101,5 +101,9 @@
  },
  "project_back": "Back",
  "project_all": "All work",
- "project_top": "Back to top"
+ "project_top": "Back to top",
+ "hidden": [
+  "foundry",
+  "journal"
+ ]
 }
