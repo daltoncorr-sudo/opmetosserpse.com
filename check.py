@@ -208,5 +208,33 @@ stub = os.path.join(D, 'blog', 'index.html')
 if not (os.path.exists(stub) and 'url=/journal/' in open(stub, encoding='utf-8').read()): problems.append('docs/blog/index.html does not send to /journal/')
 problems += ['docs/blog/: an old page is still there (%s)' % os.path.basename(f) for f in glob.glob(D + '/blog/*.html') if not f.endswith('index.html')]
 problems += ['sitemap.xml: an old /blog/ address' for _ in [0] if '/blog/' in sitemap]
+# Cloudflare Pages: every redirect stays on the site, and the Content-Security-Policy covers every inline script and
+# allows nothing outside the site but the payment processor's card frame
+import base64, hashlib
+rd = os.path.join(D, '_redirects')
+if not os.path.exists(rd): problems.append('docs/_redirects is missing')
+else:
+    for line in open(rd, encoding='utf-8').read().splitlines():
+        if not line.strip() or line.startswith('#'): continue
+        parts = line.split()
+        if len(parts) != 3 or not parts[1].startswith('/') or parts[1].startswith('//') or parts[2] not in ('301', '302', '303', '307', '308'):
+            problems.append('docs/_redirects: not an on-site redirect (%s)' % line)
+hd = os.path.join(D, '_headers')
+if not os.path.exists(hd): problems.append('docs/_headers is missing')
+else:
+    ht = open(hd, encoding='utf-8').read()
+    csp = (re.findall(r'Content-Security-Policy: (.+)', ht) or [''])[0]
+    if not csp: problems.append('docs/_headers: no Content-Security-Policy')
+    hosts = set(re.findall(r'https://[^\s;]+', csp))
+    extra = hosts - {'https://js.stripe.com', 'https://*.js.stripe.com', 'https://hooks.stripe.com', 'https://api.stripe.com'}
+    if extra: problems.append('docs/_headers: the policy allows an outside host (%s)' % ', '.join(sorted(extra)))
+    for f in glob.glob(D + '/**/*.html', recursive=True):
+        for body in re.findall(r'<script(?![^>]*\bsrc=)[^>]*>([\s\S]*?)</script>', open(f, encoding='utf-8').read()):
+            if "'sha256-%s'" % base64.b64encode(hashlib.sha256(body.encode('utf-8')).digest()).decode() not in csp:
+                problems.append('%s: an inline script the policy would block' % os.path.relpath(f, D))
+    for line in ht.splitlines():
+        if len(line) > 2000: problems.append('docs/_headers: a line over 2,000 characters')
+if not os.path.exists(os.path.join(ROOT, 'functions', 'api', 'health.js')): problems.append('functions/api/health.js is missing')
+
 print('\n'.join(sorted(set(problems))) or 'All clear: no broken links and no house-style problems%s.' % (' (a drafts build: placeholders let through)' if drafts else ''))
 sys.exit(1 if problems else 0)

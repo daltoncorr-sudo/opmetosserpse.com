@@ -6,7 +6,7 @@
 
 Needs Python 3.9+, Pillow (pip install Pillow) and, for video only, ffmpeg (brew install ffmpeg). No framework.
 """
-import argparse, hashlib, html, json, os, re, shutil, subprocess, sys, tempfile, urllib.parse, zipfile
+import argparse, base64, hashlib, html, json, os, re, shutil, subprocess, sys, tempfile, urllib.parse, zipfile
 import moves, dc_source
 from datetime import date
 
@@ -282,6 +282,60 @@ def write(path, text):
     full = os.path.join(DIST, path.lstrip('/'))
     os.makedirs(os.path.dirname(full), exist_ok=True)
     with open(full, 'w', encoding='utf-8') as f: f.write(text)
+
+# Cloudflare Pages. Every redirect stays on the site; the one outside frame is the payment processor's card field.
+STRIPE_SCRIPT = 'https://js.stripe.com https://*.js.stripe.com'
+STRIPE_FRAME = 'https://js.stripe.com https://*.js.stripe.com https://hooks.stripe.com'
+STRIPE_CONNECT = 'https://api.stripe.com'
+
+def redirects_file():
+    """docs/_redirects from content/redirects.json, a list of [from, to, status]. An empty `to` is a placeholder:
+    written as a comment until it has a target."""
+    out = ['# Built by build.py from content/redirects.json. Every target stays on this site.']
+    for src, dest, status in load(os.path.join(CONTENT, 'redirects.json')):
+        out.append('%s %s %d' % (src, dest, status) if dest else '# %s: a placeholder, no target yet' % src)
+    return '\n'.join(out) + '\n'
+
+def inline_script_hashes():
+    """The sha256 of every inline script in the built pages, for the Content-Security-Policy."""
+    found = set()
+    for dp, _, fs in os.walk(DIST):
+        for f in fs:
+            if f.endswith('.html'):
+                t = open(os.path.join(dp, f), encoding='utf-8').read()
+                for body in re.findall(r'<script(?![^>]*\bsrc=)[^>]*>([\s\S]*?)</script>', t):
+                    found.add("'sha256-%s'" % base64.b64encode(hashlib.sha256(body.encode('utf-8')).digest()).decode())
+    return sorted(found)
+
+def headers_file():
+    """docs/_headers. HTML keeps Cloudflare's default short caching (max-age=0, must-revalidate). The stylesheets and
+    scripts carry ?v= fingerprints, so they cache for a year; fonts, media and brand files for a week, since their
+    names don't change when they do. A path matching two rules gets both values joined, so the cache rules never overlap."""
+    csp = '; '.join([
+        "default-src 'self'",
+        "script-src 'self' %s %s" % (' '.join(inline_script_hashes()), STRIPE_SCRIPT),
+        "style-src 'self' 'unsafe-inline'",
+        "img-src 'self' data:",
+        "font-src 'self'",
+        "media-src 'self'",
+        "connect-src 'self' %s" % STRIPE_CONNECT,
+        "frame-src %s" % STRIPE_FRAME,
+        "object-src 'none'",
+        "base-uri 'self'",
+        "form-action 'self'",
+        "frame-ancestors 'none'",
+    ])
+    year = 'public, max-age=31536000, immutable'
+    week = 'public, max-age=604800'
+    rules = [('/*', [('X-Content-Type-Options', 'nosniff'), ('Referrer-Policy', 'strict-origin-when-cross-origin'),
+                     ('Content-Security-Policy', csp)])]
+    rules += [(p, [('Cache-Control', year)]) for p in ('/css/*', '/js/*')]
+    rules += [(p, [('Cache-Control', week)]) for p in ('/fonts/*', '/media/*', '/dc/*', '/brand/*')]
+    out = ['# Built by build.py. Cloudflare Pages applies these to static files, not to Functions (functions/ sets its own).']
+    for path, hs in rules:
+        out.append(path)
+        out += ['  %s: %s' % (k, v) for k, v in hs]
+    return '\n'.join(out) + '\n'
 
 def notes_media(p):
     """The notes file's own list of the page's media, when a page departs from daltoncorr.com (see notes_list)."""
@@ -1065,9 +1119,12 @@ def main():
     body = '<section class="notfound"><p>%s</p><p><a href="/">%s</a></p></section>' % (typo(nf['line']), esc(nf['link']))
     write('/404.html', page(site, nf['og_title'], nf['line'], '/404', body, so, extra_head='<meta name="robots" content="noindex">\n'))
 
-    # hosting files
+    # hosting files: CNAME and .nojekyll keep GitHub Pages working until DNS moves; _redirects and _headers are
+    # Cloudflare Pages' (GitHub Pages ignores them)
     write('/CNAME', site['domain'] + '\n')
     write('/.nojekyll', '')
+    write('/_redirects', redirects_file())
+    write('/_headers', headers_file())
     write('/robots.txt', 'User-agent: *\nAllow: /\nSitemap: https://%s/sitemap.xml\n' % site['domain'])
     published = [e for e in posts if not e.get('draft')] if 'journal' not in hidden else []
     urls = ['/', '/projects/', '/privacy'] + ['/projects/%s' % p['slug'] for p in ordered] + (
