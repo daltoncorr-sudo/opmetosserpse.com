@@ -438,15 +438,38 @@
   $$('[data-studio]').forEach(function (a) { a.addEventListener('click', function (e) { e.preventDefault(); closePanel(); }); });
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && current) closePanel(); });
 
+  // Where an element sits in the page's own flow: its box, less whatever offset the stage's slide still holds (closing a
+  // project measures the list while the stage is still a screen up, mid-slide)
+  function inFlow(el) {
+    var r = el.getBoundingClientRect(), d = stage.getBoundingClientRect().top - stage.parentNode.getBoundingClientRect().top;
+    return { top: r.top - d, bottom: r.bottom - d };
+  }
+  // Where the page lands when a project or a panel closes. Stepping back in the history makes the browser restore that
+  // entry's scroll, or scroll to its #work and focus it, just after the popstate, and it measures the page while the
+  // stage is still a screen up, mid-slide: one screen too high, which is the cover. (That was the All work bug: from a
+  // project opened off #work, the way back landed on the cover.) So the page holds its place for a moment, and the
+  // focus goes back where it belongs once the browser is done.
+  var held = null;
+  function landAt(y, el) {
+    if (held) window.removeEventListener('scroll', held);
+    var hold = held = function () { if (Math.abs(window.scrollY - y) > 1) window.scrollTo(0, y); };
+    hold(); window.addEventListener('scroll', hold);
+    if (el) place(el);
+    setTimeout(function () {
+      if (held !== hold) return;
+      hold(); window.removeEventListener('scroll', hold); held = null;
+      var f = document.activeElement;  // the browser's own focus goes to #work (or nowhere); a reader's own move stays
+      if (el && f !== el && (f === work || f === document.body || !f)) place(el);
+    }, 400);
+  }
   // Work: scroll so the list (its heading and rows) sits in the middle of the screen, #work in the address, focus on it.
   // If the list is taller than the screen, its top sits a little below the top edge instead.
   var work = $('#work');
-  function centerWork(smooth) {
-    var head = $('.work-head', work).getBoundingClientRect(), rows = $('#works').getBoundingClientRect();
-    var top = head.top, h = rows.bottom - head.top;
-    var y = window.scrollY + top - (h < innerHeight * .9 ? (innerHeight - h) / 2 : innerHeight * .08);
-    window.scrollTo({ top: Math.max(0, y), behavior: smooth && !reduce ? 'smooth' : 'auto' });
+  function workY() {
+    var head = inFlow($('.work-head', work)), rows = inFlow($('#works')), h = rows.bottom - head.top;
+    return Math.max(0, Math.round(window.scrollY + head.top - (h < innerHeight * .9 ? (innerHeight - h) / 2 : innerHeight * .08)));
   }
+  function centerWork(smooth) { window.scrollTo({ top: workY(), behavior: smooth && !reduce ? 'smooth' : 'auto' }); }
   $$('[data-go="work"]').forEach(function (a) {
     a.addEventListener('click', function (e) {
       e.preventDefault();
@@ -502,10 +525,8 @@
     if (list.classList.contains('is-open') && location.hash !== '#archive') history.replaceState(history.state, '', location.pathname + location.search + '#archive');
     // Back onto the work list, as it was; centered if it's off screen (wherever the project came from), and always for
     // All work, which lands on the full list
-    var r = work.getBoundingClientRect();
-    if (then === 'archive' || r.bottom < 0 || r.top > innerHeight) centerWork(false);
-    if (then === 'archive') place(work);
-    else if (ppFrom && animate) place(ppFrom);
+    var r = inFlow(work), y = then === 'archive' || r.bottom < 0 || r.top > innerHeight ? workY() : Math.round(window.scrollY);
+    landAt(y, then === 'archive' ? work : ppFrom && animate ? ppFrom : null);
   }
   function openProject(slug, animate, push) {
     return fetchProject(slug).then(function (p) {
@@ -521,14 +542,10 @@
     if (ppPushed) history.back();  // popstate slides up
     else { history.replaceState(null, '', '/' + (list.classList.contains('is-open') ? '#archive' : '#work')); showProject(false, true); }
   }
-  // The cover: the top of home, the address plain /, focus on the Work option. Stepping back in the history can make the
-  // browser restore that entry's scroll just after; hold the page at the top while it would.
+  // The cover: the top of home, the address plain /, focus on the Work option
   function toCover() {
     history.replaceState(history.state, '', location.pathname + location.search);
-    var hold = function () { if (window.scrollY) window.scrollTo(0, 0); };
-    hold(); window.addEventListener('scroll', hold);
-    setTimeout(function () { hold(); window.removeEventListener('scroll', hold); }, 400);
-    var w = $('[data-go="work"]'); if (w) place(w);
+    landAt(0, $('[data-go="work"]'));
   }
   list.addEventListener('click', function (e) {
     var a = e.target.closest('.work-row a');
@@ -575,18 +592,19 @@
   }
   panels.foundry.inert = panels.about.inert = panels.blog.inert = true;
   sync(true);
-  if (location.hash === '#archive') work.scrollIntoView();
-  if (location.hash === '#work') { centerWork(false); window.addEventListener('load', function () { centerWork(false); }); }
+  // Arriving at #work or #archive (All work, from a project page loaded by itself): the list, centered (again once its
+  // type and pictures have settled), with the focus on it
+  if (/^#(work|archive)$/.test(location.hash)) {
+    centerWork(false); work.focus({ preventScroll: true });
+    window.addEventListener('load', function () { centerWork(false); });
+  }
   window.addEventListener('popstate', function () {
     if (leaving) {
       leaving = false; pushed = false;
       if (location.hash || location.pathname !== '/') history.replaceState(null, '', '/');
-      // Stepping back can land on an earlier entry such as #work, and the browser then restores that entry's scroll
-      // (just after this event). Home goes to the cover, so hold the page at the top while it does.
-      var hold = function () { if (window.scrollY) window.scrollTo(0, 0); };
-      hold(); setPanel('', true);
-      window.addEventListener('scroll', hold);
-      setTimeout(function () { hold(); window.removeEventListener('scroll', hold); }, 400);
+      // Stepping back can land on an earlier entry such as #work, which the browser then scrolls to: Home goes to the
+      // cover, so the page holds at the top
+      landAt(0); setPanel('', true);
       return;
     }
     var slug = journal && journal.of();
