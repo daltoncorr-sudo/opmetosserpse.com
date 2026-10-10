@@ -301,6 +301,12 @@ html:not(.js) .stage:has(#about:target){transform:translateX(-66.6667%)}
 .work-row.is-current>a{color:var(--tag-gray)}
 /* The topics See more reveals on the Journal: a filter row (.filters), --s4 from the head and the rows */
 .blog-topics{margin:0 0 var(--s4)}
+/* The Journal's topics in the sans, upright, like the tags they filter (D, Oct. 10): 14px, tag gray, the chosen one
+   black in the sans's medium. No weight sweep: the sans has two weights, so the hover only turns the word ink. */
+.blog-topics .ctl{font:normal 400 14px/1.4 var(--sans);letter-spacing:0}
+.blog-topics .ctl-w{font-weight:500}
+.blog-topics .ctl-v{font-weight:400!important}
+.blog-topics .ctl.filter[aria-pressed="true"] .ctl-v{font-weight:500!important}
 .tags{display:inline-flex;flex-wrap:wrap;gap:.15em .8em;font:400 11.5px/1.4 var(--sans);letter-spacing:.02em;color:var(--tag-gray)}
 /* The year, once per year, in the left margin */
 .yr{position:absolute;right:calc(100% + var(--s4));top:0;font:400 11.5px/1.4 var(--sans);letter-spacing:.02em;color:var(--tag-gray);font-variant-numeric:tabular-nums;padding-top:.45em}

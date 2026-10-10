@@ -60,7 +60,7 @@ The standard is a top agency, not a template. Image first. Very few words, only 
 One system (`build.py` `ctl()`, `site.css` `.ctl`, `site.js` `opmetCtl` and `opmetFilters`); every control of a kind looks and behaves the same everywhere.
 - **List labels** (Selected work, All work, Selected articles, All articles at the head of a list): `.work-label`, the serif.
 - **List toggles and links** (See more, See less, Home, All work, All articles, the cover's options, the Foundry's Home and Back): `.ctl`, Source Serif 4 italic at one size, in ink, no underline. Hover sweeps the word's weight with the cursor, thin at its left edge to black at its right; a hidden copy at the heaviest weight holds the width, so nothing moves. With reduced motion the word simply turns bold. At least 44 px square to touch, without taking more room in its line; the focus ring shows for the keyboard.
-- **Filters** (the Journal's topics; the Foundry's All, Digital and Physical, still at `#foundry?digital` and `#foundry?physical`): `.ctl.filter` in a `.filters` row, one script. Tag gray; the chosen one pure black and bold, with `aria-pressed`.
+- **Filters** (the Journal's topics; the Foundry's All, Digital and Physical, still at `#foundry?digital` and `#foundry?physical`): `.ctl.filter` in a `.filters` row, one script. Tag gray; the chosen one pure black and bold, with `aria-pressed`. The Journal's topics are set in the sans, upright, 14 px, like the tags they filter, with no weight sweep; the chosen one black in the sans's medium (D, Oct. 10).
 - **Tags:** `.tags`, small sans, tag gray. Not clickable.
 
 ## The lightbox
