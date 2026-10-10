@@ -100,7 +100,7 @@ for i, slug in enumerate(order):
     hide = notes.get('hide', [])
     if hide and slug != 'sunnys-bookshop': problems.append('%s: only Sunny\'s Bookshop hides items' % rel)
     pj = json.load(open(os.path.join(ROOT, 'content', 'projects', slug + '.json'), encoding='utf-8'))
-    stem = lambda p: re.sub(r'-(600|720|800|1200|1600|2400|sm|lg|xl)$', '', re.sub(r'\.(webp|jpe?g|png|gif|mp4|webm|mov)$', '', os.path.basename(p), flags=re.I))
+    stem = lambda p: re.sub(r'-(600|720|800|1100|1200|1600|2200|2400|sm|lg|xl)$', '', re.sub(r'\.(webp|jpe?g|png|gif|mp4|webm|mov)$', '', os.path.basename(p), flags=re.I))
     hidden = {stem(m['src']) for m in pj['media'] if m['alt'] in hide}
     want = [k for k in record.get(slug, []) if k not in hidden]
     body = t.split('class="pp"', 1)[-1].split('class="g pfoot"', 1)[0]

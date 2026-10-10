@@ -95,7 +95,7 @@ def items(site_root, slug):
 def stem(path):
     """A file's name without folder, size suffix or extension: how one picture is matched across the two sites."""
     b = re.sub(r'\.(webp|jpe?g|png|gif|mp4|webm|mov)$', '', os.path.basename(path), flags=re.I)
-    return re.sub(r'-(600|720|800|1200|1600|2400|sm|lg|xl)$', '', b)
+    return re.sub(r'-(600|720|800|1100|1200|1600|2200|2400|sm|lg|xl)$', '', b)
 
 def _scripts_text(site_root, name):
     with open(os.path.join(site_root, 'js', name), encoding='utf-8') as f: return f.read()
