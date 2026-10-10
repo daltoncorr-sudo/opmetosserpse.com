@@ -103,6 +103,27 @@ html.is-locked{overflow:hidden}
 /* With posts, the list is one screen, centered on it. An article opens above; reading to its end brings the list back
    to the middle of the screen. The same in both states, so the list never moves when an article comes or goes. */
 .blog-list{display:flex;flex-direction:column;justify-content:center;min-height:100vh;padding:calc(var(--s6) * 2) 0}
+/* The Journal's masthead, on its own pages and in the panel: the hand and the name (to the studio), Journal, and a small
+   line. A newspaper's nameplate, not a hero: the inner pages' lockup, a little smaller, with the word under it. */
+.journal{--mast:150px}
+.journal-mast{height:var(--mast);display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding-top:24px;text-align:center}
+.journal-mast .lockup{gap:9px}.journal-mast .lockup-hand{height:30px}.journal-mast .wordmark{width:118px;margin-bottom:3px}
+.journal-mast p{margin:0}
+.journal-name{margin-top:14px!important;font:400 clamp(24px,2.1vw,30px)/1.15 var(--serif);letter-spacing:.01em}
+.journal-line{margin-top:4px!important;font-size:var(--size-s);color:var(--graphite)}
+.journal .blog-list{min-height:calc(100vh - var(--mast))}
+/* With an article open: one small link under the masthead, back to the list (set like the site's other options) */
+.journal-all{margin:8px 0 0;text-align:center;font:italic 400 clamp(17px,1.35vw,20px)/1.4 var(--serif);letter-spacing:.01em}
+.journal-all a{color:var(--ink)}.journal-all a:hover{color:var(--graphite)}
+.journal .article-head{margin-top:10vh}
+/* A picture in an article (a photo essay): wider than the text, centered on it */
+.article-body .article-img{width:min(90vw,60rem);margin:2.4em 0 2.4em 50%;transform:translateX(-50%)}
+.article-body .article-img img{width:100%;height:auto}
+/* The Journal's own page: the panel's contents, on a page that scrolls */
+.journal-page{padding:0 var(--gutter);width:100%}
+.journal-empty{display:flex;align-items:center;justify-content:center;min-height:calc(100vh - var(--mast));font:400 clamp(18px,1.55vw,23px)/1.5 var(--serif);text-align:center}
+.journal-empty p{margin:0}
+.work-label:focus{outline:none}
 .blog-article{display:flow-root}  /* keeps the title's margin inside, so scrolling to the article lands above its title */
 .article-head h1:focus{outline:none}
 .article-body{max-width:var(--measure);margin:0 auto;font:400 19px/1.6 var(--serif)}
