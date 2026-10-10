@@ -1,0 +1,100 @@
+{
+ "tags": [
+  "Studio",
+  "Essay",
+  "Case study",
+  "Photo essay"
+ ],
+ "posts": [
+  {
+   "slug": "opmet-osserpse",
+   "title": "Opmet Osserpse",
+   "full_title": "Opmet Osserpse",
+   "tags": [
+    "Studio"
+   ],
+   "selected": true,
+   "draft": true
+  },
+  {
+   "slug": "jony-ive-and-the-everything-designer",
+   "title": "Jony Ive and the everything designer",
+   "full_title": "Jony Ive and the everything designer",
+   "tags": [
+    "Essay"
+   ],
+   "selected": true,
+   "draft": true
+  },
+  {
+   "slug": "hollyshorts-at-half-a-decade",
+   "title": "HollyShorts at half a decade",
+   "full_title": "HollyShorts at half a decade",
+   "tags": [
+    "Case study"
+   ],
+   "selected": true,
+   "draft": true
+  },
+  {
+   "slug": "the-evolution-of-tactility-in-consumer-design",
+   "title": "The evolution of tactility in consumer design",
+   "full_title": "The evolution of tactility in consumer design",
+   "tags": [
+    "Essay"
+   ],
+   "selected": true,
+   "draft": true
+  },
+  {
+   "slug": "observations-from-venice-california",
+   "title": "Observations from Venice, California",
+   "full_title": "Observations from Venice, California",
+   "tags": [
+    "Photo essay"
+   ],
+   "selected": true,
+   "draft": true
+  },
+  {
+   "slug": "composer-with-a-pencil-designer-with-a-piano",
+   "title": "Composer with a pencil, designer with a piano",
+   "full_title": "Composer with a pencil, designer with a piano",
+   "tags": [
+    "Essay"
+   ],
+   "selected": true,
+   "draft": true
+  },
+  {
+   "slug": "hand-is-to-prompt-as-hippie-is-to-cowboy",
+   "title": "Hand is to prompt as hippie is to cowboy",
+   "full_title": "Hand is to prompt as hippie is to cowboy",
+   "tags": [
+    "Essay"
+   ],
+   "selected": true,
+   "draft": true
+  },
+  {
+   "slug": "sunnys-bookshop",
+   "title": "Sunny's Bookshop",
+   "full_title": "Sunny's Bookshop",
+   "tags": [
+    "Case study"
+   ],
+   "selected": true,
+   "draft": true
+  },
+  {
+   "slug": "building-the-opmet-serif",
+   "title": "Building the Opmet Serif",
+   "full_title": "Building the Opmet Serif",
+   "tags": [
+    "Case study"
+   ],
+   "selected": true,
+   "draft": true
+  }
+ ]
+}

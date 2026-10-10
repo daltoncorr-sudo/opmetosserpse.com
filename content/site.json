@@ -31,8 +31,8 @@
     "#foundry"
    ],
    [
-    "Blog",
-    "#blog"
+    "Journal",
+    "/journal/"
    ],
    [
     "About",
@@ -85,12 +85,14 @@
    "Say hello at hello@opmetosserpse.com\n@opmetosserpse"
   ]
  },
- "blog": {
-  "title": "Blog",
+ "journal": {
+  "title": "Journal",
+  "line": "Notes from the studio",
+  "description": "Notes from the studio.",
   "lines": [
    "Notes from the studio, coming soon."
   ],
-  "label": "Blog",
+  "label": "Journal",
   "selected": "Selected articles",
   "all": "All articles",
   "more": "See more",
