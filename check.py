@@ -81,8 +81,9 @@ for f in glob.glob(D + '/**/*.html', recursive=True):
         if re.search(r'\sloop(?=[\s>=])', tag) and not (srcs and all(re.search(r'/(%s)\.(webm|mp4)$' % '|'.join(LOOPS), x) for x in srcs)):
             problems.append('%s: a <video> that loops (only %s may)' % (rel, ' and '.join(LOOPS)))
 order = json.load(open(os.path.join(ROOT, 'content', 'index.json'), encoding='utf-8')).get('project_order', [])
-# The order of each project's daltoncorr.com page, as recorded on Oct. 8, 2026: the pages must show it, item for item
-record = json.load(open(os.path.join(ROOT, '_review', '2026-10-08_media-order-record_v02.json'), encoding='utf-8'))
+# The order of each project's daltoncorr.com page, as recorded on Oct. 8, 2026 (v02), with the pages D changed on purpose
+# at their new orders (v03, Oct. 10, 2026; the lists in their notes files): the pages must show it, item for item
+record = json.load(open(os.path.join(ROOT, '_review', '2026-10-10_media-order-record_v03.json'), encoding='utf-8'))
 for i, slug in enumerate(order):
     f = os.path.join(D, 'projects', slug + '.html')
     if not os.path.exists(f): problems.append('projects/%s: in project_order but not built' % slug); continue
