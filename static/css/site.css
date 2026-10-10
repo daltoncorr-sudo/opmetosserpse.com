@@ -404,6 +404,11 @@ html:not(.js) .stage:has(#about:target){transform:translateX(-66.6667%)}
 @supports (height:1svh){.pp{--cap:85svh}}
 .pp .b .m.cap{width:100%;max-width:calc(var(--cap) * var(--ar));margin-inline:auto}
 .pp .b .row{width:100%;max-width:calc(var(--cap) * var(--ar) + var(--g) * (var(--n) - 1));margin-inline:auto}
+/* Cut-outs (a notes file's "cut"): transparent pictures straight on the paper, no frame or box, at a size: small, medium
+   or large. Cut-outs that share a row sit in it together, centered, each at its own size, and scale down together. */
+.pp .b-cuts .cuts{grid-column:2/12;grid-row:1;display:flex;justify-content:center;align-items:center;gap:clamp(16px,2.8vw,40px)}
+.pp .b .cut{flex:0 1 var(--cw);min-width:0}
+.pp .cut-small{--cw:clamp(72px,11vw,168px)}.pp .cut-medium{--cw:clamp(104px,18vw,272px)}.pp .cut-large{--cw:clamp(150px,30vw,440px)}
 .pp .b-wide .note{grid-row:2}  /* its note in the right margin, under the picture's corner */
 .pp .row{display:flex;gap:var(--g);align-items:flex-start}.pp .row .m{flex:1 1 0;min-width:0}
 .pp .b-full{display:block}.pp .b-full .fcap{margin-top:10px}
@@ -436,6 +441,7 @@ html:not(.js) .stage:has(#about:target){transform:translateX(-66.6667%)}
   .pp .nt,.pp .note:not(:has(.again)),.pp .fcap:not(:has(.again)){display:none}.pp .note{margin:6px 0 0}
   .pp .chl{display:none}
   .pp .pfoot{justify-content:flex-start}
+  .pp .row-stack{flex-direction:column;gap:var(--u)}.pp .row-stack .m{flex:none!important;width:100%}  /* a notes file's row: stacked */
 }
 /* The foundry: objects in space. An approved exception to the one motion value (see the build report): products float
    at scattered depths, bob and turn, and open in place. Every object is plain CSS 3D; site.js places them. */

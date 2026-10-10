@@ -166,6 +166,8 @@ class Media:
 # How wide each block draws, for srcset
 SIZES = {'single': '(max-width:640px) 100vw, 77vw', 'row': '(max-width:640px) 50vw, 38vw', 'full': '100vw',
          'tall': '(max-width:640px) 100vw, 46vw'}
+# A cut-out's size (site.css .cut-small, .cut-medium, .cut-large: at most 168, 272 and 440 px wide)
+CUTS = {'small': '168px', 'medium': '272px', 'large': '440px'}
 
 def img_tag(m, sizes, alt, eager=False, extra=''):
     src, srcset, w, h = m
@@ -273,9 +275,46 @@ def write(path, text):
     with open(full, 'w', encoding='utf-8') as f: f.write(text)
 
 def notes_media(p):
-    """The notes file's own list of pictures, when a page doesn't mirror daltoncorr.com (src, alt, slot, gallery)."""
+    """The notes file's own list of the page's media, when a page departs from daltoncorr.com (see notes_list)."""
     fn = os.path.join(CONTENT, 'notes', p['slug'] + '.json')
     return load(fn).get('media', []) if os.path.exists(fn) else []
+
+def keyed(items):
+    """Name each item by key: a picture's or film's file name without size or extension, or w:<piece> for a 3D or
+    interactive piece; numbered when one repeats (w:sb-viewer-2). A key already given (a piece from a notes file) stays."""
+    seen = {}
+    for x in items:
+        k = x.get('key') or ('w:' + x['name'] if x['kind'] == 'widget' else dc_source.stem(x['src']))
+        seen[k] = seen.get(k, 0) + 1
+        x['key'] = k if seen[k] == 1 or x.get('key') else '%s-%d' % (k, seen[k])
+    return items
+
+FILMS = ('.mp4', '.mov', '.webm')
+
+def notes_list(p, src_root):
+    """A page that departs from its daltoncorr.com page (D's calls: HDtracks' fresh captures, Comedy 10's opening, Don't
+    Let Them Out's tees, Sunny's edit) lists its media in its notes file, "media", in page order. Each entry is a picture
+    or film ("src": a path in the daltoncorr clone, or under content/ for a file made for this site; .mp4, .mov and
+    .webm are films) or one of the daltoncorr.com page's 3D and interactive pieces ("piece": its key, as "w:badge-float").
+    Optional: "alt" (else the project file's, else the daltoncorr.com page's), "slot", "gallery" (pictures in one gallery
+    sit two to a row, as on daltoncorr.com), "row" (entries that share it sit in one row, side by side at one height,
+    pictures and films alike, stacked on phones) and "cut" (small, medium or large: a cut-out, a transparent picture
+    straight on the paper, no frame or box; cut-outs that share a "row" sit in one row, each at its own size)."""
+    dc, out, errs = None, [], []
+    for m in notes_media(p):
+        if m.get('piece') or dc is None and not m.get('alt'):
+            dc = dc if dc is not None else keyed(dc_source.items(src_root, p['slug']))
+        if m.get('piece'):
+            w = next((x for x in dc if x['key'] == m['piece'] and x['kind'] == 'widget'), None)
+            if not w: errs.append('piece %s: no such 3D or interactive piece on the daltoncorr.com page' % m['piece']); continue
+            out.append(dict(w, gallery=0, row=m.get('row'))); continue
+        kind = 'video' if m['src'].lower().endswith(FILMS) else 'img'
+        alt = m.get('alt') or next((x['alt'] for x in dc or [] if x.get('src') and dc_source.stem(x['src']) == dc_source.stem(m['src'])), '')
+        if m.get('cut') and (m['cut'] not in CUTS or kind != 'img'): errs.append('%s: "cut" is small, medium or large, for a picture' % m['src'])
+        out.append(dict(kind=kind, src=m['src'], alt=alt, w=0, h=0, gallery=m.get('gallery', 0), wide=m.get('slot') == 'W',
+                        cut=m.get('cut'), row=m.get('row')))
+    if errs: sys.exit('Fix the media list in content/notes/%s.json first:\n  %s' % (p['slug'], '\n  '.join(errs)))
+    return out
 
 def load_notes(p, keys):
     """content/notes/<slug>.json: the Work line, chapter labels, margin notes, how each film rests and plays, and (Sunny's
@@ -335,25 +374,35 @@ BILLBOARD = re.compile(r'billboard', re.I)
 def make_blocks(items, notes):
     """Group the items, in order, into blocks. Pictures from the same gallery on daltoncorr.com sit two to a row, at one
     height, so a gallery reads as a group; outside a gallery, two P pictures in a row pair up, as before. A billboard,
-    a full bleed (H, F), a film and a 3D or interactive piece each stand alone."""
+    a full bleed (H, F), a film and a 3D or interactive piece each stand alone. From a notes file's media list: items
+    that share a "row" sit in one row, side by side at one height, pictures and films alike (stacked on phones); a
+    cut-out ("cut") stands on the paper at its size, and cut-outs that share a "row" sit in one row (kind "cuts")."""
     out, i = [], 0
     def alone(x):
-        return x['kind'] != 'img' or x['slot'] in ('H', 'F') or BILLBOARD.search(x.get('alt', ''))
+        return x['kind'] != 'img' or x['slot'] in ('H', 'F') or BILLBOARD.search(x.get('alt', '')) or x.get('cut') or x.get('row')
     def pairable(x, y):
         if not y or alone(x) or alone(y) or x['gallery'] != y['gallery']: return False
         return bool(x['gallery']) or x['slot'] == y['slot'] == 'P'
     while i < len(items):
         it = items[i]; nxt = items[i + 1] if i + 1 < len(items) else None
-        grp = [it, nxt] if pairable(it, nxt) else [it]
+        if it.get('row') or it.get('cut'):
+            j = i + 1
+            while it.get('row') and j < len(items) and items[j].get('row') == it['row']: j += 1
+            grp = items[i:j]
+            if any(x.get('cut') for x in grp) and not all(x.get('cut') for x in grp):
+                sys.exit('Row "%s": a row is all cut-outs or none.' % it['row'])
+        else:
+            grp = [it, nxt] if pairable(it, nxt) else [it]
         i += len(grp)
         note = next((notes[x['key']]['text'] for x in grp if x['key'] in notes), None)
-        if len(grp) == 2: kind = 'row'
+        if it.get('cut'): kind = 'cuts'
+        elif len(grp) >= 2: kind = 'row'
         elif it['kind'] == 'img' and it['slot'] in ('H', 'F'): kind = 'full'
         elif it['kind'] == 'video' and it['w'] / it['h'] < 0.83: kind = 'tall'
         else: kind = 'single'
         prev = out[-1] if out else None  # a row that continues its gallery sits closer to the one before it
         cont = kind == 'row' and prev and prev['kind'] == 'row' and it['gallery'] and prev['items'][0]['gallery'] == it['gallery']
-        out.append(dict(kind=kind, items=grp, note=note, cont=bool(cont)))
+        out.append(dict(kind=kind, items=grp, note=note, cont=bool(cont), stack=kind == 'row' and bool(it.get('row'))))
     return out
 
 def block_html(b, slug):
@@ -363,16 +412,19 @@ def block_html(b, slug):
     kind = b['kind']
     ms = []
     for it in b['items']:
-        cls = 'm' + (' piece' if it['kind'] == 'widget' else '')
+        cls = 'm' + (' piece' if it['kind'] == 'widget' else '') + (' cut cut-%s' % it['cut'] if kind == 'cuts' else '')
         style = 'flex-grow:%.4f' % (it['w'] / it['h']) if kind == 'row' else ''
         if kind in ('single', 'tall') and it['kind'] != 'widget' and it['h'] > it['w']:
             cls += ' cap'; style = '--ar:%.4f' % (it['w'] / it['h'])
         style = ' style="%s"' % style if style else ''
         skip = ' data-lightbox-skip' if it['kind'] == 'widget' else ''  # a 3D or interactive piece stays out of the lightbox
-        ms.append('<div class="%s" data-i="%s"%s%s>%s</div>' % (cls, esc(it['key']), style, skip, it['html'](SIZES[kind])))
+        sizes = CUTS[it['cut']] if kind == 'cuts' else SIZES[kind]
+        ms.append('<div class="%s" data-i="%s"%s%s>%s</div>' % (cls, esc(it['key']), style, skip, it['html'](sizes)))
     if kind == 'row':
         ar = sum(it['w'] / it['h'] for it in b['items'])
-        media = '<div class="row" style="--ar:%.4f;--n:%d">%s</div>' % (ar, len(b['items']), ''.join(ms))
+        media = '<div class="row%s" style="--ar:%.4f;--n:%d">%s</div>' % (' row-stack' if b.get('stack') else '', ar, len(b['items']), ''.join(ms))
+    elif kind == 'cuts':
+        media = '<div class="cuts">%s</div>' % ''.join(ms)
     else:
         media = ''.join(ms)
     cap_ = '<span class="nt">%s</span>' % typo(b['note']) if b['note'] else ''  # the words; the film links stay apart
@@ -782,15 +834,9 @@ def main():
     stats, used_scripts = {}, set()
     for p in ordered:
         s = p['slug']; items = []
-        if notes_media(p):  # a page rebuilt with pictures made for this site: its list is in the notes file
-            dc = [dict(kind='img', src=m['src'], alt=m['alt'], w=0, h=0, gallery=m.get('gallery', 0), wide=False) for m in notes_media(p)]
-        else:
-            dc = dc_source.items(src_root, s)
+        # a page that departs from daltoncorr.com (D's calls) lists its media in its notes file; the rest mirror it
+        dc = keyed(notes_list(p, src_root) if notes_media(p) else dc_source.items(src_root, s))
         js = {dc_source.stem(m['src']): m for m in p['media']}
-        seen = {}
-        for x in dc:  # keys: a picture's file name, or w:<piece>; numbered when one repeats
-            k = 'w:' + x['name'] if x['kind'] == 'widget' else dc_source.stem(x['src'])
-            seen[k] = seen.get(k, 0) + 1; x['key'] = k if seen[k] == 1 else '%s-%d' % (k, seen[k])
         notes = p['_notes'] = load_notes(p, [x['key'] for x in dc])
         p['_record'] = [x['key'] for x in dc]
         for x in dc:
@@ -800,7 +846,8 @@ def main():
             alt = jm['alt'] if jm else x.get('alt', '')
             name = re.sub(r'[^a-z0-9]+', '-', k.lower()).strip('-')
             if x['kind'] == 'widget':
-                items.append(dict(key=k, kind='widget', name=x['name'], slot='X', gallery=0, html=lambda sz, h=x['html']: h, scripts=x['scripts']))
+                items.append(dict(key=k, kind='widget', name=x['name'], slot='X', gallery=0, html=lambda sz, h=x['html']: h, scripts=x['scripts'],
+                                  row=x.get('row')))
                 media.assets(x['assets'])
                 continue
             src = x['src'] if os.path.exists(media.path(x['src'])) or not jm else jm['src']
@@ -813,18 +860,18 @@ def main():
                 if not v: continue
                 vid = 'v-%s-%s' % (s, name)
                 items.append(dict(key=k, slot='V', kind='video', w=v['w'], h=v['h'], id=vid, sound=sound, v=v, rest=rest, gallery=x['gallery'], alt=alt,
-                                  html=lambda sz, v=v, vid=vid, alt=alt, rest=rest, sound=sound, e=eager: video_tag(v, vid, alt, rest, sound, e)))
+                                  row=x.get('row'), html=lambda sz, v=v, vid=vid, alt=alt, rest=rest, sound=sound, e=eager: video_tag(v, vid, alt, rest, sound, e)))
                 p.setdefault('_bigs', []).append(v['mp4'])
                 continue
-            r = media.image(src, s, name)
+            r = media.image(src, s, name, max_w=1600 if x.get('cut') else 2400)  # a cut-out is never wider than 440 px
             if not r: continue
             # the size: the approved slot when the picture was already on this site; otherwise from daltoncorr.com's layout
-            nm = next((m for m in notes_media(p) if m['src'] == x['src']), None)
+            nm = next((m for m in notes_media(p) if m.get('src') == x['src']), None)
             if nm and nm.get('slot'): slot = nm['slot']
             elif jm: slot = jm['slot']
             elif x['wide']: slot = 'W'
             else: slot = 'P' if r[3] > r[2] else 'L'
-            items.append(dict(key=k, slot=slot, kind='img', w=r[2], h=r[3], r=r, gallery=x['gallery'], alt=alt,
+            items.append(dict(key=k, slot=slot, kind='img', w=r[2], h=r[3], r=r, gallery=x['gallery'], alt=alt, cut=x.get('cut'), row=x.get('row'),
                               html=lambda sz, r=r, alt=alt, e=eager: img_tag(r, sz, alt, e)))
             p.setdefault('_bigs', []).append(r[0])
         blocks = make_blocks(items, notes['notes'])
