@@ -165,7 +165,7 @@ class Media:
 # How wide each block draws, for srcset
 # How wide each block draws, for srcset
 SIZES = {'single': '(max-width:640px) 100vw, 77vw', 'row': '(max-width:640px) 50vw, 38vw', 'full': '100vw',
-         'tall': '(max-width:640px) 100vw, 46vw'}
+         'tall': '(max-width:640px) 100vw, 46vw', 'stack': '(max-width:640px) 100vw, 38vw'}  # stack: a row stacked on phones
 # A cut-out's size (site.css .cut-small, .cut-medium, .cut-large: at most 168, 272 and 440 px wide)
 CUTS = {'small': '168px', 'medium': '272px', 'large': '440px'}
 
@@ -425,7 +425,7 @@ def block_html(b, slug):
             cls += ' cap'; style = '--ar:%.4f' % (it['w'] / it['h'])
         style = ' style="%s"' % style if style else ''
         skip = ' data-lightbox-skip' if it['kind'] == 'widget' else ''  # a 3D or interactive piece stays out of the lightbox
-        sizes = CUTS[it['cut']] if kind == 'cuts' else SIZES[kind]
+        sizes = CUTS[it['cut']] if kind == 'cuts' else SIZES['stack' if b.get('stack') else kind]
         ms.append('<div class="%s" data-i="%s"%s%s>%s</div>' % (cls, esc(it['key']), style, skip, it['html'](sizes)))
     if kind == 'row':
         ar = sum(it['w'] / it['h'] for it in b['items'])

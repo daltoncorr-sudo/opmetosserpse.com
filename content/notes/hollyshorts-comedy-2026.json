@@ -29,7 +29,8 @@
   "hollyshorts-comedy-10-poster-popcorn": {
    "rest": "end",
    "sound": false,
-   "poster_frame": "first"
+   "poster_frame": "first",
+   "loop": true
   }
  },
  "hide": [],
@@ -38,5 +39,156 @@
  ],
  "photography_src": "HollyShorts FilmFest albums on Flickr (photographer named in each album title), checked Oct. 9, 2026",
  "kicker": "10th Anniversary",
- "kicker_src": "D, Oct. 9, 2026"
+ "kicker_src": "D, Oct. 9, 2026",
+ "media_src": "D, Oct. 10, 2026: the page opens with the animated poster and the printed poster side by side, at one height (stacked on phones), in the order D named them; the date announcement follows them. Otherwise the daltoncorr.com page's order and galleries.",
+ "media": [
+  {
+   "src": "media/hollyshorts-comedy-10-poster-popcorn.mp4",
+   "row": "opening"
+  },
+  {
+   "src": "images/design/hollyshorts-comedy-2026/poster.webp",
+   "row": "opening"
+  },
+  {
+   "src": "images/design/hollyshorts-comedy-2026/date-announcement.webp",
+   "gallery": 8
+  },
+  {
+   "src": "images/design/hollyshorts-comedy-2026/logo-10.webp",
+   "gallery": 2
+  },
+  {
+   "src": "images/design/hollyshorts-comedy-2026/logo-variations.webp",
+   "gallery": 3
+  },
+  {
+   "piece": "w:badge-float"
+  },
+  {
+   "src": "images/design/hollyshorts-comedy-2026/poster-easel-entrance.webp",
+   "gallery": 4
+  },
+  {
+   "src": "images/design/hollyshorts-comedy-2026/poster-easel-lounge.webp",
+   "gallery": 4
+  },
+  {
+   "src": "images/design/hollyshorts-comedy-2026/step-and-repeat.webp",
+   "gallery": 4
+  },
+  {
+   "src": "images/design/hollyshorts-comedy-2026/step-and-repeat-outdoors.webp",
+   "gallery": 4
+  },
+  {
+   "src": "images/design/hollyshorts-comedy-2026/step-and-repeat-interview.webp",
+   "gallery": 4
+  },
+  {
+   "src": "images/design/hollyshorts-comedy-2026/event-step-and-repeat.webp",
+   "gallery": 4
+  },
+  {
+   "src": "images/design/hollyshorts-comedy-2026/badges-check-in.webp",
+   "gallery": 4
+  },
+  {
+   "src": "images/design/hollyshorts-comedy-2026/poster-signed.webp",
+   "gallery": 4
+  },
+  {
+   "src": "images/design/hollyshorts-comedy-2026/step-and-repeat-guests.webp",
+   "gallery": 4
+  },
+  {
+   "src": "images/design/hollyshorts-comedy-2026/event-photo.webp",
+   "gallery": 4
+  },
+  {
+   "src": "images/design/hollyshorts-comedy-2026/screen-qa-wide.webp",
+   "gallery": 5
+  },
+  {
+   "src": "images/design/hollyshorts-comedy-2026/screen-qa.webp",
+   "gallery": 5,
+   "slot": "W"
+  },
+  {
+   "src": "images/design/hollyshorts-comedy-2026/screen-theater.webp",
+   "gallery": 6
+  },
+  {
+   "src": "images/design/hollyshorts-comedy-2026/award-show-booth.webp",
+   "gallery": 6
+  },
+  {
+   "src": "images/design/hollyshorts-comedy-2026/merch-shirt-ad.webp",
+   "gallery": 7
+  },
+  {
+   "src": "images/design/hollyshorts-comedy-2026/merch-hat-ad.webp",
+   "gallery": 7
+  },
+  {
+   "src": "images/design/hollyshorts-comedy-2026/tee-take-10.webp",
+   "gallery": 7
+  },
+  {
+   "src": "images/design/hollyshorts-comedy-2026/tee-with-stupid.webp",
+   "gallery": 7
+  },
+  {
+   "src": "images/design/hollyshorts-comedy-2026/tee-red-carpet.webp",
+   "gallery": 7
+  },
+  {
+   "src": "images/design/hollyshorts-comedy-2026/official-selections.webp",
+   "gallery": 9
+  },
+  {
+   "src": "images/design/hollyshorts-comedy-2026/official-selections-count.webp",
+   "gallery": 9
+  },
+  {
+   "src": "images/design/hollyshorts-comedy-2026/official-selections-list.webp",
+   "gallery": 9
+  },
+  {
+   "src": "images/design/hollyshorts-comedy-2026/schedule-saturday.webp",
+   "gallery": 9
+  },
+  {
+   "src": "images/design/hollyshorts-comedy-2026/schedule-screen-3.webp",
+   "gallery": 9
+  },
+  {
+   "src": "images/design/hollyshorts-comedy-2026/opening-night.webp",
+   "gallery": 9
+  },
+  {
+   "src": "images/design/hollyshorts-comedy-2026/award-best-cringe.webp",
+   "gallery": 10
+  },
+  {
+   "src": "images/design/hollyshorts-comedy-2026/award-dark-comedy.webp",
+   "gallery": 10
+  },
+  {
+   "src": "images/design/hollyshorts-comedy-2026/laurel-best-cringe.webp",
+   "gallery": 11
+  },
+  {
+   "src": "images/design/hollyshorts-comedy-2026/laurel-dark-comedy.webp",
+   "gallery": 11
+  },
+  {
+   "src": "images/design/hollyshorts-comedy-2026/study-type.webp",
+   "gallery": 12
+  },
+  {
+   "src": "images/design/hollyshorts-comedy-2026/study-merch.webp",
+   "gallery": 12
+  }
+ ]
 }
