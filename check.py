@@ -67,7 +67,7 @@ for f in glob.glob(D + '/**/*.html', recursive=True):
     problems += ['%s: an ordinal that is not superscripted (%s)' % (rel, m.group(0)) for m in re.finditer(r'\b\d+(?:st|nd|rd|th)\b', text)]
 
 # Project pages (v02): alt text, no looping video (but two), notes and chapters within limits, media order, project order
-LOOPS = ('sb-05-signature-02-16x9', 'hollyshorts-comedy-10-poster-popcorn')
+LOOPS = ('sb-signature-script', 'hollyshorts-comedy-10-poster-popcorn')
 import html as H, json
 ROOT = os.path.dirname(os.path.abspath(__file__))
 for f in glob.glob(D + '/**/*.html', recursive=True):

@@ -5,171 +5,234 @@
  "chapters": [
   {
    "label": "The book",
-   "starts_at": "sb-03-book-02-4x5",
-   "src": "system[0]"
+   "starts_at": "sb-book-drawing-timelapse",
+   "src": "Brand Bible, III · The marks: The book"
   },
   {
-   "label": "Seal and signature",
-   "starts_at": "SB-Monogram-Circle-Green",
-   "src": "system[1], system[2]"
+   "label": "The marks",
+   "starts_at": "SB-Logo-Hero-Horizontal-Green",
+   "src": "Brand Bible, III · The marks"
   },
   {
-   "label": "Type and color",
-   "starts_at": "sb-06-system-01-16x9",
-   "src": "deliverables[5]"
+   "label": "The colors",
+   "starts_at": "sb-colour-library-green",
+   "src": "Brand Bible, IV · Colour"
   },
   {
-   "label": "Into the world",
-   "starts_at": "sb-12-bible-page-01",
-   "src": "work[2]"
+   "label": "In use",
+   "starts_at": "sb-13-world-01-16x9",
+   "src": "Brand Bible, VII · In use"
   }
  ],
  "notes": {},
  "video": {
-  "sb-00-hero-01-16x9": {
-   "rest": "end",
-   "sound": false
-  },
-  "sb-05-signature-02-16x9": {
-   "rest": 4.5,
-   "sound": false,
-   "loop": true
-  },
   "sb-14-film-01-9x16": {
    "rest": "end",
    "sound": true
+  },
+  "sb-book-drawing-timelapse": {
+   "rest": "end",
+   "sound": false
+  },
+  "sb-signature-script": {
+   "rest": "end",
+   "sound": false,
+   "loop": true
   }
  },
  "hide": [],
  "hide_src": "D, Oct. 10, 2026: the page's own media list (below) replaces the hide list; the eight repeats it hid stay out, with the rest D cut.",
- "media_src": "D, Oct. 10, 2026 (his picks at Checkpoint 3): the signature film first, looping, resting on its finished script; then the hero film; the seal as cut-outs in one row (content/media/sunnys-bookshop/, copied from the asset inbox: D's final package, Final Assets/Logos); the announcement film where the signature film was, playing once; two or three pages from each study; a few pieces from the package; the Brand Bible's first two pages, without the full-bleed cover.",
+ "media_src": "D, Oct. 10, 2026 (Checkpoint 3b): the page rebuilt after the Brand Bible, the work straight on the paper. The signature written on, first, looping (Final Assets/Video/SB-Video-Logo-Script-16x9-White.mp4, 7.5 to 13 s: the book, then the script, before the film's closing credit; cropped, its white mapped to the paper, no sound); the book drawn by hand (03 Source/Sketches/Hand drawing/SB-Book-Drawing-Timelapse.mov, cut before its last clean frame and fade, cropped to the drawing, twice the speed, its white mapped to the site's paper and under the grain); the fourteen marks, numbered and labeled with the Bible's words and sizes (transparent PNGs from 01 Deliverables/Final Assets/Logos, copied at 1600 px); the six colors as plain swatches with the Bible's names and roles; in use, the tote, the cap and the tags, then the announcement film.",
  "media": [
   {
-   "src": "media/sunnys-bookshop/sb-05-signature-02-16x9.mp4"
+   "src": "content/media/sunnys-bookshop/sb-signature-script.mp4",
+   "alt": "The signature written on, stroke by stroke, under the book.",
+   "grain": true
   },
   {
-   "src": "media/sunnys-bookshop/sb-00-hero-01-16x9.mp4"
+   "src": "content/media/sunnys-bookshop/sb-book-drawing-timelapse.mp4",
+   "alt": "The book drawn by hand, line by line, sped up.",
+   "grain": true
   },
   {
-   "src": "images/design/sunnys-bookshop/sb-03-book-01-16x9-2400.jpg"
+   "src": "content/media/sunnys-bookshop/SB-Book-Hero-Green.png",
+   "alt": "The book, hero: drawn by hand, line by line.",
+   "cut": "large",
+   "row": "books",
+   "n": "01",
+   "label": "Book · hero",
+   "note": "40 mm · 300 px and up"
   },
   {
-   "src": "images/design/sunnys-bookshop/sb-03-book-02-4x5-2400.jpg"
+   "src": "content/media/sunnys-bookshop/SB-Book-Digital-Green.png",
+   "alt": "The book, digital: the flat book, its pages solid.",
+   "cut": "medium",
+   "row": "books",
+   "n": "02",
+   "label": "Book · digital",
+   "note": "16 to 40 mm · 48 to 300 px"
   },
   {
-   "src": "images/design/sunnys-bookshop/sb-03-book-03-4x5-2400.jpg"
-  },
-  {
-   "src": "content/media/sunnys-bookshop/SB-Monogram-Circle-Green.png",
-   "alt": "The SB monogram in the seal’s two rings, in Library Green.",
+   "src": "content/media/sunnys-bookshop/SB-Book-Digital-Tiny-Green.png",
+   "alt": "The book, tiny, for the smallest sizes.",
    "cut": "small",
-   "row": "seal"
+   "row": "books",
+   "n": "03",
+   "label": "Book · tiny",
+   "note": "8 to 16 mm · 16 to 48 px"
+  },
+  {
+   "src": "content/media/sunnys-bookshop/SB-Logo-Hero-Horizontal-Green.png",
+   "alt": "The primary logo: Est. 2024 and the book over Sunny’s Bookshop.",
+   "cut": "large",
+   "row": "horizontal",
+   "n": "04",
+   "label": "Horizontal · the primary logo",
+   "note": "40 mm · 160 px minimum"
+  },
+  {
+   "src": "content/media/sunnys-bookshop/SB-Logo-Hero-Horizontal-Stores-Green.png",
+   "alt": "The primary logo with both shops, Tarzana and NoHo.",
+   "cut": "large",
+   "row": "horizontal",
+   "n": "05",
+   "label": "Horizontal · stores",
+   "note": "50 mm · 200 px · names both shops"
+  },
+  {
+   "src": "content/media/sunnys-bookshop/SB-Logo-Hero-Stacked-Green.png",
+   "alt": "The stacked logo: the book over Sunny’s Bookshop.",
+   "cut": "medium",
+   "row": "lockups",
+   "n": "06",
+   "label": "Stacked",
+   "note": "25 mm · 110 px"
   },
   {
    "src": "content/media/sunnys-bookshop/SB-Logo-Hero-Seal-Green.png",
-   "alt": "The seal with the hand-drawn book, in Library Green.",
-   "cut": "large",
-   "row": "seal"
-  },
-  {
-   "src": "content/media/sunnys-bookshop/SB-Logo-Digital-Seal-Black.png",
-   "alt": "The seal with the simplified book, in black.",
+   "alt": "The seal: the book in two rings, for readers and writers.",
    "cut": "medium",
-   "row": "seal"
+   "row": "lockups",
+   "n": "07",
+   "label": "Seal",
+   "note": "25 mm · 120 px"
   },
   {
-   "src": "media/sunnys-bookshop/sb-14-film-01-9x16.mp4"
+   "src": "content/media/sunnys-bookshop/SB-Logo-Hero-HalfMoon-Green.png",
+   "alt": "The half moon: Sunny’s Bookshop arched over the book.",
+   "cut": "medium",
+   "row": "lockups",
+   "n": "08",
+   "label": "Half moon",
+   "note": "30 mm · 140 px"
   },
   {
-   "src": "images/design/sunnys-bookshop/sb-06-system-01-16x9-2400.jpg"
+   "src": "content/media/sunnys-bookshop/SB-Logo-Hero-Signature-Book-Green.png",
+   "alt": "The book over the signature.",
+   "cut": "medium",
+   "row": "lockups",
+   "n": "09",
+   "label": "Signature · book",
+   "note": "35 mm · 150 px"
   },
   {
-   "src": "images/design/sunnys-bookshop/sb-06-system-02-4x5-2400.jpg"
+   "src": "content/media/sunnys-bookshop/SB-Signature-Bookshop-Green.png",
+   "alt": "The signature: Sunny’s Bookshop in script.",
+   "cut": "xl",
+   "row": "signature",
+   "n": "10",
+   "label": "Signature",
+   "note": "30 mm wide minimum, 24 pt tall"
   },
   {
-   "src": "images/design/sunnys-bookshop/sb-07-type-01-16x9-2400.jpg"
+   "src": "content/media/sunnys-bookshop/SB-Signature-Sunnys-Green.png",
+   "alt": "Sunny’s, in the signature’s script.",
+   "cut": "medium",
+   "row": "signature",
+   "n": "11",
+   "label": "Signature · Sunny’s",
+   "note": "20 mm minimum · tags, stickers, bookplates"
   },
   {
-   "src": "images/design/sunnys-bookshop/sb-07-colour-02-16x9-2400.jpg"
+   "src": "content/media/sunnys-bookshop/SB-Monogram-Circle-Green.png",
+   "alt": "The SB monogram in the seal’s two rings.",
+   "cut": "small",
+   "row": "signature",
+   "n": "12",
+   "label": "Monogram",
+   "note": "12 mm · 48 px minimum"
   },
   {
-   "src": "images/design/sunnys-bookshop/sb-08-journal-01-4x5-2400.jpg"
+   "src": "content/media/sunnys-bookshop/SB-Journal-and-Press-Wordmark-Navy.png",
+   "alt": "The Sunny’s Journal & Press wordmark, in Ink Navy.",
+   "cut": "xl",
+   "row": "press",
+   "n": "13",
+   "label": "Journal & Press · wordmark",
+   "note": "35 mm · 160 px minimum"
   },
   {
-   "src": "images/design/sunnys-bookshop/sb-08-journal-02-4x5-2400.jpg"
+   "src": "content/media/sunnys-bookshop/SB-Journal-and-Press-Stamp-Navy.png",
+   "alt": "The Sunny’s Journal & Press stamp, in Ink Navy.",
+   "cut": "small",
+   "row": "press",
+   "n": "14",
+   "label": "Journal & Press · stamp",
+   "note": "20 mm · 96 px minimum"
   },
   {
-   "src": "images/design/sunnys-bookshop/sb-10-studies-page-06-1600.webp",
-   "alt": "The studies, page 3: Bookseller tickets II: Britain, Europe, America.",
-   "row": "studies-research"
+   "src": "content/media/sunnys-bookshop/sb-colour-library-green.png",
+   "alt": "Library Green, #1E3A2F.",
+   "cut": "small",
+   "row": "colors",
+   "align": "top",
+   "label": "Library Green",
+   "note": "#1E3A2F · The lead. Type, marks, the big moments."
   },
   {
-   "src": "images/design/sunnys-bookshop/sb-10-studies-page-09-1600.webp",
-   "alt": "The studies, page 6: Trademarks & symbols.",
-   "row": "studies-research"
+   "src": "content/media/sunnys-bookshop/sb-colour-vellum.png",
+   "alt": "Vellum, #F2EBDC.",
+   "cut": "small",
+   "row": "colors",
+   "align": "top",
+   "label": "Vellum",
+   "note": "#F2EBDC · The ground. The paper, not an ink."
   },
   {
-   "src": "images/design/sunnys-bookshop/sb-10-studies-page-15-1600.webp",
-   "alt": "The studies, page 12: From sketch to solid.",
-   "row": "studies-book"
+   "src": "content/media/sunnys-bookshop/sb-colour-gilt.png",
+   "alt": "Gilt, #CBA65E.",
+   "cut": "small",
+   "row": "colors",
+   "align": "top",
+   "label": "Gilt",
+   "note": "#CBA65E · The accent. A rule, a numeral, a foil."
   },
   {
-   "src": "images/design/sunnys-bookshop/sb-10-studies-page-18-1600.webp",
-   "alt": "The studies, page 15: Book variations III: solid and distance.",
-   "row": "studies-book"
+   "src": "content/media/sunnys-bookshop/sb-colour-ink-navy.png",
+   "alt": "Ink Navy, #1F2B45.",
+   "cut": "small",
+   "row": "colors",
+   "align": "top",
+   "label": "Ink Navy",
+   "note": "#1F2B45 · Sunny’s Journal & Press only."
   },
   {
-   "src": "images/design/sunnys-bookshop/sb-10-studies-page-23-1600.webp",
-   "alt": "The studies, page 20: The book, sketchbook.",
-   "row": "studies-book"
+   "src": "content/media/sunnys-bookshop/sb-colour-binding-brown.png",
+   "alt": "Binding Brown, #6B4A33.",
+   "cut": "small",
+   "row": "colors",
+   "align": "top",
+   "label": "Binding Brown",
+   "note": "#6B4A33 · Board, leather, a line of small text."
   },
   {
-   "src": "images/design/sunnys-bookshop/sb-10-studies-page-24-1600.webp",
-   "alt": "The studies, page 21: Signature studies I.",
-   "row": "studies-signature"
-  },
-  {
-   "src": "images/design/sunnys-bookshop/sb-10-studies-page-27-1600.webp",
-   "alt": "The studies, page 24: The S.",
-   "row": "studies-signature"
-  },
-  {
-   "src": "images/design/sunnys-bookshop/sb-10-studies-page-32-1600.webp",
-   "alt": "The studies, page 29: The pen path.",
-   "row": "studies-signature"
-  },
-  {
-   "src": "images/design/sunnys-bookshop/sb-10-studies-page-33-1600.webp",
-   "alt": "The studies, page 30: The serif monogram.",
-   "row": "studies-seal"
-  },
-  {
-   "src": "images/design/sunnys-bookshop/sb-10-studies-page-37-1600.webp",
-   "alt": "The studies, page 34: Half inked.",
-   "row": "studies-seal"
-  },
-  {
-   "src": "images/design/sunnys-bookshop/sb-11-assets-01-16x9-2400.jpg"
-  },
-  {
-   "src": "images/design/sunnys-bookshop/sb-11-sheets-page-02-2200.webp",
-   "alt": "Final delivery sheets, page 2: Identity.",
-   "row": "package"
-  },
-  {
-   "src": "images/design/sunnys-bookshop/sb-11-sheets-page-03-2200.webp",
-   "alt": "Final delivery sheets, page 3: Signature.",
-   "row": "package"
-  },
-  {
-   "src": "images/design/sunnys-bookshop/sb-12-bible-page-01-1600.webp",
-   "alt": "The Brand Bible, page 1: Cover.",
-   "row": "bible"
-  },
-  {
-   "src": "images/design/sunnys-bookshop/sb-12-bible-page-02-1600.webp",
-   "alt": "The Brand Bible, page 2: Welcome.",
-   "row": "bible"
+   "src": "content/media/sunnys-bookshop/sb-colour-linen.png",
+   "alt": "Linen, #E3D7BD.",
+   "cut": "small",
+   "row": "colors",
+   "align": "top",
+   "label": "Linen",
+   "note": "#E3D7BD · Quiet panels and backgrounds."
   },
   {
    "src": "images/design/sunnys-bookshop/sb-13-world-01-16x9-2400.jpg"
@@ -179,6 +242,9 @@
   },
   {
    "src": "images/design/sunnys-bookshop/sb-13-world-03-4x5-2400.jpg"
+  },
+  {
+   "src": "media/sunnys-bookshop/sb-14-film-01-9x16.mp4"
   }
  ]
 }
