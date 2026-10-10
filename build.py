@@ -363,7 +363,8 @@ def block_html(b, slug):
     for it in b['items']:
         cls = 'm' + (' piece' if it['kind'] == 'widget' else '')
         grow = ' style="flex-grow:%.4f"' % (it['w'] / it['h']) if kind == 'row' else ''
-        ms.append('<div class="%s" data-i="%s"%s>%s</div>' % (cls, esc(it['key']), grow, it['html'](SIZES[kind])))
+        skip = ' data-lightbox-skip' if it['kind'] == 'widget' else ''  # a 3D or interactive piece stays out of the lightbox
+        ms.append('<div class="%s" data-i="%s"%s%s>%s</div>' % (cls, esc(it['key']), grow, skip, it['html'](SIZES[kind])))
     media = '<div class="row">%s</div>' % ''.join(ms) if kind == 'row' else ''.join(ms)
     cap_ = '<span class="nt">%s</span>' % typo(b['note']) if b['note'] else ''  # the words; the film links stay apart
     for it in b['items']:
@@ -390,8 +391,9 @@ def project_body(p, blocks, chapters, notes, all_work='All work'):
     rows, _ = credit_rows(p, notes)
     credits = [(typo(r), ', '.join(typo(x) for x in names) if names else '<span class="ph">[To come]</span>') for r, names in rows]
     dl = lambda xs, cls: '<dl class="%s">%s</dl>' % (cls, ''.join('<div><dt>%s</dt><dd>%s</dd></div>' % x for x in xs))
-    # data-page-only: a page with a 3D or interactive piece opens as its own page from home, so its scripts run
-    out = ['<div class="pp"%s>' % (' data-page-only' if p.get('_scripts') else ''),
+    # data-page-only: a page with a 3D or interactive piece opens as its own page from home, so its scripts run.
+    # data-lightbox: every picture on the page opens in the site lightbox, the page's pictures one group (its pieces stay out)
+    out = ['<div class="pp" data-lightbox%s>' % (' data-page-only' if p.get('_scripts') else ''),
            masthead(list(NAME), studio_hand(), ' data-cover', link=('/#archive', all_work), lockup=True),
            '<section class="open g">%s<h1>%s</h1><p class="lede">%s</p><div class="info">%s%s</div></section>' % (
                '<p class="kicker">%s</p>' % typo(notes['kicker']) if notes.get('kicker') else '', typo(p['title']), typo(notes.get('lede') or p['lede']), dl(facts, 'facts'), dl(credits, 'cr'))]

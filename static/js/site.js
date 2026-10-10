@@ -566,9 +566,9 @@
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && ppOpen) closeProject(); });
   window.addEventListener('popstate', function () {
     var slug = projectOf(location.href);
-    ppPushed = false;
-    if (slug && !ppOpen) openProject(slug, true, false);
-    else if (!slug && ppOpen) showProject(false, true);
+    // Only a step onto or off the project changes the panel; a step inside it (the lightbox closing) leaves its entry be
+    if (slug && !ppOpen) { ppPushed = false; openProject(slug, true, false); }
+    else if (!slug && ppOpen) { ppPushed = false; showProject(false, true); }
   });
 
   // Hover hook for later: every project row says when the pointer or keyboard focus enters and leaves it
@@ -912,21 +912,23 @@
 })();
 
 // The lightbox: one site component. Any picture inside an element marked data-lightbox opens full size on the paper; the
-// pictures in that element are its group (a Journal article; later, a project page). A click, Esc or the back button
+// pictures in that element are its group (a Journal article; a project page). A click, Esc or the back button
 // closes it; the arrow keys and a swipe step through the group. Focus stays inside while it's open and returns to the
-// picture after. Fades only, instant with reduced motion. Pictures dropped in later (an article in the panel on home)
-// work too. data-lightbox-skip on an <img> leaves it out (the Journal's handwritten notes).
+// picture after. Fades only, instant with reduced motion. Pictures dropped in later (an article or a project in the panel
+// on home) work too. data-lightbox-skip on an <img>, or on an element around it, leaves it out (the Journal's handwritten
+// notes; a project's 3D and interactive pieces). A picture inside a link stays a link.
 (function () {
   if (!window.HTMLDialogElement || !document.body) return;
   var reduce = !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches);
   var root = document.documentElement, SEL = '[data-lightbox] img:not([data-lightbox-skip])';
+  var ok = function (i) { return i.matches(SEL) && !i.closest('[data-lightbox-skip], a'); };
   var ms = parseFloat(getComputedStyle(root).getPropertyValue('--t')) * 1000 || 500;
   var box, pic, group = [], at = 0, opener = null, pushed = false, closing = false, timer = 0, x0 = null, swiped = false;
   // Each picture can be reached and opened from the keyboard
   function prep(el) {
     var imgs = Array.prototype.slice.call(el.querySelectorAll ? el.querySelectorAll(SEL) : []);
     if (el.matches && el.matches(SEL)) imgs.push(el);
-    imgs.forEach(function (i) { if (!i.hasAttribute('tabindex')) { i.tabIndex = 0; i.setAttribute('role', 'button'); } });
+    imgs.filter(ok).forEach(function (i) { if (!i.hasAttribute('tabindex')) { i.tabIndex = 0; i.setAttribute('role', 'button'); } });
   }
   prep(document);
   if (window.MutationObserver) new MutationObserver(function (ms) {
@@ -962,7 +964,7 @@
   function step(d) { if (group.length > 1) show(at + d); }
   function open(img) {
     var g = img.closest('[data-lightbox]');
-    group = Array.prototype.filter.call(g.querySelectorAll('img'), function (x) { return x.matches(SEL); });
+    group = Array.prototype.filter.call(g.querySelectorAll('img'), ok);
     if (!box) make();
     clearTimeout(timer); closing = false; opener = img;
     show(group.indexOf(img));
@@ -981,7 +983,7 @@
   }
   document.addEventListener('click', function (e) {
     var img = e.target.closest && e.target.closest(SEL);
-    if (!img || img.closest('a') || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button) return;
+    if (!img || !ok(img) || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button) return;
     e.preventDefault(); open(img);
   });
   // While it's open it takes the keys first, so Esc closes the lightbox and not the panel under it
@@ -994,7 +996,7 @@
       else return;
       e.preventDefault(); e.stopPropagation(); return;
     }
-    if ((e.key === 'Enter' || e.key === ' ') && e.target.matches && e.target.matches(SEL)) { e.preventDefault(); e.stopPropagation(); open(e.target); }
+    if ((e.key === 'Enter' || e.key === ' ') && e.target.matches && e.target.matches(SEL) && ok(e.target)) { e.preventDefault(); e.stopPropagation(); open(e.target); }
   }, true);
   window.addEventListener('popstate', function () {
     var mine = history.state && history.state.lightbox;

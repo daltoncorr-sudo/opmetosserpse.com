@@ -64,7 +64,7 @@ One system (`build.py` `ctl()`, `site.css` `.ctl`, `site.js` `opmetCtl` and `opm
 - **Tags:** `.tags`, small sans, tag gray. Not clickable.
 
 ## The lightbox
-One site component (site.js and site.css). Any `<img>` inside an element marked `data-lightbox` opens full size on the paper; that element's pictures are its group (a Journal article marks its body). A click, Esc or the back button closes it; the arrow keys and a swipe step through the group; focus stays inside and returns to the picture. Fades only, instant with reduced motion. Pictures added later (an article in the panel) work too. `data-lightbox-skip` on an `<img>` leaves it out. No frame, buttons or new color.
+One site component (site.js and site.css). Any `<img>` inside an element marked `data-lightbox` opens full size on the paper; that element's pictures are its group (a Journal article marks its body; a project page marks its `.pp`, so all of a project's pictures, cut-outs too, are one group). A click, Esc or the back button closes it; the arrow keys and a swipe step through the group; focus stays inside and returns to the picture. Fades only, instant with reduced motion. Pictures added later (an article or a project in the panel on home) work too. `data-lightbox-skip` on an `<img>`, or on an element around it, leaves it out (the Journal's handwritten notes; a project's 3D and interactive pieces, whose wrapper carries it); a picture inside a link stays a link. Films aren't pictures: they stay out. No frame, buttons or new color.
 
 ## Publishing
 GitHub Pages, from the `docs/` folder on `main`. daltoncorr.com stays live as it is: both sites run side by side, with no redirects. `docs/CNAME` already says `opmetosserpse.com`. D publishes; nobody else pushes.

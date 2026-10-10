@@ -235,7 +235,7 @@ html.is-locked{overflow:hidden}
 .lightbox img{max-width:100%;max-height:100%;width:auto;height:auto;object-fit:contain;transition:opacity var(--t) var(--ease)}
 .lightbox img.out{opacity:0;transition:none}
 html.lb-open{overflow:hidden}
-[data-lightbox] img:not([data-lightbox-skip]){cursor:zoom-in}
+[data-lightbox] img:not([data-lightbox-skip],[data-lightbox-skip] img,a img){cursor:zoom-in}
 html:not(.js) .stage:has(#foundry:target){transform:none}
 html:not(.js) .stage:has(#about:target){transform:translateX(-66.6667%)}
 .panel{flex:none;width:33.3333%;padding:0 var(--gutter)}
