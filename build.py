@@ -166,8 +166,8 @@ class Media:
 # How wide each block draws, for srcset
 SIZES = {'single': '(max-width:640px) 100vw, 77vw', 'row': '(max-width:640px) 50vw, 38vw', 'full': '100vw',
          'tall': '(max-width:640px) 100vw, 46vw', 'stack': '(max-width:640px) 100vw, 38vw'}  # stack: a row stacked on phones
-# A cut-out's size (site.css .cut-small, .cut-medium, .cut-large: at most 168, 272 and 440 px wide)
-CUTS = {'small': '168px', 'medium': '272px', 'large': '440px'}
+# A cut-out's size (site.css .cut-small, .cut-medium, .cut-large, .cut-xl: at most 168, 272, 440 and 640 px wide)
+CUTS = {'small': '168px', 'medium': '272px', 'large': '440px', 'xl': '640px'}
 
 def img_tag(m, sizes, alt, eager=False, extra=''):
     src, srcset, w, h = m
@@ -307,7 +307,9 @@ def notes_list(p, src_root):
     Optional: "alt" (else the project file's, else the daltoncorr.com page's), "slot", "gallery" (pictures in one gallery
     sit two to a row, as on daltoncorr.com), "row" (entries that share it sit in one row, side by side at one height,
     pictures and films alike, stacked on phones), "cap": false (a page capture meant to be scrolled, left at its full
-    width instead of capped at 85vh) and "cut" (small, medium or large: a cut-out, a transparent picture
+    width instead of capped at 85vh), a label ("n", a numeral; "label", a short name; "note", one short line: shown
+    under the picture, as in Sunny's Brand Bible), "align": "top" (a row of cut-outs top-aligned, not on one baseline)
+    "grain": true (a film drawn on white, its white set to the paper: it sits under the grain, like the page) and "cut" (small, medium, large or xl: a cut-out, a transparent picture
     straight on the paper, no frame or box; cut-outs that share a "row" sit in one row, each at its own size)."""
     dc, out, errs = None, [], []
     for m in notes_media(p):
@@ -319,9 +321,10 @@ def notes_list(p, src_root):
             out.append(dict(w, gallery=0, row=m.get('row'))); continue
         kind = 'video' if m['src'].lower().endswith(FILMS) else 'img'
         alt = m.get('alt') or next((x['alt'] for x in dc or [] if x.get('src') and dc_source.stem(x['src']) == dc_source.stem(m['src'])), '')
-        if m.get('cut') and (m['cut'] not in CUTS or kind != 'img'): errs.append('%s: "cut" is small, medium or large, for a picture' % m['src'])
+        if m.get('cut') and (m['cut'] not in CUTS or kind != 'img'): errs.append('%s: "cut" is small, medium, large or xl, for a picture' % m['src'])
         out.append(dict(kind=kind, src=m['src'], alt=alt, w=0, h=0, gallery=m.get('gallery', 0), wide=m.get('slot') == 'W',
-                        cut=m.get('cut'), row=m.get('row'), cap=m.get('cap', True)))
+                        cut=m.get('cut'), row=m.get('row'), cap=m.get('cap', True), align=m.get('align'), grain=m.get('grain'),
+                        lbl=(m.get('n'), m.get('label'), m.get('note')) if m.get('label') else None))
     if errs: sys.exit('Fix the media list in content/notes/%s.json first:\n  %s' % (p['slug'], '\n  '.join(errs)))
     return out
 
@@ -421,19 +424,25 @@ def block_html(b, slug):
     kind = b['kind']
     ms = []
     for it in b['items']:
-        cls = 'm' + (' piece' if it['kind'] == 'widget' else '') + (' cut cut-%s' % it['cut'] if kind == 'cuts' else '')
+        cls = 'm' + (' piece' if it['kind'] == 'widget' else '') + (' cut cut-%s' % it['cut'] if kind == 'cuts' else '') + (' grain' if it.get('grain') else '')
         style = 'flex-grow:%.4f' % (it['w'] / it['h']) if kind == 'row' else ''
         if kind in ('single', 'tall') and it['kind'] != 'widget' and it['h'] > it['w'] and it.get('cap', True):
             cls += ' cap'; style = '--ar:%.4f' % (it['w'] / it['h'])
         style = ' style="%s"' % style if style else ''
         skip = ' data-lightbox-skip' if it['kind'] == 'widget' else ''  # a 3D or interactive piece stays out of the lightbox
         sizes = CUTS[it['cut']] if kind == 'cuts' else SIZES['stack' if b.get('stack') else kind]
-        ms.append('<div class="%s" data-i="%s"%s%s>%s</div>' % (cls, esc(it['key']), style, skip, it['html'](sizes)))
+        lbl = ''
+        if it.get('lbl'):  # a numeral, a name and a note, under the picture (Sunny's, after its Brand Bible)
+            n, t, note = it['lbl']
+            lbl = '<p class="lbl">%s<span class="lbl-t">%s</span>%s</p>' % (
+                '<span class="lbl-n">%s</span>' % esc(n) if n else '', typo(t), '<span class="lbl-s">%s</span>' % typo(note) if note else '')
+        ms.append('<div class="%s" data-i="%s"%s%s>%s%s</div>' % (cls, esc(it['key']), style, skip, it['html'](sizes), lbl))
     if kind == 'row':
         ar = sum(it['w'] / it['h'] for it in b['items'])
         media = '<div class="row%s" style="--ar:%.4f;--n:%d">%s</div>' % (' row-stack' if b.get('stack') else '', ar, len(b['items']), ''.join(ms))
-    elif kind == 'cuts':
-        media = '<div class="cuts">%s</div>' % ''.join(ms)
+    elif kind == 'cuts':  # labeled cut-outs stand on one baseline, their labels under them; "align": "top" hangs them from one line
+        top = any(it.get('align') == 'top' for it in b['items'])
+        media = '<div class="cuts%s">%s</div>' % (' top' if top else ' end' if any(it.get('lbl') for it in b['items']) else '', ''.join(ms))
     else:
         media = ''.join(ms)
     cap_ = '<span class="nt">%s</span>' % typo(b['note']) if b['note'] else ''  # the words; the film links stay apart
@@ -874,7 +883,7 @@ def main():
                 if not v: continue
                 vid = 'v-%s-%s' % (s, name)
                 items.append(dict(key=k, slot='V', kind='video', w=v['w'], h=v['h'], id=vid, sound=sound, v=v, rest=rest, gallery=x['gallery'], alt=alt,
-                                  row=x.get('row'), loop=loop,
+                                  row=x.get('row'), loop=loop, grain=x.get('grain'),
                                   html=lambda sz, v=v, vid=vid, alt=alt, rest=rest, sound=sound, e=eager, loop=loop: video_tag(v, vid, alt, rest, sound, e, loop)))
                 p.setdefault('_bigs', []).append(v['mp4'])
                 continue
@@ -887,6 +896,7 @@ def main():
             elif x['wide']: slot = 'W'
             else: slot = 'P' if r[3] > r[2] else 'L'
             items.append(dict(key=k, slot=slot, kind='img', w=r[2], h=r[3], r=r, gallery=x['gallery'], alt=alt, cut=x.get('cut'), row=x.get('row'), cap=x.get('cap', True),
+                              lbl=x.get('lbl'), align=x.get('align'),
                               html=lambda sz, r=r, alt=alt, e=eager: img_tag(r, sz, alt, e)))
             p.setdefault('_bigs', []).append(r[0])
         blocks = make_blocks(items, notes['notes'])
