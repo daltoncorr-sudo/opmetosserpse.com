@@ -437,7 +437,8 @@
       });
     });
   });
-  $$('[data-studio]').forEach(function (a) { a.addEventListener('click', function (e) { e.preventDefault(); closePanel(); }); });
+  // Delegated: an article dropped into the Journal's panel brings its own Home
+  document.addEventListener('click', function (e) { if (e.target.closest('[data-studio]')) { e.preventDefault(); closePanel(); } });
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && current) closePanel(); });
 
   // Where an element sits in the page's own flow: its box, less whatever offset the stage's slide still holds (closing a

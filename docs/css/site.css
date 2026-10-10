@@ -185,7 +185,7 @@ html.is-locked{overflow:hidden}
 .journal.is-reading .journal-line{display:none}
 /* An article: All articles about 40px under the masthead; the date and topic in small sans, the title in bold, then the
    text at the measure with a margin to its right (about 260px) for handwritten notes. */
-.journal-all{margin:40px 0 0;text-align:center}
+.journal-all{display:flex;justify-content:center;flex-wrap:wrap;gap:0 var(--s3);margin:40px 0 0}  /* All articles, and Home beside it */
 .journal .article{width:min(100%,var(--measure));margin:0 auto}
 .journal .article-head{margin:var(--s6) 0 var(--s5);text-align:left;max-width:none}
 .article-head .article-meta{display:flex;flex-wrap:wrap;gap:0 1.4em;margin:0 0 14px;font:400 13px/1.4 var(--sans);letter-spacing:.02em;color:var(--tag-gray)}
