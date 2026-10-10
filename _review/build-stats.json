@@ -1,28 +1,28 @@
 {
  "sunnys-bookshop": {
   "order": [
-   "sb-00-hero-01-16x9",
-   "sb-03-book-02-4x5",
-   "sb-03-book-03-4x5",
-   "sb-04-seal-01-16x9",
-   "sb-04-seal-02-4x5",
-   "sb-05-signature-02-16x9",
-   "sb-06-system-01-16x9",
-   "sb-06-system-02-4x5",
-   "sb-07-type-01-16x9",
-   "sb-07-colour-02-16x9",
-   "sb-08-journal-01-4x5",
-   "sb-08-journal-02-4x5",
-   "w:sb-viewer",
-   "sb-11-assets-01-16x9",
-   "sb-11-assets-03-4x5",
-   "sb-11-assets-04-4x5",
-   "w:sb-viewer-2",
-   "sb-12-bible-01-16x9",
-   "sb-12-bible-02-4x5",
-   "sb-12-bible-03-4x5",
-   "sb-12-bible-05-4x5",
-   "w:sb-viewer-3",
+   "sb-signature-script",
+   "sb-book-drawing-timelapse",
+   "SB-Book-Hero-Green",
+   "SB-Book-Digital-Green",
+   "SB-Book-Digital-Tiny-Green",
+   "SB-Logo-Hero-Horizontal-Green",
+   "SB-Logo-Hero-Horizontal-Stores-Green",
+   "SB-Logo-Hero-Stacked-Green",
+   "SB-Logo-Hero-Seal-Green",
+   "SB-Logo-Hero-HalfMoon-Green",
+   "SB-Logo-Hero-Signature-Book-Green",
+   "SB-Signature-Bookshop-Green",
+   "SB-Signature-Sunnys-Green",
+   "SB-Monogram-Circle-Green",
+   "SB-Journal-and-Press-Wordmark-Navy",
+   "SB-Journal-and-Press-Stamp-Navy",
+   "sb-colour-library-green",
+   "sb-colour-vellum",
+   "sb-colour-gilt",
+   "sb-colour-ink-navy",
+   "sb-colour-binding-brown",
+   "sb-colour-linen",
    "sb-13-world-01-16x9",
    "sb-13-world-02-4x5",
    "sb-13-world-03-4x5",
@@ -30,59 +30,45 @@
   ],
   "blocks": [
    "single",
-   "row",
-   "full",
    "single",
-   "single",
-   "single",
-   "single",
-   "single",
-   "single",
-   "row",
-   "single",
-   "single",
-   "row",
-   "single",
-   "full",
-   "row",
-   "single",
-   "single",
+   "cuts",
+   "cuts",
+   "cuts",
+   "cuts",
+   "cuts",
+   "cuts",
    "single",
    "row",
    "tall"
   ],
-  "full": 2,
+  "full": 0,
   "runs": [
-   "single"
+   "cuts"
   ],
-  "pieces": [
-   "w:sb-viewer",
-   "w:sb-viewer-2",
-   "w:sb-viewer-3"
-  ],
+  "pieces": [],
   "lede_words": 29,
   "photo": true,
   "videos": [
    {
-    "key": "sb-00-hero-01-16x9",
+    "key": "sb-signature-script",
     "block": "single",
     "rest": "end",
     "sound": false,
     "bytes": {
-     "webm": 535571,
-     "mp4": 639747,
-     "poster": 37048
+     "webm": 99651,
+     "mp4": 90177,
+     "poster": 30600
     }
    },
    {
-    "key": "sb-05-signature-02-16x9",
+    "key": "sb-book-drawing-timelapse",
     "block": "single",
-    "rest": "4.5",
+    "rest": "end",
     "sound": false,
     "bytes": {
-     "webm": 128653,
-     "mp4": 107405,
-     "poster": 25024
+     "webm": 447542,
+     "mp4": 489973,
+     "poster": 51370
     }
    },
    {
@@ -185,8 +171,9 @@
  },
  "hollyshorts-comedy-2026": {
   "order": [
-   "poster",
    "hollyshorts-comedy-10-poster-popcorn",
+   "poster",
+   "date-announcement",
    "logo-10",
    "logo-variations",
    "w:badge-float",
@@ -209,7 +196,6 @@
    "tee-take-10",
    "tee-with-stupid",
    "tee-red-carpet",
-   "date-announcement",
    "official-selections",
    "official-selections-count",
    "official-selections-list",
@@ -224,8 +210,8 @@
    "study-merch"
   ],
   "blocks": [
-   "single",
-   "tall",
+   "row",
+   "full",
    "single",
    "single",
    "single",
@@ -240,7 +226,6 @@
    "row",
    "row",
    "single",
-   "full",
    "row",
    "row",
    "row",
@@ -261,7 +246,7 @@
   "videos": [
    {
     "key": "hollyshorts-comedy-10-poster-popcorn",
-    "block": "tall",
+    "block": "row",
     "rest": "end",
     "sound": false,
     "bytes": {
@@ -584,19 +569,19 @@
   "order": [
    "final-a",
    "final-b",
-   "printed-wall",
-   "printed-floor",
    "printed-tees",
    "scans-02",
    "scans-03",
-   "scans-01"
+   "scans-01",
+   "tee-white-trimmed",
+   "tee-black-trimmed"
   ],
   "blocks": [
    "row",
+   "single",
+   "single",
    "row",
-   "single",
-   "single",
-   "row"
+   "cuts"
   ],
   "full": 0,
   "runs": [],
