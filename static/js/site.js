@@ -622,7 +622,7 @@
 (function () {
   var reduce = !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches);
   function films(root) {
-    // The two looping films (Sunny's announcement film, Comedy 10's animated poster): muted, round and round while on
+    // The two looping films (Sunny's signature film, Comedy 10's animated poster): muted, round and round while on
     // screen, never with reduced motion (then Play, or Play with sound). Play with sound turns the sound on and becomes
     // Mute; Mute turns it back off. If a browser won't play it with sound, it goes back to muted.
     Array.prototype.forEach.call(root.querySelectorAll('.pp video[loop]'), function (v) {

@@ -67,7 +67,7 @@ for f in glob.glob(D + '/**/*.html', recursive=True):
     problems += ['%s: an ordinal that is not superscripted (%s)' % (rel, m.group(0)) for m in re.finditer(r'\b\d+(?:st|nd|rd|th)\b', text)]
 
 # Project pages (v02): alt text, no looping video (but two), notes and chapters within limits, media order, project order
-LOOPS = ('sb-14-film-01-9x16', 'hollyshorts-comedy-10-poster-popcorn')
+LOOPS = ('sb-05-signature-02-16x9', 'hollyshorts-comedy-10-poster-popcorn')
 import html as H, json
 ROOT = os.path.dirname(os.path.abspath(__file__))
 for f in glob.glob(D + '/**/*.html', recursive=True):
@@ -76,7 +76,7 @@ for f in glob.glob(D + '/**/*.html', recursive=True):
         if not re.search(r'\salt="', tag): problems.append('%s: an <img> without alt' % rel)
     for tag, inner in re.findall(r'(<video\b[^>]*>)([\s\S]*?)</video>', t):
         if not re.search(r'\saria-label="[^"]+"', tag): problems.append('%s: a <video> without aria-label' % rel)
-        # Films never loop, except the two D chose (Oct. 10, 2026): Sunny's announcement film and Comedy 10's animated poster
+        # Films never loop, except the two D chose (Oct. 10, 2026): Sunny's signature film and Comedy 10's animated poster
         srcs = re.findall(r'src="([^"]+)"', inner)
         if re.search(r'\sloop(?=[\s>=])', tag) and not (srcs and all(re.search(r'/(%s)\.(webm|mp4)$' % '|'.join(LOOPS), x) for x in srcs)):
             problems.append('%s: a <video> that loops (only %s may)' % (rel, ' and '.join(LOOPS)))

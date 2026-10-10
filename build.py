@@ -177,8 +177,9 @@ def img_tag(m, sizes, alt, eager=False, extra=''):
 
 def video_tag(v, vid, alt, rest, sound, eager=False, loop=False):
     """Shows its poster frame, plays once (muted, on screen) and rests; a film with sound waits for a click. Never loops,
-    except the two films D chose to (loop, set in the notes file: Sunny's announcement film and Comedy 10's animated
-    poster): muted, round and round while on screen (site.js), from its first frame."""
+    except the two films D chose to (loop, set in the notes file: Sunny's signature film and Comedy 10's animated
+    poster): muted, round and round while on screen (site.js). Its poster is its first frame, or the frame its notes
+    file's "rest" names when the first is weak (the signature film's opens before the script is written)."""
     if loop:
         return ('<video id="%s" poster="%s" width="%d" height="%d" playsinline muted loop preload="%s" aria-label="%s">'
                 '<source src="%s" type="video/webm"><source src="%s" type="video/mp4"></video>') % (
@@ -867,7 +868,7 @@ def main():
                 vn = notes['video'].get(k, {})
                 has_sound = media.has_audio(src)
                 rest, sound, loop = str(vn.get('rest', 'end')), bool(vn.get('sound', has_sound)), bool(vn.get('loop'))
-                v = media.video(src, s, name, rest, sound, first=loop or vn.get('poster_frame') == 'first')
+                v = media.video(src, s, name, rest, sound, first=vn.get('poster_frame') == 'first' or (loop and 'rest' not in vn))
                 if not v: continue
                 vid = 'v-%s-%s' % (s, name)
                 items.append(dict(key=k, slot='V', kind='video', w=v['w'], h=v['h'], id=vid, sound=sound, v=v, rest=rest, gallery=x['gallery'], alt=alt,
