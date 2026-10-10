@@ -140,6 +140,11 @@
               timer: 0, busy: false, state: { open: false, topic: 'All' }, years: {} };
     L.rows = $$('.work-row', L.list);
     $$('.yr', L.list).forEach(function (y) { L.years[y.textContent] = y; });
+    // The work list's rows come in the Selected order (work.json); open, they run newest first (data-n). Rows move as
+    // whole elements, so focus order always follows what's on screen.
+    var closedOrder = L.rows.slice(), openOrder = L.rows.every(function (r) { return r.hasAttribute('data-n'); }) &&
+      L.rows.slice().sort(function (a, b) { return a.getAttribute('data-n') - b.getAttribute('data-n'); });
+    function arrange(open) { if (openOrder) (open ? openOrder : closedOrder).forEach(function (r) { L.list.appendChild(r); }); }
     var tops = function (els) { return els.map(function (r) { return r.getBoundingClientRect().top; }); };
     var moving = function (els) { return o.glideHead ? els.concat([L.head]) : els; };
     L.shows = function (r, st) {
@@ -168,6 +173,7 @@
     }
     function apply(st, animate) {
       L.state = st;
+      arrange(st.open);
       L.list.classList.toggle('is-open', st.open);
       if (L.topics) {
         L.topics.hidden = !st.open;
@@ -185,7 +191,7 @@
       if (L.topics) $$('button', L.topics).forEach(function (b) { b.setAttribute('aria-pressed', b.getAttribute('data-topic') === st.topic); });
       if (o.address) o.address(st);
       var leaving = L.rows.filter(function (r) { return L.shows(r, was) && !L.shows(r, st); }),
-          arriving = L.rows.filter(function (r) { return !L.shows(r, was) && L.shows(r, st); }),
+          arriving = (openOrder ? (st.open ? openOrder : closedOrder) : L.rows).filter(function (r) { return !L.shows(r, was) && L.shows(r, st); }),
           staying = moving(L.rows.filter(function (r) { return L.shows(r, was) && L.shows(r, st); }));
       var topicsIn = L.topics && st.open && !was.open, topicsOut = L.topics && !st.open && was.open;
       if (L.live) {

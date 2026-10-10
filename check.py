@@ -99,7 +99,14 @@ for i, slug in enumerate(order):
 for page_, pat in (('index.html', r'class="work-row[^"]*" data-project="([^"]+)"><?(?:span class="yr">\d+</span>)?<a href'),
                    ('projects/index.html', r'<li id="([^"]+)"><a href="/projects/')):
     t = open(os.path.join(D, page_), encoding='utf-8').read()
-    got = [x for x in re.findall(r'data-project="([^"]+)"[^>]*>(?:<span class="yr">\d+</span>)?<a href', t)] if page_ == 'index.html' else re.findall(pat, t)
+    if page_ == 'index.html':  # the rows come in the Selected order; data-n is each row's place in the full list
+        rows = re.findall(r'data-project="([^"]+)" data-n="(\d+)"[^>]*>(?:<span class="yr">\d+</span>)?(<a href|<span class="plain")', t)
+        got = [x for x, n, kind in sorted(rows, key=lambda r: int(r[1])) if kind == '<a href']
+        sel = json.load(open(os.path.join(ROOT, 'content', 'work.json'), encoding='utf-8'))['selected']
+        shown = re.findall(r'class="work-row" data-project="([^"]+)"', t)  # Selected rows (no "extra"), in page order
+        if shown != sel: problems.append('index.html: Selected work is not in the order of work.json "selected"')
+        if [x for x, _, _ in rows][:len(sel)] != sel: problems.append('index.html: the Selected rows do not come first')
+    else: got = re.findall(pat, t)
     if got != order: problems.append('%s: the project list does not follow project_order' % page_)
 # The Journal: every published post has its page and is in the sitemap; a draft has neither (in a drafts build its
 # page is a preview, never shipped); /journal/ is in the sitemap once a post is published; /blog/ sends to /journal/

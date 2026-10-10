@@ -1,5 +1,5 @@
 {
- "_note": "One entry per project, newest first; order within a year is the display order. tags: one or two from \"tags\" below. selected: shown in Selected works. media: for later. line: the old description, kept for rows without a page.",
+ "_note": "One entry per project, newest first; order within a year is the display order. tags: one or two from \"tags\" below. selected: the Selected work list, in its order (every other project is in the archive only). media: for later. line: the old description, kept for rows without a page. A festival edition reads edition first: \"22nd Anniversary | ...\".",
  "tags": [
   "Art direction",
   "Artwork",
@@ -12,6 +12,17 @@
   "Social",
   "Web design"
  ],
+ "selected": [
+  "sunnys-bookshop",
+  "hollyshorts-22",
+  "hollyshorts-comedy-2026",
+  "weissman-character-edition",
+  "hdtracks",
+  "red-mask",
+  "polish-film-festival",
+  "hollyshorts-london-2024",
+  "hollyshorts-20"
+ ],
  "projects": [
   {
    "slug": "sunnys-bookshop",
@@ -21,29 +32,26 @@
     "Brand design",
     "Identity"
    ],
-   "selected": true,
    "media": []
   },
   {
    "slug": "hollyshorts-22",
-   "title": "Oscar®-Qualifying HollyShorts Film Festival | 22nd Anniversary",
+   "title": "22nd Anniversary | Oscar®-Qualifying HollyShorts Film Festival",
    "year": "2026",
    "tags": [
     "Art direction",
     "Artwork"
    ],
-   "selected": true,
    "media": []
   },
   {
    "slug": "hollyshorts-comedy-2026",
-   "title": "HollyShorts Comedy Film Festival | 10th Anniversary",
+   "title": "10th Anniversary | HollyShorts Comedy Film Festival",
    "year": "2026",
    "tags": [
     "Art direction",
     "Identity"
    ],
-   "selected": true,
    "media": []
   },
   {
@@ -54,7 +62,6 @@
     "Brand design",
     "Web design"
    ],
-   "selected": false,
    "media": []
   },
   {
@@ -64,7 +71,6 @@
    "tags": [
     "Social"
    ],
-   "selected": false,
    "media": [],
    "line": "Design for a nonprofit campaign."
   },
@@ -76,7 +82,6 @@
     "Art direction",
     "Artwork"
    ],
-   "selected": true,
    "media": []
   },
   {
@@ -87,18 +92,16 @@
     "Print",
     "Book design"
    ],
-   "selected": true,
    "media": []
   },
   {
    "slug": "hollyshorts-21",
-   "title": "Oscar®-Qualifying HollyShorts Film Festival | 21st Anniversary",
+   "title": "21st Anniversary | Oscar®-Qualifying HollyShorts Film Festival",
    "year": "2025",
    "tags": [
     "Art direction",
     "Artwork"
    ],
-   "selected": false,
    "media": []
   },
   {
@@ -109,18 +112,16 @@
     "Key art",
     "Print"
    ],
-   "selected": true,
    "media": []
   },
   {
    "slug": "hollyshorts-dubai-2025",
-   "title": "HollyShorts Dubai | Inaugural Edition",
+   "title": "Inaugural Edition | HollyShorts Dubai",
    "year": "2025",
    "tags": [
     "Identity",
     "Art direction"
    ],
-   "selected": false,
    "media": []
   },
   {
@@ -131,29 +132,26 @@
     "Key art",
     "Artwork"
    ],
-   "selected": true,
    "media": []
   },
   {
    "slug": "hollyshorts-london-2025",
-   "title": "BAFTA®-Qualifying HollyShorts London | Second Edition",
+   "title": "Second Edition | BAFTA®-Qualifying HollyShorts London",
    "year": "2025",
    "tags": [
     "Art direction",
     "Key art"
    ],
-   "selected": false,
    "media": []
   },
   {
    "slug": "hollyshorts-comedy-2025",
-   "title": "HollyShorts Comedy Film Festival | Ninth Anniversary",
+   "title": "Ninth Anniversary | HollyShorts Comedy Film Festival",
    "year": "2025",
    "tags": [
     "Brand design",
     "Identity"
    ],
-   "selected": false,
    "media": []
   },
   {
@@ -163,7 +161,6 @@
    "tags": [
     "Identity"
    ],
-   "selected": false,
    "media": [],
    "line": "Brand identity for a private client."
   },
@@ -174,30 +171,27 @@
    "tags": [
     "Key art"
    ],
-   "selected": false,
    "media": [],
    "line": "Key art and pitch decks for a production company."
   },
   {
    "slug": "hollyshorts-london-2024",
-   "title": "BAFTA®-Qualifying HollyShorts London | Inaugural Edition",
+   "title": "Inaugural Edition | BAFTA®-Qualifying HollyShorts London",
    "year": "2024",
    "tags": [
     "Art direction",
     "Artwork"
    ],
-   "selected": true,
    "media": []
   },
   {
    "slug": "hollyshorts-20",
-   "title": "Oscar®-Qualifying HollyShorts Film Festival | 20th Anniversary",
+   "title": "20th Anniversary | Oscar®-Qualifying HollyShorts Film Festival",
    "year": "2024",
    "tags": [
     "Art direction",
     "Artwork"
    ],
-   "selected": true,
    "media": []
   },
   {
@@ -207,7 +201,6 @@
    "tags": [
     "Artwork"
    ],
-   "selected": false,
    "media": []
   },
   {
@@ -218,7 +211,6 @@
     "Brand design",
     "Identity"
    ],
-   "selected": false,
    "media": []
   },
   {
@@ -229,7 +221,6 @@
     "Key art",
     "Artwork"
    ],
-   "selected": false,
    "media": []
   },
   {
@@ -239,7 +230,6 @@
    "tags": [
     "Key art"
    ],
-   "selected": false,
    "media": [],
    "line": "Poster for an award-winning short."
   },
@@ -251,7 +241,6 @@
     "Brand design",
     "Packaging"
    ],
-   "selected": false,
    "media": [],
    "line": "Branding and packaging for a best-selling author."
   },
@@ -262,7 +251,6 @@
    "tags": [
     "Book design"
    ],
-   "selected": false,
    "media": [],
    "line": "Book design for a private client."
   },
@@ -274,7 +262,6 @@
     "Artwork",
     "Print"
    ],
-   "selected": false,
    "media": []
   },
   {
@@ -285,18 +272,16 @@
     "Artwork",
     "Book design"
    ],
-   "selected": false,
    "media": []
   },
   {
    "slug": "hollyshorts-19",
-   "title": "Oscar®-Qualifying HollyShorts Film Festival | 19th Anniversary",
+   "title": "19th Anniversary | Oscar®-Qualifying HollyShorts Film Festival",
    "year": "2023",
    "tags": [
     "Art direction",
     "Artwork"
    ],
-   "selected": false,
    "media": []
   },
   {
@@ -306,7 +291,6 @@
    "tags": [
     "Key art"
    ],
-   "selected": false,
    "media": [],
    "line": "Poster for a short film, distributed by BAM In Motion."
   },
@@ -318,7 +302,6 @@
     "Artwork",
     "Key art"
    ],
-   "selected": false,
    "media": [],
    "line": "Original artwork and poster."
   },
@@ -329,7 +312,6 @@
    "tags": [
     "Web design"
    ],
-   "selected": false,
    "media": [],
    "line": "Website design for the festival."
   },
@@ -341,18 +323,16 @@
     "Key art",
     "Social"
    ],
-   "selected": false,
    "media": [],
    "line": "Award campaign and social graphics for a short film."
   },
   {
    "slug": "hollyshorts-18",
-   "title": "Oscar®-Qualifying HollyShorts Film Festival | 18th Anniversary",
+   "title": "18th Anniversary | Oscar®-Qualifying HollyShorts Film Festival",
    "year": "2022",
    "tags": [
     "Social"
    ],
-   "selected": false,
    "media": []
   },
   {
@@ -362,7 +342,6 @@
    "tags": [
     "Key art"
    ],
-   "selected": false,
    "media": [],
    "line": "Poster for a short film."
   },
@@ -373,7 +352,6 @@
    "tags": [
     "Art direction"
    ],
-   "selected": false,
    "media": [],
    "line": "Art department for a short film."
   },
@@ -385,7 +363,6 @@
     "Brand design",
     "Web design"
    ],
-   "selected": true,
    "media": []
   },
   {
@@ -396,7 +373,6 @@
     "Web design",
     "Social"
    ],
-   "selected": false,
    "media": [],
    "line": "Web and social for a Manhattan gallery."
   }

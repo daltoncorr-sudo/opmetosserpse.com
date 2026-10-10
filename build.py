@@ -418,12 +418,19 @@ def list_rows(entries):
     return '<ul class="list">%s</ul>' % ''.join(li)
 
 def load_work(projects):
-    """content/work.json: every project, newest first, with its tags and whether it is Selected. Fails on drift."""
+    """content/work.json: every project, newest first, with its tags, and "selected": the Selected work list, in its
+    own order (e['selected'] is the place in it, 1 up, or 0). Fails on drift."""
     w = load(os.path.join(CONTENT, 'work.json')); vocab = w['tags']; seen = set(); errs = []
+    sel = w.get('selected', [])
+    slugs = {e['slug'] for e in w['projects']}
+    errs += ['selected: %s is not a project in work.json' % s for s in sel if s not in slugs]
+    errs += ['selected: %s is listed twice' % s for s in set(sel) if sel.count(s) > 1]
     for e in w['projects']:
         s = e['slug']
         if s in seen: errs.append('%s: listed twice' % s)
         seen.add(s)
+        if 'selected' in e: errs.append('%s: "selected" lives in the top-level list now, not on the entry' % s)
+        e['selected'] = sel.index(s) + 1 if s in sel else 0
         if not re.fullmatch(r'\d{4}', e.get('year', '')): errs.append('%s: year must be four digits' % s)
         if not 1 <= len(e['tags']) <= 2: errs.append('%s: needs one or two tags' % s)
         errs += ['%s: "%s" is not in the tag list' % (s, t) for t in e['tags'] if t not in vocab]
@@ -442,16 +449,18 @@ def work_title(e):
     return '<a href="/projects/%s">%s</a>' % (e['slug'], typo(e['title'])) if e['page'] else '<span class="plain">%s</span>' % typo(e['title'])
 
 def work_section(items, w):
-    """One list, newest first. Collapsed: the Selected titles only. See more opens the rest in place, with tags beside
-    each name and the year in the left margin, once per year."""
+    """One list. Collapsed: the Selected titles only, in the Selected order (work.json). See more opens the rest in
+    place, newest first, with tags beside each name and the year in the left margin, once per year. The rows are written
+    in the collapsed order; data-n is each row's place in the full list, and site.js reorders them when it opens."""
     rows, seen, i = [], set(), 0
-    for e in items:
+    for n, e in enumerate(items):
         yr = '' if e['year'] in seen else '<span class="yr">%s</span>' % e['year']
         seen.add(e['year'])
         extra = not e['selected']
-        rows.append('<li class="work-row%s" data-project="%s"%s>%s%s%s</li>' % (
-            ' extra' if extra else '', e['slug'], ' style="--i:%d"' % i if extra else '', yr, work_title(e), tag_list(e['tags'])))
+        rows.append((e['selected'] or 1000 + n, '<li class="work-row%s" data-project="%s" data-n="%d"%s>%s%s%s</li>' % (
+            ' extra' if extra else '', e['slug'], n, ' style="--i:%d"' % i if extra else '', yr, work_title(e), tag_list(e['tags']))))
         if extra: i += 1
+    rows = [r for _, r in sorted(rows)]
     return ('<section class="work" id="work" tabindex="-1" aria-label="%s"><div class="work-head">'
             '<h2 class="work-label" data-closed="%s" data-open="%s">%s</h2>'
             '<button type="button" class="archive-toggle" aria-expanded="false" aria-controls="works" data-open-label="%s" data-close-label="%s">%s</button>'
