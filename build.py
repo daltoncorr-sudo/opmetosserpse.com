@@ -166,8 +166,9 @@ class Media:
 # How wide each block draws, for srcset
 SIZES = {'single': '(max-width:640px) 100vw, 77vw', 'row': '(max-width:640px) 50vw, 38vw', 'full': '100vw',
          'tall': '(max-width:640px) 100vw, 46vw', 'stack': '(max-width:640px) 100vw, 38vw'}  # stack: a row stacked on phones
-# A cut-out's size (site.css .cut-small, .cut-medium, .cut-large, .cut-xl: at most 168, 272, 440 and 640 px wide)
-CUTS = {'small': '168px', 'medium': '272px', 'large': '440px', 'xl': '640px'}
+# A cut-out's size (site.css .cut-small, .cut-medium, .cut-large, .cut-xl: at most 168, 272, 440 and 640 px wide;
+# .cut-true: its own width "w", in points, so pieces shown together keep their real relative sizes)
+CUTS = {'small': '168px', 'medium': '272px', 'large': '440px', 'xl': '640px', 'true': '440px'}
 
 def img_tag(m, sizes, alt, eager=False, extra=''):
     src, srcset, w, h = m
@@ -298,6 +299,8 @@ def keyed(items):
     return items
 
 FILMS = ('.mp4', '.mov', '.webm')
+# Up to four chapter labels a page; Sunny's Bookshop, built after its Brand Bible, has one per section (D, Oct. 10)
+MAX_CHAPTERS = {'sunnys-bookshop': 10}
 
 def notes_list(p, src_root):
     """A page that departs from its daltoncorr.com page (D's calls: HDtracks' fresh captures, Comedy 10's opening, Don't
@@ -307,10 +310,11 @@ def notes_list(p, src_root):
     Optional: "alt" (else the project file's, else the daltoncorr.com page's), "slot", "gallery" (pictures in one gallery
     sit two to a row, as on daltoncorr.com), "row" (entries that share it sit in one row, side by side at one height,
     pictures and films alike, stacked on phones), "cap": false (a page capture meant to be scrolled, left at its full
-    width instead of capped at 85vh), a label ("n", a numeral; "label", a short name; "note", one short line: shown
-    under the picture, as in Sunny's Brand Bible), "align": "top" (a row of cut-outs top-aligned, not on one baseline)
+    width instead of capped at 85vh), a label ("n", a numeral; "label", a short name; "note", one short line, or a list
+    of lines: shown under the picture, as in Sunny's Brand Bible), "align": "top" (a row of cut-outs top-aligned, not on one baseline)
     "grain": true (a film drawn on white, its white set to the paper: it sits under the grain, like the page) and "cut" (small, medium, large or xl: a cut-out, a transparent picture
-    straight on the paper, no frame or box; cut-outs that share a "row" sit in one row, each at its own size)."""
+    straight on the paper, no frame or box; cut-outs that share a "row" sit in one row, each at its own size; "true"
+    with "w", its width in points, keeps pieces at their real relative sizes, shown reduced)."""
     dc, out, errs = None, [], []
     for m in notes_media(p):
         if m.get('piece') or dc is None and not m.get('alt'):
@@ -321,9 +325,10 @@ def notes_list(p, src_root):
             out.append(dict(w, gallery=0, row=m.get('row'))); continue
         kind = 'video' if m['src'].lower().endswith(FILMS) else 'img'
         alt = m.get('alt') or next((x['alt'] for x in dc or [] if x.get('src') and dc_source.stem(x['src']) == dc_source.stem(m['src'])), '')
-        if m.get('cut') and (m['cut'] not in CUTS or kind != 'img'): errs.append('%s: "cut" is small, medium, large or xl, for a picture' % m['src'])
+        if m.get('cut') and (m['cut'] not in CUTS or kind != 'img'): errs.append('%s: "cut" is small, medium, large, xl or true, for a picture' % m['src'])
+        if m.get('cut') == 'true' and not isinstance(m.get('w'), (int, float)): errs.append('%s: a "true" cut-out needs "w", its width in points' % m['src'])
         out.append(dict(kind=kind, src=m['src'], alt=alt, w=0, h=0, gallery=m.get('gallery', 0), wide=m.get('slot') == 'W',
-                        cut=m.get('cut'), row=m.get('row'), cap=m.get('cap', True), align=m.get('align'), grain=m.get('grain'),
+                        cut=m.get('cut'), row=m.get('row'), cap=m.get('cap', True), align=m.get('align'), grain=m.get('grain'), pt=m.get('w'),
                         lbl=(m.get('n'), m.get('label'), m.get('note')) if m.get('label') else None))
     if errs: sys.exit('Fix the media list in content/notes/%s.json first:\n  %s' % (p['slug'], '\n  '.join(errs)))
     return out
@@ -346,7 +351,7 @@ def load_notes(p, keys):
         if k not in keys: errs.append('"%s" is not an item on this page' % k)
     for k, x in n['notes'].items():
         if len(x['text'].split()) > 25: errs.append('note %s runs over 25 words' % k)
-    if len(n['chapters']) > 4: errs.append('more than four chapter labels')
+    if len(n['chapters']) > MAX_CHAPTERS.get(s, 4): errs.append('more than %d chapter labels' % MAX_CHAPTERS.get(s, 4))
     for c in n['chapters']:
         if not 2 <= len(c['label'].split()) <= 5: errs.append('chapter "%s" should be 2 to 5 words' % c['label'])
     if errs: sys.exit('Fix content/notes/%s.json first:\n  %s' % (s, '\n  '.join(errs)))
@@ -425,7 +430,7 @@ def block_html(b, slug):
     ms = []
     for it in b['items']:
         cls = 'm' + (' piece' if it['kind'] == 'widget' else '') + (' cut cut-%s' % it['cut'] if kind == 'cuts' else '') + (' grain' if it.get('grain') else '')
-        style = 'flex-grow:%.4f' % (it['w'] / it['h']) if kind == 'row' else ''
+        style = 'flex-grow:%.4f' % (it['w'] / it['h']) if kind == 'row' else '--w:%g' % it['pt'] if kind == 'cuts' and it.get('pt') else ''
         if kind in ('single', 'tall') and it['kind'] != 'widget' and it['h'] > it['w'] and it.get('cap', True):
             cls += ' cap'; style = '--ar:%.4f' % (it['w'] / it['h'])
         style = ' style="%s"' % style if style else ''
@@ -434,8 +439,9 @@ def block_html(b, slug):
         lbl = ''
         if it.get('lbl'):  # a numeral, a name and a note, under the picture (Sunny's, after its Brand Bible)
             n, t, note = it['lbl']
+            notes = [note] if isinstance(note, str) else note or []
             lbl = '<p class="lbl">%s<span class="lbl-t">%s</span>%s</p>' % (
-                '<span class="lbl-n">%s</span>' % esc(n) if n else '', typo(t), '<span class="lbl-s">%s</span>' % typo(note) if note else '')
+                '<span class="lbl-n">%s</span>' % esc(n) if n else '', typo(t), ''.join('<span class="lbl-s">%s</span>' % typo(x) for x in notes))
         ms.append('<div class="%s" data-i="%s"%s%s>%s%s</div>' % (cls, esc(it['key']), style, skip, it['html'](sizes), lbl))
     if kind == 'row':
         ar = sum(it['w'] / it['h'] for it in b['items'])
@@ -477,7 +483,8 @@ def project_body(p, blocks, chapters, notes, all_work='All work'):
     dl = lambda xs, cls: '<dl class="%s">%s</dl>' % (cls, ''.join('<div><dt>%s</dt><dd>%s</dd></div>' % x for x in xs))
     # data-page-only: a page with a 3D or interactive piece opens as its own page from home, so its scripts run.
     # data-lightbox: every picture on the page opens in the site lightbox, the page's pictures one group (its pieces stay out)
-    out = ['<div class="pp" data-lightbox%s>' % (' data-page-only' if p.get('_scripts') else ''),
+    # air: a page with more room between its sections and its rows (the notes file's "air": Sunny's, after its Bible)
+    out = ['<div class="pp%s" data-lightbox%s>' % (' pp-air' if notes.get('air') else '', ' data-page-only' if p.get('_scripts') else ''),
            masthead(list(NAME), studio_hand(), ' data-cover', link=('/#archive', all_work), lockup=True),
            '<section class="open g">%s<h1>%s</h1><p class="lede">%s</p><div class="info">%s%s</div></section>' % (
                '<p class="kicker">%s</p>' % typo(notes['kicker']) if notes.get('kicker') else '', typo(p['title']), typo(notes.get('lede') or p['lede']), dl(facts, 'facts'), dl(credits, 'cr'))]
@@ -896,7 +903,7 @@ def main():
             elif x['wide']: slot = 'W'
             else: slot = 'P' if r[3] > r[2] else 'L'
             items.append(dict(key=k, slot=slot, kind='img', w=r[2], h=r[3], r=r, gallery=x['gallery'], alt=alt, cut=x.get('cut'), row=x.get('row'), cap=x.get('cap', True),
-                              lbl=x.get('lbl'), align=x.get('align'),
+                              lbl=x.get('lbl'), align=x.get('align'), pt=x.get('pt'),
                               html=lambda sz, r=r, alt=alt, e=eager: img_tag(r, sz, alt, e)))
             p.setdefault('_bigs', []).append(r[0])
         blocks = make_blocks(items, notes['notes'])

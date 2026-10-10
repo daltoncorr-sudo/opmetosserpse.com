@@ -95,7 +95,8 @@ for i, slug in enumerate(order):
     for cap in re.findall(r'<figcaption[^>]*>([\s\S]*?)</figcaption>', t):
         words = re.sub(r'<a [^>]*>[^<]*</a>', ' ', cap); words = re.sub(r'<[^>]+>', ' ', words)
         if len(words.split()) > 25: problems.append('%s: a note runs over 25 words' % rel)
-    if t.count('class="chap"') > 4: problems.append('%s: more than four chapter labels' % rel)
+    # up to four chapter labels; Sunny's Bookshop, built after its Brand Bible, one per section, up to ten (D, Oct. 10)
+    if t.count('class="chap"') > (10 if slug == 'sunnys-bookshop' else 4): problems.append('%s: too many chapter labels' % rel)
     # media order: the record, with only Sunny's repeats left out
     hide = notes.get('hide', [])
     if hide and slug != 'sunnys-bookshop': problems.append('%s: only Sunny\'s Bookshop hides items' % rel)
@@ -103,7 +104,7 @@ for i, slug in enumerate(order):
     stem = lambda p: re.sub(r'-(600|720|800|1100|1200|1600|2200|2400|sm|lg|xl)$', '', re.sub(r'\.(webp|jpe?g|png|gif|mp4|webm|mov)$', '', os.path.basename(p), flags=re.I))
     hidden = {stem(m['src']) for m in pj['media'] if m['alt'] in hide}
     want = [k for k in record.get(slug, []) if k not in hidden]
-    body = t.split('class="pp"', 1)[-1].split('class="g pfoot"', 1)[0]
+    body = re.split(r'class="pp[ "]', t, 1)[-1].split('class="g pfoot"', 1)[0]
     got = [H.unescape(k) for k in re.findall(r'data-i="([^"]+)"', body)]
     if got != want: problems.append('%s: media order differs from daltoncorr.com (%d items, expected %d)' % (rel, len(got), len(want)))
     if 'Next project' in t: problems.append('%s: a "Next project" (pages end on All work)' % rel)
@@ -151,8 +152,8 @@ class LB(HTMLParser):
 for f in glob.glob(D + '/projects/*.html'):
     if f.endswith('index.html'): continue
     t = open(f, encoding='utf-8').read(); rel = os.path.relpath(f, D)
-    if not re.search(r'<div class="pp" data-lightbox[\s>]', t): problems.append('%s: the page is not marked data-lightbox' % rel)
-    body = t.split('class="pp"', 1)[-1].split('class="g pfoot"', 1)[0]
+    if not re.search(r'<div class="pp(?: [\w-]+)*" data-lightbox[\s>]', t): problems.append('%s: the page is not marked data-lightbox' % rel)
+    body = re.split(r'class="pp[ "]', t, 1)[-1].split('class="g pfoot"', 1)[0]
     for st in re.findall(r'\sstyle="([^"]*)"', re.sub(r'<div class="m piece"[\s\S]*?(?=<div class="m|</figure>)', '', body)):
         if re.search(CROP + r'|overflow|aspect-ratio|(?<![-\w])height', st): problems.append('%s: an inline style that can crop a picture (%s)' % (rel, st))
     lb = LB(); lb.feed(t)
