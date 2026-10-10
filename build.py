@@ -898,9 +898,8 @@ def main():
             return '<a href="%s"%s>%s</a>' % (links[k], ' rel="noopener"' if ext else '', k)
         return pat.sub(sub, s).replace('\n', '<br>')
     go = lambda u: 'blog' if u.startswith('/journal') else u[1:]
-    published = any(not e.get('draft') for e in load(os.path.join(CONTENT, 'journal.json'))['posts'])
     nav = ''.join('<a class="ctl" href="%s"%s>%s</a>' % (esc(u), ' rel="noopener"' if u.startswith('http') else ' data-go="%s"' % go(u), ctl(t))
-                  for t, u in h['nav'] if published or not u.startswith('/journal'))
+                  for t, u in h['nav'])  # the Journal is in the menu now, before its first post (D, Oct. 10)
     # Side panels: the foundry one screen to the left of home (a field of objects, from content/foundry.json),
     # About one screen to the right.
     fd = site['foundry']
