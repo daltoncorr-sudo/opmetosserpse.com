@@ -58,6 +58,14 @@ for f in glob.glob(D + '/**/*.html', recursive=True):
             problems.append('%s: the Journal row %s has no page' % (rel, slug))
     problems += ['%s: an old imported post (%s)' % (rel, x) for x in OLD_POSTS if x in t]
 
+# Ordinals are superscripted everywhere they show (build.py typo() writes 22<sup class="ord">nd</sup>): in the visible
+# text of every page, a number run straight into st, nd, rd or th is one that was missed
+for f in glob.glob(D + '/**/*.html', recursive=True):
+    t = open(f, encoding='utf-8').read(); rel = os.path.relpath(f, D)
+    body = t.split('<body', 1)[-1]
+    text = re.sub(r'<[^>]+>', ' ', re.sub(r'<(script|style|svg)[\s\S]*?</\1>', ' ', body))
+    problems += ['%s: an ordinal that is not superscripted (%s)' % (rel, m.group(0)) for m in re.finditer(r'\b\d+(?:st|nd|rd|th)\b', text)]
+
 # Project pages (v02): alt text, no looping video, notes and chapters within limits, media order, project order
 import html as H, json
 ROOT = os.path.dirname(os.path.abspath(__file__))

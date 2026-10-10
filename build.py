@@ -27,11 +27,13 @@ def load(p):
         return json.load(f)
 
 def typo(s):
-    """Straight quotes to curly, for any copy that arrives with straight ones."""
+    """Straight quotes to curly, for any copy that arrives with straight ones; ordinals superscript (22nd: the 22 and a
+    <sup class="ord">nd</sup>, site.css), so the content stays plain text. For element text only, never an attribute."""
     s = esc(s)
     s = re.sub(r'(^|[\s(\[\u2014])&#x27;', '\\1\u2018', s).replace('&#x27;', '\u2019')
     s = re.sub(r'(^|[\s(\[\u2014])&quot;', '\\1\u201c', s).replace('&quot;', '\u201d')
     s = s.replace(' | ', '\u00a0| ')  # a bar in a title stays at the end of its line
+    s = re.sub(r'\b(\d+)(st|nd|rd|th)\b', r'\1<sup class="ord">\2</sup>', s)
     return s.replace('Venice, California', 'Venice,\u00a0California')  # keep the place on one line
 
 def ff(*args):

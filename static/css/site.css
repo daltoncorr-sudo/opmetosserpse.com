@@ -86,6 +86,9 @@ body::after{content:"";position:fixed;inset:0;z-index:1;pointer-events:none;back
 .vh{position:absolute!important;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 .skip{position:absolute;left:-9999px}.skip:focus{left:var(--gutter);top:8px;background:var(--paper);padding:4px 8px;z-index:20}
 p{margin:0 0 1em}
+/* Ordinals (22nd), from build.py typo(): neither face has superior letters (no sups), so a smaller copy whose tops
+   sit on the cap line; it never changes the line's height */
+sup.ord{position:relative;top:-.44em;font-size:.62em;line-height:0;vertical-align:baseline}
 h1{font:inherit;margin:0}
 ul{list-style:none;margin:0;padding:0}
 
@@ -328,7 +331,7 @@ html:not(.js) .stage:has(#about:target){transform:translateX(-66.6667%)}
 }
 
 /* A project page (v02): a 12-column grid. The masthead (the Journal's, see .mast) and All work under it; the title,
-   centered, in the serif; under it the paragraph, and one list of facts and credits. Then the work in the eight middle
+   centered, in the bold serif; under it the paragraph, and one list of facts and credits. Then the work in the eight middle
    columns, pictures from one gallery in even rows; chapter labels in the left margin, notes in the right one, beside
    their picture. At the end, All work. Scoped to .pp, so home and the other pages can't change. Pictures never move. */
 .pp{--m:clamp(16px,2.8vw,40px);--g:clamp(12px,1.6667vw,24px);--u:56px;--U:120px;--t1:44px;--b:16px;--s:13px;
@@ -342,8 +345,8 @@ html:not(.js) .stage:has(#about:target){transform:translateX(-66.6667%)}
 /* The opening: the title; under it, across the eight middle columns, the paragraph and one list */
 .pp .open{padding-top:48px;align-items:start}
 /* A line above the title, when a project has one ("20th Anniversary"), set as the title */
-.pp .open .kicker{grid-column:3/11;grid-row:1;text-align:center;font-family:var(--serif);font-size:var(--t1);line-height:1.12;text-wrap:balance}
-.pp .open h1{grid-column:3/11;grid-row:2;text-align:center;font-family:var(--serif);font-size:var(--t1);line-height:1.12;letter-spacing:0;text-wrap:balance}
+.pp .open .kicker{grid-column:3/11;grid-row:1;text-align:center;font-family:var(--bold-font);font-weight:var(--bold-weight);font-size:var(--t1);line-height:1.12;text-wrap:balance}
+.pp .open h1{grid-column:3/11;grid-row:2;text-align:center;font-family:var(--bold-font);font-weight:var(--bold-weight);font-size:var(--t1);line-height:1.12;letter-spacing:0;text-wrap:balance}
 .pp .open .lede{grid-column:3/7;grid-row:3;margin-top:36px;padding-right:var(--g);font-size:var(--b);line-height:1.55}
 .pp .open .info{grid-column:7/11;grid-row:3;margin-top:40px}
 .pp .facts,.pp .cr{font-size:var(--s);line-height:1.45}
