@@ -209,11 +209,11 @@ def ink_filters():
         for n, (d, b, sl, ic, k) in INK.items())
     return '<svg class="ink-defs" width="0" height="0" aria-hidden="true" focusable="false"><defs>%s</defs></svg>' % f
 
-def page(site, title, desc, path, body, og_image=None, current=None, extra_head='', main_cls=''):
+def page(site, title, desc, path, body, og_image=None, current=None, extra_head='', main_cls='', header=True, og_type='website'):
     url = 'https://%s%s' % (site['domain'], path)
     og = og_image or '/media/site/og.jpg'
     # No menu bar. Inner pages carry only the hand and the name, centered, back to the cover.
-    header = '' if path == '/' else ('<header class="site-header"><a class="lockup" href="/" aria-label="Opmet Osserpse">%s%s</a></header>'
+    header = '' if path == '/' or not header else ('<header class="site-header"><a class="lockup" href="/" aria-label="Opmet Osserpse">%s%s</a></header>'
                                      % (brand_svg('hand-mark.svg', 'lockup-hand'), brand_svg('wordmark.svg', 'wordmark ink')))
     # Which way the page flips: forward onto a project, back onto home
     page_cls = ' class="page-home"' if path == '/' else ' class="page-project"' if path.startswith('/projects/') and path != '/projects/' else ''
@@ -226,13 +226,16 @@ def page(site, title, desc, path, body, og_image=None, current=None, extra_head=
 <title>%(title)s</title>
 <meta name="description" content="%(desc)s">
 <link rel="canonical" href="%(url)s">
-<meta property="og:type" content="website">
+<meta property="og:type" content="%(og_type)s">
 <meta property="og:site_name" content="Opmet Osserpse">
 <meta property="og:title" content="%(title)s">
 <meta property="og:description" content="%(desc)s">
 <meta property="og:url" content="%(url)s">
 <meta property="og:image" content="https://%(domain)s%(og)s">
 <meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="%(title)s">
+<meta name="twitter:description" content="%(desc)s">
+<meta name="twitter:image" content="https://%(domain)s%(og)s">
 <meta name="theme-color" content="#F7F6F2">
 <link rel="icon" href="/brand/hand-mark.svg" type="image/svg+xml">
 <link rel="preload" href="/fonts/libre-caslon-text/libre-caslon-text-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
@@ -252,7 +255,7 @@ def page(site, title, desc, path, body, og_image=None, current=None, extra_head=
 ''' % dict(title=esc(title), desc=esc(desc), url=url, domain=site['domain'], og=og, nav=nav, tz=site['clock_timezone'],
            place=esc(site['clock_place']), body=body, name=esc(site['name']), descr=esc(site['description'].rstrip('.')),
            email=site['email'], line=esc(site['line']), copy=esc(site['copyright']), privacy=esc(site['privacy_line']),
-           v=site['_v'], extra=extra_head, ink=ink_filters(), page_cls=page_cls, main_cls=' class="%s"' % main_cls if main_cls else '')
+           v=site['_v'], extra=extra_head, ink=ink_filters(), page_cls=page_cls, og_type=og_type, main_cls=' class="%s"' % main_cls if main_cls else '')
 
 def write(path, text):
     full = os.path.join(DIST, path.lstrip('/'))
@@ -462,43 +465,65 @@ def ap_date(d):
     """2026-03-15 -> March 15, 2026 (AP style)."""
     return '%s %d, %d' % (AP_MONTHS[d.month - 1], d.day, d.year)
 
-def load_blog():
-    """content/blog.json: every post, newest first, with its tags and whether it is Selected. The text of each post is
-    content/blog/<slug>.txt, one paragraph per block, blocks separated by a blank line. Fails on drift."""
-    b = load(os.path.join(CONTENT, 'blog.json')); vocab = b['tags']; seen = set(); errs = []
-    folder = os.path.join(CONTENT, 'blog')
+def load_blog(media, drafts=False):
+    """content/journal.json: every post, newest first, with its tags and whether it is Selected. The text of each post is
+    content/journal/<slug>.txt, one paragraph per block, blocks separated by a blank line; a block that is just
+    "image: <file> | <alt text>" is a picture from content/journal/images/<slug>/. A post marked "draft" is left out
+    (no page, no row, not in the sitemap) unless the build runs with --drafts; only a draft may be empty or undated.
+    Fails on drift."""
+    b = load(os.path.join(CONTENT, 'journal.json')); vocab = b['tags']; seen = set(); errs = []; posts = []
+    folder = os.path.join(CONTENT, 'journal')
     for e in b['posts']:
         s = e['slug']
         if s in seen: errs.append('%s: listed twice' % s)
         seen.add(s)
+        draft = bool(e.get('draft'))
+        if draft and not drafts: continue
+        e.setdefault('full_title', e['title']); e.setdefault('selected', False)
         try:
-            if not re.fullmatch(r'\d{4}-\d{2}-\d{2}', e.get('date', '')): raise ValueError
-            e['_date'] = date.fromisoformat(e['date'])
+            if 'date' not in e and draft: e['_date'] = None
+            elif not re.fullmatch(r'\d{4}-\d{2}-\d{2}', e.get('date', '')): raise ValueError
+            else: e['_date'] = date.fromisoformat(e['date'])
         except ValueError:
-            errs.append('%s: date must be ISO, like 2026-03-15' % s); e['_date'] = date.min
+            errs.append('%s: date must be ISO, like 2026-03-15 (only a draft may go without one)' % s); e['_date'] = None
         if not 1 <= len(e.get('tags', [])) <= 2: errs.append('%s: needs one or two tags' % s)
         errs += ['%s: "%s" is not in the tag list' % (s, t) for t in e.get('tags', []) if t not in vocab]
         fn = os.path.join(folder, s + '.txt')
-        if not os.path.exists(fn): errs.append('%s: content/blog/%s.txt is missing' % (s, s)); continue
-        with open(fn, encoding='utf-8') as f: text = f.read().strip()
-        e['paras'] = [' '.join(x.split()) for x in re.split(r'\n\s*\n', text) if x.strip()]
-        if not e['paras']: errs.append('%s: content/blog/%s.txt is empty' % (s, s))
+        if not os.path.exists(fn): errs.append('%s: content/journal/%s.txt is missing' % (s, s)); continue
+        with open(fn, encoding='utf-8') as fh: text = fh.read().strip()
+        e['blocks'], e['_og'] = [], None
+        for x in re.split(r'\n\s*\n', text):
+            x = ' '.join(x.split())
+            if not x: continue
+            m = re.fullmatch(r'image:\s*([^|]+?)\s*\|\s*(.+)', x)
+            if m:
+                rel = 'content/journal/images/%s/%s' % (s, m.group(1))
+                r = media.image(rel, 'journal-' + s, re.sub(r'[^a-z0-9]+', '-', os.path.splitext(m.group(1))[0].lower()))
+                if not r: errs.append('%s: image %s is missing' % (s, rel)); continue
+                e['blocks'].append(('img', r, m.group(2)))
+                e['_og'] = e['_og'] or media.og(rel, 'journal-' + s)
+            else:
+                e['blocks'].append(('p', x))
+        e['paras'] = [x[1] for x in e['blocks'] if x[0] == 'p']
+        if not e['blocks'] and not draft: errs.append('%s: content/journal/%s.txt is empty (only a draft may be)' % (s, s))
+        posts.append(e)
     if os.path.isdir(folder):
-        errs += ['%s: has a .txt but is missing from blog.json' % fn[:-4] for fn in sorted(os.listdir(folder)) if fn.endswith('.txt') and fn[:-4] not in seen]
-    if errs: sys.exit('Fix content/blog.json first:\n  ' + '\n  '.join(errs))
-    return sorted(b['posts'], key=lambda e: e['_date'], reverse=True), vocab
+        errs += ['%s: has a .txt but is missing from journal.json' % fn[:-4] for fn in sorted(os.listdir(folder)) if fn.endswith('.txt') and fn[:-4] not in seen]
+    if errs: sys.exit('Fix content/journal.json first:\n  ' + '\n  '.join(errs))
+    dated = sorted([e for e in posts if e['_date']], key=lambda e: e['_date'], reverse=True)
+    return dated + [e for e in posts if not e['_date']], vocab  # undated drafts last, in file order
 
 def blog_section(posts, vocab, w, current=None):
-    """The blog list: the work list turned upside down, with the same markup, so the same CSS and motion apply. See more
-    also reveals a row of topics that filter it."""
+    """The Journal's list: the work list turned upside down, with the same markup, so the same CSS and motion apply. See
+    more also reveals a row of topics that filter it."""
     rows, seen, i = [], set(), 0
     for e in posts:
-        y = str(e['_date'].year)
-        yr = '' if y in seen else '<span class="yr">%s</span>' % y
+        y = str(e['_date'].year) if e['_date'] else ''
+        yr = '' if not y or y in seen else '<span class="yr">%s</span>' % y
         seen.add(y)
         extra = not e['selected']
         cur = e['slug'] == current
-        rows.append('<li class="work-row%s%s" data-slug="%s" data-tags="%s" data-year="%s"%s>%s<a href="/blog/%s"%s>%s</a>%s</li>' % (
+        rows.append('<li class="work-row%s%s" data-slug="%s" data-tags="%s" data-year="%s"%s>%s<a href="/journal/%s"%s>%s</a>%s</li>' % (
             ' extra' if extra else '', ' is-current' if cur else '', e['slug'], esc('|'.join(e['tags'])), y,
             ' style="--i:%d"' % i if extra else '', yr, e['slug'], ' aria-current="page"' if cur else '', typo(e['title']), tag_list(e['tags'])))
         if extra: i += 1
@@ -514,12 +539,21 @@ def blog_section(posts, vocab, w, current=None):
         esc(w['label']), esc(w['selected']), esc(w['all']), esc(w['selected']), esc(w['more']), esc(w['less']), esc(w['more']), esc(w['back']),
         topics, ''.join(rows))
 
-def article(e):
-    """One post: the title, the date, the text. Nothing else."""
-    return ('<article class="article"><header class="article-head"><h1 tabindex="-1">%s</h1>'
-            '<p class="article-date"><time datetime="%s">%s</time></p></header>'
-            '<div class="article-body">%s</div></article>') % (
-        typo(e['title']), e['date'], ap_date(e['_date']), ''.join('<p>%s</p>' % typo(x) for x in e['paras']))
+def article(e, w):
+    """One post, under the masthead: All articles (back to the list), then the title, the date and the text."""
+    body = ''.join('<p>%s</p>' % typo(x[1]) if x[0] == 'p' else
+                   '<figure class="article-img">%s</figure>' % img_tag(x[1], '(max-width:640px) 100vw, 60rem', x[2]) for x in e['blocks'])
+    when = ('<p class="article-date"><time datetime="%s">%s</time></p>' % (e['date'], ap_date(e['_date']))) if e['_date'] else ''
+    return ('<p class="journal-all"><a href="/journal/" data-all>%s</a></p>'
+            '<article class="article"><header class="article-head"><h1 tabindex="-1">%s</h1>%s</header>'
+            '<div class="article-body">%s</div></article>') % (esc(w['all']), typo(e['title']), when, body)
+
+def masthead(w, panel=False):
+    """The Journal's nameplate: the hand and the name (to the studio), Journal, and a small line. Quiet and small."""
+    home = ' data-studio' if panel else ''  # in the panel above home, the name slides back to the cover
+    return ('<header class="journal-mast"><a class="lockup" href="/"%s aria-label="Opmet Osserpse">%s%s</a>'
+            '<p class="journal-name">%s</p><p class="journal-line">%s</p></header>') % (
+        home, brand_svg('hand-mark.svg', 'lockup-hand'), brand_svg('wordmark.svg', 'wordmark ink'), esc(w['title']), typo(w['line']))
 
 def blurb(s, n=155):
     """A search description: the first paragraph, trimmed at a word break."""
@@ -595,7 +629,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('--daltoncorr', required=True, help='path to a clone of daltoncorr-sudo/daltoncorr-porfolio')
     ap.add_argument('--zip', action='store_true', help='also write a zip of each project images, for press')
-    ap.add_argument('--drafts', action='store_true', help='also build foundry products marked draft (a preview; never ship it)')
+    ap.add_argument('--drafts', action='store_true', help='also build foundry products and Journal posts marked draft (a preview; never ship it)')
     a = ap.parse_args()
     src_root = os.path.join(os.path.abspath(a.daltoncorr), 'site')
     if not os.path.isdir(src_root): sys.exit('Not found: %s (expected the repo with a site/ folder)' % src_root)
@@ -772,7 +806,10 @@ def main():
             ext = links[k].startswith('http')
             return '<a href="%s"%s>%s</a>' % (links[k], ' rel="noopener"' if ext else '', k)
         return pat.sub(sub, s).replace('\n', '<br>')
-    nav = ''.join('<a href="%s"%s>%s</a>' % (esc(u), ' rel="noopener"' if u.startswith('http') else ' data-go="%s"' % u[1:], esc(t)) for t, u in h['nav'])
+    go = lambda u: 'blog' if u.startswith('/journal') else u[1:]
+    published = any(not e.get('draft') for e in load(os.path.join(CONTENT, 'journal.json'))['posts'])
+    nav = ''.join('<a href="%s"%s>%s</a>' % (esc(u), ' rel="noopener"' if u.startswith('http') else ' data-go="%s"' % go(u), esc(t))
+                  for t, u in h['nav'] if published or not u.startswith('/journal'))
     # Side panels: the foundry one screen to the left of home (a field of objects, from content/foundry.json),
     # About one screen to the right.
     fd = site['foundry']
@@ -785,23 +822,29 @@ def main():
                    '<div class="about-main"><div class="about-body">%s</div></div>'
                    '<div class="about-press"><h3 class="press-title">%s</h3>%s</div></div></section>') % (
         ' '.join('<span>%s</span>' % esc(x) for x in ap['title'].split()), esc(site['back']), ''.join('<p>%s</p>' % link(typo(x)) for x in ap['lines']) + ''.join('<p class="contact">%s</p>' % link(typo(x)) for x in ap['contact']), esc(ap['press_title']), press_list(press))
-    # The blog sits one screen above home: an empty slot for an article, then the list at the bottom of the screen,
-    # next to home. Until there are posts, the lines from site.json (or content/blog.html).
-    bl = site['blog']
-    posts, blog_tags = load_blog()
-    if posts:
-        blog = ('<section class="blog-panel" id="blog" aria-labelledby="blog-title"><h2 class="vh" id="blog-title">%s</h2>'
-                '<div class="blog-article" data-article></div>%s</section>') % (esc(bl['title']), blog_section(posts, blog_tags, bl))
-    else:
-        bl_file = os.path.join(CONTENT, 'blog.html')
-        bl_body = open(bl_file, encoding='utf-8').read() if os.path.exists(bl_file) else ''.join('<p>%s</p>' % typo(x) for x in bl['lines'])
-        blog = ('<section class="blog-panel" id="blog" aria-labelledby="blog-title"><div class="blog-inner"><div class="title-row">'
-                '<h2 class="vh" id="blog-title">%s</h2><p class="home-big"><a href="#" data-studio>%s</a></p></div>'
-                '<div class="blog-body">%s</div></div></section>') % (esc(bl['title']), esc(site['back']), bl_body)
-    # One page per post, so a reload or a shared link lands on the article and still ends at the list
+    # The Journal: a panel one screen above home, and its own pages at /journal/ and /journal/<slug>, all with the same
+    # masthead, slot and list. Until a post is published it's out of the menu and the sitemap, and /journal/ is noindex.
+    jw = site['journal']
+    posts, blog_tags = load_blog(media, a.drafts)
+    jtitle = '%s | %s' % (jw['title'], site['name'])
+    empty_lines = '<div class="journal-empty">%s</div>' % ''.join('<p>%s</p>' % typo(x) for x in jw['lines'])
+    listing = lambda cur=None: blog_section(posts, blog_tags, jw, cur) if posts else empty_lines
+    blog = ('<section class="blog-panel journal" id="blog" aria-labelledby="blog-title" data-title="%s"><h2 class="vh" id="blog-title">%s</h2>%s'
+            '<div class="blog-article" data-article></div>%s</section>') % (esc(jtitle), esc(jw['title']), masthead(jw, True), listing())
+    noindex = '' if posts else '<meta name="robots" content="noindex">\n'
+    jpage = lambda inner, cur=None: '<div class="journal-page journal" data-journal data-title="%s">%s<div class="blog-article" data-article>%s</div>%s</div>' % (
+        esc(jtitle), masthead(jw), inner, listing(cur))
+    write('/journal/index.html', page(site, jtitle, jw['description'], '/journal/', jpage(''), so, header=False, extra_head=noindex))
+    # One page per post, so a reload or a shared link lands on the article (at its top) and still ends at the list
     for e in posts:
-        body = '<div class="blog-article" data-article>%s</div>%s' % (article(e), blog_section(posts, blog_tags, bl, e['slug']))
-        write('/blog/%s.html' % e['slug'], page(site, '%s | %s' % (e['full_title'], site['name']), blurb(e['paras'][0]), '/blog/%s' % e['slug'], body, so))
+        write('/journal/%s.html' % e['slug'], page(site, '%s | %s' % (e['full_title'], site['name']),
+                                                   blurb(e['paras'][0]) if e['paras'] else jw['description'], '/journal/%s' % e['slug'],
+                                                   jpage(article(e, jw), e['slug']), e['_og'] or so, header=False, og_type='article'))
+    # The old address: /blog/ goes to the Journal (its old articles are gone)
+    write('/blog/index.html', '<!doctype html>\n<html lang="en"><head><meta charset="utf-8"><title>%s</title>'
+          '<link rel="canonical" href="https://%s/journal/"><meta http-equiv="refresh" content="0; url=/journal/">'
+          '<meta name="robots" content="noindex"><script>location.replace("/journal/")</script></head>'
+          '<body><p><a href="/journal/">%s</a></p></body></html>\n' % (esc(jtitle), site['domain'], esc(jw['title'])))
     cover = ('<section class="cover"><div class="cover-inner"><h1><span class="mark" %s>%s</span><span class="name ink">%s<span class="name-text">Opmet Osserpse</span></span></h1>'
              '<nav class="cover-nav" aria-label="Site">%s</nav></div></section>') % (
         moves.mark_attrs(mv), hand + mv['layers'], brand_svg('wordmark.svg', 'wordmark'), nav)
@@ -831,7 +874,9 @@ def main():
     write('/CNAME', site['domain'] + '\n')
     write('/.nojekyll', '')
     write('/robots.txt', 'User-agent: *\nAllow: /\nSitemap: https://%s/sitemap.xml\n' % site['domain'])
-    urls = ['/', '/projects/', '/privacy'] + ['/projects/%s' % p['slug'] for p in ordered] + ['/blog/%s' % e['slug'] for e in posts]
+    published = [e for e in posts if not e.get('draft')]
+    urls = ['/', '/projects/', '/privacy'] + ['/projects/%s' % p['slug'] for p in ordered] + (
+        ['/journal/'] + ['/journal/%s' % e['slug'] for e in published] if published else [])
     write('/sitemap.xml', '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n%s</urlset>\n' % ''.join(
         '  <url><loc>https://%s%s</loc></url>\n' % (site['domain'], u) for u in urls))
 
