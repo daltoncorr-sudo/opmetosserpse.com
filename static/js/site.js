@@ -308,6 +308,8 @@
       change();
       box.scrollTop += head.getBoundingClientRect().top - y;
     }
+    // An article open: the masthead turns small (site.css .is-reading)
+    var root = slot.closest('.journal'), reading = function (on) { if (root) root.classList.toggle('is-reading', on); };
     function markRow(slug) {
       if (articles) articles.rows.forEach(function (r) {
         var on = r.getAttribute('data-slug') === slug, a = $('a', r);
@@ -326,7 +328,7 @@
       return fetchEntry(slug).then(function (a) {
         if (o.active && !o.active()) return;
         moving = true;  // the address follows the reader, not this move
-        holdList(function () { slot.innerHTML = a.html; });
+        holdList(function () { slot.innerHTML = a.html; reading(true); });
         if (push) history.pushState({ article: slug, depth: depth() + 1 }, '', '/journal/' + slug);
         else if (location.pathname !== '/journal/' + slug) history.replaceState(history.state, '', '/journal/' + slug);  // back onto an article read to its end
         J.shown = slug; J.title = a.title; document.title = a.title; markRow(slug);
@@ -340,12 +342,12 @@
       J.shown = null; moving = true;
       scrollTo(box.scrollHeight - view(), function () {
         if (J.shown) return;  // another article opened meanwhile
-        holdList(function () { slot.innerHTML = ''; });
+        holdList(function () { slot.innerHTML = ''; reading(false); });
         markRow(null); document.title = J.list;
         var l = articles && $('.work-label', scope); if (l) { l.setAttribute('tabindex', '-1'); l.focus({ preventScroll: true }); }
       });
     }
-    J.reset = function () { cancelAnimationFrame(raf); moving = false; slot.innerHTML = ''; J.shown = null; markRow(null); box.scrollTop = 0; };
+    J.reset = function () { cancelAnimationFrame(raf); moving = false; slot.innerHTML = ''; reading(false); J.shown = null; markRow(null); box.scrollTop = 0; };
     J.go = function (slug) { if (slug) { if (slug !== J.shown) show(slug, false); } else hide(); };
     J.adopt = function (slug) { J.shown = slug; J.title = document.title; };  // an article already on the page
     // Which article an entry in the history holds: its address says, or (once the reader reached the list and the address

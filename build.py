@@ -932,8 +932,8 @@ def main():
     blog = ('<section class="blog-panel journal" id="blog" aria-labelledby="blog-title" data-title="%s"><h2 class="vh" id="blog-title">%s</h2>%s'
             '<div class="blog-article" data-article></div>%s</section>') % (esc(jtitle), esc(jw['title']), journal_mast(jw, True), listing())
     noindex = '' if posts else '<meta name="robots" content="noindex">\n'
-    jpage = lambda inner, cur=None: '<div class="journal-page journal" data-journal data-title="%s">%s<div class="blog-article" data-article>%s</div>%s</div>' % (
-        esc(jtitle), journal_mast(jw), inner, listing(cur))
+    jpage = lambda inner, cur=None: '<div class="journal-page journal%s" data-journal data-title="%s">%s<div class="blog-article" data-article>%s</div>%s</div>' % (
+        ' is-reading' if inner else '', esc(jtitle), journal_mast(jw), inner, listing(cur))  # is-reading: the small masthead
     write('/journal/index.html', page(site, jtitle, jw['description'], '/journal/', jpage(''), so, header=False, extra_head=noindex, main_cls='journal-main'))
     # One page per post, so a reload or a shared link lands on the article (at its top) and still ends at the list
     for e in posts:
