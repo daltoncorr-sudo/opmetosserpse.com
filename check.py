@@ -111,6 +111,49 @@ for i, slug in enumerate(order):
         words = ' '.join(re.sub(r'<span class="ctl-w"[^>]*>[^<]*</span>', ' ', m.group(2)).split())
         words = ' '.join(re.sub(r'<[^>]+>', ' ', words).split())
         if words in ('Back', 'Home', 'Back to top'): problems.append('%s: a "%s" control (project pages have the masthead and All work)' % (rel, words))
+# Whole pictures: nothing styles a project page's picture (or the lightbox's) to crop. In site.css, no rule for .pp or
+# .lightbox uses object-fit other than contain, clip-path or object-view-box, and no picture's frame (.m, .row, .cut,
+# .cuts, a block .b) hides what spills over; on the pages, no inline style does either.
+from html.parser import HTMLParser
+css = open(os.path.join(D, 'css', 'site.css'), encoding='utf-8').read() if os.path.exists(os.path.join(D, 'css', 'site.css')) else ''
+CROP = r'object-fit:\s*(?:cover|fill|none|scale-down)|clip-path|object-view-box'
+FRAME = r'(?:^|[\s>+~,])(?:img|video|\.m|\.row|\.cuts?|\.b)(?![\w-])'
+for sel, body in re.findall(r'([^{}]+)\{([^{}]*)\}', re.sub(r'/\*[\s\S]*?\*/', '', css)):
+    sel = ' '.join(sel.split())
+    if not re.search(r'\.(?:pp|lightbox)(?![\w-])', sel): continue
+    if re.search(CROP, body): problems.append('site.css: %s crops a picture (%s)' % (sel, re.search(CROP, body).group(0)))
+    if re.search(r'overflow:\s*(?:hidden|clip)', body) and re.search(FRAME, sel): problems.append('site.css: %s hides what spills over a picture' % sel)
+# Every picture on a project page opens in the lightbox: it sits inside the page's data-lightbox (.pp), with no
+# data-lightbox-skip on it or around it, and not in a link. Only the 3D and interactive pieces (.piece) stay out, and
+# every picture in one does.
+class LB(HTMLParser):
+    def __init__(self):
+        super().__init__(); self.stack, self.out = [], []
+    def handle_starttag(self, tag, a):
+        a = dict(a); cls = (a.get('class') or '').split()
+        st = dict(lb='data-lightbox' in a, skip='data-lightbox-skip' in a, piece='piece' in cls, pp='pp' in cls, a=tag == 'a')
+        if tag == 'img':
+            up = self.stack + [st]
+            if any(x['pp'] for x in up):
+                self.out.append((a.get('src', ''), any(x['piece'] for x in up), any(x['lb'] for x in up) and not any(x['skip'] or x['a'] for x in up)))
+            return
+        if tag not in ('br', 'hr', 'source', 'meta', 'link', 'input', 'wbr', 'path', 'use', 'circle', 'rect', 'line', 'polyline', 'ellipse', 'stop'):
+            self.stack.append(st)
+    def handle_startendtag(self, tag, a):
+        if tag == 'img': self.handle_starttag(tag, a)
+    def handle_endtag(self, tag):
+        if tag not in ('img', 'br', 'hr', 'source', 'meta', 'link', 'input', 'wbr', 'path', 'use', 'circle', 'rect', 'line', 'polyline', 'ellipse', 'stop') and self.stack: self.stack.pop()
+for f in glob.glob(D + '/projects/*.html'):
+    if f.endswith('index.html'): continue
+    t = open(f, encoding='utf-8').read(); rel = os.path.relpath(f, D)
+    if not re.search(r'<div class="pp" data-lightbox[\s>]', t): problems.append('%s: the page is not marked data-lightbox' % rel)
+    body = t.split('class="pp"', 1)[-1].split('class="g pfoot"', 1)[0]
+    for st in re.findall(r'\sstyle="([^"]*)"', re.sub(r'<div class="m piece"[\s\S]*?(?=<div class="m|</figure>)', '', body)):
+        if re.search(CROP + r'|overflow|aspect-ratio|(?<![-\w])height', st): problems.append('%s: an inline style that can crop a picture (%s)' % (rel, st))
+    lb = LB(); lb.feed(t)
+    for src, piece, opens in lb.out:
+        if piece and opens: problems.append('%s: a picture in a 3D or interactive piece opens in the lightbox (%s)' % (rel, src))
+        if not piece and not opens: problems.append('%s: a picture that does not open in the lightbox (%s)' % (rel, src))
 # All work resolves to the work list: /#archive opens the full list on home
 home_t = open(os.path.join(D, 'index.html'), encoding='utf-8').read()
 if not ('id="work"' in home_t and 'id="works"' in home_t and 'class="ctl archive-toggle"' in home_t): problems.append('index.html: no work list for All work (/#archive) to open')
