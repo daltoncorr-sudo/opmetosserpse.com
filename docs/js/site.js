@@ -117,8 +117,9 @@
   setTimeout(function () { play(first); setInterval(function () { play(); }, every); }, delay);
 })();
 
-// Home: the side panels (foundry to the left, About to the right, the blog above), the Work link, the two lists that
-// open in place (work and blog), projects and articles, and the project hover hook.
+// Home: the side panels (foundry to the left, About to the right, the Journal above), the Work link, the two lists that
+// open in place (work and the Journal), projects and articles, and the project hover hook. The Journal's own pages use
+// the list and the article engine too.
 (function () {
   var stage = document.querySelector('[data-stage]');
   var root = document.documentElement;
@@ -240,6 +241,127 @@
   document.addEventListener('pointerdown', function () { byKey = false; }, true);
   var place = function (el) { el.focus({ preventScroll: true, focusVisible: byKey }); };
   var articles = $('#articles') && List($('#articles'), { wait: true, glideHead: true });
+
+  // The Journal: an article opens above the list, under the masthead. Its page is fetched once and its entry (All
+  // articles, then the <article>) dropped into the slot, with the scroll corrected so the list doesn't move; then the
+  // view scrolls to the top: the masthead, and the article's first line. Reading to the end brings you to the list,
+  // which simply follows the article, and the address follows you: /journal/<slug> while you read, /journal/ at the
+  // list. The same engine runs in the panel above home (box: the panel) and on the Journal's own pages (box: the page).
+  var cssVar = function (n) { return getComputedStyle(root).getPropertyValue(n); };
+  var slideMs = parseFloat(cssVar('--slide')) * 1000 || 900;
+  var curve = (cssVar('--slide-ease').match(/-?[\d.]+/g) || [.65, 0, .35, 1]).map(Number);
+  // The stage's curve, for scrolling (native smooth scrolling can't take one): solve x(s) = t, return y(s)
+  function ease(t) {
+    var lo = 0, hi = 1, u = t, b = function (s, p1, p2) { return 3 * (1 - s) * (1 - s) * s * p1 + 3 * (1 - s) * s * s * p2 + s * s * s; };
+    for (var i = 0; i < 24; i++) { u = (lo + hi) / 2; if (b(u, curve[0], curve[2]) < t) lo = u; else hi = u; }
+    return b(u, curve[1], curve[3]);
+  }
+  var articleOf = function (u) { var m = u && new URL(u, location.href).pathname.match(/^\/journal\/([^\/]+?)(?:\.html)?$/); return m && m[1]; };
+  var depth = function () { return (history.state && history.state.depth) || 0; };
+  function Journal(box, o) {
+    var page = box === document.scrollingElement, scope = page ? document : box, slot = $('[data-article]', scope);
+    var J = { shown: null, title: '', list: o.title }, cache = {}, raf = 0, moving = false;
+    var boxTop = function () { return page ? 0 : box.getBoundingClientRect().top; };
+    var view = function () { return page ? innerHeight : box.clientHeight; };
+    function scrollTo(to, done) {
+      cancelAnimationFrame(raf);
+      to = Math.max(0, Math.min(to, box.scrollHeight - view()));
+      var from = box.scrollTop, t0 = performance.now();
+      // no motion with reduced motion, or in a tab nobody can see (it gets no animation frames): straight there
+      if (reduce || document.hidden || Math.abs(to - from) < 1) { box.scrollTop = to; moving = false; if (done) done(); return; }
+      moving = true;
+      (function step(now) {
+        var p = Math.min(1, (now - t0) / slideMs);
+        box.scrollTop = from + (to - from) * ease(p);
+        if (p < 1) raf = requestAnimationFrame(step); else { moving = false; if (done) done(); }
+      })(t0);
+    }
+    ['wheel', 'touchstart', 'keydown'].forEach(function (ev) { (page ? window : box).addEventListener(ev, function () { cancelAnimationFrame(raf); moving = false; }, { passive: true }); });
+    // Change what's above the list without moving the list: measure its head before and after, and scroll by the difference
+    function holdList(change) {
+      var head = $('.work-head', scope); if (!head) { change(); return; }
+      var y = head.getBoundingClientRect().top;
+      change();
+      box.scrollTop += head.getBoundingClientRect().top - y;
+    }
+    function markRow(slug) {
+      if (articles) articles.rows.forEach(function (r) {
+        var on = r.getAttribute('data-slug') === slug, a = $('a', r);
+        r.classList.toggle('is-current', on);
+        if (on) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current');
+      });
+    }
+    function fetchEntry(slug) {
+      if (cache[slug]) return Promise.resolve(cache[slug]);
+      return fetch('/journal/' + slug).then(function (r) { if (!r.ok) throw new Error(r.status); return r.text(); }).then(function (t) {
+        var d = new DOMParser().parseFromString(t, 'text/html');
+        return (cache[slug] = { html: d.querySelector('[data-article]').innerHTML, title: d.title });
+      });
+    }
+    function show(slug, push) {
+      return fetchEntry(slug).then(function (a) {
+        if (o.active && !o.active()) return;
+        moving = true;  // the address follows the reader, not this move
+        holdList(function () { slot.innerHTML = a.html; });
+        if (push) history.pushState({ article: slug, depth: depth() + 1 }, '', '/journal/' + slug);
+        else if (location.pathname !== '/journal/' + slug) history.replaceState(history.state, '', '/journal/' + slug);  // back onto an article read to its end
+        J.shown = slug; J.title = a.title; document.title = a.title; markRow(slug);
+        var h = $('h1', slot); if (h) h.focus({ preventScroll: true });
+        scrollTo(0, function () { if (J.shown === slug && location.pathname !== '/journal/' + slug) history.replaceState(history.state, '', '/journal/' + slug); });
+      }).catch(function () { location.href = '/journal/' + slug; });
+    }
+    // Back to the list: down to it, then the article goes and the list stays exactly where it is
+    function hide() {
+      if (!J.shown) return;
+      J.shown = null; moving = true;
+      scrollTo(box.scrollHeight - view(), function () {
+        if (J.shown) return;  // another article opened meanwhile
+        holdList(function () { slot.innerHTML = ''; });
+        markRow(null); document.title = J.list;
+        var l = articles && $('.work-label', scope); if (l) { l.setAttribute('tabindex', '-1'); l.focus({ preventScroll: true }); }
+      });
+    }
+    J.reset = function () { cancelAnimationFrame(raf); moving = false; slot.innerHTML = ''; J.shown = null; markRow(null); box.scrollTop = 0; };
+    J.go = function (slug) { if (slug) { if (slug !== J.shown) show(slug, false); } else hide(); };
+    J.adopt = function (slug) { J.shown = slug; J.title = document.title; };  // an article already on the page
+    // Which article an entry in the history holds: its address says, or (once the reader reached the list and the address
+    // followed to /journal/) the entry remembers it
+    J.of = function () { return articleOf(location.href) || (location.pathname === '/journal/' && history.state && history.state.article) || null; };
+    if (articles) articles.list.addEventListener('click', function (e) {
+      var a = e.target.closest('.work-row a');
+      if (!a || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button) return;
+      var slug = articleOf(a.href); if (!slug) return;
+      e.preventDefault(); show(slug, true);
+    });
+    // All articles, under the masthead: back to the list, as a step of its own
+    scope.addEventListener('click', function (e) {
+      var a = e.target.closest('[data-all]');
+      if (!a || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button) return;
+      e.preventDefault();
+      if (!J.shown) return;
+      history.pushState({ depth: depth() + 1 }, '', '/journal/');
+      hide();
+    });
+    // The address follows the reader: once the article has scrolled away and the list is in view, it's /journal/
+    (page ? window : box).addEventListener('scroll', function () {
+      if (!J.shown || moving || (o.active && !o.active())) return;
+      var art = $('article', slot); if (!art) return;
+      var past = art.getBoundingClientRect().bottom - boxTop() < view() * .25;
+      var want = past ? '/journal/' : '/journal/' + J.shown;
+      if (location.pathname !== want) { history.replaceState(history.state, '', want); document.title = past ? J.list : J.title; }
+    }, { passive: true });
+    return J;
+  }
+
+  // The Journal's own pages, /journal/ and /journal/<slug>: the same list and articles, scrolling the page itself
+  var own = $('[data-journal]');
+  if (own && articles) {
+    var jp = Journal(document.scrollingElement, { title: own.getAttribute('data-title') });
+    if ('scrollRestoration' in history) history.scrollRestoration = 'manual';  // the Journal places the view itself on back and forward
+    if (articleOf(location.href)) jp.adopt(articleOf(location.href));
+    history.replaceState({ depth: 0, article: articleOf(location.href) }, '', location.pathname.replace(/\.html$/, '') + location.search);
+    window.addEventListener('popstate', function () { jp.go(jp.of()); });
+  }
   if (!stage) return;
   root.classList.add('js');
   var home = $('[data-home]'), panels = { foundry: $('#foundry'), about: $('#about'), blog: $('#blog') };
@@ -252,7 +374,7 @@
     var was = current;
     if (name === was && !root.classList.contains('at-' + name)) return;
     var instant = !animate || reduce;
-    if (name === 'blog' && window.scrollY) window.scrollTo(0, 0);  // the blog sits above the top of the page
+    if (name === 'blog' && window.scrollY) window.scrollTo(0, 0);  // the Journal sits above the top of the page
     root.classList.toggle('is-locked', name === 'blog');
     if (instant) stage.classList.add('no-anim');
     stage.classList.toggle('is-foundry', name === 'foundry');
@@ -264,8 +386,8 @@
     home.inert = !!name;
     if (instant) { void stage.offsetWidth; stage.classList.remove('no-anim'); }
     // Leaving the blog: once the slide has finished, empty the article slot, so the next visit starts at the list
-    if (articles && name === 'blog') { clearTimeout(blogReset); resetBlog(); }
-    if (articles && was === 'blog' && name !== 'blog') { document.title = homeTitle; blogReset = setTimeout(resetBlog, instant ? 0 : slideMs); }
+    if (name === 'blog') { clearTimeout(blogReset); resetBlog(); document.title = panels.blog.getAttribute('data-title') || homeTitle; }
+    if (was === 'blog' && name !== 'blog') { document.title = homeTitle; blogReset = setTimeout(resetBlog, instant ? 0 : slideMs); }
     if (name) { panels[name].scrollTop = 0; place($('[data-studio]', panels[name])); }
     else if (was && animate) { var l = $('[data-go="' + was + '"]'); if (l) place(l); }
   }
@@ -277,13 +399,14 @@
       leaving = true;
       history.go(-steps);  // popstate slides it home
     }
-    else { history.replaceState(null, '', url()); setPanel('', true); }
+    else { history.replaceState(null, '', current === 'blog' ? '/' : url()); setPanel('', true); }
   }
   ['foundry', 'about', 'blog'].forEach(function (name) {
     $$('[data-go="' + name + '"]').forEach(function (a) {
       a.addEventListener('click', function (e) {
         e.preventDefault();
-        if (location.hash !== '#' + name) { history.pushState(null, '', url('#' + name)); pushed = true; }
+        if (name === 'blog') { if (location.pathname !== '/journal/') { history.pushState(null, '', '/journal/'); pushed = true; } }
+        else if (location.hash !== '#' + name) { history.pushState(null, '', url('#' + name)); pushed = true; }
         setPanel(name, true);
       });
     });
@@ -397,88 +520,16 @@
     r.addEventListener('focusout', function (e) { if (!r.contains(e.relatedTarget)) fire('project:leave'); });
   });
 
-  // The blog: an article opens above the list. Its page is fetched once and its <article> dropped into the slot, with the
-  // panel's scroll corrected so the list doesn't move; then the panel scrolls up to the article's first line. Reading
-  // to the end brings you back to the list, which simply follows the article. The address is the article's own.
-  var blogPanel = panels.blog, slot = $('[data-article]', blogPanel), shown = null, articleCache = {}, blogReset = 0;
-  var cssVar = function (n) { return getComputedStyle(root).getPropertyValue(n); };
-  var slideMs = parseFloat(cssVar('--slide')) * 1000 || 900;
-  var curve = (cssVar('--slide-ease').match(/-?[\d.]+/g) || [.65, 0, .35, 1]).map(Number);
-  // The stage's curve, for scrolling (native smooth scrolling can't take one): solve x(s) = t, return y(s)
-  function ease(t) {
-    var lo = 0, hi = 1, u = t, b = function (s, p1, p2) { return 3 * (1 - s) * (1 - s) * s * p1 + 3 * (1 - s) * s * s * p2 + s * s * s; };
-    for (var i = 0; i < 24; i++) { u = (lo + hi) / 2; if (b(u, curve[0], curve[2]) < t) lo = u; else hi = u; }
-    return b(u, curve[1], curve[3]);
-  }
-  var raf = 0;
-  function scrollPanel(to, done) {
-    cancelAnimationFrame(raf);
-    to = Math.max(0, Math.min(to, blogPanel.scrollHeight - blogPanel.clientHeight));
-    var from = blogPanel.scrollTop, t0 = performance.now();
-    if (reduce || Math.abs(to - from) < 1) { blogPanel.scrollTop = to; if (done) done(); return; }
-    (function step(now) {
-      var p = Math.min(1, (now - t0) / slideMs);
-      blogPanel.scrollTop = from + (to - from) * ease(p);
-      if (p < 1) raf = requestAnimationFrame(step); else if (done) done();
-    })(t0);
-  }
-  if (blogPanel) ['wheel', 'touchstart'].forEach(function (ev) { blogPanel.addEventListener(ev, function () { cancelAnimationFrame(raf); }, { passive: true }); });
-  // Change what's above the list without moving the list: measure its head before and after, and scroll by the difference
-  function holdList(change) {
-    var head = $('.work-head', blogPanel), y = head.getBoundingClientRect().top;
-    change();
-    blogPanel.scrollTop += head.getBoundingClientRect().top - y;
-  }
-  function markRow(slug) {
-    articles.rows.forEach(function (r) {
-      var on = r.getAttribute('data-slug') === slug, a = $('a', r);
-      r.classList.toggle('is-current', on);
-      if (on) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current');
-    });
-  }
-  var articleOf = function (u) { var m = u && new URL(u, location.href).pathname.match(/^\/blog\/([^\/]+)$/); return m && m[1]; };
-  function fetchArticle(slug) {
-    if (articleCache[slug]) return Promise.resolve(articleCache[slug]);
-    return fetch('/blog/' + slug).then(function (r) { if (!r.ok) throw new Error(r.status); return r.text(); }).then(function (t) {
-      var d = new DOMParser().parseFromString(t, 'text/html');
-      return (articleCache[slug] = { html: d.querySelector('article').outerHTML, title: d.title });
-    });
-  }
-  function showArticle(slug, push) {
-    return fetchArticle(slug).then(function (a) {
-      if (current !== 'blog') return;
-      holdList(function () { slot.innerHTML = a.html; });
-      if (push) history.pushState({ article: slug, depth: ((history.state && history.state.depth) || 0) + 1 }, '', '/blog/' + slug);
-      shown = slug; document.title = a.title; markRow(slug);
-      $('h1', slot).focus({ preventScroll: true });
-      scrollPanel(slot.getBoundingClientRect().top - blogPanel.getBoundingClientRect().top + blogPanel.scrollTop);
-    }).catch(function () { location.href = '/blog/' + slug; });
-  }
-  // Back from an article: down to the list, then the article goes and the list stays exactly where it is
-  function hideArticle() {
-    if (!shown) return;
-    shown = null;
-    scrollPanel(blogPanel.scrollHeight - blogPanel.clientHeight, function () {
-      if (shown) return;  // another article opened meanwhile
-      holdList(function () { slot.innerHTML = ''; });
-      markRow(null); document.title = homeTitle;
-    });
-  }
-  function resetBlog() {
-    if (!articles) return;
-    cancelAnimationFrame(raf);
-    slot.innerHTML = ''; shown = null; markRow(null); blogPanel.scrollTop = 0;
-  }
-  if (articles) articles.list.addEventListener('click', function (e) {
-    var a = e.target.closest('.work-row a');
-    if (!a || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button) return;
-    var slug = articleOf(a.href); if (!slug) return;
-    e.preventDefault(); showArticle(slug, true);
-  });
+  // The Journal in its panel: the engine above, with the panel as the box that scrolls
+  var blogReset = 0, journal = panels.blog && $('[data-article]', panels.blog) ? Journal(panels.blog, {
+    title: panels.blog.getAttribute('data-title'), active: function () { return current === 'blog'; } }) : null;
+  function resetBlog() { if (journal) journal.reset(); }
 
   // Arriving at #foundry (or #foundry/<id>) or #about opens that panel at once; #archive opens the list at once
   function sync(first) {
     var h = location.hash.slice(1).split(/[\/?]/)[0];  // #foundry/<id> is the foundry with a product open, #foundry?digital filtered
+    if (location.pathname.indexOf('/journal') === 0) h = 'blog';
+    else if (h === 'blog') history.replaceState(history.state, '', '/journal/');  // the old address
     setPanel(panels[h] ? h : '', !first);
     if (h === 'archive') setOpen(true, false);
   }
@@ -489,7 +540,7 @@
   window.addEventListener('popstate', function () {
     if (leaving) {
       leaving = false; pushed = false;
-      if (location.hash || articleOf(location.href)) history.replaceState(null, '', '/');
+      if (location.hash || location.pathname !== '/') history.replaceState(null, '', '/');
       // Stepping back can land on an earlier entry such as #work, and the browser then restores that entry's scroll
       // (just after this event). Home goes to the cover, so hold the page at the top while it does.
       var hold = function () { if (window.scrollY) window.scrollTo(0, 0); };
@@ -498,9 +549,9 @@
       setTimeout(function () { hold(); window.removeEventListener('scroll', hold); }, 400);
       return;
     }
-    var slug = articles && articleOf(location.href);
-    if (slug) { if (current !== 'blog') setPanel('blog', true); if (slug !== shown) showArticle(slug, false); return; }  // forward onto an article
-    if (articles && current === 'blog' && location.hash === '#blog') { hideArticle(); return; }  // back from an article, to the list
+    var slug = journal && journal.of();
+    if (slug) { if (current !== 'blog') setPanel('blog', true); journal.go(slug); return; }  // forward onto an article
+    if (journal && current === 'blog' && location.pathname === '/journal/') { journal.go(null); return; }  // back from an article, to the list
     pushed = false; sync(false);
   });
 })();
@@ -822,4 +873,98 @@ document.addEventListener('click', function (e) {
 
   still(function () { measure(); render(); });
   fromHash(false);
+})();
+
+// The lightbox: one site component. Any picture inside an element marked data-lightbox opens full size on the paper; the
+// pictures in that element are its group (a Journal article; later, a project page). A click, Esc or the back button
+// closes it; the arrow keys and a swipe step through the group. Focus stays inside while it's open and returns to the
+// picture after. Fades only, instant with reduced motion. Pictures dropped in later (an article in the panel on home)
+// work too. data-lightbox-skip on an <img> leaves it out (the Journal's handwritten notes).
+(function () {
+  if (!window.HTMLDialogElement || !document.body) return;
+  var reduce = !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches);
+  var root = document.documentElement, SEL = '[data-lightbox] img:not([data-lightbox-skip])';
+  var ms = parseFloat(getComputedStyle(root).getPropertyValue('--t')) * 1000 || 500;
+  var box, pic, group = [], at = 0, opener = null, pushed = false, closing = false, timer = 0, x0 = null, swiped = false;
+  // Each picture can be reached and opened from the keyboard
+  function prep(el) {
+    var imgs = Array.prototype.slice.call(el.querySelectorAll ? el.querySelectorAll(SEL) : []);
+    if (el.matches && el.matches(SEL)) imgs.push(el);
+    imgs.forEach(function (i) { if (!i.hasAttribute('tabindex')) { i.tabIndex = 0; i.setAttribute('role', 'button'); } });
+  }
+  prep(document);
+  if (window.MutationObserver) new MutationObserver(function (ms) {
+    ms.forEach(function (m) { Array.prototype.forEach.call(m.addedNodes, function (n) { if (n.nodeType === 1) prep(n); }); });
+  }).observe(document.body, { childList: true, subtree: true });
+  function make() {
+    box = document.createElement('dialog'); box.className = 'lightbox'; box.tabIndex = -1;
+    pic = document.createElement('img'); pic.alt = ''; pic.decoding = 'async';
+    box.appendChild(pic); document.body.appendChild(box);
+    box.addEventListener('click', function () { if (swiped) { swiped = false; return; } close(); });
+    box.addEventListener('cancel', function (e) { e.preventDefault(); close(); });
+    box.addEventListener('close', function () {  // however it closed: tidy up, and focus back on the picture
+      clearTimeout(timer); closing = false; box.classList.remove('on'); root.classList.remove('lb-open');
+      if (pushed) { pushed = false; history.back(); }
+      if (opener) opener.focus({ preventScroll: true });
+    });
+    box.addEventListener('touchstart', function (e) { x0 = e.touches.length === 1 ? e.touches[0].clientX : null; }, { passive: true });
+    box.addEventListener('touchend', function (e) {
+      if (x0 === null) return;
+      var dx = e.changedTouches[0].clientX - x0; x0 = null;
+      if (Math.abs(dx) > 40) { swiped = true; step(dx < 0 ? 1 : -1); setTimeout(function () { swiped = false; }, 500); }
+    }, { passive: true });
+  }
+  function show(i) {
+    at = (i + group.length) % group.length;
+    var src = group[at];
+    pic.classList.add('out');
+    pic.onload = function () { pic.classList.remove('out'); };  // fades in once it's there
+    pic.sizes = '100vw'; pic.srcset = src.getAttribute('srcset') || ''; pic.src = src.currentSrc || src.src;
+    if (pic.complete && pic.naturalWidth) pic.classList.remove('out');
+    box.setAttribute('aria-label', src.alt || '');
+  }
+  function step(d) { if (group.length > 1) show(at + d); }
+  function open(img) {
+    var g = img.closest('[data-lightbox]');
+    group = Array.prototype.filter.call(g.querySelectorAll('img'), function (x) { return x.matches(SEL); });
+    if (!box) make();
+    clearTimeout(timer); closing = false; opener = img;
+    show(group.indexOf(img));
+    if (!box.open) box.showModal();
+    root.classList.add('lb-open'); box.focus();
+    void box.offsetWidth; box.classList.add('on');
+    // its own entry in the history, so the back button closes it (the address stays the same)
+    if (!pushed) { history.pushState(Object.assign({}, history.state, { lightbox: true }), '', location.href); pushed = true; }
+  }
+  function close(fromHistory) {
+    if (!box || !box.open || closing) return;
+    closing = true;
+    if (pushed && !fromHistory) { pushed = false; history.back(); }
+    box.classList.remove('on');
+    timer = setTimeout(function () { box.close(); }, reduce ? 0 : ms);
+  }
+  document.addEventListener('click', function (e) {
+    var img = e.target.closest && e.target.closest(SEL);
+    if (!img || img.closest('a') || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button) return;
+    e.preventDefault(); open(img);
+  });
+  // While it's open it takes the keys first, so Esc closes the lightbox and not the panel under it
+  window.addEventListener('keydown', function (e) {
+    if (box && box.open) {
+      var k = e.key;
+      if (k === 'Escape' || k === 'Enter' || k === ' ') close();
+      else if (k === 'ArrowRight' || k === 'ArrowLeft') step(k === 'ArrowRight' ? 1 : -1);
+      else if (k === 'Tab') box.focus();
+      else return;
+      e.preventDefault(); e.stopPropagation(); return;
+    }
+    if ((e.key === 'Enter' || e.key === ' ') && e.target.matches && e.target.matches(SEL)) { e.preventDefault(); e.stopPropagation(); open(e.target); }
+  }, true);
+  window.addEventListener('popstate', function () {
+    var mine = history.state && history.state.lightbox;
+    if (box && box.open && !mine) { pushed = false; close(true); }
+    else if (mine && !(box && box.open)) {  // forward onto a closed lightbox's entry: nothing to show there
+      var st = Object.assign({}, history.state); delete st.lightbox; history.replaceState(st, '', location.href);
+    }
+  });
 })();

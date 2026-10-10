@@ -103,11 +103,93 @@ html.is-locked{overflow:hidden}
 /* With posts, the list is one screen, centered on it. An article opens above; reading to its end brings the list back
    to the middle of the screen. The same in both states, so the list never moves when an article comes or goes. */
 .blog-list{display:flex;flex-direction:column;justify-content:center;min-height:100vh;padding:calc(var(--s6) * 2) 0}
+/* The Journal (design v2, Oct. 10, 2026, centered at D's checkpoint), on its own pages and in the panel: a column of
+   about 980px, centered. The masthead is centered; the list is centered like the work list (sized to its widest row),
+   left-aligned inside, the year in its left margin; an article's text column is centered, its note margin to the right. */
+.journal{--col:980px;--yr-room:76px;--mh:clamp(48px,6.5vw,96px);--mast-top:clamp(40px,9vh,104px);--note-w:260px;--note-gap:56px;
+  --text:calc(var(--measure) + var(--note-gap) + var(--note-w));
+  --mast:calc(var(--mast-top) + var(--mh) * 3.12 + 46px);  /* the masthead's height: three lines of the name, then the line */
+  padding:0 max(calc(var(--gutter) + var(--yr-room)),calc((100% - var(--col)) / 2));container-type:inline-size}
+.journal-main{padding:0}
+.journal-page{width:100%}
+@media (max-width:599px){.journal{padding:0 var(--gutter)}}  /* phones: the year sits in the list's own margin */
+/* The masthead: Opmet, Osserpse, Journal, one word a line, each centered, in the About page's big type, bigger; the
+   writing hand sits beside the last word, outside the centering (static for now; [data-journal-hand] and
+   [data-journal-word] are kept as hooks). Then one small line in the serif italic. To the studio home. */
+.journal-mast{padding-top:var(--mast-top);text-align:center}
+.journal-name{display:block;width:max-content;max-width:100%;margin:0 auto;text-align:center;font-family:var(--bold-font);font-weight:var(--bold-weight);font-size:var(--mh);line-height:1.04;letter-spacing:-.01em;color:var(--ink)}
+.journal-name>span{display:block}
+.journal-last{position:relative;width:max-content;margin:0 auto}
+.journal-word{display:inline-block}
+/* The writing hand: its nib (lower left) at the end of the word, near the baseline */
+.journal-hand{position:absolute;left:calc(100% + .04em);bottom:.06em;height:1.18em;line-height:0;pointer-events:none}
+.journal-hand-art{display:block;height:100%;width:auto}
+.journal-hand[data-pose="stand-in"]{height:1em;transform:rotate(-24deg);transform-origin:0 100%}
+.journal-line{margin:18px 0 0;font:italic 400 20px/1.4 var(--serif);letter-spacing:.01em;color:var(--tag-gray)}
+@media (max-width:599px){.journal-line{font-size:18px}}
+/* The list: the same list and behavior, with more air (masthead to label about 160px, label row to topics 48px, topics
+   to the first title 64px), the label at the column's left edge. The list fills the screen below the masthead. */
+.journal .blog-list{justify-content:flex-start;min-height:calc(100vh - var(--mast));padding:160px 0 var(--s6)}
+.journal .work-head{margin-bottom:48px}
+.journal .blog-topics{margin:-12px 0 52px}
+/* No published posts yet: one line where the list will be */
+.journal-empty{min-height:calc(100vh - var(--mast));text-align:center;padding:160px 0 var(--s6);font:400 clamp(18px,1.55vw,23px)/1.5 var(--serif)}
+.journal-empty p{margin:0}
+@media (max-width:599px){.journal .blog-list,.journal-empty{padding-top:112px}}
+/* An article: All articles about 40px under the masthead; the date and topic in small sans, the title in bold, then the
+   text at the measure with a margin to its right (about 260px) for handwritten notes. */
+.journal-all{margin:40px 0 0;text-align:center;font:italic 400 clamp(17px,1.35vw,20px)/1.4 var(--serif);letter-spacing:.01em}
+.journal-all a{color:var(--ink)}.journal-all a:hover{color:var(--graphite)}
+.journal .article{width:min(100%,var(--measure));margin:0 auto}
+.journal .article-head{margin:var(--s6) 0 var(--s5);text-align:left;max-width:none}
+.article-head .article-meta{display:flex;flex-wrap:wrap;gap:0 1.4em;margin:0 0 14px;font:400 13px/1.4 var(--sans);letter-spacing:.02em;color:var(--tag-gray)}
+.journal .article-head h1{font-family:var(--bold-font);font-weight:var(--bold-weight);font-size:clamp(30px,3.6vw,52px);line-height:1.08;letter-spacing:-.01em}
+.work-label:focus{outline:none}
 .blog-article{display:flow-root}  /* keeps the title's margin inside, so scrolling to the article lands above its title */
 .article-head h1:focus{outline:none}
-.article-body{max-width:var(--measure);margin:0 auto;font:400 19px/1.6 var(--serif)}
-.article-body p{margin:0 0 1.2em}
-@media (max-width:599px){.article-body{font-size:18px}}
+.article-body{display:flow-root;font:400 19px/1.6 var(--serif)}
+.article-body p{margin:0 0 1.2em;max-width:var(--measure)}
+.article-para{width:100%}
+/* A margin note: a scan of handwriting, straight on the paper, beside the paragraph it follows (it comes first in the
+   markup and floats into the margin; notes stack, never overlap). Where there's no margin, it drops under its paragraph. */
+.article-note{float:right;clear:right;width:var(--note-w);margin:.2em 0 24px;transform:rotate(var(--r,0deg))}
+.article-note img{width:100%;height:auto}
+/* Pictures: column (the text's width), pair (two side by side, at one height, across the text and its margin) and wide
+   (the whole column). Clean, above the grain. Captions in small sans, gray. They open in the lightbox. */
+.article-img,.article-pair{position:relative;z-index:2;clear:both;margin:2.4em 0}
+.article-img img{width:100%;height:auto}
+.article-img.is-column{width:min(100%,var(--measure))}
+.article-img.is-pair,.article-pair{width:100%}
+.article-img.is-wide{width:100cqw;margin-left:50%;transform:translateX(-50%)}  /* the whole column, centered on the page */
+/* Where the page is wide enough for the note margin, notes sit in it and pairs run across the text and the margin */
+@media (min-width:1280px){
+  .article-para,.article-img.is-pair,.article-pair{width:var(--text)}
+}
+.article-pair{display:flex;gap:24px;align-items:flex-start}
+.article-pair .article-img{flex:var(--ar,1) 1 0;min-width:0;margin:0}
+.article-img figcaption{margin:10px 0 0;font:400 13px/1.45 var(--sans);letter-spacing:.01em;color:var(--tag-gray);max-width:var(--measure)}
+/* The last paragraph ends on a tiny hand */
+.article-end{display:inline-block;height:.95em;width:auto;margin-left:.4em;vertical-align:-.12em}
+@media (max-width:1279px){
+  .article-para{display:flex;flex-direction:column}
+  .article-note{order:1;float:none;width:200px;margin:-.2em 0 1.6em}
+}
+@media (max-width:599px){
+  .journal .article-head{margin-top:var(--s5)}
+  .article-body{font-size:18px}
+  .article-note{width:170px}
+  .article-pair{flex-direction:column;gap:16px}.article-pair .article-img{flex:none;width:100%}
+}
+/* The lightbox (site.js): one picture at a time, full size, on the paper. No frame, no buttons; it fades. */
+.lightbox{position:fixed;inset:0;width:100%;height:100%;max-width:none;max-height:none;margin:0;padding:var(--gutter);border:0;background:var(--paper);color:var(--ink);opacity:0;transition:opacity var(--t) var(--ease);cursor:zoom-out;overflow:hidden}
+.lightbox[open]{display:flex;align-items:center;justify-content:center}
+.lightbox.on{opacity:1}
+.lightbox::backdrop{background:transparent}
+.lightbox:focus{outline:none}
+.lightbox img{max-width:100%;max-height:100%;width:auto;height:auto;object-fit:contain;transition:opacity var(--t) var(--ease)}
+.lightbox img.out{opacity:0;transition:none}
+html.lb-open{overflow:hidden}
+[data-lightbox] img:not([data-lightbox-skip]){cursor:zoom-in}
 html:not(.js) .stage:has(#foundry:target){transform:none}
 html:not(.js) .stage:has(#about:target){transform:translateX(-66.6667%)}
 .panel{flex:none;width:33.3333%;padding:0 var(--gutter)}
