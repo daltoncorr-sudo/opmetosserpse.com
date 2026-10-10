@@ -170,6 +170,9 @@ html.is-locked{overflow:hidden}
 /* On the Journal the masthead is centered as a block, its lines left-justified on each other, the small line on the
    same left edge (D, Oct. 10). The writing hand stays just right of Journal, outside the block. */
 .journal .mast{width:max-content;max-width:100%;margin-left:auto;margin-right:auto;text-align:left}
+/* The Journal's list: the masthead half the big type (D, Oct. 10), and its line in ink, centered under it */
+.journal .mast{--mh:clamp(24px,3.25vw,48px)}
+.journal .journal-line{text-align:center;color:var(--ink)}
 .journal .mast .mast-name,.journal .mast-last{margin-left:0;margin-right:0;text-align:left}
 /* With an article open (its own page, or read in the list), the masthead is small, like a project page's nameplate
    (D, Oct. 10): the writing hand to the left of the three words, which stay left-justified, the block centered, no
