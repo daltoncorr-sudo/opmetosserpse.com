@@ -1,4 +1,41 @@
-// Opmet Osserpse: clock, filters, hover previews, quiet video. No tracking, no cookies.
+// Opmet Osserpse: controls, clock, hover previews, quiet video. No tracking, no cookies.
+
+// Controls: one system for every list link, toggle and filter (build.py ctl(), site.css .ctl). The hover sweeps the
+// word's weight with the cursor, thin at its left edge to black at its right; a hidden copy at the heaviest weight holds
+// the width, so nothing moves. Only with a fine pointer that hovers; with reduced motion the word simply turns bold.
+//   opmetCtl.label(el, text): change a control's words (both copies)
+//   opmetFilters(group, pick): one filter row (buttons with data-filter and aria-pressed); pick(key) on a click;
+//     returns set(key), which marks the chosen one
+(function () {
+  var mq = function (q) { return !!(window.matchMedia && matchMedia(q).matches); };
+  var fine = mq('(hover: hover) and (pointer: fine)'), reduce = mq('(prefers-reduced-motion: reduce)'), cur = null;
+  window.opmetCtl = {
+    label: function (el, text) {
+      var w = el.querySelector('.ctl-w'), v = el.querySelector('.ctl-v');
+      if (w && v) { w.textContent = v.textContent = text; } else el.textContent = text;
+    }
+  };
+  function rest(c) { var v = c && c.querySelector('.ctl-v'); if (v) v.style.fontWeight = ''; }
+  if (fine) {
+    document.addEventListener('mousemove', function (e) {
+      var c = e.target.closest ? e.target.closest('.ctl') : null;
+      if (c !== cur) { rest(cur); cur = c; }
+      var v = c && c.querySelector('.ctl-v'); if (!v) return;
+      var r = c.getBoundingClientRect(), t = Math.min(1, Math.max(0, (e.clientX - r.left) / r.width));
+      v.style.fontWeight = reduce ? 700 : Math.round(200 + t * 700);
+    }, { passive: true });
+    document.addEventListener('mouseout', function (e) { if (cur && !(e.relatedTarget && cur.contains(e.relatedTarget))) { rest(cur); cur = null; } });
+  }
+  window.opmetFilters = function (group, pick) {
+    var buttons = Array.prototype.slice.call(group.querySelectorAll('button[data-filter]'));
+    group.addEventListener('click', function (e) {
+      var b = e.target.closest('button[data-filter]');
+      if (b && group.contains(b)) pick(b.getAttribute('data-filter'));
+    });
+    return { set: function (key) { buttons.forEach(function (b) { b.setAttribute('aria-pressed', b.getAttribute('data-filter') === key ? 'true' : 'false'); }); } };
+  };
+})();
+
 (function () {
   var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -20,21 +57,6 @@
       clock.textContent = (place ? place + ', ' : '') + parts.weekday + ', ' + MON[+parts.month - 1] + ' ' + parts.day + ', ' + time;
     };
     tick(); setInterval(tick, 15000);
-  }
-
-  // Sector filters on the projects list
-  var filters = document.querySelector('[data-filters]');
-  if (filters) {
-    var rows = Array.prototype.slice.call(document.querySelectorAll('[data-sector]'));
-    filters.addEventListener('click', function (e) {
-      var b = e.target.closest('button'); if (!b) return;
-      var s = b.getAttribute('data-filter');
-      Array.prototype.forEach.call(filters.querySelectorAll('button'), function (x) { x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); });
-      rows.forEach(function (r) { r.hidden = !(s === 'All' || r.getAttribute('data-sector') === s); });
-      try { history.replaceState(null, '', s === 'All' ? location.pathname : location.pathname + '?sector=' + encodeURIComponent(s)); } catch (err) {}
-    });
-    var q = new URLSearchParams(location.search).get('sector');
-    if (q) { var btn = filters.querySelector('[data-filter="' + q.replace(/"/g, '') + '"]'); if (btn) btn.click(); }
   }
 
   // Hover preview: one fixed place to the right of the list, crossfading between projects
@@ -140,6 +162,11 @@
               timer: 0, busy: false, state: { open: false, topic: 'All' }, years: {} };
     L.rows = $$('.work-row', L.list);
     $$('.yr', L.list).forEach(function (y) { L.years[y.textContent] = y; });
+    // The work list's rows come in the Selected order (work.json); open, they run newest first (data-n). Rows move as
+    // whole elements, so focus order always follows what's on screen.
+    var closedOrder = L.rows.slice(), openOrder = L.rows.every(function (r) { return r.hasAttribute('data-n'); }) &&
+      L.rows.slice().sort(function (a, b) { return a.getAttribute('data-n') - b.getAttribute('data-n'); });
+    function arrange(open) { if (openOrder) (open ? openOrder : closedOrder).forEach(function (r) { L.list.appendChild(r); }); }
     var tops = function (els) { return els.map(function (r) { return r.getBoundingClientRect().top; }); };
     var moving = function (els) { return o.glideHead ? els.concat([L.head]) : els; };
     L.shows = function (r, st) {
@@ -168,6 +195,7 @@
     }
     function apply(st, animate) {
       L.state = st;
+      arrange(st.open);
       L.list.classList.toggle('is-open', st.open);
       if (L.topics) {
         L.topics.hidden = !st.open;
@@ -180,12 +208,12 @@
       if (st.open === was.open && st.topic === was.topic) return;
       clearTimeout(L.timer); L.clean();
       L.toggle.setAttribute('aria-expanded', st.open);
-      L.toggle.textContent = L.toggle.getAttribute(st.open ? 'data-close-label' : 'data-open-label');
+      opmetCtl.label(L.toggle, L.toggle.getAttribute(st.open ? 'data-close-label' : 'data-open-label'));
       L.label.textContent = L.label.getAttribute(st.open ? 'data-open' : 'data-closed');
-      if (L.topics) $$('button', L.topics).forEach(function (b) { b.setAttribute('aria-pressed', b.getAttribute('data-topic') === st.topic); });
+      if (L.filters) L.filters.set(st.topic);
       if (o.address) o.address(st);
       var leaving = L.rows.filter(function (r) { return L.shows(r, was) && !L.shows(r, st); }),
-          arriving = L.rows.filter(function (r) { return !L.shows(r, was) && L.shows(r, st); }),
+          arriving = (openOrder ? (st.open ? openOrder : closedOrder) : L.rows).filter(function (r) { return !L.shows(r, was) && L.shows(r, st); }),
           staying = moving(L.rows.filter(function (r) { return L.shows(r, was) && L.shows(r, st); }));
       var topicsIn = L.topics && st.open && !was.open, topicsOut = L.topics && !st.open && was.open;
       if (L.live) {
@@ -217,11 +245,7 @@
       if (o.wait && L.busy) return;
       L.set({ open: !L.state.open, topic: 'All' }, true);  // See less also resets the topic to All
     });
-    if (L.topics) L.topics.addEventListener('click', function (e) {
-      var b = e.target.closest('button[data-topic]');
-      if (!b || L.busy) return;
-      L.set({ open: true, topic: b.getAttribute('data-topic') }, true);
-    });
+    if (L.topics) L.filters = opmetFilters(L.topics, function (key) { if (!L.busy) L.set({ open: true, topic: key }, true); });
     // Center the column on its content: as wide as the widest row of the full list, tags included
     L.fit = function () {
       L.list.classList.add('measuring'); L.head.style.width = 'max-content';
@@ -414,15 +438,38 @@
   $$('[data-studio]').forEach(function (a) { a.addEventListener('click', function (e) { e.preventDefault(); closePanel(); }); });
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && current) closePanel(); });
 
+  // Where an element sits in the page's own flow: its box, less whatever offset the stage's slide still holds (closing a
+  // project measures the list while the stage is still a screen up, mid-slide)
+  function inFlow(el) {
+    var r = el.getBoundingClientRect(), d = stage.getBoundingClientRect().top - stage.parentNode.getBoundingClientRect().top;
+    return { top: r.top - d, bottom: r.bottom - d };
+  }
+  // Where the page lands when a project or a panel closes. Stepping back in the history makes the browser restore that
+  // entry's scroll, or scroll to its #work and focus it, just after the popstate, and it measures the page while the
+  // stage is still a screen up, mid-slide: one screen too high, which is the cover. (That was the All work bug: from a
+  // project opened off #work, the way back landed on the cover.) So the page holds its place for a moment, and the
+  // focus goes back where it belongs once the browser is done.
+  var held = null;
+  function landAt(y, el) {
+    if (held) window.removeEventListener('scroll', held);
+    var hold = held = function () { if (Math.abs(window.scrollY - y) > 1) window.scrollTo(0, y); };
+    hold(); window.addEventListener('scroll', hold);
+    if (el) place(el);
+    setTimeout(function () {
+      if (held !== hold) return;
+      hold(); window.removeEventListener('scroll', hold); held = null;
+      var f = document.activeElement;  // the browser's own focus goes to #work (or nowhere); a reader's own move stays
+      if (el && f !== el && (f === work || f === document.body || !f)) place(el);
+    }, 400);
+  }
   // Work: scroll so the list (its heading and rows) sits in the middle of the screen, #work in the address, focus on it.
   // If the list is taller than the screen, its top sits a little below the top edge instead.
   var work = $('#work');
-  function centerWork(smooth) {
-    var head = $('.work-head', work).getBoundingClientRect(), rows = $('#works').getBoundingClientRect();
-    var top = head.top, h = rows.bottom - head.top;
-    var y = window.scrollY + top - (h < innerHeight * .9 ? (innerHeight - h) / 2 : innerHeight * .08);
-    window.scrollTo({ top: Math.max(0, y), behavior: smooth && !reduce ? 'smooth' : 'auto' });
+  function workY() {
+    var head = inFlow($('.work-head', work)), rows = inFlow($('#works')), h = rows.bottom - head.top;
+    return Math.max(0, Math.round(window.scrollY + head.top - (h < innerHeight * .9 ? (innerHeight - h) / 2 : innerHeight * .08)));
   }
+  function centerWork(smooth) { window.scrollTo({ top: workY(), behavior: smooth && !reduce ? 'smooth' : 'auto' }); }
   $$('[data-go="work"]').forEach(function (a) {
     a.addEventListener('click', function (e) {
       e.preventDefault();
@@ -446,9 +493,12 @@
   });
 
   // A project opens as a screen below home. Its page is fetched once, its content dropped into the panel, and the view
-  // slides down to it; Back, Esc or the browser's back button slide up to the list exactly as it was. The address is the
-  // project's own, so a reload or a shared link simply opens the project page.
-  var pp = $('#project'), ppInner = $('.project-inner', pp), ppOpen = false, ppPushed = false, ppFrom = null, cache = {};
+  // slides down to it; Esc or the browser's back button slide up to the list exactly as it was. In the panel the
+  // masthead (data-cover) slides up to the cover, and All work (data-all-work, under the masthead and at the end) to
+  // the full list, centered; on a project page loaded by itself they are plain links to / and /#archive. The address
+  // is the project's own, so a reload or a shared link simply opens the project page.
+  //   ppThen: where closing leads: '' the list as it was, 'cover' the cover, 'archive' the full list
+  var pp = $('#project'), ppInner = $('.project-inner', pp), ppOpen = false, ppPushed = false, ppFrom = null, ppThen = '', cache = {};
   pp.inert = true;
   var projectOf = function (u) { var m = u && new URL(u, location.href).pathname.match(/^\/projects\/([^\/]+)$/); return m && m[1]; };
   function fetchProject(slug) {
@@ -467,14 +517,16 @@
     root.classList.toggle('is-locked', open);
     ppOpen = open; pp.inert = !open; home.inert = open;
     if (instant) { void pp.offsetWidth; stage.classList.remove('no-anim'); pp.classList.remove('no-anim'); }
-    if (open) { var b = $('[data-back]', pp); if (b) place(b); }
-    else {
-      document.title = homeTitle;
-      if (list.classList.contains('is-open') && location.hash !== '#archive') history.replaceState(history.state, '', location.pathname + location.search + '#archive');
-      var r = work.getBoundingClientRect();
-      if (r.bottom < 0 || r.top > innerHeight) centerWork(false);  // back onto the work list, wherever the project came from
-      if (ppFrom && animate) place(ppFrom);
-    }
+    if (open) { var b = $('.mast-name', pp); if (b) place(b); return; }
+    var then = ppThen; ppThen = '';
+    document.title = homeTitle;
+    if (then === 'cover') { toCover(); return; }
+    if (then === 'archive') setOpen(true, false);
+    if (list.classList.contains('is-open') && location.hash !== '#archive') history.replaceState(history.state, '', location.pathname + location.search + '#archive');
+    // Back onto the work list, as it was; centered if it's off screen (wherever the project came from), and always for
+    // All work, which lands on the full list
+    var r = inFlow(work), y = then === 'archive' || r.bottom < 0 || r.top > innerHeight ? workY() : Math.round(window.scrollY);
+    landAt(y, then === 'archive' ? work : ppFrom && animate ? ppFrom : null);
   }
   function openProject(slug, animate, push) {
     return fetchProject(slug).then(function (p) {
@@ -485,9 +537,15 @@
       showProject(true, animate);
     }).catch(function () { location.href = '/projects/' + slug; });
   }
-  function closeProject() {
+  function closeProject(then) {
+    ppThen = then || '';
     if (ppPushed) history.back();  // popstate slides up
     else { history.replaceState(null, '', '/' + (list.classList.contains('is-open') ? '#archive' : '#work')); showProject(false, true); }
+  }
+  // The cover: the top of home, the address plain /, focus on the Work option
+  function toCover() {
+    history.replaceState(history.state, '', location.pathname + location.search);
+    landAt(0, $('[data-go="work"]'));
   }
   list.addEventListener('click', function (e) {
     var a = e.target.closest('.work-row a');
@@ -497,9 +555,8 @@
   });
   pp.addEventListener('click', function (e) {
     var a = e.target.closest('a'); if (!a || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button) return;
-    if (a.hasAttribute('data-back') || a.getAttribute('href') === '/#work') { e.preventDefault(); closeProject(); return; }
-    if (a.getAttribute('href') === '/#archive') { e.preventDefault(); setOpen(true, false); closeProject(); return; }  // All work: up to the full list
-    if (a.hasAttribute('data-totop')) return;  // handled below, for the panel and the page alike
+    if (a.hasAttribute('data-cover')) { e.preventDefault(); closeProject('cover'); return; }  // the masthead: up to the cover
+    if (a.hasAttribute('data-all-work')) { e.preventDefault(); closeProject('archive'); return; }  // All work: up to the full list
     var slug = projectOf(a.href);
     if (slug) { e.preventDefault(); fetchProject(slug).then(function () { openProject(slug, false, false).then(function () { history.replaceState({ project: slug }, '', '/projects/' + slug); }); }); }
   });
@@ -535,18 +592,19 @@
   }
   panels.foundry.inert = panels.about.inert = panels.blog.inert = true;
   sync(true);
-  if (location.hash === '#archive') work.scrollIntoView();
-  if (location.hash === '#work') { centerWork(false); window.addEventListener('load', function () { centerWork(false); }); }
+  // Arriving at #work or #archive (All work, from a project page loaded by itself): the list, centered (again once its
+  // type and pictures have settled), with the focus on it
+  if (/^#(work|archive)$/.test(location.hash)) {
+    centerWork(false); work.focus({ preventScroll: true });
+    window.addEventListener('load', function () { centerWork(false); });
+  }
   window.addEventListener('popstate', function () {
     if (leaving) {
       leaving = false; pushed = false;
       if (location.hash || location.pathname !== '/') history.replaceState(null, '', '/');
-      // Stepping back can land on an earlier entry such as #work, and the browser then restores that entry's scroll
-      // (just after this event). Home goes to the cover, so hold the page at the top while it does.
-      var hold = function () { if (window.scrollY) window.scrollTo(0, 0); };
-      hold(); setPanel('', true);
-      window.addEventListener('scroll', hold);
-      setTimeout(function () { hold(); window.removeEventListener('scroll', hold); }, 400);
+      // Stepping back can land on an earlier entry such as #work, which the browser then scrolls to: Home goes to the
+      // cover, so the page holds at the top
+      landAt(0); setPanel('', true);
       return;
     }
     var slug = journal && journal.of();
@@ -555,16 +613,6 @@
     pushed = false; sync(false);
   });
 })();
-
-// Back to top, at the end of a project: in the panel it scrolls the panel, on a project page the page; focus goes to Back
-document.addEventListener('click', function (e) {
-  var a = e.target.closest('[data-totop]'); if (!a) return;
-  e.preventDefault();
-  var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
-  var panel = a.closest('.project-panel');
-  (panel || window).scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' });
-  var back = (panel || document).querySelector('[data-back]'); if (back) back.focus({ preventScroll: true });
-});
 
 // A project page: films that play once and rest, and notes that turn from gray to ink on the reading line. The same code
 // runs on a project page and on a project dropped into the panel on home (site.js calls window.opmetProject for it).
@@ -615,8 +663,11 @@ document.addEventListener('click', function (e) {
   var mq = function (q) { return window.matchMedia && matchMedia(q).matches; };
   var reduce = mq('(prefers-reduced-motion: reduce)');
   var panel = fd.closest('.foundry-panel'), field = $('[data-field]'), space = $('.fd-space'), left = $('[data-left]'), text = $('[data-text]');
-  var home = $('.fd-home'), homeV = $('.fd-v', home), homeW = $('.fd-w', home);
-  var filters = $$('[data-filter]');
+  var home = $('.fd-home');
+  var filters = $$('[data-filter]'), filterRow = opmetFilters($('[data-fd-filters]'), function (key) {
+    setFilter(key, true);
+    history.replaceState(null, '', fieldUrl());
+  });
   var SLOTS = fd.getAttribute('data-slots').split(' ').map(function (t) { var p = t.split(',').map(Number); return { x: p[0], y: p[1], d: p[2] }; });
   var items = $$('.fd-item').map(function (el) {
     return { el: el, id: el.getAttribute('data-id'), kind: el.getAttribute('data-kind'), link: $('.fd-link', el), turn: $('.fd-turn', el), oy: 161 };
@@ -704,8 +755,7 @@ document.addEventListener('click', function (e) {
     $$('[data-for]').forEach(function (el) { el.hidden = el.getAttribute('data-for') !== id; });
   }
   function setHome(open) {
-    var l = home.getAttribute(open ? 'data-back-label' : 'data-home-label');
-    homeV.textContent = homeW.textContent = l;
+    opmetCtl.label(home, home.getAttribute(open ? 'data-back-label' : 'data-home-label'));
   }
 
   function openView(id, animate) {
@@ -837,31 +887,14 @@ document.addEventListener('click', function (e) {
     if (key === st.filter) return;
     var go = function () {
       st.filter = key; st.hover = null;
-      filters.forEach(function (x) { x.setAttribute('aria-pressed', x.getAttribute('data-filter') === key ? 'true' : 'false'); });
+      filterRow.set(key);
       render();
     };
     animate && !reduce ? go() : still(go);
   }
-  filters.forEach(function (b) {
-    b.addEventListener('click', function () {
-      setFilter(b.getAttribute('data-filter'), true);
-      history.replaceState(null, '', fieldUrl());
-    });
-  });
   // The Foundry link on home writes #foundry; keep the filter that's showing in the address
   document.addEventListener('click', function (e) {
     if (e.target.closest('[data-go="foundry"]') && st.filter !== 'all') history.replaceState(null, '', fieldUrl());
-  });
-  // Hover: the word's weight follows the cursor across it, 200 at the left to 900 at the right. A hidden copy at 900
-  // holds each word's width, so nothing shifts.
-  filters.concat(home).forEach(function (b) {
-    var v = $('.fd-v', b);
-    b.addEventListener('mousemove', function (e) {
-      if (!hoverable) return;
-      var r = b.getBoundingClientRect(), t = Math.min(1, Math.max(0, (e.clientX - r.left) / r.width));
-      v.style.fontWeight = Math.round(200 + t * 700);
-    });
-    b.addEventListener('mouseleave', function () { v.style.fontWeight = ''; });
   });
 
   var rt;
