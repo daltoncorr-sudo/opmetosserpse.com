@@ -298,7 +298,8 @@ def notes_list(p, src_root):
     .webm are films) or one of the daltoncorr.com page's 3D and interactive pieces ("piece": its key, as "w:badge-float").
     Optional: "alt" (else the project file's, else the daltoncorr.com page's), "slot", "gallery" (pictures in one gallery
     sit two to a row, as on daltoncorr.com), "row" (entries that share it sit in one row, side by side at one height,
-    pictures and films alike, stacked on phones) and "cut" (small, medium or large: a cut-out, a transparent picture
+    pictures and films alike, stacked on phones), "cap": false (a page capture meant to be scrolled, left at its full
+    width instead of capped at 85vh) and "cut" (small, medium or large: a cut-out, a transparent picture
     straight on the paper, no frame or box; cut-outs that share a "row" sit in one row, each at its own size)."""
     dc, out, errs = None, [], []
     for m in notes_media(p):
@@ -312,7 +313,7 @@ def notes_list(p, src_root):
         alt = m.get('alt') or next((x['alt'] for x in dc or [] if x.get('src') and dc_source.stem(x['src']) == dc_source.stem(m['src'])), '')
         if m.get('cut') and (m['cut'] not in CUTS or kind != 'img'): errs.append('%s: "cut" is small, medium or large, for a picture' % m['src'])
         out.append(dict(kind=kind, src=m['src'], alt=alt, w=0, h=0, gallery=m.get('gallery', 0), wide=m.get('slot') == 'W',
-                        cut=m.get('cut'), row=m.get('row')))
+                        cut=m.get('cut'), row=m.get('row'), cap=m.get('cap', True)))
     if errs: sys.exit('Fix the media list in content/notes/%s.json first:\n  %s' % (p['slug'], '\n  '.join(errs)))
     return out
 
@@ -414,7 +415,7 @@ def block_html(b, slug):
     for it in b['items']:
         cls = 'm' + (' piece' if it['kind'] == 'widget' else '') + (' cut cut-%s' % it['cut'] if kind == 'cuts' else '')
         style = 'flex-grow:%.4f' % (it['w'] / it['h']) if kind == 'row' else ''
-        if kind in ('single', 'tall') and it['kind'] != 'widget' and it['h'] > it['w']:
+        if kind in ('single', 'tall') and it['kind'] != 'widget' and it['h'] > it['w'] and it.get('cap', True):
             cls += ' cap'; style = '--ar:%.4f' % (it['w'] / it['h'])
         style = ' style="%s"' % style if style else ''
         skip = ' data-lightbox-skip' if it['kind'] == 'widget' else ''  # a 3D or interactive piece stays out of the lightbox
@@ -871,7 +872,7 @@ def main():
             elif jm: slot = jm['slot']
             elif x['wide']: slot = 'W'
             else: slot = 'P' if r[3] > r[2] else 'L'
-            items.append(dict(key=k, slot=slot, kind='img', w=r[2], h=r[3], r=r, gallery=x['gallery'], alt=alt, cut=x.get('cut'), row=x.get('row'),
+            items.append(dict(key=k, slot=slot, kind='img', w=r[2], h=r[3], r=r, gallery=x['gallery'], alt=alt, cut=x.get('cut'), row=x.get('row'), cap=x.get('cap', True),
                               html=lambda sz, r=r, alt=alt, e=eager: img_tag(r, sz, alt, e)))
             p.setdefault('_bigs', []).append(r[0])
         blocks = make_blocks(items, notes['notes'])

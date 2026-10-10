@@ -58,7 +58,8 @@
   {
    "src": "content/media/hdtracks/hdtracks-home-desktop-tall-2026.webp",
    "alt": "The store’s home page, top to bottom: featured collections, then rows of new, best-selling and hand-picked albums.",
-   "slot": "P"
+   "slot": "P",
+   "cap": false
   },
   {
    "src": "content/media/hdtracks/hdtracks-home-phone-2026.webp",
