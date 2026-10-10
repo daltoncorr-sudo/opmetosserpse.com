@@ -468,7 +468,9 @@ def ap_date(d):
 def load_blog(media, drafts=False):
     """content/journal.json: every post, newest first, with its tags and whether it is Selected. The text of each post is
     content/journal/<slug>.txt, one paragraph per block, blocks separated by a blank line; a block that is just
-    "image: <file> | <alt text>" is a picture from content/journal/images/<slug>/. A post marked "draft" is left out
+    "image: <file> | <alt text> | <size> | <caption>" is a picture from content/journal/images/<slug>/ (size column, wide
+    or pair, column if left out; the caption is optional), and "note: <file> | <alt text> | <rotate>" is a handwritten
+    margin note (a transparent PNG) beside the paragraph before it. A post marked "draft" is left out
     (no page, no row, not in the sitemap) unless the build runs with --drafts; only a draft may be empty or undated.
     Fails on drift."""
     b = load(os.path.join(CONTENT, 'journal.json')); vocab = b['tags']; seen = set(); errs = []; posts = []
@@ -495,13 +497,28 @@ def load_blog(media, drafts=False):
         for x in re.split(r'\n\s*\n', text):
             x = ' '.join(x.split())
             if not x: continue
-            m = re.fullmatch(r'image:\s*([^|]+?)\s*\|\s*(.+)', x)
+            m = re.fullmatch(r'(image|note):\s*(.+)', x)
             if m:
-                rel = 'content/journal/images/%s/%s' % (s, m.group(1))
-                r = media.image(rel, 'journal-' + s, re.sub(r'[^a-z0-9]+', '-', os.path.splitext(m.group(1))[0].lower()))
-                if not r: errs.append('%s: image %s is missing' % (s, rel)); continue
-                e['blocks'].append(('img', r, m.group(2)))
-                e['_og'] = e['_og'] or media.og(rel, 'journal-' + s)
+                kind, parts = m.group(1), [y.strip() for y in m.group(2).split('|')]
+                fname, alt, opt = parts[0], parts[1] if len(parts) > 1 else '', parts[2] if len(parts) > 2 else ''
+                if not alt: errs.append('%s: %s %s needs alt text' % (s, kind, fname)); continue
+                rel = 'content/journal/images/%s/%s' % (s, fname)
+                name = re.sub(r'[^a-z0-9]+', '-', os.path.splitext(fname)[0].lower())
+                if kind == 'image':
+                    size = opt or 'column'
+                    if size not in ('column', 'wide', 'pair'): errs.append('%s: image %s: size is column, wide or pair, not "%s"' % (s, fname, size)); continue
+                    r = media.image(rel, 'journal-' + s, name)
+                    if not r: errs.append('%s: image %s is missing' % (s, rel)); continue
+                    e['blocks'].append(('img', r, alt, size, '|'.join(parts[3:]).strip()))
+                    e['_og'] = e['_og'] or media.og(rel, 'journal-' + s)
+                else:
+                    try: rot = float(opt or 0)
+                    except ValueError: errs.append('%s: note %s: rotate is a number of degrees, not "%s"' % (s, fname, opt)); continue
+                    if not e['blocks'] or e['blocks'][-1][0] not in ('p', 'note'):
+                        errs.append('%s: note %s must follow a paragraph (it sits beside it)' % (s, fname)); continue
+                    r = media.image(rel, 'journal-' + s, 'note-' + name, max_w=800)  # a scan of handwriting, shown about 260px wide
+                    if not r: errs.append('%s: note %s is missing' % (s, rel)); continue
+                    e['blocks'].append(('note', r, alt, max(-15.0, min(15.0, rot))))
             else:
                 e['blocks'].append(('p', x))
         e['paras'] = [x[1] for x in e['blocks'] if x[0] == 'p']
@@ -539,21 +556,60 @@ def blog_section(posts, vocab, w, current=None):
         esc(w['label']), esc(w['selected']), esc(w['all']), esc(w['selected']), esc(w['more']), esc(w['less']), esc(w['more']), esc(w['back']),
         topics, ''.join(rows))
 
+def article_body(blocks):
+    """An article's text and pictures. A note goes beside the paragraph it follows (in the margin, or under it where the
+    margin is too narrow); two pair pictures in a row share one row, at one height; the last paragraph ends on a tiny hand."""
+    def fig(b, sizes, extra=''):
+        _, r, alt, size, cap = b
+        return '<figure class="article-img is-%s"%s>%s%s</figure>' % (
+            size, extra, img_tag(r, sizes, alt), '<figcaption>%s</figcaption>' % typo(cap) if cap else '')
+    note = lambda b: '<figure class="article-note"%s>%s</figure>' % (
+        ' style="--r:%gdeg"' % b[3] if b[3] else '', img_tag(b[1], '260px', b[2], extra=' data-lightbox-skip'))
+    last = max([k for k, b in enumerate(blocks) if b[0] == 'p'] or [-1])
+    out, i = [], 0
+    while i < len(blocks):
+        b = blocks[i]
+        if b[0] == 'p':
+            j = i + 1
+            while j < len(blocks) and blocks[j][0] == 'note': j += 1
+            p = '<p>%s%s</p>' % (typo(b[1]), brand_svg('hand-mark.svg', 'article-end') if i == last else '')
+            # the notes come first in the markup, so they float beside the paragraph (see .article-para in site.css)
+            out.append('<div class="article-para">%s%s</div>' % (''.join(note(n) for n in blocks[i + 1:j]), p) if j > i + 1 else p)
+            i = j
+        elif b[3] == 'pair' and i + 1 < len(blocks) and blocks[i + 1][0] == 'img' and blocks[i + 1][3] == 'pair':
+            out.append('<div class="article-pair">%s</div>' % ''.join(
+                fig(x, '(max-width:640px) 100vw, 430px', ' style="--ar:%.4f"' % (x[1][2] / x[1][3])) for x in blocks[i:i + 2]))
+            i += 2
+        else:
+            out.append(fig(b, {'column': '(max-width:640px) 100vw, 34rem', 'wide': '(max-width:1060px) 100vw, 980px',
+                               'pair': '(max-width:640px) 100vw, 860px'}[b[3]]))
+            i += 1
+    return ''.join(out)
+
 def article(e, w):
-    """One post, under the masthead: All articles (back to the list), then the title, the date and the text."""
-    body = ''.join('<p>%s</p>' % typo(x[1]) if x[0] == 'p' else
-                   '<figure class="article-img">%s</figure>' % img_tag(x[1], '(max-width:640px) 100vw, 60rem', x[2]) for x in e['blocks'])
-    when = ('<p class="article-date"><time datetime="%s">%s</time></p>' % (e['date'], ap_date(e['_date']))) if e['_date'] else ''
+    """One post, under the masthead: All articles (back to the list), then the date and topic, the title and the text.
+    The text's pictures open in the site lightbox (data-lightbox)."""
+    when = '<time datetime="%s">%s</time>' % (e['date'], ap_date(e['_date'])) if e['_date'] else ''
+    meta = '<p class="article-meta">%s%s</p>' % (when, ''.join('<span>%s</span>' % esc(t) for t in e['tags']))
     return ('<p class="journal-all"><a href="/journal/" data-all>%s</a></p>'
-            '<article class="article"><header class="article-head"><h1 tabindex="-1">%s</h1>%s</header>'
-            '<div class="article-body">%s</div></article>') % (esc(w['all']), typo(e['title']), when, body)
+            '<article class="article"><header class="article-head">%s<h1 tabindex="-1">%s</h1></header>'
+            '<div class="article-body" data-lightbox>%s</div></article>') % (esc(w['all']), meta, typo(e['title']), article_body(e['blocks']))
+
+# The hand beside "Journal" in the masthead: the writing hand (static/brand/writing-hand.svg, pending D's OK); if that
+# file is ever removed, the hand mark stands in, turned to write. A hook for the later "write Journal" move:
+# [data-journal-hand] is the hand, [data-journal-word] the word it writes.
+def journal_hand():
+    pose = 'writing' if os.path.exists(os.path.join(ROOT, 'static', 'brand', 'writing-hand.svg')) else 'stand-in'
+    art = brand_svg('writing-hand.svg' if pose == 'writing' else 'hand-mark.svg', 'journal-hand-art')
+    return '<span class="journal-hand" data-journal-hand data-pose="%s" aria-hidden="true">%s</span>' % (pose, art)
 
 def masthead(w, panel=False):
-    """The Journal's nameplate: the hand and the name (to the studio), Journal, and a small line. Quiet and small."""
-    home = ' data-studio' if panel else ''  # in the panel above home, the name slides back to the cover
-    return ('<header class="journal-mast"><a class="lockup" href="/"%s aria-label="Opmet Osserpse">%s%s</a>'
-            '<p class="journal-name">%s</p><p class="journal-line">%s</p></header>') % (
-        home, brand_svg('hand-mark.svg', 'lockup-hand'), brand_svg('wordmark.svg', 'wordmark ink'), esc(w['title']), typo(w['line']))
+    """The Journal's nameplate (design v2): Opmet, Osserpse, Journal, one word a line, in the About page's big type, the
+    hand writing the last word; then a small line. It links to the studio home."""
+    home = ' data-studio' if panel else ''  # in the panel above home, it slides back to the cover
+    return ('<header class="journal-mast"><a class="journal-name" href="/"%s><span>Opmet</span> <span>Osserpse</span> '
+            '<span class="journal-last"><span class="journal-word" data-journal-word>%s</span>%s</span></a>'
+            '<p class="journal-line">%s</p></header>') % (home, esc(w['title']), journal_hand(), typo(w['line']))
 
 def blurb(s, n=155):
     """A search description: the first paragraph, trimmed at a word break."""
@@ -834,12 +890,13 @@ def main():
     noindex = '' if posts else '<meta name="robots" content="noindex">\n'
     jpage = lambda inner, cur=None: '<div class="journal-page journal" data-journal data-title="%s">%s<div class="blog-article" data-article>%s</div>%s</div>' % (
         esc(jtitle), masthead(jw), inner, listing(cur))
-    write('/journal/index.html', page(site, jtitle, jw['description'], '/journal/', jpage(''), so, header=False, extra_head=noindex))
+    write('/journal/index.html', page(site, jtitle, jw['description'], '/journal/', jpage(''), so, header=False, extra_head=noindex, main_cls='journal-main'))
     # One page per post, so a reload or a shared link lands on the article (at its top) and still ends at the list
     for e in posts:
         write('/journal/%s.html' % e['slug'], page(site, '%s | %s' % (e['full_title'], site['name']),
                                                    blurb(e['paras'][0]) if e['paras'] else jw['description'], '/journal/%s' % e['slug'],
-                                                   jpage(article(e, jw), e['slug']), e['_og'] or so, header=False, og_type='article'))
+                                                   jpage(article(e, jw), e['slug']), e['_og'] or so, header=False, og_type='article',
+                                                   main_cls='journal-main'))
     # The old address: /blog/ goes to the Journal (its old articles are gone)
     write('/blog/index.html', '<!doctype html>\n<html lang="en"><head><meta charset="utf-8"><title>%s</title>'
           '<link rel="canonical" href="https://%s/journal/"><meta http-equiv="refresh" content="0; url=/journal/">'
