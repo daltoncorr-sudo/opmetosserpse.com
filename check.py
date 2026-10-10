@@ -42,7 +42,8 @@ for f in glob.glob(D + '/**/*.html', recursive=True):
     text = strip(t2)
     # "AI" and all caps are allowed in editorial writing: the body of a Journal article is left out of those two checks,
     # and only that. Everywhere else on the site (work pages, home, the Journal's own chrome) they still fail.
-    plain = strip(re.sub(r'<div class="article-body">[\s\S]*?</div>', ' ', t2))
+    # The body runs to the end of its article (it holds paragraphs, notes and rows of pictures, so it can't end at a </div>)
+    plain = strip(re.sub(r'<div class="article-body"[^>]*>[\s\S]*?</article>', ' ', t2))
     if not drafts:
         bare = strip(re.sub(r'<div class="fd-img" data-placeholder[^>]*>[^<]*</div>', ' ', t))
         problems += ['%s: a bracketed placeholder (%s)' % (rel, m.group(0)) for m in re.finditer(BRACKETS, bare) if m.group(0) not in ALLOWED]
