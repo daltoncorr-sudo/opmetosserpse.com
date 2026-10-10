@@ -874,3 +874,97 @@ document.addEventListener('click', function (e) {
   still(function () { measure(); render(); });
   fromHash(false);
 })();
+
+// The lightbox: one site component. Any picture inside an element marked data-lightbox opens full size on the paper; the
+// pictures in that element are its group (a Journal article; later, a project page). A click, Esc or the back button
+// closes it; the arrow keys and a swipe step through the group. Focus stays inside while it's open and returns to the
+// picture after. Fades only, instant with reduced motion. Pictures dropped in later (an article in the panel on home)
+// work too. data-lightbox-skip on an <img> leaves it out (the Journal's handwritten notes).
+(function () {
+  if (!window.HTMLDialogElement || !document.body) return;
+  var reduce = !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches);
+  var root = document.documentElement, SEL = '[data-lightbox] img:not([data-lightbox-skip])';
+  var ms = parseFloat(getComputedStyle(root).getPropertyValue('--t')) * 1000 || 500;
+  var box, pic, group = [], at = 0, opener = null, pushed = false, closing = false, timer = 0, x0 = null, swiped = false;
+  // Each picture can be reached and opened from the keyboard
+  function prep(el) {
+    var imgs = Array.prototype.slice.call(el.querySelectorAll ? el.querySelectorAll(SEL) : []);
+    if (el.matches && el.matches(SEL)) imgs.push(el);
+    imgs.forEach(function (i) { if (!i.hasAttribute('tabindex')) { i.tabIndex = 0; i.setAttribute('role', 'button'); } });
+  }
+  prep(document);
+  if (window.MutationObserver) new MutationObserver(function (ms) {
+    ms.forEach(function (m) { Array.prototype.forEach.call(m.addedNodes, function (n) { if (n.nodeType === 1) prep(n); }); });
+  }).observe(document.body, { childList: true, subtree: true });
+  function make() {
+    box = document.createElement('dialog'); box.className = 'lightbox'; box.tabIndex = -1;
+    pic = document.createElement('img'); pic.alt = ''; pic.decoding = 'async';
+    box.appendChild(pic); document.body.appendChild(box);
+    box.addEventListener('click', function () { if (swiped) { swiped = false; return; } close(); });
+    box.addEventListener('cancel', function (e) { e.preventDefault(); close(); });
+    box.addEventListener('close', function () {  // however it closed: tidy up, and focus back on the picture
+      clearTimeout(timer); closing = false; box.classList.remove('on'); root.classList.remove('lb-open');
+      if (pushed) { pushed = false; history.back(); }
+      if (opener) opener.focus({ preventScroll: true });
+    });
+    box.addEventListener('touchstart', function (e) { x0 = e.touches.length === 1 ? e.touches[0].clientX : null; }, { passive: true });
+    box.addEventListener('touchend', function (e) {
+      if (x0 === null) return;
+      var dx = e.changedTouches[0].clientX - x0; x0 = null;
+      if (Math.abs(dx) > 40) { swiped = true; step(dx < 0 ? 1 : -1); setTimeout(function () { swiped = false; }, 500); }
+    }, { passive: true });
+  }
+  function show(i) {
+    at = (i + group.length) % group.length;
+    var src = group[at];
+    pic.classList.add('out');
+    pic.onload = function () { pic.classList.remove('out'); };  // fades in once it's there
+    pic.sizes = '100vw'; pic.srcset = src.getAttribute('srcset') || ''; pic.src = src.currentSrc || src.src;
+    if (pic.complete && pic.naturalWidth) pic.classList.remove('out');
+    box.setAttribute('aria-label', src.alt || '');
+  }
+  function step(d) { if (group.length > 1) show(at + d); }
+  function open(img) {
+    var g = img.closest('[data-lightbox]');
+    group = Array.prototype.filter.call(g.querySelectorAll('img'), function (x) { return x.matches(SEL); });
+    if (!box) make();
+    clearTimeout(timer); closing = false; opener = img;
+    show(group.indexOf(img));
+    if (!box.open) box.showModal();
+    root.classList.add('lb-open'); box.focus();
+    void box.offsetWidth; box.classList.add('on');
+    // its own entry in the history, so the back button closes it (the address stays the same)
+    if (!pushed) { history.pushState(Object.assign({}, history.state, { lightbox: true }), '', location.href); pushed = true; }
+  }
+  function close(fromHistory) {
+    if (!box || !box.open || closing) return;
+    closing = true;
+    if (pushed && !fromHistory) { pushed = false; history.back(); }
+    box.classList.remove('on');
+    timer = setTimeout(function () { box.close(); }, reduce ? 0 : ms);
+  }
+  document.addEventListener('click', function (e) {
+    var img = e.target.closest && e.target.closest(SEL);
+    if (!img || img.closest('a') || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button) return;
+    e.preventDefault(); open(img);
+  });
+  // While it's open it takes the keys first, so Esc closes the lightbox and not the panel under it
+  window.addEventListener('keydown', function (e) {
+    if (box && box.open) {
+      var k = e.key;
+      if (k === 'Escape' || k === 'Enter' || k === ' ') close();
+      else if (k === 'ArrowRight' || k === 'ArrowLeft') step(k === 'ArrowRight' ? 1 : -1);
+      else if (k === 'Tab') box.focus();
+      else return;
+      e.preventDefault(); e.stopPropagation(); return;
+    }
+    if ((e.key === 'Enter' || e.key === ' ') && e.target.matches && e.target.matches(SEL)) { e.preventDefault(); e.stopPropagation(); open(e.target); }
+  }, true);
+  window.addEventListener('popstate', function () {
+    var mine = history.state && history.state.lightbox;
+    if (box && box.open && !mine) { pushed = false; close(true); }
+    else if (mine && !(box && box.open)) {  // forward onto a closed lightbox's entry: nothing to show there
+      var st = Object.assign({}, history.state); delete st.lightbox; history.replaceState(st, '', location.href);
+    }
+  });
+})();
