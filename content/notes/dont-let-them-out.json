@@ -5,5 +5,52 @@
  "chapters": [],
  "notes": {},
  "video": {},
- "hide": []
+ "hide": [],
+ "media_src": "D, Oct. 10, 2026: the daltoncorr.com page's pictures, then the two poster tees, white then black, as cut-outs on the paper (work only, not for sale: no price or shop link). The tees: content/media/dont-let-them-out/, copied from the asset inbox (the trimmed exports).",
+ "media": [
+  {
+   "src": "images/design/dont-let-them-out/final-a.webp",
+   "gallery": 1
+  },
+  {
+   "src": "images/design/dont-let-them-out/final-b.webp",
+   "gallery": 1
+  },
+  {
+   "src": "images/design/dont-let-them-out/printed-wall.webp",
+   "gallery": 2
+  },
+  {
+   "src": "images/design/dont-let-them-out/printed-floor.webp",
+   "gallery": 2
+  },
+  {
+   "src": "images/design/dont-let-them-out/printed-tees.webp",
+   "gallery": 3
+  },
+  {
+   "src": "images/design/dont-let-them-out/scans-02.webp",
+   "gallery": 4
+  },
+  {
+   "src": "images/design/dont-let-them-out/scans-03.webp",
+   "gallery": 5
+  },
+  {
+   "src": "images/design/dont-let-them-out/scans-01.webp",
+   "gallery": 5
+  },
+  {
+   "src": "content/media/dont-let-them-out/tee-white-trimmed.webp",
+   "alt": "The poster tee in white.",
+   "cut": "large",
+   "row": "tees"
+  },
+  {
+   "src": "content/media/dont-let-them-out/tee-black-trimmed.webp",
+   "alt": "The poster tee in black.",
+   "cut": "large",
+   "row": "tees"
+  }
+ ]
 }
