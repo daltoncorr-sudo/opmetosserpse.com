@@ -231,8 +231,10 @@ html:not(.js) .stage:has(#about:target){transform:translateX(-66.6667%)}
 .press .outlet{font-family:var(--serif);font-size:19px;margin-right:.35em}
 .press .headline{color:#747069} /* lighter gray, 4.55:1 on --paper */
 .press a:hover .outlet{color:inherit}
-/* About: the title and a paragraph at the top left; the press to the right, set a little lower. Home stays at the top right. */
-.about-grid{display:grid;grid-template-columns:minmax(0,2.4fr) minmax(0,1fr);gap:clamp(32px,7vw,120px);padding:12vh clamp(8px,calc(4vw - var(--gutter)),56px) 14vh;text-align:left}
+/* About: Home at the top left, the paragraphs under it, the press to the right, set a little lower. A 12-column grid
+   (the project pages' gutter): the paragraphs in the first eight columns, the press from the ninth. */
+.about-grid{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:clamp(32px,7vw,120px) clamp(12px,1.6667vw,24px);padding:12vh clamp(8px,calc(4vw - var(--gutter)),56px) 14vh;text-align:left}
+.about-main{grid-column:1/9}
 /* Home, small, at the top of the panel */
 .title-row{display:flex;flex-wrap:wrap;align-items:flex-end;column-gap:.42em;font-size:clamp(17px,1.35vw,20px);margin:0 0 var(--s5)}
 .about-grid .title-row{grid-column:1/-1;margin:0}
@@ -240,9 +242,9 @@ html:not(.js) .stage:has(#about:target){transform:translateX(-66.6667%)}
 .about-panel .about-body{font-family:var(--bold-font);font-weight:var(--bold-weight);font-size:clamp(26px,3.5vw,50px);line-height:1.12;letter-spacing:-.01em;max-width:16em}
 .about-body p{margin:0 0 .75em}
 .about-body p.contact{margin-top:.75em}
-.about-press{text-align:left;padding-top:clamp(120px,30vh,320px)}
+.about-press{grid-column:9/13;text-align:left;padding-top:clamp(120px,30vh,320px)}
 .about-press .press-title{margin-top:0}
-@media (max-width:860px){.about-grid{grid-template-columns:1fr}.about-press{padding-top:0}}
+@media (max-width:860px){.about-grid{grid-template-columns:minmax(0,1fr)}.about-main,.about-press{grid-column:1/-1}.about-press{padding-top:0}}
 
 /* The cover: centered. The hand and the name side by side, the words below, then three lines in bold. */
 .cover{height:100vh;height:100svh;min-height:420px;display:flex;align-items:center;justify-content:center;text-align:center}
