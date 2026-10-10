@@ -409,7 +409,11 @@ html:not(.js) .stage:has(#about:target){transform:translateX(-66.6667%)}
 .pp .b-cuts .cuts{grid-column:1/13;grid-row:1;display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:var(--u) clamp(16px,2.8vw,40px)}
 .pp .cuts.end{align-items:flex-end}.pp .cuts.top{align-items:flex-start}
 .pp .b .cut{flex:0 1 var(--cw);min-width:0}
-.pp .cut-small{--cw:clamp(72px,11vw,168px)}.pp .cut-medium{--cw:clamp(104px,18vw,272px)}.pp .cut-large{--cw:clamp(150px,30vw,440px)}.pp .cut-xl{--cw:clamp(220px,44vw,640px)}
+.pp .cuts .cut img{width:var(--cw);max-width:100%}  /* the picture at its own size, whatever room its label takes */
+.pp .cuts.end .cut,.pp .cuts.top .cut{flex-basis:max(var(--cw),150px)}  /* a labeled cut-out: room for its label */
+.pp .cut-small{--cw:clamp(72px,11vw,168px)}.pp .cut-medium{--cw:clamp(104px,18vw,272px)}.pp .cut-large{--cw:clamp(150px,30vw,440px)}.pp .cut-xl{--cw:clamp(220px,44vw,640px)}.pp .cut-true{--cw:calc(var(--w) * clamp(.7px,.11vw,1.6px))}  /* its width in points, shown reduced */
+/* air (Sunny's, after its Brand Bible): more room between sections, and between rows within one */
+.pp-air>.ch{margin-top:calc(var(--U) * 2)}.pp-air .ch>.b+.b{margin-top:calc(var(--u) * 1.75)}
 /* A label under a picture (a notes file's "n", "label" and "note"; Sunny's Bookshop, after its Brand Bible): the name in
    the small sans, its note under it in gray, and the numeral as the Bible sets it, an old-style serif figure in its Gilt.
    The Gilt is the one color the site adds, on this page only (D, Oct. 10). */
@@ -451,7 +455,8 @@ html:not(.js) .stage:has(#about:target){transform:translateX(-66.6667%)}
   .pp .chl{display:none}
   .pp .pfoot{justify-content:flex-start}
   .pp .row-stack{flex-direction:column;gap:var(--u)}.pp .row-stack .m{flex:none!important;width:100%}  /* a notes file's row: stacked */
-  .pp .cuts.end .cut,.pp .cuts.top .cut{flex-basis:max(var(--cw),120px)}  /* a labeled cut-out: room for its label */
+  .pp .cuts.end .cut,.pp .cuts.top .cut{flex-basis:max(var(--cw),120px)}
+  .pp .cut-xl{--cw:100%}  /* an xl cut-out (a wordmark, a type specimen) runs the full width on a phone */
 }
 /* The foundry: objects in space. An approved exception to the one motion value (see the build report): products float
    at scattered depths, bob and turn, and open in place. Every object is plain CSS 3D; site.js places them. */
