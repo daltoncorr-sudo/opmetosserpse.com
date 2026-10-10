@@ -176,7 +176,8 @@ def img_tag(m, sizes, alt, eager=False, extra=''):
     return '<img src="%s"%s width="%d" height="%d" alt="%s"%s%s>' % (src, ss, w, h, esc(alt), lazy, extra)
 
 def video_tag(v, vid, alt, rest, sound, eager=False, loop=False):
-    """Shows its poster frame, plays once (muted, on screen) and rests; a film with sound waits for a click. Never loops,
+    """Shows its poster frame, plays once (muted, on screen) and rests; a film with sound plays muted too, with Play with
+    sound under it (D, Oct. 10). Never loops,
     except the two films D chose to (loop, set in the notes file: Sunny's signature film and Comedy 10's animated
     poster): muted, round and round while on screen (site.js). Its poster is its first frame, or the frame its notes
     file's "rest" names when the first is weak (the signature film's opens before the script is written)."""
@@ -184,7 +185,7 @@ def video_tag(v, vid, alt, rest, sound, eager=False, loop=False):
         return ('<video id="%s" poster="%s" width="%d" height="%d" playsinline muted loop preload="%s" aria-label="%s">'
                 '<source src="%s" type="video/webm"><source src="%s" type="video/mp4"></video>') % (
             vid, v['poster'], v['w'], v['h'], 'auto' if eager else 'metadata', esc(alt), v['webm'], v['mp4'])
-    once = '' if sound else ' data-once'
+    once = ' data-once'
     return ('<video id="%s" poster="%s" width="%d" height="%d" playsinline muted preload="%s" data-rest="%s"%s aria-label="%s">'
             '<source src="%s" type="video/webm"><source src="%s" type="video/mp4"></video>') % (
         vid, v['poster'], v['w'], v['h'], 'auto' if eager else 'metadata', rest, once, esc(alt), v['webm'], v['mp4'])
@@ -437,12 +438,13 @@ def block_html(b, slug):
         media = ''.join(ms)
     cap_ = '<span class="nt">%s</span>' % typo(b['note']) if b['note'] else ''  # the words; the film links stay apart
     for it in b['items']:
-        if it['kind'] == 'video' and it.get('loop'):  # a looping film: with sound, its control sits right under it;
-            if not it['sound']: cap_ += ' <a href="#" class="again" data-again="%s" hidden>Play</a>' % it['id']  # Play: reduced motion
-            else: media += ('<p class="film-ctl"><button type="button" class="ctl" data-unmute="%s" data-off="Play with sound" data-on="Mute">%s</button></p>'
-                            % (it['id'], ctl('Play with sound')))
-        elif it['kind'] == 'video':
-            if it['sound']: cap_ += ' <a href="#" class="again" data-sound="%s">Play with sound</a>' % it['id']
+        if it['kind'] != 'video': continue
+        if it['sound']:  # every film plays muted; one with sound has Play with sound right under it (the shared control)
+            media += ('<p class="film-ctl"><button type="button" class="ctl" data-unmute="%s" data-off="Play with sound" data-on="Mute">%s</button></p>'
+                      % (it['id'], ctl('Play with sound')))
+        if it.get('loop'):  # Play: reduced motion
+            if not it['sound']: cap_ += ' <a href="#" class="again" data-again="%s" hidden>Play</a>' % it['id']
+        else:
             cap_ += ' <a href="#" class="again" data-again="%s" hidden>Play again</a>' % it['id']
     cap_ = cap_.strip()
     if kind == 'full':  # a full bleed has no grid of its own: its note sits in one, under it, in the right margin

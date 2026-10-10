@@ -622,39 +622,52 @@
 (function () {
   var reduce = !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches);
   function films(root) {
-    // The two looping films (Sunny's signature film, Comedy 10's animated poster): muted, round and round while on
-    // screen, never with reduced motion (then Play, or Play with sound). Play with sound turns the sound on and becomes
-    // Mute; Mute turns it back off. If a browser won't play it with sound, it goes back to muted.
-    Array.prototype.forEach.call(root.querySelectorAll('.pp video[loop]'), function (v) {
-      var again = root.querySelector('[data-again="' + v.id + '"]'), sound = root.querySelector('[data-unmute="' + v.id + '"]');
-      function say() { if (sound) opmetCtl.label(sound, sound.getAttribute(v.muted ? 'data-off' : 'data-on')); }
-      function play() {
-        var p = v.play();
-        if (p && p.catch) p.catch(function () { if (!v.muted) { v.muted = true; say(); var q = v.play(); if (q && q.catch) q.catch(function () {}); } });
-      }
-      if (sound) sound.addEventListener('click', function (e) {
+    // Every film plays muted (D, Oct. 10). A film with sound has Play with sound right under it (the shared control),
+    // which turns its sound on (from the start, if it has already played and rests) and becomes Mute; Mute turns it
+    // back off. If a browser won't play it with sound, it goes back to muted.
+    function soundCtl(v, b, play) {
+      function say() { opmetCtl.label(b, b.getAttribute(v.muted ? 'data-off' : 'data-on')); }
+      b.addEventListener('click', function (e) {
         e.preventDefault(); v.muted = !v.muted; say();
-        if (!v.muted && v.paused) play();
+        if (!v.muted && v.paused) play(true);
       });
-      if (again) again.addEventListener('click', function (e) { e.preventDefault(); again.hidden = true; play(); });
+      return say;
+    }
+    function start(v, say) {  // play; with sound refused, muted
+      var p = v.play();
+      if (p && p.catch) p.catch(function () { if (!v.muted) { v.muted = true; if (say) say(); var q = v.play(); if (q && q.catch) q.catch(function () {}); } });
+      return p;
+    }
+    // The two looping films (Sunny's signature film, Comedy 10's animated poster): round and round while on screen,
+    // never with reduced motion (then Play, or Play with sound).
+    Array.prototype.forEach.call(root.querySelectorAll('.pp video[loop]'), function (v) {
+      var again = root.querySelector('[data-again="' + v.id + '"]'), b = root.querySelector('[data-unmute="' + v.id + '"]'), say = null;
+      function play() { if (again) again.hidden = true; start(v, say); }
+      if (b) say = soundCtl(v, b, play);
+      if (again) again.addEventListener('click', function (e) { e.preventDefault(); play(); });
       if (reduce || !('IntersectionObserver' in window)) { if (again) { again.hidden = false; again.textContent = 'Play'; } return; }
       new IntersectionObserver(function (es) {
         es.forEach(function (e) { if (e.isIntersecting) { if (v.paused) play(); } else if (!v.paused) v.pause(); });
       }, { threshold: 0.25 }).observe(v);
     });
+    // Every other film plays once, muted, when it's on screen, and rests on its chosen frame, with Play again
     Array.prototype.forEach.call(root.querySelectorAll('.pp video[data-rest]'), function (v) {
-      var state = 'idle', again = root.querySelector('[data-again="' + v.id + '"]'), sound = root.querySelector('[data-sound="' + v.id + '"]'), r = v.dataset.rest;
+      var state = 'idle', again = root.querySelector('[data-again="' + v.id + '"]'), b = root.querySelector('[data-unmute="' + v.id + '"]'), r = v.dataset.rest, say = null;
       function rest() { try { v.currentTime = r === 'end' ? Math.max(0, v.duration - 0.05) : parseFloat(r); } catch (e) {} }
       function offer(t) { if (again) { again.hidden = false; again.textContent = t; } }
+      function play(asked) {
+        if (state === 'done') v.currentTime = 0;
+        state = 'playing'; if (again) again.hidden = true;
+        var p = start(v, say); if (p && p.catch && !asked) p.catch(function () { offer('Play'); });
+      }
+      if (b) say = soundCtl(v, b, play);
       v.addEventListener('ended', function () { state = 'done'; rest(); offer('Play again'); });
-      if (again) again.addEventListener('click', function (e) { e.preventDefault(); if (state === 'done') v.currentTime = 0; state = 'playing'; again.hidden = true; v.play(); });
-      if (sound) sound.addEventListener('click', function (e) { e.preventDefault(); v.muted = false; v.controls = true; state = 'playing'; sound.hidden = true; if (again) again.hidden = true; v.play(); });
-      if (sound) return;                                    // a film with sound plays only when asked
+      if (again) again.addEventListener('click', function (e) { e.preventDefault(); play(true); });
       if (reduce || !('IntersectionObserver' in window)) { offer('Play'); return; }  // reduced motion: nothing plays until clicked
       new IntersectionObserver(function (es) {
         es.forEach(function (e) {
           var seen = e.intersectionRect.height >= Math.min(e.boundingClientRect.height * 0.6, innerHeight * 0.35);
-          if (seen && state !== 'done') { if (v.paused) { state = 'playing'; var p = v.play(); if (p && p.catch) p.catch(function () { offer('Play'); }); } }
+          if (seen && state !== 'done') { if (v.paused) play(); }
           else if (!e.isIntersecting && !v.paused) v.pause();
         });
       }, { threshold: [0, .1, .2, .3, .4, .5, .6, .7, .8, .9, 1] }).observe(v);
