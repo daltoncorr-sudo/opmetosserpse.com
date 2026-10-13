@@ -227,8 +227,11 @@ def ink_filters():
         for n, (d, b, sl, ic, k) in INK.items())
     return '<svg class="ink-defs" width="0" height="0" aria-hidden="true" focusable="false"><defs>%s</defs></svg>' % f
 
-def page(site, title, desc, path, body, og_image=None, current=None, extra_head='', main_cls='', header=True, og_type='website'):
+def page(site, title, desc, path, body, og_image=None, current=None, extra_head='', main_cls='', header=True, og_type='website', ld=()):
+    """ld: the page's own JSON-LD nodes, after the studio and the site, which every page carries (see ld_graph)."""
     url = 'https://%s%s' % (site['domain'], path)
+    # The machine-readable layer, last in the head and invisible: the data feeds, then one JSON-LD block
+    data = ''.join('<link rel="alternate" type="application/json" href="%s" title="%s">\n' % f for f in FEEDS) + ld_script(ld_graph(site) + list(ld))
     og = og_image or '/media/site/og.jpg'
     # No menu bar. Inner pages carry only the hand and the name (live text, in Opmet Serif), centered, back to the cover.
     header = '' if path == '/' or not header else ('<header class="site-header"><a class="lockup" href="/">%s<span class="wordmark ink">%s</span></a></header>'
@@ -262,7 +265,7 @@ def page(site, title, desc, path, body, og_image=None, current=None, extra_head=
 <link rel="preload" href="/fonts/source-serif-4/source-serif-4-italic-latin.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/fonts/opmet-serif/opmet-serif-title.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/css/site.css?v=%(v)s">
-%(extra)s</head>
+%(extra)s%(data)s</head>
 <body>
 %(ink)s
 <a class="skip" href="#main">Skip to content</a>
@@ -276,12 +279,145 @@ def page(site, title, desc, path, body, og_image=None, current=None, extra_head=
 ''' % dict(title=esc(title), desc=esc(desc), url=url, domain=site['domain'], og=og, nav=nav, tz=site['clock_timezone'],
            place=esc(site['clock_place']), body=body, name=esc(site['name']), descr=esc(site['description'].rstrip('.')),
            email=site['email'], line=esc(site['line']), copy=esc(site['copyright']), privacy=esc(site['privacy_line']),
-           v=site['_v'], extra=extra_head, ink=ink_filters(), page_cls=page_cls, og_type=og_type, main_cls=' class="%s"' % main_cls if main_cls else '')
+           v=site['_v'], extra=extra_head, ink=ink_filters(), page_cls=page_cls, og_type=og_type, main_cls=' class="%s"' % main_cls if main_cls else '',
+           data=data)
 
 def write(path, text):
     full = os.path.join(DIST, path.lstrip('/'))
     os.makedirs(os.path.dirname(full), exist_ok=True)
     with open(full, 'w', encoding='utf-8') as f: f.write(text)
+
+# The machine-readable site (06_Visibility, W1), all from content/ and invisible on the page: JSON-LD on every page, the
+# feeds in /data/, /llms.txt, a robots.txt group for each named crawler and a date on each sitemap address. The studio's
+# shared facts live in content/entity.json. Hidden sections (site.json "hidden") get only the studio and the site, and
+# stay out of every list, feed and file.
+FOUNDER = 'Dalton Corr'  # in the data only when site.json "founder_in_data" is true (D's answer 2: off by default)
+FEEDS = (('/data/studio.json', 'Studio'), ('/data/work.json', 'Work'))  # each page links them (<link rel="alternate">)
+MIME = {'.svg': 'image/svg+xml', '.png': 'image/png', '.webp': 'image/webp', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.gif': 'image/gif'}
+
+def load_entity(site):
+    """content/entity.json, with the long description from site.json (the site's meta line), so the two never drift."""
+    e = load(os.path.join(CONTENT, 'entity.json'))
+    e['longDescription'] = site['home']['og_description']
+    e['_base'] = 'https://%s' % site['domain']
+    return e
+
+def ld_graph(site):
+    """The two nodes on every page: the studio, with one stable @id, and the site, which it publishes."""
+    e = site['_entity']; base = e['_base']; loc = e['foundingLocation']
+    logo = base + e['logo']
+    org = {'@type': 'Organization', '@id': e['id'], 'name': e['name'], 'alternateName': e['alternateName'], 'url': e['url'],
+           'logo': {'@type': 'ImageObject', '@id': base + '/#logo', 'url': logo, 'contentUrl': logo,
+                    'encodingFormat': MIME[os.path.splitext(logo)[1].lower()]},
+           'description': e['description'],
+           'foundingLocation': {'@type': 'Place', 'name': '%s, %s' % (loc['addressLocality'], loc['addressRegion']),
+                                'address': dict({'@type': 'PostalAddress'}, **loc)},
+           'email': e['email'], 'sameAs': e['sameAs'], 'knowsAbout': e['knowsAbout']}
+    if site.get('founder_in_data') is True: org['founder'] = {'@type': 'Person', 'name': FOUNDER}
+    web = {'@type': 'WebSite', '@id': base + '/#website', 'url': e['url'], 'name': e['name'], 'alternateName': e['alternateName'],
+           'description': e['longDescription'], 'inLanguage': 'en', 'publisher': {'@id': e['id']}}
+    return [org, web]
+
+def ld_script(nodes):
+    """One JSON-LD block for the page. Every < is escaped, so nothing in the text can close the script."""
+    s = json.dumps({'@context': 'https://schema.org', '@graph': nodes}, ensure_ascii=False, indent=1)
+    return '<script type="application/ld+json">\n%s\n</script>\n' % s.replace('<', '\\u003c')
+
+def shown_lede(p):
+    """The paragraph the page shows: the notes file's lede when it has one (it speaks as the studio), else the project's."""
+    return p['_notes'].get('lede') or p['lede']
+
+def work_ref(p, wj, base):
+    """A project as the lists name it: its page's @id and address, its title, and the list's longer title when it differs."""
+    url = '%s/projects/%s' % (base, p['slug'])
+    r = {'@type': 'CreativeWork', '@id': url + '#work', 'url': url, 'name': p['title']}
+    t = wj.get(p['slug'], {}).get('title')
+    if t and t != p['title']: r['alternateName'] = t
+    return r
+
+def work_ld(site, p, wj):
+    """A project page: the work, made and published by the studio, for its client (sourceOrganization: the organization
+    on whose behalf the creator worked), with its pictures and their alt text; and the path to it, Home, Work, the page."""
+    e = site['_entity']; base = e['_base']; studio = {'@id': e['id']}
+    pics, seen = [], set()
+    for x in p['_items']:
+        if x['kind'] != 'img' or x['r'][0] in seen: continue
+        seen.add(x['r'][0])
+        pic = {'@type': 'ImageObject', 'contentUrl': base + x['r'][0]}
+        if x['alt']: pic['description'] = x['alt']
+        pic['encodingFormat'] = MIME[os.path.splitext(x['r'][0])[1].lower()]
+        pics.append(pic)
+    work = work_ref(p, wj, base)
+    work.update({'dateCreated': p['year'][-4:], 'creator': studio, 'publisher': studio,
+                 'sourceOrganization': {'@type': 'Organization', 'name': p['client']}, 'description': shown_lede(p),
+                 'keywords': wj.get(p['slug'], {}).get('tags', []), 'image': pics,
+                 'isPartOf': {'@type': 'CollectionPage', '@id': base + '/projects/', 'url': base + '/projects/'}})
+    trail = ((site['back'], base + '/'), (site['home']['work']['label'], base + '/projects/'), (p['title'], work['url']))
+    crumbs = {'@type': 'BreadcrumbList', '@id': work['url'] + '#breadcrumb', 'itemListElement': [
+        {'@type': 'ListItem', 'position': n, 'name': name, 'item': u} for n, (name, u) in enumerate(trail, 1)]}
+    return [work, crumbs]
+
+def collection_ld(site, ordered, wj):
+    """/projects/: the page, and the list of every project page on it, in its order."""
+    e = site['_entity']; base = e['_base']; pr = site['projects']
+    items = [{'@type': 'ListItem', 'position': n, 'item': work_ref(p, wj, base)} for n, p in enumerate(ordered, 1)]
+    return [{'@type': 'CollectionPage', '@id': base + '/projects/', 'url': base + '/projects/', 'name': pr['og_title'],
+             'description': pr['og_description'], 'isPartOf': {'@id': base + '/#website'}, 'publisher': {'@id': e['id']},
+             'mainEntity': {'@type': 'ItemList', '@id': base + '/projects/#list', 'numberOfItems': len(items), 'itemListElement': items}}]
+
+def data_json(x):
+    return json.dumps(x, ensure_ascii=False, indent=1) + '\n'
+
+def studio_data(site):
+    """/data/studio.json: the studio's facts, as plain JSON for agents (the JSON-LD carries the same, in schema.org's words)."""
+    e = site['_entity']; base = e['_base']; loc = e['foundingLocation']
+    return data_json({'id': e['id'], 'name': e['name'], 'alternate_name': e['alternateName'], 'description': e['description'],
+                      'long_description': e['longDescription'], 'url': e['url'], 'email': e['email'],
+                      'founding_location': {'locality': loc['addressLocality'], 'region': loc['addressRegion'], 'country': loc['addressCountry']},
+                      'knows_about': e['knowsAbout'], 'logo': base + e['logo'], 'same_as': e['sameAs'],
+                      'work_url': base + '/data/work.json'})
+
+def work_data(site, entries, projects):
+    """/data/work.json: every project on /projects/, in its order. Public fields only: slug, title, year, tags and, for a
+    project with a page, its client, the paragraph its page shows, its address and its card picture. Never its notes
+    (challenge, work, system, deliverables, press) or credits."""
+    e = site['_entity']; base = e['_base']; out = []
+    for w in entries:
+        p = projects.get(w['slug']) if w['page'] else None
+        out.append({'slug': w['slug'], 'title': w['title'], 'year': w['year'], 'tags': w['tags'],
+                    'client': p['client'] if p else None, 'lede': shown_lede(p) if p else None,
+                    'url': '%s/projects/%s' % (base, p['slug']) if p else None,
+                    'image': {'url': base + p['preview'], 'alt': p['card'].get('alt', '')} if p and p.get('preview') else None})
+    return data_json({'studio': e['id'], 'url': base + '/projects/', 'projects': out})
+
+def llms_file(site, ordered, wj):
+    """/llms.txt: the name, the one line, then the work and the address to write to. Nothing hidden."""
+    e = site['_entity']; base = e['_base']
+    out = ['# %s' % e['name'], '', '> %s' % e['description'], '', '## Work', '']
+    out += ['- [%s](%s/projects/%s)' % (wj.get(p['slug'], {}).get('title') or p['title'], base, p['slug']) for p in ordered]
+    out += ['', '## Contact', '', '- [%s](mailto:%s)' % (e['email'], e['email'])]
+    return '\n'.join(out) + '\n'
+
+def robots_file(site):
+    """robots.txt: everyone allowed, and a group for each crawler in content/entity.json. A crawler that finds a group
+    of its own reads only that one, so each carries the same rules as everyone's, unless entity.json turns it off."""
+    rules = ['Allow: /']
+    out = ['# Built by build.py from content/entity.json.', 'User-agent: *'] + rules
+    for c in site['_entity']['crawlers']:
+        out += ['', 'User-agent: %s' % c['name']] + (rules if c['allow'] is True else ['Disallow: /'])
+    return '\n'.join(out + ['', 'Sitemap: https://%s/sitemap.xml' % site['domain']]) + '\n'
+
+def last_changed(*paths):
+    """When these sources last changed (YYYY-MM-DD), for the sitemap: today while any has a change not yet committed,
+    else the date of the last commit that touched one (the repo's last commit when none has); empty without git."""
+    try:
+        r = subprocess.run(['git', '-C', ROOT, 'status', '--porcelain', '--', *paths], capture_output=True, text=True)
+        if r.returncode == 0 and r.stdout.strip(): return date.today().isoformat()
+        for args in (['--', *paths], []):
+            r = subprocess.run(['git', '-C', ROOT, 'log', '-1', '--format=%cs', *args], capture_output=True, text=True)
+            if r.returncode == 0 and r.stdout.strip(): return r.stdout.strip()
+    except OSError: pass
+    return ''
 
 # Cloudflare Pages. Every redirect stays on the site; the one outside frame is the payment processor's card field.
 STRIPE_SCRIPT = 'https://js.stripe.com https://*.js.stripe.com'
@@ -297,13 +433,14 @@ def redirects_file():
     return '\n'.join(out) + '\n'
 
 def inline_script_hashes():
-    """The sha256 of every inline script in the built pages, for the Content-Security-Policy."""
+    """The sha256 of every inline script in the built pages, for the Content-Security-Policy. JSON-LD is left out: it is
+    a data block, which browsers never run, so the policy has nothing to allow (and a hash a page would overrun _headers)."""
     found = set()
     for dp, _, fs in os.walk(DIST):
         for f in fs:
             if f.endswith('.html'):
                 t = open(os.path.join(dp, f), encoding='utf-8').read()
-                for body in re.findall(r'<script(?![^>]*\bsrc=)[^>]*>([\s\S]*?)</script>', t):
+                for body in re.findall(r'<script(?![^>]*\bsrc=)(?![^>]*\btype="application/ld\+json")[^>]*>([\s\S]*?)</script>', t):
                     found.add("'sha256-%s'" % base64.b64encode(hashlib.sha256(body.encode('utf-8')).digest()).decode())
     return sorted(found)
 
@@ -891,6 +1028,8 @@ def main():
     for f in ('static/css/site.css', 'static/js/site.js'):
         with open(os.path.join(ROOT, f), 'rb') as fh: h.update(fh.read())
     site['_v'] = h.hexdigest()[:10]
+    site['_entity'] = load_entity(site)  # the studio's facts, for the data layer
+    wj = {e['slug']: e for e in load(os.path.join(CONTENT, 'work.json'))['projects']}  # each project's list title and tags
     index = load(os.path.join(CONTENT, 'index.json'))
     projects = {}
     for fn in sorted(os.listdir(os.path.join(CONTENT, 'projects'))):
@@ -1014,7 +1153,7 @@ def main():
                 '<script src="/js/%s?v=%s" defer></script>\n' % (n if n.startswith('vendor/') else 'work/' + n, site['_v'])
                 for n in dict.fromkeys(p['_scripts']))
         write('/projects/%s.html' % s, page(site, p['seo']['title'], p['seo']['description'], '/projects/%s' % s, body, og, '/projects', extra_head=head,
-                                            header=False))  # the masthead, in the page, replaces the header
+                                            header=False, ld=work_ld(site, p, wj)))  # the masthead, in the page, replaces the header
     os.makedirs(os.path.join(ROOT, '_review'), exist_ok=True)
     with open(os.path.join(ROOT, '_review', 'build-stats.json'), 'w', encoding='utf-8') as fh:
         json.dump(stats, fh, indent=1)
@@ -1032,7 +1171,8 @@ def main():
     entries = items
     pr = site['projects']
     body = '<section class="index">%s</section><div class="preview" aria-hidden="true"><img alt=""></div>' % list_rows(entries)
-    write('/projects/index.html', page(site, pr['og_title'], pr['og_description'], '/projects/', body, so, '/projects'))
+    write('/projects/index.html', page(site, pr['og_title'], pr['og_description'], '/projects/', body, so, '/projects',
+                                       ld=collection_ld(site, ordered, wj)))
 
     # home: the hand and the name, alone on the first screen. Scroll for the studio, then the index.
     h = site['home']
@@ -1129,12 +1269,24 @@ def main():
     write('/.nojekyll', '')
     write('/_redirects', redirects_file())
     write('/_headers', headers_file())
-    write('/robots.txt', 'User-agent: *\nAllow: /\nSitemap: https://%s/sitemap.xml\n' % site['domain'])
+    write('/robots.txt', robots_file(site))
     published = [e for e in posts if not e.get('draft')] if 'journal' not in hidden else []
     urls = ['/', '/projects/', '/privacy'] + ['/projects/%s' % p['slug'] for p in ordered] + (
         ['/journal/'] + ['/journal/%s' % e['slug'] for e in published] if published else [])
+    # lastmod: when the content a page is built from last changed (last_changed); for a post, its own date if later
+    src = {'/': ('content/site.json', 'content/work.json', 'content/index.json', 'content/press.json'),
+           '/projects/': ('content/work.json', 'content/index.json'), '/privacy': ('content/site.json',)}
+    src.update({'/projects/%s' % p['slug']: ('content/projects/%s.json' % p['slug'], 'content/notes/%s.json' % p['slug'],
+                                             'content/media/%s' % p['slug']) for p in ordered})
+    lastmod = {u: last_changed(*x) for u, x in src.items()}
+    lastmod.update({'/journal/%s' % e['slug']: max(e['date'], last_changed('content/journal/%s.txt' % e['slug'])) for e in published})
+    if published: lastmod['/journal/'] = max(lastmod['/journal/%s' % e['slug']] for e in published)
     write('/sitemap.xml', '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n%s</urlset>\n' % ''.join(
-        '  <url><loc>https://%s%s</loc></url>\n' % (site['domain'], u) for u in urls))
+        '  <url><loc>https://%s%s</loc><lastmod>%s</lastmod></url>\n' % (site['domain'], u, lastmod.get(u) or date.today().isoformat()) for u in urls))
+    # The feeds (the Opmet API, level 1) and the guide for language models: public facts only, nothing hidden
+    write('/data/studio.json', studio_data(site))
+    write('/data/work.json', work_data(site, entries, projects))
+    write('/llms.txt', llms_file(site, ordered, wj))
 
     size = sum(os.path.getsize(os.path.join(dp, f)) for dp, _, fs in os.walk(DIST) for f in fs)
     print('Built %d project pages, %d list rows, %d articles, into %s (%.0f MB).' % (len(ordered), len(entries), len(posts), DIST, size / 1e6))

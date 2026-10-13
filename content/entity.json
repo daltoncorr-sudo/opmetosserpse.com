@@ -1,0 +1,38 @@
+{
+ "_note": "The studio's shared facts, one place for the machine-readable site: build.py reads them for the JSON-LD on every page, /data/studio.json, /llms.txt and /robots.txt. The long description is not repeated here: it is site.json's home og_description, the site's meta line, read at build so the two never drift. The founder is added to the Organization only when site.json's founder_in_data is true (D's answer 2; off by default). crawlers: each has its own group in robots.txt with the same rules as everyone's; \"allow\": false gives that crawler alone Disallow: / (D's answer 3).",
+ "name": "Opmet Osserpse",
+ "alternateName": "Opmetosserpse",
+ "url": "https://opmetosserpse.com/",
+ "id": "https://opmetosserpse.com/#studio",
+ "description": "Creative studio founded in Venice, California",
+ "logo": "/brand/hand-mark.svg",
+ "foundingLocation": {
+  "addressLocality": "Venice",
+  "addressRegion": "California",
+  "addressCountry": "United States"
+ },
+ "email": "hello@opmetosserpse.com",
+ "sameAs": [
+  "https://www.instagram.com/opmetosserpse/"
+ ],
+ "knowsAbout": [
+  "Identity",
+  "Type design",
+  "Art direction",
+  "Key art",
+  "Campaigns",
+  "Motion",
+  "Sound"
+ ],
+ "crawlers": [
+  {"name": "GPTBot", "allow": true},
+  {"name": "OAI-SearchBot", "allow": true},
+  {"name": "ChatGPT-User", "allow": true},
+  {"name": "ClaudeBot", "allow": true},
+  {"name": "Claude-SearchBot", "allow": true},
+  {"name": "Claude-User", "allow": true},
+  {"name": "PerplexityBot", "allow": true},
+  {"name": "Google-Extended", "allow": true},
+  {"name": "Applebot-Extended", "allow": true}
+ ]
+}

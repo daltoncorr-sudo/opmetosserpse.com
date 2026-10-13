@@ -232,13 +232,176 @@ else:
     hosts = set(re.findall(r'https://[^\s;]+', csp))
     extra = hosts - {'https://js.stripe.com', 'https://*.js.stripe.com', 'https://hooks.stripe.com', 'https://api.stripe.com'}
     if extra: problems.append('docs/_headers: the policy allows an outside host (%s)' % ', '.join(sorted(extra)))
-    for f in glob.glob(D + '/**/*.html', recursive=True):
-        for body in re.findall(r'<script(?![^>]*\bsrc=)[^>]*>([\s\S]*?)</script>', open(f, encoding='utf-8').read()):
+    for f in glob.glob(D + '/**/*.html', recursive=True):  # JSON-LD is a data block, never run: the policy leaves it out
+        for body in re.findall(r'<script(?![^>]*\bsrc=)(?![^>]*\btype="application/ld\+json")[^>]*>([\s\S]*?)</script>', open(f, encoding='utf-8').read()):
             if "'sha256-%s'" % base64.b64encode(hashlib.sha256(body.encode('utf-8')).digest()).decode() not in csp:
                 problems.append('%s: an inline script the policy would block' % os.path.relpath(f, D))
     for line in ht.splitlines():
         if len(line) > 2000: problems.append('docs/_headers: a line over 2,000 characters')
 if not os.path.exists(os.path.join(ROOT, 'functions', 'api', 'health.js')): problems.append('functions/api/health.js is missing')
+
+# The machine-readable site (W1): one JSON-LD block on every page, its facts matching content/; /data/, /llms.txt,
+# robots.txt and the sitemap's dates. The house-style words cover their human-readable text (not keys, @type, @context,
+# addresses, emails, dates or media types). Dalton's name is in the data only with site.json's founder_in_data on, and
+# then only as the studio's founder. Hidden sections stay out of every list, feed and file.
+BASE = 'https://opmetosserpse.com'
+site_j = json.load(open(os.path.join(ROOT, 'content', 'site.json'), encoding='utf-8'))
+ent = json.load(open(os.path.join(ROOT, 'content', 'entity.json'), encoding='utf-8'))
+founder_on = site_j.get('founder_in_data') is True
+FOUNDER = {'@type': 'Person', 'name': 'Dalton Corr'}
+CRAWLERS = ('GPTBot', 'OAI-SearchBot', 'ChatGPT-User', 'ClaudeBot', 'Claude-SearchBot', 'Claude-User', 'PerplexityBot', 'Google-Extended', 'Applebot-Extended')
+FORBIDDEN = {'challenge', 'work', 'system', 'deliverables', 'press', 'credits'}  # a project's fields that stay in content/
+STUBS = {'blog/index.html'}  # the old address: a redirect to /journal/, not a page
+LITERAL = re.compile(r'(?:https?://|mailto:|/)\S*|[^@\s]+@[^@\s]+\.[a-z]+|\d{4}(?:-\d{2}){0,2}|[a-z]+/[\w.+-]+|[a-z]{2}')
+projects_c = {os.path.basename(f)[:-5]: json.load(open(f, encoding='utf-8')) for f in glob.glob(os.path.join(ROOT, 'content', 'projects', '*.json'))}
+notes_c = {os.path.basename(f)[:-5]: json.load(open(f, encoding='utf-8')) for f in glob.glob(os.path.join(ROOT, 'content', 'notes', '*.json'))}
+wjs = {e['slug']: e for e in json.load(open(os.path.join(ROOT, 'content', 'work.json'), encoding='utf-8'))['projects']}
+lede = lambda s: notes_c.get(s, {}).get('lede') or projects_c[s]['lede']  # the paragraph the page shows
+in_docs = lambda path: any(os.path.exists(D + x) for x in (path, path + '.html', path.rstrip('/') + '/index.html'))
+gone = [x for x, sec in (('/journal', 'journal'), ('/foundry', 'foundry'), ('#foundry', 'foundry')) if sec in hidden]  # addresses never in a list, feed or file
+
+def style(where, v, key=''):
+    """The house-style words, on every string value but the literal ones; the name as one word only as the alternate name."""
+    if isinstance(v, dict):
+        for k, x in v.items():
+            if k not in ('@context', '@type', '@id'): style(where, x, k)
+    elif isinstance(v, list):
+        for x in v: style(where, x, key)
+    elif isinstance(v, str) and not LITERAL.fullmatch(v):
+        for pat, why in CHECKS + [(BRACKETS, 'a bracketed placeholder')]:
+            if why == "Dalton's name outside the credits" or (why == 'the name written as one word' and key in ('alternateName', 'alternate_name')): continue
+            for m in re.finditer(pat, v):
+                if why == 'a word in all caps' and m.group(0) in ACRONYMS: continue
+                problems.append('%s: %s (%s) in %s' % (where, why, m.group(0), key or 'the text'))
+
+def no_name(where, raw):
+    if re.search(r'dalton\W*corr', raw, re.I): problems.append("%s: Dalton's name in the data" % where)
+
+def no_hidden(where, raw):
+    problems.extend('%s: a hidden section (%s)' % (where, x) for x in gone if x in raw)
+
+class Pics(LB):  # a project page's pictures with their alt text, outside its 3D and interactive pieces
+    def handle_starttag(self, tag, a):
+        n = len(self.out); super().handle_starttag(tag, a)
+        if len(self.out) > n: self.out[-1] += (dict(a).get('alt') or '',)
+
+for f in sorted(glob.glob(D + '/**/*.html', recursive=True)):
+    rel = os.path.relpath(f, D); t = open(f, encoding='utf-8').read()
+    if rel in STUBS: continue
+    for href in ('/data/studio.json', '/data/work.json'):
+        if '<link rel="alternate" type="application/json" href="%s"' % href not in t: problems.append('%s: no link to %s' % (rel, href))
+    blocks = re.findall(r'<script type="application/ld\+json">([\s\S]*?)</script>', t)
+    if len(blocks) != 1: problems.append('%s: %d JSON-LD blocks (one a page)' % (rel, len(blocks))); continue
+    try: ld = json.loads(blocks[0])
+    except ValueError as x: problems.append('%s: JSON-LD that does not parse (%s)' % (rel, x)); continue
+    g = ld.get('@graph') or []
+    if ld.get('@context') != 'https://schema.org': problems.append('%s: JSON-LD without the schema.org context' % rel)
+    slug = rel[len('projects/'):-5] if rel.startswith('projects/') and rel != 'projects/index.html' else None
+    kind = 'project' if slug else 'projects' if rel == 'projects/index.html' else 'hidden' if (rel.startswith('journal/') and 'journal' in hidden) or (rel == 'foundry.html' and 'foundry' in hidden) else 'page'
+    types = [n.get('@type') for n in g]
+    want = ['Organization', 'WebSite'] + {'project': ['CreativeWork', 'BreadcrumbList'], 'projects': ['CollectionPage']}.get(kind, [])
+    if types != want: problems.append('%s: JSON-LD types %s, expected %s' % (rel, ', '.join(map(str, types)), ', '.join(want))); continue
+    org, web = g[0], g[1]
+    style(rel + ' JSON-LD', g); no_hidden(rel + ' JSON-LD', json.dumps(g[2:]))
+    if founder_on and org.get('founder') == FOUNDER: org = dict(org); del org['founder']  # the one place it may be
+    elif founder_on: problems.append('%s: the founder switch is on but the studio has no founder' % rel)
+    no_name(rel + ' JSON-LD', json.dumps([org, web] + g[2:], ensure_ascii=False))
+    # the studio: one, with its stable @id and content/entity.json's facts
+    if org.get('@id') != ent['id']: problems.append('%s: the Organization @id is not %s' % (rel, ent['id']))
+    for k in ('name', 'alternateName', 'url', 'description', 'email', 'sameAs', 'knowsAbout'):
+        if org.get(k) != ent[k]: problems.append('%s: the Organization %s differs from content/entity.json' % (rel, k))
+    if (org.get('logo') or {}).get('contentUrl') != BASE + ent['logo'] or not in_docs(ent['logo']): problems.append('%s: the Organization logo' % rel)
+    addr = (org.get('foundingLocation') or {}).get('address') or {}
+    if {k: addr.get(k) for k in ent['foundingLocation']} != ent['foundingLocation']: problems.append('%s: the founding location differs from content/entity.json' % rel)
+    if web.get('publisher') != {'@id': ent['id']} or web.get('description') != site_j['home']['og_description'] or web.get('url') != ent['url']:
+        problems.append('%s: the WebSite is not the studio\'s, or its description differs from site.json' % rel)
+    if kind == 'project':
+        p, cw, bc = projects_c[slug], g[2], g[3]; url = '%s/projects/%s' % (BASE, slug)
+        facts = {'@id': url + '#work', 'url': url, 'name': p['title'], 'dateCreated': p['year'][-4:], 'description': lede(slug),
+                 'sourceOrganization': {'@type': 'Organization', 'name': p['client']}, 'creator': {'@id': ent['id']},
+                 'publisher': {'@id': ent['id']}, 'keywords': wjs[slug]['tags']}
+        problems += ['%s: the CreativeWork %s differs from content/' % (rel, k) for k, v in facts.items() if cw.get(k) != v]
+        if (cw.get('isPartOf') or {}).get('@id') != BASE + '/projects/': problems.append('%s: the CreativeWork is not part of /projects/' % rel)
+        pics = Pics(); pics.feed(t)
+        shown = {(BASE + src, alt) for src, piece, _, alt in pics.out if not piece}
+        listed = {(x.get('contentUrl'), x.get('description', '')) for x in cw.get('image') or []}
+        if shown != listed: problems.append('%s: the CreativeWork pictures differ from the page (%d listed, %d shown)' % (rel, len(listed), len(shown)))
+        problems += ['%s: a CreativeWork picture that is not in docs/ (%s)' % (rel, u) for u, _ in listed if not in_docs((u or '')[len(BASE):])]
+        trail = [(1, site_j['back'], BASE + '/'), (2, site_j['home']['work']['label'], BASE + '/projects/'), (3, p['title'], url)]
+        if [(x.get('position'), x.get('name'), x.get('item')) for x in bc.get('itemListElement', [])] != trail: problems.append('%s: the breadcrumb is not Home, Work, the project' % rel)
+    if kind == 'projects':
+        il = (g[2].get('mainEntity') or {}).get('itemListElement') or []
+        got = [(x.get('position'), (x.get('item') or {}).get('@id'), (x.get('item') or {}).get('url'), (x.get('item') or {}).get('name')) for x in il]
+        if got != [(n, '%s/projects/%s#work' % (BASE, s), '%s/projects/%s' % (BASE, s), projects_c[s]['title']) for n, s in enumerate(order, 1)]:
+            problems.append('%s: the CollectionPage does not list every project page, in project_order' % rel)
+# the feeds: public fields only, every project on /projects/ in its order, nothing hidden
+dd = os.path.join(D, 'data')
+extra_files = sorted(set(os.listdir(dd) if os.path.isdir(dd) else []) - {'studio.json', 'work.json'})
+problems += ['docs/data/%s: a feed that is not built yet, or a hidden one' % x for x in extra_files]
+if 'journal' in hidden and os.path.exists(os.path.join(D, 'journal', 'feed.xml')): problems.append('docs/journal/feed.xml: the Journal is hidden')
+feeds = {}
+for name in ('studio', 'work'):
+    fp = os.path.join(dd, name + '.json')
+    if not os.path.exists(fp): problems.append('docs/data/%s.json is missing' % name); continue
+    raw = open(fp, encoding='utf-8').read()
+    try: feeds[name] = json.loads(raw)
+    except ValueError as x: problems.append('docs/data/%s.json does not parse (%s)' % (name, x)); continue
+    keys = set()
+    walk = lambda v: [keys.add(k) or walk(x) for k, x in v.items()] if isinstance(v, dict) else [walk(x) for x in v] if isinstance(v, list) else None
+    walk(feeds[name])
+    problems += ['docs/data/%s.json: a field that stays in content/ (%s)' % (name, k) for k in sorted(keys & FORBIDDEN)]
+    style('docs/data/%s.json' % name, feeds[name]); no_name('docs/data/%s.json' % name, raw); no_hidden('docs/data/%s.json' % name, raw)
+if 'studio' in feeds:
+    sj = feeds['studio']
+    want = {'id': ent['id'], 'name': ent['name'], 'alternate_name': ent['alternateName'], 'description': ent['description'],
+            'long_description': site_j['home']['og_description'], 'url': ent['url'], 'email': ent['email'], 'same_as': ent['sameAs'], 'knows_about': ent['knowsAbout']}
+    problems += ['docs/data/studio.json: %s differs from content/' % k for k, v in want.items() if sj.get(k) != v]
+if 'work' in feeds:
+    rows = re.findall(r'<li id="([^"]+)"', open(os.path.join(D, 'projects', 'index.html'), encoding='utf-8').read())
+    wp = feeds['work'].get('projects') or []
+    if [x.get('slug') for x in wp] != rows: problems.append('docs/data/work.json: not every project on /projects/, in its order')
+    for x in wp:
+        s = x.get('slug'); w = wjs.get(s, {})
+        if (x.get('title'), x.get('year'), x.get('tags')) != (w.get('title'), w.get('year'), w.get('tags')): problems.append('docs/data/work.json: %s differs from work.json' % s)
+        if s in projects_c:
+            if (x.get('client'), x.get('lede'), x.get('url')) != (projects_c[s]['client'], lede(s), '%s/projects/%s' % (BASE, s)): problems.append('docs/data/work.json: %s differs from its page' % s)
+            if not x.get('image') or not in_docs(x['image'].get('url', '')[len(BASE):]): problems.append('docs/data/work.json: %s has no lead picture in docs/' % s)
+        elif any(x.get(k) is not None for k in ('client', 'lede', 'url', 'image')): problems.append('docs/data/work.json: %s has no page but page fields' % s)
+# /llms.txt: the name, the one line, every project page, the address; nothing hidden
+lp = os.path.join(D, 'llms.txt')
+if not os.path.exists(lp): problems.append('docs/llms.txt is missing')
+else:
+    lt = open(lp, encoding='utf-8').read()
+    if not lt.startswith('# %s\n\n> %s\n' % (ent['name'], ent['description'])): problems.append('docs/llms.txt: not the name, then the one line')
+    problems += ['docs/llms.txt: %s is missing' % s for s in order if '](%s/projects/%s)' % (BASE, s) not in lt]
+    if '](mailto:%s)' % ent['email'] not in lt: problems.append('docs/llms.txt: no contact address')
+    problems += ['docs/llms.txt: a link to nowhere (%s)' % u for u in re.findall(r'\]\((%s[^)]*)\)' % BASE, lt) if not in_docs(u[len(BASE):] or '/')]
+    for line in lt.splitlines(): style('docs/llms.txt', re.sub(r'\]\([^)]*\)', ']', line).lstrip('#>- ').replace('[', '').replace(']', ''))
+    no_name('docs/llms.txt', lt); no_hidden('docs/llms.txt', lt)
+# robots.txt: everyone allowed, and each named crawler in a group of its own with everyone's rules (or none, if switched off)
+rp = os.path.join(D, 'robots.txt'); rt = open(rp, encoding='utf-8').read() if os.path.exists(rp) else ''
+groups, cur, ua = {}, None, False
+for line in rt.splitlines():
+    k, _, v = line.split('#', 1)[0].partition(':'); k, v = k.strip().lower(), v.strip()
+    if k == 'user-agent':
+        if not ua: cur = []
+        groups[v] = cur; ua = True
+    elif k in ('allow', 'disallow') and cur is not None: cur.append('%s: %s' % (k.capitalize(), v)); ua = False
+    elif k: ua = False
+allow = {c['name']: c['allow'] is True for c in ent.get('crawlers', [])}
+if 'Allow: /' not in groups.get('*', []): problems.append('robots.txt: everyone is not allowed')
+if set(allow) != set(CRAWLERS): problems.append('content/entity.json: the crawlers are not the nine named')
+for c in CRAWLERS:
+    if c not in groups: problems.append('robots.txt: no group for %s' % c)
+    elif groups[c] != (groups.get('*') if allow.get(c) else ['Disallow: /']): problems.append('robots.txt: %s does not carry the rules entity.json gives it' % c)
+if 'Sitemap: %s/sitemap.xml' % BASE not in rt: problems.append('robots.txt: no Sitemap line')
+no_name('docs/robots.txt', rt)
+# the sitemap: every address is a page in docs/, with a date
+locs = re.findall(r'<loc>([^<]*)</loc>', sitemap)
+dated = re.findall(r'<url><loc>([^<]*)</loc><lastmod>(\d{4}-\d{2}-\d{2})</lastmod></url>', sitemap)
+if len(dated) != len(locs): problems.append('sitemap.xml: an address without a date (lastmod)')
+problems += ['sitemap.xml: %s is not a page in docs/' % u for u in locs if not (u.startswith(BASE) and in_docs(u[len(BASE):]))]
+no_name('docs/sitemap.xml', sitemap); no_hidden('docs/sitemap.xml', sitemap)
 
 print('\n'.join(sorted(set(problems))) or 'All clear: no broken links and no house-style problems%s.' % (' (a drafts build: placeholders let through)' if drafts else ''))
 sys.exit(1 if problems else 0)

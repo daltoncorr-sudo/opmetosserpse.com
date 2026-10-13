@@ -105,5 +105,6 @@
  "hidden": [
   "foundry",
   "journal"
- ]
+ ],
+ "founder_in_data": false
 }
