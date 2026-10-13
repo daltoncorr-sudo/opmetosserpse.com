@@ -200,16 +200,17 @@ if 'journal' in hidden:
     live = []  # the checks below expect nothing in the sitemap
 for e in journal['posts']:
     built = os.path.exists(os.path.join(D, 'journal', e['slug'] + '.html'))
-    if not e.get('draft') and not built: problems.append('journal.json: %s has no page in docs/journal/' % e['slug'])
+    if not e.get('draft') and not built and 'journal' not in hidden: problems.append('journal.json: %s has no page in docs/journal/' % e['slug'])
     if e.get('draft') and built and not drafts: problems.append('docs/journal/%s.html: a draft was built' % e['slug'])
     if e.get('draft') and loc('/journal/' + e['slug']): problems.append('sitemap.xml: the draft %s is listed' % e['slug'])
 for e in live:
     if not loc('/journal/' + e['slug']): problems.append('sitemap.xml: /journal/%s is missing' % e['slug'])
 if live != [] and not loc('/journal/'): problems.append('sitemap.xml: /journal/ is missing')
 if not live and loc('/journal/'): problems.append('sitemap.xml: /journal/ is listed with nothing published')
-if not os.path.exists(os.path.join(D, 'journal', 'index.html')): problems.append('docs/journal/index.html is missing')
+if 'journal' not in hidden and not os.path.exists(os.path.join(D, 'journal', 'index.html')): problems.append('docs/journal/index.html is missing')
 stub = os.path.join(D, 'blog', 'index.html')
-if not (os.path.exists(stub) and 'url=/journal/' in open(stub, encoding='utf-8').read()): problems.append('docs/blog/index.html does not send to /journal/')
+to = '/' if 'journal' in hidden else '/journal/'  # while the Journal is hidden, the old address goes home
+if not (os.path.exists(stub) and 'url=%s"' % to in open(stub, encoding='utf-8').read()): problems.append('docs/blog/index.html does not send to %s' % to)
 problems += ['docs/blog/: an old page is still there (%s)' % os.path.basename(f) for f in glob.glob(D + '/blog/*.html') if not f.endswith('index.html')]
 problems += ['sitemap.xml: an old /blog/ address' for _ in [0] if '/blog/' in sitemap]
 # Cloudflare Pages: every redirect stays on the site, and the Content-Security-Policy covers every inline script and
@@ -402,6 +403,59 @@ dated = re.findall(r'<url><loc>([^<]*)</loc><lastmod>(\d{4}-\d{2}-\d{2})</lastmo
 if len(dated) != len(locs): problems.append('sitemap.xml: an address without a date (lastmod)')
 problems += ['sitemap.xml: %s is not a page in docs/' % u for u in locs if not (u.startswith(BASE) and in_docs(u[len(BASE):]))]
 no_name('docs/sitemap.xml', sitemap); no_hidden('docs/sitemap.xml', sitemap)
+
+# Hidden sections ship nothing (site.json "hidden", D, Oct. 13): no file of theirs in docs/, none of their markup or
+# words on any page, and no link or redirect into one. Taken off the list, the build brings all of it back.
+def section_of(u):  # as build.py's: the section an on-site address leads into, by its first word
+    u = re.sub(r'^https://opmetosserpse\.com(?=/|$)', '', u) or '/'
+    m = re.match(r'/?#?([a-z]+)', u) if u[0] in '/#' else None
+    return m.group(1) if m else None
+SECTION = {'foundry': 'Foundry', 'journal': 'Journal'}
+FILES = {'foundry': ('foundry.html', 'foundry', 'media/foundry-*'), 'journal': ('journal', 'media/journal-*')}
+MARKUP = {  # what build.py writes for each one: its panel on home, its pages and its name among the panels in the early script
+    'foundry': r'\bid="foundry(?:-title)?"|\bfoundry-panel\b|\bdata-foundry\b|\bdata-fd-|\bclass="(?:[^"]*\s)?fd-|\bdata-go="foundry"'
+               r'|<script>(?:(?!</script>)[\s\S])*\bfoundry\b',
+    'journal': r'\bid="(?:blog|blog-title|articles)"|\b(?:blog-panel|blog-list|blog-topics|blog-article|journal-line|journal-empty|journal-page|'
+               r'journal-main|journal-all|article-body)\b|\bdata-journal\b|\bdata-article\b|\bdata-go="blog"|<script>(?:(?!</script>)[\s\S])*\b(?:blog|journal)\b'}
+norm = lambda s: ' '.join(H.unescape(s).translate({0x2018: "'", 0x2019: "'", 0x201c: '"', 0x201d: '"', 0xa0: ' '}).split())
+def strings(v):
+    return [y for x in v.values() for y in strings(x)] if isinstance(v, dict) else [y for x in v for y in strings(x)] if isinstance(v, list) else [v] if isinstance(v, str) else []
+# Each one's own words, as its panel and pages would show them: the Foundry's products and holding page (its labels are
+# the shared controls' words, and the 3D pieces say "Drag to rotate" too); the Journal's line, titles, the start of each
+# paragraph and its pictures' alt text and captions
+fdj = json.load(open(os.path.join(ROOT, 'content', 'foundry.json'), encoding='utf-8'))
+said = {'foundry': [site_j['foundry']['og_title'], site_j['foundry']['og_description']] + [x for p in fdj['products'] for x in
+                    [p['name'], p['type'], p['line'], p['meta']] + [l for l, _ in p['images']] + [t for t, _ in p['actions']]],
+        'journal': [site_j['journal'][k] for k in ('line', 'description')] + site_j['journal']['lines'] + [x for e in journal['posts'] for x in (e['title'], e.get('full_title', ''))]}
+whole = {'foundry': strings([site_j['foundry'], fdj]), 'journal': strings([site_j['journal'], journal])}  # all of each one's text
+for e in journal['posts']:
+    fp = os.path.join(ROOT, 'content', 'journal', e['slug'] + '.txt')
+    for b in re.split(r'\n\s*\n', open(fp, encoding='utf-8').read() if os.path.exists(fp) else ''):
+        b = ' '.join(b.split()); m = re.fullmatch(r'(?:image|note):\s*(.+)', b); whole['journal'].append(b)
+        said['journal'] += [x.strip() for k, x in enumerate(m.group(1).split('|')) if k in (1, 3)] if m else [' '.join(b.split()[:6])] if len(b.split()) >= 6 else []
+# Only the words that are theirs alone: two words or more, or a figure ($45), and in no shown section's content
+seen_src = '\n'.join(norm(x) for x in strings([{k: v for k, v in site_j.items() if k not in ('foundry', 'journal')}, projects_c, notes_c, wjs, ent,
+                                                json.load(open(os.path.join(ROOT, 'content', 'press.json'), encoding='utf-8'))]
+                                               + [v for k, v in whole.items() if k not in hidden]))
+said = {k: sorted({norm(x) for x in v if (len(x.split()) > 1 or re.search(r'\d', x)) and norm(x) not in seen_src}) for k, v in said.items()}
+for sec in hidden:
+    for pat in FILES.get(sec, ()):
+        problems += ['docs/%s: the %s is hidden but this ships' % (os.path.relpath(f, D), SECTION[sec]) for f in glob.glob(os.path.join(D, pat))]
+for f in sorted(glob.glob(D + '/**/*.html', recursive=True)):
+    rel = os.path.relpath(f, D); t = open(f, encoding='utf-8').read()
+    shown = norm(re.sub(r'<[^>]+>', ' ', re.sub(r'<sup class="ord">([^<]*)</sup>', r'\1', re.sub(r'<(script|style|svg)[\s\S]*?</\1>', ' ', t))) + ' ' +
+                 ' '.join(re.findall(r'\s(?:content|alt|aria-label|title|data-title)="([^"]*)"', t)))
+    targets = re.findall(r'\s(?:href|src|poster|action|content)="([^"]*)"', t) + re.findall(r'url=([^"\s;>]+)', t) + re.findall(r'location\.replace\("([^"]*)"\)', t)
+    for sec in hidden:
+        if sec not in SECTION: continue
+        problems += ['%s: the %s is hidden but the page carries its markup (%s)' % (rel, SECTION[sec], m.group(0)[:40]) for m in re.finditer(MARKUP[sec], t)]
+        problems += ['%s: the %s is hidden but the page carries its words (%s)' % (rel, SECTION[sec], s) for s in said[sec] if re.search(r'(?<!\w)%s(?!\w)' % re.escape(s), shown)]
+        problems += ['%s: a link into the hidden %s (%s)' % (rel, SECTION[sec], u) for u in targets if u and section_of(u) == sec]
+if os.path.exists(rd):
+    for line in open(rd, encoding='utf-8').read().splitlines():
+        parts = line.split()
+        if parts and not line.startswith('#') and len(parts) == 3 and section_of(parts[1]) in hidden:
+            problems.append('docs/_redirects: a redirect into the hidden %s (%s)' % (SECTION.get(section_of(parts[1]), section_of(parts[1])), line))
 
 print('\n'.join(sorted(set(problems))) or 'All clear: no broken links and no house-style problems%s.' % (' (a drafts build: placeholders let through)' if drafts else ''))
 sys.exit(1 if problems else 0)

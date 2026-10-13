@@ -391,6 +391,7 @@
   if (!stage) return;
   root.classList.add('js');
   var home = $('[data-home]'), panels = { foundry: $('#foundry'), about: $('#about'), blog: $('#blog') };
+  Object.keys(panels).forEach(function (k) { if (!panels[k]) delete panels[k]; });  // a hidden section's panel isn't built
   var url = function (hash) { return location.pathname + location.search + (hash || ''); };
   var current = '', pushed = false;  // pushed: this visit added the panel's entry, so closing can step back over it
   var leaving = false, homeTitle = document.title;  // leaving: Home or Esc is stepping back through history to the cover
@@ -589,11 +590,11 @@
   function sync(first) {
     var h = location.hash.slice(1).split(/[\/?]/)[0];  // #foundry/<id> is the foundry with a product open, #foundry?digital filtered
     if (location.pathname.indexOf('/journal') === 0) h = 'blog';
-    else if (h === 'blog') history.replaceState(history.state, '', '/journal/');  // the old address
+    else if (h === 'blog' && panels.blog) history.replaceState(history.state, '', '/journal/');  // the old address
     setPanel(panels[h] ? h : '', !first);
     if (h === 'archive') setOpen(true, false);
   }
-  panels.foundry.inert = panels.about.inert = panels.blog.inert = true;
+  Object.keys(panels).forEach(function (k) { panels[k].inert = true; });
   sync(true);
   // Arriving at #work or #archive (All work, from a project page loaded by itself): the list, centered (again once its
   // type and pictures have settled), with the focus on it

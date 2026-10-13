@@ -115,6 +115,7 @@ main{padding:0 var(--gutter);flex:1}
 .home-main{padding:0}
 .stage-clip{overflow-x:hidden;overflow-x:clip}
 .stage{display:flex;align-items:flex-start;width:300%;transform:translateX(-33.3333%);transition:transform var(--slide) var(--slide-ease)}
+.stage>.home-panel:first-child{margin-left:33.3333%}  /* the foundry hidden, its panel isn't built: home keeps its place */
 .stage.is-foundry,.at-foundry .stage{transform:none}
 .stage.is-about,.at-about .stage{transform:translateX(-66.6667%)}
 .stage.is-blog,.at-blog .stage{transform:translate(-33.3333%,100vh)}

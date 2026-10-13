@@ -289,8 +289,8 @@ def write(path, text):
 
 # The machine-readable site (06_Visibility, W1), all from content/ and invisible on the page: JSON-LD on every page, the
 # feeds in /data/, /llms.txt, a robots.txt group for each named crawler and a date on each sitemap address. The studio's
-# shared facts live in content/entity.json. Hidden sections (site.json "hidden") get only the studio and the site, and
-# stay out of every list, feed and file.
+# shared facts live in content/entity.json. Hidden sections (site.json "hidden") aren't built, so they're in no page,
+# list, feed or file.
 FOUNDER = 'Dalton Corr'  # in the data only when site.json "founder_in_data" is true (D's answer 2: off by default)
 FEEDS = (('/data/studio.json', 'Studio'), ('/data/work.json', 'Work'))  # each page links them (<link rel="alternate">)
 MIME = {'.svg': 'image/svg+xml', '.png': 'image/png', '.webp': 'image/webp', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.gif': 'image/gif'}
@@ -424,11 +424,19 @@ STRIPE_SCRIPT = 'https://js.stripe.com https://*.js.stripe.com'
 STRIPE_FRAME = 'https://js.stripe.com https://*.js.stripe.com https://hooks.stripe.com'
 STRIPE_CONNECT = 'https://api.stripe.com'
 
-def redirects_file():
+def section_of(u):
+    """The section an on-site address leads into, by its first word: /journal/ and /journal/<slug> the Journal
+    ("journal"); /foundry, /#foundry and #foundry/<id> the Foundry ("foundry"); #about About. None for / or an outside one."""
+    m = re.match(r'/?#?([a-z]+)', u) if u and u[0] in '/#' else None
+    return m.group(1) if m else None
+
+def redirects_file(hidden=()):
     """docs/_redirects from content/redirects.json, a list of [from, to, status]. An empty `to` is a placeholder:
-    written as a comment until it has a target."""
+    written as a comment until it has a target. A target in a hidden section (site.json "hidden") is home instead,
+    until the section is shown again."""
     out = ['# Built by build.py from content/redirects.json. Every target stays on this site.']
     for src, dest, status in load(os.path.join(CONTENT, 'redirects.json')):
+        if dest and section_of(dest) in hidden: dest = '/'
         out.append('%s %s %d' % (src, dest, status) if dest else '# %s: a placeholder, no target yet' % src)
     return '\n'.join(out) + '\n'
 
@@ -1185,10 +1193,11 @@ def main():
     print('Hand moves: %s%s' % (', '.join(x['name'] for x in mv['moves']),
           ''.join('; %s off (%s)' % s for s in mv['skipped'])))
     links = h['links']
-    # Sections hidden until they're built (site.json "hidden", D, Oct. 9): out of the menu, not linked from the text, and
-    # (the Journal) out of the sitemap and noindex. Their panels and pages still build, reachable only by address.
+    # Sections hidden until they're built (site.json "hidden", D, Oct. 9): nothing of them ships (D, Oct. 13). Out of the
+    # menu, not linked from the text, no panel on home, no pages, no pictures; /blog/ and the redirects into them go
+    # home. Take one off the list and rebuild, and all of it comes back.
     hidden = set(site.get('hidden', []))
-    section = lambda u: 'journal' if u.startswith('/journal') else u.lstrip('#') if u.startswith('#') else None
+    section = section_of
     pat = re.compile('|'.join(re.escape(k) for k in sorted(links, key=len, reverse=True)))
     def link(s, used=None):
         used = set()
@@ -1205,7 +1214,7 @@ def main():
     # Side panels: the foundry one screen to the left of home (a field of objects, from content/foundry.json),
     # About one screen to the right.
     fd = site['foundry']
-    foundry = foundry_panel(load(os.path.join(CONTENT, 'foundry.json')), fd['title'], a.drafts)
+    foundry = foundry_panel(load(os.path.join(CONTENT, 'foundry.json')), fd['title'], a.drafts) if 'foundry' not in hidden else ''
     ap = site['about']
     press = load(os.path.join(CONTENT, 'press.json'))['press']
     about_panel = ('<section class="panel side about-panel" id="about" aria-labelledby="about-title">'
@@ -1216,28 +1225,36 @@ def main():
         ' '.join('<span>%s</span>' % esc(x) for x in ap['title'].split()), ctl(site['back']), ''.join('<p>%s</p>' % link(typo(x)) for x in ap['lines']) + ''.join('<p class="contact">%s</p>' % link(typo(x)) for x in ap['contact']), esc(ap['press_title']), press_list(press))
     # The Journal: a panel one screen above home, and its own pages at /journal/ and /journal/<slug>, all with the same
     # masthead, slot and list. Until a post is published it's out of the menu and the sitemap, and /journal/ is noindex.
+    # Hidden, none of it is built: no panel, no pages, no pictures.
     jw = site['journal']
-    posts, blog_tags = load_blog(media, a.drafts)
+    shown = 'journal' not in hidden
+    posts, blog_tags = load_blog(media, a.drafts) if shown else ([], [])
     jtitle = '%s | %s' % (jw['title'], site['name'])
-    empty_lines = '<div class="journal-empty">%s</div>' % ''.join('<p>%s</p>' % typo(x) for x in jw['lines'])
-    listing = lambda cur=None: blog_section(posts, blog_tags, jw, cur) if posts else empty_lines
-    blog = ('<section class="blog-panel journal" id="blog" aria-labelledby="blog-title" data-title="%s"><h2 class="vh" id="blog-title">%s</h2>%s'
-            '<div class="blog-article" data-article></div>%s</section>') % (esc(jtitle), esc(jw['title']), journal_mast(jw, True), listing())
-    noindex = '' if posts and 'journal' not in hidden else '<meta name="robots" content="noindex">\n'
-    jpage = lambda inner, cur=None: '<div class="journal-page journal%s" data-journal data-title="%s">%s<div class="blog-article" data-article>%s</div>%s</div>' % (
-        ' is-reading' if inner else '', esc(jtitle), journal_mast(jw), inner, listing(cur))  # is-reading: the small masthead
-    write('/journal/index.html', page(site, jtitle, jw['description'], '/journal/', jpage(''), so, header=False, extra_head=noindex, main_cls='journal-main'))
-    # One page per post, so a reload or a shared link lands on the article (at its top) and still ends at the list
-    for e in posts:
-        write('/journal/%s.html' % e['slug'], page(site, '%s | %s' % (e['full_title'], site['name']),
-                                                   blurb(e['paras'][0]) if e['paras'] else jw['description'], '/journal/%s' % e['slug'],
-                                                   jpage(article(e, jw), e['slug']), e['_og'] or so, header=False, og_type='article',
-                                                   main_cls='journal-main', extra_head=noindex if 'journal' in hidden else ''))
-    # The old address: /blog/ goes to the Journal (its old articles are gone)
+    blog = ''
+    if shown:
+        empty_lines = '<div class="journal-empty">%s</div>' % ''.join('<p>%s</p>' % typo(x) for x in jw['lines'])
+        listing = lambda cur=None: blog_section(posts, blog_tags, jw, cur) if posts else empty_lines
+        blog = ('<section class="blog-panel journal" id="blog" aria-labelledby="blog-title" data-title="%s"><h2 class="vh" id="blog-title">%s</h2>%s'
+                '<div class="blog-article" data-article></div>%s</section>') % (esc(jtitle), esc(jw['title']), journal_mast(jw, True), listing())
+        noindex = '' if posts and 'journal' not in hidden else '<meta name="robots" content="noindex">\n'
+        jpage = lambda inner, cur=None: '<div class="journal-page journal%s" data-journal data-title="%s">%s<div class="blog-article" data-article>%s</div>%s</div>' % (
+            ' is-reading' if inner else '', esc(jtitle), journal_mast(jw), inner, listing(cur))  # is-reading: the small masthead
+        write('/journal/index.html', page(site, jtitle, jw['description'], '/journal/', jpage(''), so, header=False, extra_head=noindex, main_cls='journal-main'))
+        # One page per post, so a reload or a shared link lands on the article (at its top) and still ends at the list
+        for e in posts:
+            write('/journal/%s.html' % e['slug'], page(site, '%s | %s' % (e['full_title'], site['name']),
+                                                       blurb(e['paras'][0]) if e['paras'] else jw['description'], '/journal/%s' % e['slug'],
+                                                       jpage(article(e, jw), e['slug']), e['_og'] or so, header=False, og_type='article',
+                                                       main_cls='journal-main', extra_head=noindex if 'journal' in hidden else ''))
+    else:  # docs/media keeps encoded files between builds: take out the Journal's pictures (media/journal-<slug>/)
+        for n in os.listdir(os.path.join(DIST, 'media')):
+            if n.startswith('journal-'): shutil.rmtree(os.path.join(DIST, 'media', n))
+    # The old address: /blog/ goes to the Journal (its old articles are gone), or home while the Journal is hidden
+    to, to_title, to_name = ('/journal/', jtitle, jw['title']) if shown else ('/', site['name'], site['name'])
     write('/blog/index.html', '<!doctype html>\n<html lang="en"><head><meta charset="utf-8"><title>%s</title>'
-          '<link rel="canonical" href="https://%s/journal/"><meta http-equiv="refresh" content="0; url=/journal/">'
-          '<meta name="robots" content="noindex"><script>location.replace("/journal/")</script></head>'
-          '<body><p><a href="/journal/">%s</a></p></body></html>\n' % (esc(jtitle), site['domain'], esc(jw['title'])))
+          '<link rel="canonical" href="https://%s%s"><meta http-equiv="refresh" content="0; url=%s">'
+          '<meta name="robots" content="noindex"><script>location.replace("%s")</script></head>'
+          '<body><p><a href="%s">%s</a></p></body></html>\n' % (esc(to_title), site['domain'], to, to, to, to, esc(to_name)))
     # The hand and the name: the name is live text in Opmet Serif (static/fonts/opmet-serif/opmet-serif-title.woff2)
     cover = ('<section class="cover"><div class="cover-inner"><h1><span class="mark" %s>%s</span><span class="name ink">%s</span></h1>'
              '<nav class="cover-nav" aria-label="Site">%s</nav></div></section>') % (
@@ -1245,17 +1262,20 @@ def main():
     body = ('<div class="stage-clip"><div class="stage" data-stage>%s<div class="panel home-panel">%s<div data-home>%s%s</div></div>%s</div></div>'
             '<section class="project-panel" id="project" aria-label="Project"><div class="project-inner"></div></section>') % (
         foundry, blog, cover, work_section(items, h['work']), about_panel)
-    early = '<script>if(/^#(foundry|about|blog)([\\/?]|$)/.test(location.hash))document.documentElement.classList.add("at-"+location.hash.slice(1).split(/[\\/?]/)[0])</script>\n'
+    # Arriving at a panel's address opens it at once: only the panels home carries (a hidden section's isn't built)
+    names = '|'.join(n for n, sec in (('foundry', 'foundry'), ('about', 'about'), ('blog', 'journal')) if sec not in hidden)
+    early = '<script>if(/^#(%s)([\\/?]|$)/.test(location.hash))document.documentElement.classList.add("at-"+location.hash.slice(1).split(/[\\/?]/)[0])</script>\n' % names
     if a.drafts: early += '<meta name="drafts" content="on">\n'  # check.py lets bracketed placeholders pass in a drafts build
     write('/index.html', page(site, 'Opmet Osserpse', h['og_description'], '/', body, so, '/', main_cls='home-main',
                               extra_head=early + '<link rel="stylesheet" href="/css/moves.css?v=%s">\n' % site['_v']))
 
-    # foundry (a holding page until the shop opens), privacy, 404
+    # foundry (a holding page until the shop opens; not built while the Foundry is hidden), privacy, 404
     # /foundry is now a panel on the home page: send the old address there, inside this site
-    body = '<section class="single"><p><a href="/#foundry">%s</a></p></section>' % esc(fd['title'])
-    write('/foundry.html', page(site, fd['og_title'], fd['og_description'], '/foundry', body, so,
-                                extra_head='<meta http-equiv="refresh" content="0; url=/#foundry">\n<meta name="robots" content="noindex">\n'
-                                           '<script>location.replace("/#foundry")</script>\n'))
+    if 'foundry' not in hidden:
+        body = '<section class="single"><p><a href="/#foundry">%s</a></p></section>' % esc(fd['title'])
+        write('/foundry.html', page(site, fd['og_title'], fd['og_description'], '/foundry', body, so,
+                                    extra_head='<meta http-equiv="refresh" content="0; url=/#foundry">\n<meta name="robots" content="noindex">\n'
+                                               '<script>location.replace("/#foundry")</script>\n'))
     pv = site['privacy']
     body = '<article class="page">%s</article>' % ''.join('<p>%s</p>' % typo(x) for x in pv['lines'])
     write('/privacy.html', page(site, pv['og_title'], pv['og_description'], '/privacy', body, so))
@@ -1267,7 +1287,7 @@ def main():
     # Cloudflare Pages' (GitHub Pages ignores them)
     write('/CNAME', site['domain'] + '\n')
     write('/.nojekyll', '')
-    write('/_redirects', redirects_file())
+    write('/_redirects', redirects_file(hidden))
     write('/_headers', headers_file())
     write('/robots.txt', robots_file(site))
     published = [e for e in posts if not e.get('draft')] if 'journal' not in hidden else []
@@ -1289,7 +1309,8 @@ def main():
     write('/llms.txt', llms_file(site, ordered, wj))
 
     size = sum(os.path.getsize(os.path.join(dp, f)) for dp, _, fs in os.walk(DIST) for f in fs)
-    print('Built %d project pages, %d list rows, %d articles, into %s (%.0f MB).' % (len(ordered), len(entries), len(posts), DIST, size / 1e6))
+    print('Built %d project pages, %d list rows, %d articles, into %s (%.0f MB).%s' % (len(ordered), len(entries), len(posts), DIST, size / 1e6,
+          ' Hidden, not built: %s.' % ', '.join(sorted(hidden)) if hidden else ''))
     if media.log: print('\n'.join(media.log))
 
 if __name__ == '__main__':
