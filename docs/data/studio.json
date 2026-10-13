@@ -1,0 +1,28 @@
+{
+ "id": "https://opmetosserpse.com/#studio",
+ "name": "Opmet Osserpse",
+ "alternate_name": "Opmetosserpse",
+ "description": "Creative studio founded in Venice, California",
+ "long_description": "A creative studio in Venice, California: identities, key art and campaigns for festivals, films and businesses.",
+ "url": "https://opmetosserpse.com/",
+ "email": "hello@opmetosserpse.com",
+ "founding_location": {
+  "locality": "Venice",
+  "region": "California",
+  "country": "United States"
+ },
+ "knows_about": [
+  "Identity",
+  "Type design",
+  "Art direction",
+  "Key art",
+  "Campaigns",
+  "Motion",
+  "Sound"
+ ],
+ "logo": "https://opmetosserpse.com/brand/hand-mark.svg",
+ "same_as": [
+  "https://www.instagram.com/opmetosserpse/"
+ ],
+ "work_url": "https://opmetosserpse.com/data/work.json"
+}
