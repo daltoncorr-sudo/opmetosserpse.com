@@ -233,7 +233,7 @@ def page(site, title, desc, path, body, og_image=None, current=None, extra_head=
     # The machine-readable layer, last in the head and invisible: the data feeds, then one JSON-LD block
     data = ''.join('<link rel="alternate" type="application/json" href="%s" title="%s">\n' % f for f in FEEDS) + ld_script(ld_graph(site) + list(ld))
     og = og_image or '/media/site/og.jpg'
-    # No menu bar. Inner pages carry only the hand and the name (live text, in Opmet Serif), centered, back to the cover.
+    # No menu bar. Inner pages carry only the hand and the name (live text, in Opmet Serif Black Italic), centered, back to the cover.
     header = '' if path == '/' or not header else ('<header class="site-header"><a class="lockup" href="/">%s<span class="wordmark ink">%s</span></a></header>'
                                      % (brand_svg('hand-mark.svg', 'lockup-hand'), esc(site['name'])))
     # Which way the page flips: forward onto a project, back onto home
@@ -259,11 +259,9 @@ def page(site, title, desc, path, body, og_image=None, current=None, extra_head=
 <meta name="twitter:image" content="https://%(domain)s%(og)s">
 <meta name="theme-color" content="#F7F6F2">
 <link rel="icon" href="/brand/hand-mark.svg" type="image/svg+xml">
-<link rel="preload" href="/fonts/libre-caslon-text/libre-caslon-text-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="preload" href="/fonts/libre-caslon-text/libre-caslon-text-latin-700-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/fonts/instrument-sans/instrument-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="preload" href="/fonts/source-serif-4/source-serif-4-italic-latin.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="preload" href="/fonts/opmet-serif/opmet-serif-title.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/opmet-serif/opmet-serif.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/opmet-serif/opmet-serif-italic.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/css/site.css?v=%(v)s">
 %(extra)s%(data)s</head>
 <body>
@@ -1255,7 +1253,7 @@ def main():
           '<link rel="canonical" href="https://%s%s"><meta http-equiv="refresh" content="0; url=%s">'
           '<meta name="robots" content="noindex"><script>location.replace("%s")</script></head>'
           '<body><p><a href="%s">%s</a></p></body></html>\n' % (esc(to_title), site['domain'], to, to, to, to, esc(to_name)))
-    # The hand and the name: the name is live text in Opmet Serif (static/fonts/opmet-serif/opmet-serif-title.woff2)
+    # The hand and the name: the name is live text in Opmet Serif Black, upright (static/fonts/opmet-serif/opmet-serif.woff2)
     cover = ('<section class="cover"><div class="cover-inner"><h1><span class="mark" %s>%s</span><span class="name ink">%s</span></h1>'
              '<nav class="cover-nav" aria-label="Site">%s</nav></div></section>') % (
         moves.mark_attrs(mv), hand + mv['layers'], esc(site['name']), nav)
