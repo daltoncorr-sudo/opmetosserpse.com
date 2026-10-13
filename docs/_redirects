@@ -1,5 +1,5 @@
 # Built by build.py from content/redirects.json. Every target stays on this site.
-/foundry /#foundry 302
+/foundry / 302
 # /serif: a placeholder, no target yet
 # /season-one: a placeholder, no target yet
 # /shop: a placeholder, no target yet
