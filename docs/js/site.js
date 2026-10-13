@@ -1039,3 +1039,18 @@
     }
   });
 })();
+
+// Back to top, at the end of a project page: up to its top, in the panel on home or on the page by itself, and the focus
+// to the masthead. Instant with reduced motion; without the script, the link goes to #main.
+(function () {
+  document.addEventListener('click', function (e) {
+    var a = e.target.closest('[data-top]');
+    if (!a || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button) return;
+    e.preventDefault();
+    var box = a.closest('.project-panel') || document.scrollingElement;
+    var still = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+    box.scrollTo({ top: 0, behavior: still || document.hidden ? 'auto' : 'smooth' });  // a hidden tab gets no smooth scroll
+    var pp = a.closest('.pp'), m = pp && pp.querySelector('.mast-name');
+    if (m) m.focus({ preventScroll: true });
+  });
+})();

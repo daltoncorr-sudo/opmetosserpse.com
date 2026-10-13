@@ -523,7 +523,7 @@ def block_html(b, slug):
     return '<figure class="b g b-%s%s%s"%s>%s%s</figure>' % (kind, ' b-cont' if b.get('cont') else '', ' b-wide' if b.get('wide') else '',
                                                            ' data-read' if cap_ else '', media, fc)
 
-def project_body(p, blocks, chapters, notes, all_work='All work'):
+def project_body(p, blocks, chapters, notes, all_work='All work', top='Back to top', home='Home'):
     """The masthead (the Journal's, without "Journal": Opmet and Osserpse with the hand mark, to the studio home) and
     All work under it; the title; under it the paragraph, and one list of facts and credits. Then the work, centered,
     with chapter labels in the left margin and notes in the right one. At the end, All work again. No next project."""
@@ -539,7 +539,7 @@ def project_body(p, blocks, chapters, notes, all_work='All work'):
     # data-lightbox: every picture on the page opens in the site lightbox, the page's pictures one group (its pieces stay out)
     # air: a page with more room between its sections and its rows (the notes file's "air": Sunny's, after its Bible)
     out = ['<div class="pp%s" data-lightbox%s>' % (' pp-air' if notes.get('air') else '', ' data-page-only' if p.get('_scripts') else ''),
-           masthead(list(NAME), studio_hand(), ' data-cover', link=('/#archive', all_work), lockup=True),
+           masthead(list(NAME), studio_hand(), ' data-cover', link=('/#archive', all_work), lockup=True, home=home),
            '<section class="open g">%s<h1>%s</h1><p class="lede">%s</p><div class="info">%s%s</div></section>' % (
                '<p class="kicker">%s</p>' % typo(notes['kicker']) if notes.get('kicker') else '', typo(p['title']), typo(notes.get('lede') or p['lede']), dl(facts, 'facts'), dl(credits, 'cr'))]
     starts = {c['starts_at']: c for c in chapters}
@@ -559,7 +559,9 @@ def project_body(p, blocks, chapters, notes, all_work='All work'):
                        % (' ch-above' if b['kind'] == 'full' or b.get('wide') else '', esc(c['label']), n, typo(c['label'])))
         out.append(block_html(b, p['slug']))
     if open_ch: out.append('</section>')
-    out.append('<nav class="g pfoot" aria-label="%s"><a class="ctl" href="/#archive" data-all-work>%s</a></nav>' % (esc(all_work), ctl(all_work)))
+    # At the end: All work, Home and Back to top (D, Oct. 9)
+    out.append('<nav class="g pfoot" aria-label="%s"><a class="ctl" href="/#archive" data-all-work>%s</a> <a class="ctl" href="/" data-cover>%s</a> <a class="ctl" href="#main" data-top>%s</a></nav>'
+               % (esc(all_work), ctl(all_work), ctl(home), ctl(top)))
     out.append('</div>')
     return '\n'.join(out)
 
@@ -780,7 +782,7 @@ def studio_hand():
 
 NAME = ('Opmet', 'Osserpse')
 
-def masthead(words, hand, hook='', line=None, link=None, last_attr='', lockup=False):
+def masthead(words, hand, hook='', line=None, link=None, last_attr='', lockup=False, home=None):
     """One nameplate, for the Journal (design v2) and every project page: the words in the big type (all of them plain
     bold, the name too: D, Oct. 10), one a line, the hand just right of the last word, all one link to the studio home.
     On the Journal the lines are left-justified on each other and the block is centered. Under it,
@@ -794,7 +796,9 @@ def masthead(words, hand, hook='', line=None, link=None, last_attr='', lockup=Fa
     if lockup:  # the hand, then the words, one a line
         first, last = hand, '<span class="mast-words">%s</span>' % ''.join('<span>%s</span>' % word(x) for x in words)
     under = '<p class="journal-line">%s</p>' % typo(line) if line else ''
-    if link: under += '<p class="mast-link"><a class="ctl" href="%s" data-all-work>%s</a></p>' % (link[0], ctl(link[1]))
+    # home: Home beside All work (a project page, D, Oct. 9), back to the cover like the nameplate (data-cover)
+    if link: under += '<p class="mast-link"><a class="ctl" href="%s" data-all-work>%s</a>%s</p>' % (
+        link[0], ctl(link[1]), ' <a class="ctl" href="/" data-cover>%s</a>' % ctl(home) if home else '')
     return '<header class="mast"><a class="mast-name%s" href="/"%s>%s %s</a>%s</header>' % (' mast-lockup' if lockup else '', hook, first, last, under)
 
 def journal_mast(w, panel=False):
@@ -1003,7 +1007,7 @@ def main():
                 for n, rel in enumerate(bigs, 1):
                     full = os.path.join(DIST, rel.lstrip('/'))
                     z.write(full, '%s-%02d%s' % (s, n, os.path.splitext(full)[1]))
-        body = project_body(p, p['_blocks'], p['_chapters'], p['_notes'], site['project_all'])
+        body = project_body(p, p['_blocks'], p['_chapters'], p['_notes'], site['project_all'], site['project_top'], site['back'])
         head = ''
         if p['_scripts']:  # a page with a 3D or interactive piece: its styles and scripts, in order
             head = '<link rel="stylesheet" href="/css/work.css?v=%s">\n' % site['_v'] + ''.join(
