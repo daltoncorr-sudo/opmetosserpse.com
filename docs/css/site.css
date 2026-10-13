@@ -1,21 +1,13 @@
 /* Opmet Osserpse: the look of a sheet of paper (Lareu Gonzalez), the calm of LoveFrom,
    the organization and motion of Porto Rocha. Every value lives in :root. */
-@font-face{font-family:"Libre Caslon Text";font-style:normal;font-weight:400;font-display:swap;src:url(../fonts/libre-caslon-text/libre-caslon-text-latin-400-normal.woff2) format("woff2");unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
-@font-face{font-family:"Libre Caslon Text";font-style:normal;font-weight:400;font-display:swap;src:url(../fonts/libre-caslon-text/libre-caslon-text-latin-ext-400-normal.woff2) format("woff2");unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+1E00-1E9F,U+A720-A7FF}
-@font-face{font-family:"Libre Caslon Text";font-style:normal;font-weight:700;font-display:swap;src:url(../fonts/libre-caslon-text/libre-caslon-text-latin-700-normal.woff2) format("woff2");unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
-@font-face{font-family:"Libre Caslon Text";font-style:normal;font-weight:700;font-display:swap;src:url(../fonts/libre-caslon-text/libre-caslon-text-latin-ext-700-normal.woff2) format("woff2");unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+1E00-1E9F,U+A720-A7FF}
-@font-face{font-family:"Libre Caslon Text";font-style:italic;font-weight:400;font-display:swap;src:url(../fonts/libre-caslon-text/libre-caslon-text-latin-400-italic.woff2) format("woff2")}
+/* Opmet Serif 1.000, the studio's own face: two variable fonts, weight 100 to 900 and optical size 8 to 72 (Text
+   below 24, Display above). Every serif on the site, from the text to the titles (Black, 900) and the controls' italic */
+@font-face{font-family:"Opmet Serif";font-style:normal;font-weight:100 900;font-display:swap;src:url(../fonts/opmet-serif/opmet-serif.woff2) format("woff2")}
+@font-face{font-family:"Opmet Serif";font-style:italic;font-weight:100 900;font-display:swap;src:url(../fonts/opmet-serif/opmet-serif-italic.woff2) format("woff2")}
 @font-face{font-family:"Instrument Sans";font-style:normal;font-weight:400;font-display:swap;src:url(../fonts/instrument-sans/instrument-sans-latin-400-normal.woff2) format("woff2")}
 @font-face{font-family:"Instrument Sans";font-style:normal;font-weight:400;font-display:swap;src:url(../fonts/instrument-sans/instrument-sans-latin-ext-400-normal.woff2) format("woff2");unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+1E00-1E9F,U+A720-A7FF}
 @font-face{font-family:"Instrument Sans";font-style:italic;font-weight:400;font-display:swap;src:url(../fonts/instrument-sans/instrument-sans-latin-400-italic.woff2) format("woff2")}
 @font-face{font-family:"Instrument Sans";font-style:italic;font-weight:400;font-display:swap;src:url(../fonts/instrument-sans/instrument-sans-latin-ext-400-italic.woff2) format("woff2");unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+1E00-1E9F,U+A720-A7FF}
-/* Opmet Serif (it isn't released), from its newest build (v48), each file cut to the letters it sets, weight axis kept:
-   the name ("Opmet Osserpse", the italic: the cover, the masthead, the inner pages' header) and the foundry's O and a
-   (the upright). Source Serif 4 italic: the controls' face, for its weight axis (the hover sweep), standing in until
-   Opmet Serif has capitals */
-@font-face{font-family:"Opmet Serif Title";font-style:italic;font-weight:100 900;font-display:block;src:url(../fonts/opmet-serif/opmet-serif-title.woff2) format("woff2")}
-@font-face{font-family:"Opmet Serif Oa";font-style:normal;font-weight:100 900;font-display:block;src:url(../fonts/opmet-serif/opmet-serif-oa.woff2) format("woff2")}
-@font-face{font-family:"Source Serif 4";font-style:italic;font-weight:200 900;font-display:swap;src:url(../fonts/source-serif-4/source-serif-4-italic-latin.woff2) format("woff2")}
 @font-face{font-family:"Instrument Sans";font-style:normal;font-weight:500;font-display:swap;src:url(../fonts/instrument-sans/instrument-sans-latin-500-normal.woff2) format("woff2")}
 
 :root{
@@ -23,8 +15,8 @@
   --paper:#F7F6F2; --paper-deep:#EEEDE8; --ink:#161512; --graphite:#635E57; --tag-gray:#5E5A53;
   /* The grain: a 256px tile of neutral SVG noise (stitched, no seams), fixed and multiplied. 0 turns it off. */
   --grain:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='256' height='256'%3E%3Cfilter id='g' x='0' y='0' width='100%25' height='100%25' color-interpolation-filters='sRGB'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' seed='4' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .2  0 0 0 0 .2  0 0 0 0 .2  1 0 0 0 -.52'/%3E%3C/filter%3E%3Crect width='256' height='256' filter='url(%23g)'/%3E%3C/svg%3E"); --grain-size:256px; --grain-opacity:.22;
-  /* Two faces. When Opmet Serif ships, put it first in --serif. */
-  --serif:"Libre Caslon Text",Georgia,"Times New Roman",serif;
+  /* Two faces: Opmet Serif and Instrument Sans (D, Oct. 13, 2026) */
+  --serif:"Opmet Serif",Georgia,"Times New Roman",serif;
   --sans:"Instrument Sans","Helvetica Neue",Arial,sans-serif;
   /* Two sizes. */
   --size-s:14px; --size-m:17px;
@@ -40,19 +32,19 @@
   --margin:clamp(20px,3.4vw,56px);
   /* The masthead (the Journal and the project pages): its type size and the room above it */
   --mh:clamp(48px,6.5vw,96px); --mast-top:clamp(40px,9vh,104px);
-  /* The bold face: Libre Caslon Text Bold, a real bold (D, Oct. 10), until the custom font arrives */
-  --bold-font:var(--serif); --bold-weight:700;
-  /* The name, Opmet Osserpse, in Opmet Serif's italic, Medium, on the cover and in the inner pages' header (the
-     wordmark's style and weight). The masthead sets it in the plain bold (D, Oct. 10) */
-  --title-font:"Opmet Serif Title",var(--serif); --title-weight:500;
+  /* The titles: Opmet Serif Black, the heaviest it has (D, Oct. 13, 2026) */
+  --bold-font:var(--serif); --bold-weight:900;
+  /* The name, Opmet Osserpse, in Opmet Serif Black: upright on the cover (D, Oct. 13), italic in the inner pages'
+     header. The masthead sets it in the upright Black, like the other titles (D, Oct. 10) */
+  --title-font:var(--serif); --title-weight:900;
   /* Controls: one face and size for every list link, toggle and filter; pure black only for the chosen filter */
-  --ctl-font:"Source Serif 4",var(--serif); --ctl-size:clamp(17px,1.35vw,20px); --black:#000;
+  --ctl-font:var(--serif); --ctl-size:clamp(17px,1.35vw,20px); --black:#000;
 }
 *,*::before,*::after{box-sizing:border-box}
 [hidden]{display:none!important}
 html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
 html{background:var(--paper)}
-body{margin:0;min-height:100vh;display:flex;flex-direction:column;background:var(--paper);color:var(--ink);font:400 var(--size-s)/1.55 var(--sans);-webkit-font-smoothing:antialiased}
+body{margin:0;min-height:100vh;display:flex;flex-direction:column;background:var(--paper);color:var(--ink);font:400 var(--size-s)/1.55 var(--sans);font-optical-sizing:auto;-webkit-font-smoothing:antialiased}
 img,video{display:block;max-width:100%;height:auto}
 a{color:inherit;text-decoration:none;transition:color var(--t) var(--ease)}
 a:hover{color:var(--graphite)}
@@ -108,7 +100,7 @@ ul{list-style:none;margin:0;padding:0}
 .site-header{position:relative;display:flex;justify-content:center;padding:28px var(--gutter) 0}
 .lockup{display:flex;align-items:flex-end;gap:13px;color:var(--ink)}
 .lockup-hand{display:block;height:42px;width:auto}
-.lockup .wordmark{display:block;margin-bottom:4px;font:italic var(--title-weight) calc(168px / 6.9)/1.17 var(--title-font);white-space:nowrap}
+.lockup .wordmark{display:block;margin-bottom:4px;font:italic var(--title-weight) calc(168px / 8.31)/1.17 var(--title-font);white-space:nowrap}
 main{padding:0 var(--gutter);flex:1}
 
 /* Home: a stage of three panels. The foundry is one screen to the left of home, About one screen to the right. */
@@ -259,7 +251,7 @@ html:not(.js) .stage:has(#about:target){transform:translateX(-66.6667%)}
 .title-row{display:flex;flex-wrap:wrap;align-items:flex-end;column-gap:.42em;font-size:clamp(17px,1.35vw,20px);margin:0 0 var(--s5)}
 .about-grid .title-row{grid-column:1/-1;margin:0}
 .home-big{margin:0}
-.about-panel .about-body{font-family:var(--bold-font);font-weight:var(--bold-weight);font-size:clamp(26px,3.5vw,50px);line-height:1.12;letter-spacing:-.01em;max-width:16em}
+.about-panel .about-body{font-family:var(--bold-font);font-weight:var(--bold-weight);font-size:clamp(min(5.4vw,26px),3.5vw,50px);line-height:1.12;letter-spacing:-.01em;max-width:16em}
 .about-body p{margin:0 0 .75em}
 .about-body p.contact{margin-top:.75em}
 .about-press{grid-column:9/13;text-align:left;padding-top:clamp(120px,30vh,320px)}
@@ -273,15 +265,15 @@ html:not(.js) .stage:has(#about:target){transform:translateX(-66.6667%)}
 .cover .mark{position:relative;display:block;flex:none;height:var(--hand-h);width:var(--hand-w);transform-origin:50% 96%}
 .cover .hand{display:block;width:100%;height:100%}
 .cover .pose{position:absolute;left:0;top:0;width:100%;height:auto;opacity:0}
-/* The name: live text in Opmet Serif's Medium Italic (the wordmark's style and weight), as wide as the wordmark was
-   (--wm-w: the name is 6.9em at that weight) and in a box as tall (1.17em) */
-.cover .name{display:block;color:var(--ink);--wm-w:clamp(230px,33vw,560px);font:italic var(--title-weight) calc(var(--wm-w) / 6.9)/1.17 var(--title-font);white-space:nowrap}
+/* The name: live text in Opmet Serif Black, upright, 1.4 times as wide as the wordmark was (D, Oct. 13, 2026). --wm-w
+   is its width: the name is about 9.76em in the upright Black (measured at 375 and 1440 px), in a box 1.17em tall */
+.cover .name{display:block;color:var(--ink);--wm-w:clamp(322px,46.2vw,784px);font:var(--title-weight) calc(var(--wm-w) / 9.76)/1.17 var(--title-font);white-space:nowrap}
 .cover-nav{display:flex;flex-wrap:wrap;justify-content:center;gap:var(--s1) var(--s4);margin:var(--s4) 0 0}
 /* The hand on the cover. Each move lives in its own folder under moves/; build.py gathers them into /css/moves.css. */
 @keyframes arrive{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
 @media (max-width:719px){
   :root{--hand-h:clamp(100px,18vh,160px)}
-  .cover .name{--wm-w:min(50vw,240px)}
+  .cover .name{--wm-w:min(70vw,336px)}
 }
 
 /* Work: one list on a grid (title, tags, year). Collapsed, only the Selected rows show; See more opens the rest in place. */
@@ -378,7 +370,7 @@ html:not(.js) .stage:has(#about:target){transform:translateX(-66.6667%)}
 .pp .ph{color:var(--gray);font-style:italic}
 .pp .g{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));column-gap:var(--g);padding:0 var(--m)}
 /* The opening: the title; under it, across the eight middle columns, the paragraph and one list */
-.pp{--pt:clamp(30px,5.6vw,84px)}  /* the project's title: the focus */
+.pp{--pt:clamp(min(30px,7.6vw),5.6vw,84px)}  /* the project's title: the focus. Under 395 px a little smaller, so "Oscar®-Qualifying" holds one line in the Black */
 .pp .open{padding-top:clamp(72px,12vh,140px);align-items:start}
 /* A line above the title, when a project has one ("20th Anniversary"), set as the title */
 .pp .open .kicker{grid-column:2/12;grid-row:1;text-align:center;font-family:var(--bold-font);font-weight:var(--bold-weight);font-size:var(--pt);line-height:1.04;letter-spacing:-.01em;text-wrap:balance;overflow-wrap:break-word}
@@ -488,7 +480,7 @@ html:not(.js) .stage:has(#about:target){transform:translateX(-66.6667%)}
 .fd-face{position:absolute;display:block;box-sizing:border-box;backface-visibility:hidden;-webkit-backface-visibility:hidden}
 .fd-center,.fd-ph-face{display:flex;align-items:center;justify-content:center}
 .fd-ph-face{font:italic 400 14px var(--serif)}
-.fd-oa span{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font:400 176px/1 "Opmet Serif Oa",var(--serif)}
+.fd-oa span{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font:400 176px/1 "Opmet Serif",var(--serif)}
 .fd-book-cover{display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:28px 16px 36px}
 .fd-book-series{font-size:11px;color:var(--graphite)}
 .fd-book-title{font:400 25px var(--serif)}
