@@ -957,15 +957,16 @@ def blurb(s, n=155):
     return s[:n].rsplit(' ', 1)[0].rstrip(' ,;:.—') + '…'
 
 def press_list(press):
-    """Press, by year, newest first. Plain lines: the outlet, then the headline."""
+    """Press, by year, newest first. Plain lines: the outlet, then the headline. Each year sits in the left margin beside
+    its first line, as the years do in the work list (D, Oct. 13)."""
     out, year = [], None
     for x in press:
         if x['year'] != year:
-            if year: out.append('</ul>')
-            year = x['year']; out.append('<h4 class="press-year">%s</h4><ul class="press">' % year)
+            if year: out.append('</ul></div>')
+            year = x['year']; out.append('<div class="press-group"><h4 class="press-year">%s</h4><ul class="press">' % year)
         line = '<span class="outlet">%s</span> <span class="headline">%s</span>' % (typo(x['outlet']), typo(x['title']))
         out.append('<li>%s</li>' % ('<a href="%s" rel="noopener">%s</a>' % (esc(x['url']), line) if x['url'] else line))
-    return ''.join(out) + '</ul>'
+    return ''.join(out) + '</ul></div>'
 
 # The foundry: a field of objects one screen to the left of home. Each product in content/foundry.json floats at a
 # slot (x and y at 1440 wide, and a depth d); its object is an HTML partial in content/foundry/objects/<object>.html,
@@ -1220,7 +1221,7 @@ def main():
                    '<div class="about-grid"><div class="title-row">'
                    '<h2 class="vh" id="about-title">%s</h2><p class="home-big"><a class="ctl" href="#" data-studio>%s</a></p></div>'
                    '<div class="about-main"><div class="about-body">%s</div></div>'
-                   '<div class="about-press"><h3 class="press-title">%s</h3>%s</div></div></section>') % (
+                   '<div class="about-press"><h3 class="press-title vh">%s</h3>%s</div></div></section>') % (  # no Press heading on screen (D, Oct. 13)
         ' '.join('<span>%s</span>' % esc(x) for x in ap['title'].split()), ctl(site['back']), ''.join('<p>%s</p>' % link(typo(x)) for x in ap['lines']) + ''.join('<p class="contact">%s</p>' % link(typo(x)) for x in ap['contact']), esc(ap['press_title']), press_list(press))
     # The Journal: a panel one screen above home, and its own pages at /journal/ and /journal/<slug>, all with the same
     # masthead, slot and list. Until a post is published it's out of the menu and the sitemap, and /journal/ is noindex.
