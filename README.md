@@ -28,7 +28,7 @@ The first build takes a few minutes, while it encodes about 400 images; later bu
 
 ## The rules of the look
 The standard is a top agency, not a template. Image first. Very few words, only where needed. Extreme restraint, on project pages too.
-- **The home page:** the hand and the name, alone in the center of the first screen. Below the scroll: a few short lines about the studio, then a plain list of the 22 projects. Nothing else.
+- **The home page** is the work page (D, Oct. 13, 2026): the hand above the name at the top center, a little smaller than the old full-screen cover, About under them (Work is left out of the menu, since the list is right there), then the work list, working as before: Selected work, See more and See less, a project opening as a screen below. The list's Home is gone; a project's nameplate and Home still land at the top of home. Nothing else.
 - **No menu bar anywhere.** Inner pages carry only the hand and the name, small and centered, which link back to the cover. Project pages and the Journal carry the masthead instead (below).
 - **Dalton Corr's name doesn't appear on the site,** except in a project's credits, as "Dalton Corr, Opmet Osserpse." The studio speaks for itself.
 - An off-white ground (`--paper: #FBFBF8`), near-black ink, no accent color: the work brings every color.

@@ -26,7 +26,7 @@
   /* The home page's two longer motions: the stage slide and the Archive opening */
   --slide:.9s; --slide-ease:cubic-bezier(.65,0,.35,1); --open:.7s;
   /* The cover */
-  --hand-h:clamp(120px,24vh,260px); --hand-w:calc(var(--hand-h) * .484); --lockup-gap:clamp(18px,2vw,32px);
+  --hand-h:clamp(102px,20.4vh,221px); --hand-w:calc(var(--hand-h) * .484); --lockup-gap:clamp(18px,2vw,32px);
   /* One spacing scale, used everywhere on home */
   --s1:8px; --s2:16px; --s3:24px; --s4:40px; --s5:64px; --s6:104px;
   --margin:clamp(20px,3.4vw,56px);
@@ -258,28 +258,29 @@ html:not(.js) .stage:has(#about:target){transform:translateX(-66.6667%)}
 .about-press .press-title{margin-top:0}
 @media (max-width:860px){.about-grid{grid-template-columns:minmax(0,1fr)}.about-main,.about-press{grid-column:1/-1}.about-press{padding-top:0}}
 
-/* The cover: centered. The hand and the name side by side, the words below, then three lines in bold. */
-.cover{height:100vh;height:100svh;min-height:420px;display:flex;align-items:center;justify-content:center;text-align:center}
+/* The top of home: the hand above the name, centered at the top, About under them, then the work list right below
+   (D, Oct. 13, 2026: the work page is the front page now). Both 0.85 times the size they had on the full-screen cover */
+.cover{display:flex;justify-content:center;text-align:center;padding:var(--mast-top) var(--gutter) 0}
 .cover-inner{display:flex;flex-direction:column;align-items:center;animation:arrive 1.6s var(--ease) both}
 .cover h1{display:flex;flex-direction:column;align-items:center;gap:var(--s3)}
 .cover .mark{position:relative;display:block;flex:none;height:var(--hand-h);width:var(--hand-w);transform-origin:50% 96%}
 .cover .hand{display:block;width:100%;height:100%}
 .cover .pose{position:absolute;left:0;top:0;width:100%;height:auto;opacity:0}
-/* The name: live text in Opmet Serif Black, upright, 1.4 times as wide as the wordmark was (D, Oct. 13, 2026). --wm-w
-   is its width: the name is about 9.76em in the upright Black (measured at 375 and 1440 px), in a box 1.17em tall */
-.cover .name{display:block;color:var(--ink);--wm-w:clamp(322px,46.2vw,784px);font:var(--title-weight) calc(var(--wm-w) / 9.76)/1.17 var(--title-font);white-space:nowrap}
+/* The name: live text in Opmet Serif Black, upright (D, Oct. 13, 2026). --wm-w is its width: the name is about 9.76em
+   in the upright Black (measured at 375 and 1440 px), in a box 1.17em tall */
+.cover .name{display:block;color:var(--ink);--wm-w:clamp(274px,39.3vw,666px);font:var(--title-weight) calc(var(--wm-w) / 9.76)/1.17 var(--title-font);white-space:nowrap}
 .cover-nav{display:flex;flex-wrap:wrap;justify-content:center;gap:var(--s1) var(--s4);margin:var(--s4) 0 0}
 /* The hand on the cover. Each move lives in its own folder under moves/; build.py gathers them into /css/moves.css. */
 @keyframes arrive{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
 @media (max-width:719px){
-  :root{--hand-h:clamp(100px,18vh,160px)}
-  .cover .name{--wm-w:min(70vw,336px)}
+  :root{--hand-h:clamp(85px,15.3vh,136px)}
+  .cover .name{--wm-w:min(59.5vw,286px)}
 }
 
 /* Work: one list on a grid (title, tags, year). Collapsed, only the Selected rows show; See more opens the rest in place. */
 /* The blog list (.blog-list) is the same list, above home. */
 .work,.blog-list{width:min(var(--work-w,44rem),100%);margin:0 auto}
-.work{padding:var(--s6) 0 50vh;scroll-margin-top:0}
+.work{padding:var(--s5) 0 50vh;scroll-margin-top:0}
 /* site.js sizes the column to its widest row (all projects, tags included) so it sits centered; this measures it */
 .works.measuring{width:max-content}.works.measuring .work-row{display:flex!important}.works.measuring .work-row{flex-wrap:nowrap}
 .work:focus{outline:none}

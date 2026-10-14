@@ -765,10 +765,9 @@ def work_section(items, w):
     rows = [r for _, r in sorted(rows)]
     return ('<section class="work" id="work" tabindex="-1" aria-label="%s"><div class="work-head">'
             '<h2 class="work-label" data-closed="%s" data-open="%s">%s</h2>'
-            '<button type="button" class="ctl archive-toggle" aria-expanded="false" aria-controls="works" data-open-label="%s" data-close-label="%s">%s</button>'
-            '<a class="ctl work-back" href="#" data-top>%s</a></div>'
+            '<button type="button" class="ctl archive-toggle" aria-expanded="false" aria-controls="works" data-open-label="%s" data-close-label="%s">%s</button></div>'
             '<ul class="works" id="works">%s</ul></section>') % (
-        esc(w['label']), esc(w['selected']), esc(w['all']), esc(w['selected']), esc(w['more']), esc(w['less']), ctl(w['more']), ctl(w['back']), ''.join(rows))
+        esc(w['label']), esc(w['selected']), esc(w['all']), esc(w['selected']), esc(w['more']), esc(w['less']), ctl(w['more']), ''.join(rows))
 
 AP_MONTHS = ('Jan.', 'Feb.', 'March', 'April', 'May', 'June', 'July', 'Aug.', 'Sept.', 'Oct.', 'Nov.', 'Dec.')
 
@@ -1207,8 +1206,9 @@ def main():
             return '<a href="%s"%s>%s</a>' % (links[k], ' rel="noopener"' if ext else '', k)
         return pat.sub(sub, s).replace('\n', '<br>')
     go = lambda u: 'blog' if u.startswith('/journal') else u[1:]
+    # The work list sits right under the name (D, Oct. 13, 2026), so the menu leaves out Work
     nav = ''.join('<a class="ctl" href="%s"%s>%s</a>' % (esc(u), ' rel="noopener"' if u.startswith('http') else ' data-go="%s"' % go(u), ctl(t))
-                  for t, u in h['nav'] if section(u) not in hidden)
+                  for t, u in h['nav'] if section(u) not in hidden and u != '#work')
     # Side panels: the foundry one screen to the left of home (a field of objects, from content/foundry.json),
     # About one screen to the right.
     fd = site['foundry']
@@ -1253,7 +1253,8 @@ def main():
           '<link rel="canonical" href="https://%s%s"><meta http-equiv="refresh" content="0; url=%s">'
           '<meta name="robots" content="noindex"><script>location.replace("%s")</script></head>'
           '<body><p><a href="%s">%s</a></p></body></html>\n' % (esc(to_title), site['domain'], to, to, to, to, esc(to_name)))
-    # The hand and the name: the name is live text in Opmet Serif Black, upright (static/fonts/opmet-serif/opmet-serif.woff2)
+    # The hand and the name at the top center of home, the work list right under them (D, Oct. 13, 2026): the name is
+    # live text in Opmet Serif Black, upright (static/fonts/opmet-serif/opmet-serif.woff2)
     cover = ('<section class="cover"><div class="cover-inner"><h1><span class="mark" %s>%s</span><span class="name ink">%s</span></h1>'
              '<nav class="cover-nav" aria-label="Site">%s</nav></div></section>') % (
         moves.mark_attrs(mv), hand + mv['layers'], esc(site['name']), nav)
