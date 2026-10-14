@@ -26,7 +26,7 @@
   /* The home page's two longer motions: the stage slide and the Archive opening */
   --slide:.9s; --slide-ease:cubic-bezier(.65,0,.35,1); --open:.7s;
   /* The cover */
-  --hand-h:clamp(102px,20.4vh,221px); --hand-w:calc(var(--hand-h) * .484); --lockup-gap:clamp(18px,2vw,32px);
+  --hand-h:42px; --hand-w:calc(var(--hand-h) * .484); --lockup-gap:clamp(18px,2vw,32px);
   /* One spacing scale, used everywhere on home */
   --s1:8px; --s2:16px; --s3:24px; --s4:40px; --s5:64px; --s6:104px;
   --margin:clamp(20px,3.4vw,56px);
@@ -258,26 +258,22 @@ html:not(.js) .stage:has(#about:target){transform:translateX(-66.6667%)}
 .about-press .press-title{margin-top:0}
 @media (max-width:860px){.about-grid{grid-template-columns:minmax(0,1fr)}.about-main,.about-press{grid-column:1/-1}.about-press{padding-top:0}}
 
-/* The top of home: the hand above the name, centered at the top, About under them, then the work list right below
-   (D, Oct. 13, 2026: the work page is the front page now). Both 0.85 times the size they had on the full-screen cover */
-.cover{display:flex;justify-content:center;text-align:center;padding:var(--mast-top) var(--gutter) 0}
-.cover-inner{display:flex;flex-direction:column;align-items:center;animation:arrive 1.6s var(--ease) both}
-.cover h1{display:flex;flex-direction:column;align-items:center;gap:var(--s3)}
-.cover .mark{position:relative;display:block;flex:none;height:var(--hand-h);width:var(--hand-w);transform-origin:50% 96%}
+/* The top of home, one row (D, Oct. 13, 2026): the hand small at the left, the name very small in the center, the menu
+   at the right; the work list centered below. One type size on home, --one (the list's): the name, the menu, the list's
+   head, its rows, tags and years */
+[data-home]{--one:clamp(17px,1.3vw,19px);--ctl-size:var(--one)}
+.cover{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;column-gap:var(--s3);padding:28px var(--gutter) 0;animation:arrive 1.6s var(--ease) both}
+.cover .mark{position:relative;display:block;justify-self:start;height:var(--hand-h);width:var(--hand-w);transform-origin:50% 96%}
 .cover .hand{display:block;width:100%;height:100%}
 .cover .pose{position:absolute;left:0;top:0;width:100%;height:auto;opacity:0}
-/* The name: live text in Opmet Serif Black, upright (D, Oct. 13, 2026). --wm-w is its width: the name is about 9.76em
-   in the upright Black (measured at 375 and 1440 px), in a box 1.17em tall */
-.cover .name{display:block;color:var(--ink);--wm-w:clamp(274px,39.3vw,666px);font:var(--title-weight) calc(var(--wm-w) / 9.76)/1.17 var(--title-font);white-space:nowrap}
-.cover-nav{display:flex;flex-wrap:wrap;justify-content:center;gap:var(--s1) var(--s4);margin:var(--s4) 0 0}
+.cover .name{margin:0;color:var(--ink);font:var(--title-weight) var(--one)/1.2 var(--title-font);white-space:nowrap}
+.cover-nav{justify-self:end;display:flex;gap:var(--s1) var(--s4)}
+.work .work-label{font-size:var(--one);line-height:1.25}
+.work .tags,.work .yr{font-size:var(--one);line-height:1.25;letter-spacing:0}
+.work .yr{padding-top:0}
 /* The hand on the cover. Each move lives in its own folder under moves/; build.py gathers them into /css/moves.css. */
 @keyframes arrive{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
 @media (max-width:719px){
-  :root{--hand-h:clamp(85px,15.3vh,136px)}
-  .cover .name{--wm-w:min(59.5vw,286px)}
-  .work{padding-top:var(--s6)}
-  .work-head{flex-direction:column;align-items:flex-start;row-gap:var(--s1)}  /* See more under Selected work (D, Oct. 13) */
-  .work-head .ctl{justify-items:start}  /* its word on the label's left edge (the heavy copy holds the width to the right) */
 }
 
 /* Work: one list on a grid (title, tags, year). Collapsed, only the Selected rows show; See more opens the rest in place. */
@@ -313,6 +309,10 @@ html:not(.js) .stage:has(#about:target){transform:translateX(-66.6667%)}
 .tags,.yr{opacity:0;visibility:hidden;transition:opacity .5s var(--ease) .15s,visibility 0s .65s}
 .works.is-open .tags,.works.is-open .yr{opacity:1;visibility:visible;transition:opacity .5s var(--ease) .15s,visibility 0s}
 .works:not(.is-open) .extra,.works .out{display:none}
+.works:not(.is-open) .tags{position:absolute}  /* hidden tags take no room, so a closed list's rows sit evenly */
+/* Phones: less room above the list, and See more under Selected work, its word on the label's left edge (the heavy
+   copy holds the width to the right) (D, Oct. 13) */
+@media (max-width:719px){.work{padding-top:var(--s5)}.work-head{flex-direction:column;align-items:flex-start;row-gap:var(--s1)}.work-head .ctl{justify-items:start}}
 @media (max-width:599px){.works{padding-left:3.2rem}.yr{right:auto;left:-3.2rem}.work .work-head{padding-left:3.2rem}}  /* the head on the names' left edge (D, Oct. 13) */
 /* The motion: rows already showing glide to their new places while the others fade in between (transform and opacity) */
 .work .glide,.blog-list .glide{transition:transform var(--open) var(--slide-ease)}
@@ -351,7 +351,7 @@ html:not(.js) .stage:has(#about:target){transform:translateX(-66.6667%)}
 
 .fade{opacity:0;transition:opacity var(--t) var(--ease)}.fade.in{opacity:1}
 @media (prefers-reduced-motion:reduce){
-  .cover-inner,.cover .mark,.cover .mark *{animation:none!important}
+  .cover,.cover .mark,.cover .mark *{animation:none!important}
   *,*::before,*::after{transition:none!important;animation:none!important}
   .fade{opacity:1}
 }
