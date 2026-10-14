@@ -35,6 +35,21 @@
    }
   },
   {
+   "slug": "opmet-serif",
+   "title": "Opmet Serif",
+   "year": "2026",
+   "tags": [
+    "Type design"
+   ],
+   "client": "Opmet Osserpse",
+   "lede": "Opmet Serif, the typeface of Opmet Osserpse: how it started from the founder’s handwriting, its wink, how its letters are drawn and the whole font.",
+   "url": "https://opmetosserpse.com/projects/opmet-serif",
+   "image": {
+    "url": "https://opmetosserpse.com/media/opmet-serif/card.webp",
+    "alt": "Two facing book pages set in Opmet Serif: a chapter opening in Display Italic, with justified text in Text Regular, small caps and a pull quote in italic."
+   }
+  },
+  {
    "slug": "hollyshorts-comedy-2026",
    "title": "10th Anniversary | HollyShorts Comedy Film Festival",
    "year": "2026",

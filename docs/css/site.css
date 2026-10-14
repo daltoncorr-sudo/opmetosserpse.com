@@ -1,6 +1,6 @@
 /* Opmet Osserpse: the look of a sheet of paper (Lareu Gonzalez), the calm of LoveFrom,
    the organization and motion of Porto Rocha. Every value lives in :root. */
-/* Opmet Serif 1.000, the studio's own face: two variable fonts, weight 100 to 900 and optical size 8 to 72 (Text
+/* Opmet Serif 1.004, the studio's own face: two variable fonts, weight 100 to 900 and optical size 8 to 72 (Text
    below 24, Display above). Every serif on the site, from the text to the titles (Black, 900) and the controls' italic */
 @font-face{font-family:"Opmet Serif";font-style:normal;font-weight:100 900;font-display:swap;src:url(../fonts/opmet-serif/opmet-serif.woff2) format("woff2")}
 @font-face{font-family:"Opmet Serif";font-style:italic;font-weight:100 900;font-display:swap;src:url(../fonts/opmet-serif/opmet-serif-italic.woff2) format("woff2")}

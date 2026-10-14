@@ -2,7 +2,7 @@
 /*
   X-Content-Type-Options: nosniff
   Referrer-Policy: strict-origin-when-cross-origin
-  Content-Security-Policy: default-src 'self'; script-src 'self' 'sha256-1tDPdeWNjdqUkS5UOsNLzR7O2uYYppPG16kqscmrgtQ=' 'sha256-euTQYFCOuckbJO+5tHnevHy6w69s9X6BVymdXznC7YU=' https://js.stripe.com https://*.js.stripe.com; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; media-src 'self'; connect-src 'self' https://api.stripe.com; frame-src https://js.stripe.com https://*.js.stripe.com https://hooks.stripe.com; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'sha256-1tDPdeWNjdqUkS5UOsNLzR7O2uYYppPG16kqscmrgtQ=' 'sha256-5Vkac+OlpIE67Lzn45VPiNUiBguJv4ziTSXT0aQtMgA=' 'sha256-euTQYFCOuckbJO+5tHnevHy6w69s9X6BVymdXznC7YU=' https://js.stripe.com https://*.js.stripe.com; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; media-src 'self'; connect-src 'self' https://api.stripe.com; frame-src https://js.stripe.com https://*.js.stripe.com https://hooks.stripe.com; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'
 /css/*
   Cache-Control: public, max-age=31536000, immutable
 /js/*
