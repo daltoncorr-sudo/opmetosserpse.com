@@ -240,7 +240,7 @@ html:not(.js) .stage:has(#about:target){transform:translateX(-66.6667%)}
 .press-year{font:italic 400 var(--size-s) var(--serif);color:var(--tag-gray);margin:1.8em 0 .4em}
 .press li{margin:0 0 .3em}
 .press{font-size:15px}
-.press .outlet{font-family:var(--serif);font-size:19px;margin-right:.35em}
+.press .outlet{font-family:var(--sans);font-size:19px;margin-right:.35em}
 .press .headline{color:#747069} /* lighter gray, 4.55:1 on --paper */
 .press a:hover .outlet{color:inherit}
 /* About: Home at the top left, the paragraphs under it, the press to the right, set a little lower. A 12-column grid
@@ -258,17 +258,19 @@ html:not(.js) .stage:has(#about:target){transform:translateX(-66.6667%)}
 .about-press .press-title{margin-top:0}
 @media (max-width:860px){.about-grid{grid-template-columns:minmax(0,1fr)}.about-main,.about-press{grid-column:1/-1}.about-press{padding-top:0}}
 
-/* The top of home, one row (D, Oct. 13, 2026): the hand small at the left, the name very small in the center, the menu
-   at the right; the work list centered below. One type size on home, --one (the list's): the name, the menu, the list's
-   head, its rows, tags and years */
+/* The top of home, one line (D, Oct. 13, 2026): the hand beside the name, the pair centered on the page, About just
+   to their right, the hand centered on the line; a little way down, so it and the work list below read as two
+   similar blocks, both centered. One type size on home, --one (the
+   list's): the name, the menu, the list's head, its rows, tags and years */
 [data-home]{--one:clamp(17px,1.3vw,19px);--ctl-size:var(--one)}
-.cover{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;column-gap:var(--s3);padding:28px var(--gutter) 0;animation:arrive 1.6s var(--ease) both}
-.cover .mark{position:relative;display:block;justify-self:start;height:var(--hand-h);width:var(--hand-w);transform-origin:50% 96%}
+.cover{display:grid;grid-template-columns:minmax(0,1fr) auto auto minmax(0,1fr);align-items:center;padding:clamp(64px,18vh,200px) var(--gutter) 0;animation:arrive 1.6s var(--ease) both}
+.cover .mark{grid-column:2;grid-row:1;margin-right:13px;position:relative;display:block;height:var(--hand-h);width:var(--hand-w);transform-origin:50% 96%}
 .cover .hand{display:block;width:100%;height:100%}
 .cover .pose{position:absolute;left:0;top:0;width:100%;height:auto;opacity:0}
-.cover .name{margin:0;color:var(--ink);font:var(--title-weight) var(--one)/1.2 var(--title-font);white-space:nowrap}
-.cover-nav{justify-self:end;display:flex;gap:var(--s1) var(--s4)}
-.work .work-label{font-size:var(--one);line-height:1.25}
+.cover .name{grid-column:3;grid-row:1;margin:0;color:var(--ink);font:var(--title-weight) var(--one)/1.2 var(--title-font);white-space:nowrap}
+.cover-nav{grid-column:4;grid-row:1;justify-self:start;margin-left:var(--s4);display:flex;gap:var(--s1) var(--s4)}
+@media (max-width:719px){.cover{padding-top:clamp(48px,10vh,96px)}.cover-nav{margin-left:var(--s3)}}
+.work .work-label{font:400 var(--one)/1.25 var(--sans)}  /* in the sans, like the names (D, Oct. 13) */
 .work .tags,.work .yr{font-size:var(--one);line-height:1.25;letter-spacing:0}
 .work .yr{padding-top:0}
 /* The hand on the cover. Each move lives in its own folder under moves/; build.py gathers them into /css/moves.css. */
@@ -279,7 +281,7 @@ html:not(.js) .stage:has(#about:target){transform:translateX(-66.6667%)}
 /* Work: one list on a grid (title, tags, year). Collapsed, only the Selected rows show; See more opens the rest in place. */
 /* The blog list (.blog-list) is the same list, above home. */
 .work,.blog-list{width:min(var(--work-w,44rem),100%);margin:0 auto}
-.work{padding:calc(var(--s6) * 2) 0 50vh;scroll-margin-top:0}  /* well below the name (D, Oct. 13) */
+.work{padding:var(--s5) 0 50vh;scroll-margin-top:0}
 /* site.js sizes the column to its widest row (all projects, tags included) so it sits centered; this measures it */
 .works.measuring{width:max-content}.works.measuring .work-row{display:flex!important}.works.measuring .work-row{flex-wrap:nowrap}
 .work:focus{outline:none}
@@ -310,9 +312,13 @@ html:not(.js) .stage:has(#about:target){transform:translateX(-66.6667%)}
 .works.is-open .tags,.works.is-open .yr{opacity:1;visibility:visible;transition:opacity .5s var(--ease) .15s,visibility 0s}
 .works:not(.is-open) .extra,.works .out{display:none}
 .works:not(.is-open) .tags{position:absolute}  /* hidden tags take no room, so a closed list's rows sit evenly */
-/* Phones: less room above the list, and See more under Selected work, its word on the label's left edge (the heavy
+/* The column is as wide as the widest name, so the names sit centered on the page (D, Oct. 13); on a wide screen an
+   open list's tags hang to the right of it, on the names' line */
+.works.measuring .tags{display:none}
+@media (min-width:1000px){.work .work-row{flex-wrap:nowrap}.work .work-row>a,.work .work-row .plain,.work .tags{flex:none}}
+/* Phones: See more under Selected work, its word on the label's left edge (the heavy
    copy holds the width to the right) (D, Oct. 13) */
-@media (max-width:719px){.work{padding-top:var(--s5)}.work-head{flex-direction:column;align-items:flex-start;row-gap:var(--s1)}.work-head .ctl{justify-items:start}}
+@media (max-width:719px){.work-head{flex-direction:column;align-items:flex-start;row-gap:var(--s1)}.work-head .ctl{justify-items:start}}
 @media (max-width:599px){.works{padding-left:3.2rem}.yr{right:auto;left:-3.2rem}.work .work-head{padding-left:3.2rem}}  /* the head on the names' left edge (D, Oct. 13) */
 /* The motion: rows already showing glide to their new places while the others fade in between (transform and opacity) */
 .work .glide,.blog-list .glide{transition:transform var(--open) var(--slide-ease)}
@@ -367,10 +373,10 @@ html:not(.js) .stage:has(#about:target){transform:translateX(-66.6667%)}
 .pp a:hover{color:var(--gray)}
 /* The masthead on a project page is the studio's nameplate, small (D, Oct. 10): the hand mark to the left of Opmet
    Osserpse, the two words left-justified on each other, the pair centered. The project's title is the focus. */
-.pp .mast{--mh:clamp(22px,2.2vw,30px);padding-top:clamp(28px,5vh,56px)}
-.mast .mast-lockup{display:flex;align-items:flex-end;gap:.24em;width:max-content;max-width:100%;margin:0 auto;text-align:left}
-.mast-lockup .mast-words>span{display:block}
-.mast-lockup .mast-hand{position:static;flex:none;height:1.9em;margin-bottom:.16em}
+.pp .mast{--mh:clamp(17px,1.3vw,19px);padding-top:clamp(28px,5vh,56px)}
+/* The nameplate looks as the name does on home (D, Oct. 13): the hand beside Opmet Osserpse, one line, centered on it */
+.mast .mast-lockup{display:flex;align-items:center;gap:13px;line-height:1.2;letter-spacing:0;width:max-content;max-width:100%;margin:0 auto;text-align:left}
+.mast-lockup .mast-hand{position:static;flex:none;height:var(--hand-h)}
 .pp .mast .mast-link{margin-top:14px}
 .pp figure,.pp h1,.pp h2,.pp p,.pp dl,.pp dd{margin:0}.pp h1,.pp h2{font-weight:400}
 .pp .ph{color:var(--gray);font-style:italic}
@@ -381,7 +387,7 @@ html:not(.js) .stage:has(#about:target){transform:translateX(-66.6667%)}
 /* A line above the title, when a project has one ("20th Anniversary"), set as the title */
 .pp .open .kicker{grid-column:2/12;grid-row:1;text-align:center;font-family:var(--bold-font);font-weight:var(--bold-weight);font-size:var(--pt);line-height:1.04;letter-spacing:-.01em;text-wrap:balance;overflow-wrap:break-word}
 .pp .open h1{grid-column:2/12;grid-row:2;text-align:center;font-family:var(--bold-font);font-weight:var(--bold-weight);font-size:var(--pt);line-height:1.04;letter-spacing:-.01em;text-wrap:balance;overflow-wrap:break-word}
-.pp .open .lede{grid-column:3/7;grid-row:3;margin-top:64px;padding-right:var(--g);font-size:var(--b);line-height:1.55}
+.pp .open .lede{grid-column:3/7;grid-row:3;max-width:22em;margin-top:64px;padding-right:var(--g);font-size:var(--b);line-height:1.55}
 .pp .open .info{grid-column:7/11;grid-row:3;margin-top:68px}
 .pp .facts,.pp .cr{font-size:var(--s);line-height:1.45}
 .pp .facts div,.pp .cr div{display:grid;grid-template-columns:8.6em minmax(0,1fr);column-gap:12px;padding:0 0 5px}
