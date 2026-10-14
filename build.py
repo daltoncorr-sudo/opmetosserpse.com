@@ -1253,10 +1253,10 @@ def main():
           '<link rel="canonical" href="https://%s%s"><meta http-equiv="refresh" content="0; url=%s">'
           '<meta name="robots" content="noindex"><script>location.replace("%s")</script></head>'
           '<body><p><a href="%s">%s</a></p></body></html>\n' % (esc(to_title), site['domain'], to, to, to, to, esc(to_name)))
-    # The hand and the name at the top center of home, the work list right under them (D, Oct. 13, 2026): the name is
-    # live text in Opmet Serif Black, upright (static/fonts/opmet-serif/opmet-serif.woff2)
-    cover = ('<section class="cover"><div class="cover-inner"><h1><span class="mark" %s>%s</span><span class="name ink">%s</span></h1>'
-             '<nav class="cover-nav" aria-label="Site">%s</nav></div></section>') % (
+    # The top of home, one row (D, Oct. 13, 2026): the hand small at the left, the name very small in the center (live
+    # text in Opmet Serif Black, upright), the menu at the right; the work list centered below
+    cover = ('<header class="cover"><span class="mark" %s>%s</span><h1 class="name ink">%s</h1>'
+             '<nav class="cover-nav" aria-label="Site">%s</nav></header>') % (
         moves.mark_attrs(mv), hand + mv['layers'], esc(site['name']), nav)
     body = ('<div class="stage-clip"><div class="stage" data-stage>%s<div class="panel home-panel">%s<div data-home>%s%s</div></div>%s</div></div>'
             '<section class="project-panel" id="project" aria-label="Project"><div class="project-inner"></div></section>') % (
