@@ -237,7 +237,11 @@ html:not(.js) .stage:has(#about:target){transform:translateX(-66.6667%)}
 .about-body{font-family:var(--serif);line-height:1.6}
 .about-body a{text-decoration:underline;text-underline-offset:.2em;text-decoration-thickness:1px}
 .press-title{font:400 var(--size-m) var(--serif);margin:3.2em 0 1.2em}
-.press-year{font:400 var(--size-s) var(--serif);color:var(--tag-gray);margin:1.8em 0 .4em}
+/* The press: no heading on screen; each year in the left margin beside its first line, as in the work list (.yr)
+   (D, Oct. 13). Narrower, the list steps in to make room, as the work list does on phones */
+.press-group{position:relative}
+.press-year{position:absolute;right:calc(100% + var(--s4));top:0;margin:0;font:400 11.5px/1.4 var(--sans);letter-spacing:.02em;color:var(--tag-gray);font-variant-numeric:tabular-nums;padding-top:.8em}  /* on its line's baseline */
+@media (max-width:1199px){.about-press{padding-left:3.2rem}.press-year{right:auto;left:-3.2rem}}  /* under 1200px the margin would reach the text */
 .press li{margin:0 0 .3em}
 .press{font-size:15px}
 .press .outlet{font-family:var(--sans);font-size:19px;margin-right:.35em}
