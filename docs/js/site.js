@@ -683,7 +683,24 @@
     });
   }
   function soon() { if (!queued) { queued = true; requestAnimationFrame(read); } }
-  window.opmetProject = function (root) { films(root); read(); };
+  // A finished page (content/pages/, Opmet Serif): its own script, from /js/pages/, run on its part of the page
+  // (data-page). Fetched once, then run for each copy that lands: on its own page, or each time it slides in from home.
+  var pageJs = {};
+  function pages(root) {
+    Array.prototype.forEach.call(root.querySelectorAll('[data-page][data-page-js]'), function (el) {
+      var slug = el.getAttribute('data-page'), src = el.getAttribute('data-page-js');
+      var run = function () { var f = window.opmetPages && window.opmetPages[slug]; if (f) f(el); };
+      if (pageJs[src] === 'done' || (window.opmetPages && window.opmetPages[slug])) { run(); return; }
+      if (!pageJs[src]) {
+        pageJs[src] = [];
+        var s = document.createElement('script'); s.src = src;
+        s.onload = function () { var q = pageJs[src]; pageJs[src] = 'done'; q.forEach(function (f) { f(); }); };
+        document.head.appendChild(s);
+      }
+      pageJs[src].push(run);
+    });
+  }
+  window.opmetProject = function (root) { films(root); read(); pages(root); };
   if (document.querySelector('.pp')) window.opmetProject(document);
   document.addEventListener('scroll', soon, { passive: true, capture: true });  // the page, or the project panel on home
   window.addEventListener('resize', soon);

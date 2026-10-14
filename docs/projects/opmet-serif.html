@@ -21,203 +21,7 @@
 <link rel="preload" href="/fonts/instrument-sans/instrument-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/fonts/opmet-serif/opmet-serif.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/fonts/opmet-serif/opmet-serif-italic.woff2" as="font" type="font/woff2" crossorigin>
-<style>
-@font-face{font-family:"Opmet Serif";font-style:normal;font-weight:100 900;font-display:block;src:url(/fonts/opmet-serif/opmet-serif.woff2) format("woff2")}
-@font-face{font-family:"Opmet Serif";font-style:italic;font-weight:100 900;font-display:block;src:url(/fonts/opmet-serif/opmet-serif-italic.woff2) format("woff2")}
-@font-face{font-family:"Instrument Sans";font-style:normal;font-weight:400;font-display:swap;src:url(/fonts/instrument-sans/instrument-sans-latin-400-normal.woff2) format("woff2")}
-@font-face{font-family:"Instrument Sans";font-style:normal;font-weight:400;font-display:swap;src:url(/fonts/instrument-sans/instrument-sans-latin-ext-400-normal.woff2) format("woff2");unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+1E00-1E9F,U+A720-A7FF}
-@font-face{font-family:"Instrument Sans";font-style:italic;font-weight:400;font-display:swap;src:url(/fonts/instrument-sans/instrument-sans-latin-400-italic.woff2) format("woff2")}
-@font-face{font-family:"Instrument Sans";font-style:italic;font-weight:400;font-display:swap;src:url(/fonts/instrument-sans/instrument-sans-latin-ext-400-italic.woff2) format("woff2");unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+1E00-1E9F,U+A720-A7FF}
-@font-face{font-family:"Instrument Sans";font-style:normal;font-weight:500;font-display:swap;src:url(/fonts/instrument-sans/instrument-sans-latin-500-normal.woff2) format("woff2")}
-
-/* A project page of opmetosserpse.com, made for one typeface: a standard header, the quote and the hand it came from,
-   then the work, centered. Paper and ink only; the type is the only image that moves. */
-:root{
-  --paper:#F7F6F2; --paper-deep:#EEEDE8; --sheet:#FFFFFF; --ink:#161512; --graphite:#635E57; --rule:#D8D5CD; --wash:rgba(22,21,18,.08);
-  --serif:"Opmet Serif",Georgia,"Times New Roman",serif;
-  --sans:"Instrument Sans","Helvetica Neue",Arial,sans-serif;
-  --margin:clamp(20px,3.4vw,56px); --gutter:clamp(14px,1.7vw,24px);
-  --t:.5s; --ease:cubic-bezier(.3,.1,.2,1);
-  --mcol:clamp(104px,9vw,140px); --mgap:clamp(32px,3.2vw,48px);
-  --s1:8px; --s2:16px; --s3:24px; --s4:40px; --s5:72px; --s6:clamp(96px,13vw,184px);
-  color-scheme:light;
-}
-*,*::before,*::after{box-sizing:border-box}
-html{background:var(--paper);-webkit-text-size-adjust:100%;text-size-adjust:100%}
-body{margin:0;background:var(--paper);color:var(--ink);font:400 13px/1.55 var(--sans);-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
-.page{max-width:1440px;margin:0 auto;padding-inline:var(--margin);padding-block:0 var(--s5);overflow-x:clip}
-button,input{font:inherit;color:inherit}
-:focus-visible{outline:1.5px solid var(--ink);outline-offset:4px}
-a{color:inherit;text-decoration:none}
-.grid{display:block}
-.label{font:400 12px/1.4 var(--sans);letter-spacing:.02em;color:var(--graphite)}
-.num{font-variant-numeric:tabular-nums}
-
-/* The nameplate: the hand, then Opmet over Osserpse, centered */
-.mast{display:flex;justify-content:center;padding-top:clamp(28px,5vh,56px)}
-.mast a{display:flex;align-items:flex-end;gap:.24em;font:900 clamp(22px,2.4vw,32px)/1.02 var(--serif);font-optical-sizing:auto;letter-spacing:-.005em;transition:color var(--t) var(--ease)}
-.mast a:hover{color:var(--graphite)}
-.mast-hand{height:2.05em;width:auto;margin-bottom:.06em}
-.mast-hand path{fill:currentColor}
-.mast span{display:block}
-
-/* It started by hand: the quote, then the handwriting with lines pointing to what the serif took from it */
-.hand{margin-top:var(--s6);display:grid;justify-items:center;text-align:center}
-.quote{margin:0;max-width:22em;font:italic 400 clamp(24px,3vw,40px)/1.25 var(--serif);font-variation-settings:"opsz" 48;text-wrap:balance}
-.quote p{margin:0}
-.quote cite{display:block;margin-top:var(--s2);font:400 15px/1.4 var(--sans);font-style:normal;color:var(--ink)}
-.sigmap{margin:0;width:min(100%,1000px);padding-block:190px 270px}
-.sig-box{position:relative}
-.sig-box > svg{display:block;width:100%;height:auto}
-.sig-box > svg path{fill:var(--ink)}
-.call{position:absolute;left:var(--x);top:var(--y);width:0;height:0;--len:64px}
-.call::before{content:"";position:absolute;left:-3.5px;top:-3.5px;width:7px;height:7px;border-radius:50%;background:var(--ink)}
-.call .lead{position:absolute;left:-.5px;width:1px;height:var(--len);background:var(--ink)}
-.call.up .lead{bottom:0} .call.down .lead{top:0}
-.call .txt{position:absolute;width:max-content;max-width:19em;display:grid;gap:4px;text-align:left}
-.call.up .txt{bottom:calc(var(--len) + 12px)} .call.down .txt{top:calc(var(--len) + 12px)}
-.call.left .txt{left:-2px} .call.right .txt{right:-2px;text-align:right;justify-items:end}
-.call b{font:400 clamp(19px,2vw,26px)/1.15 var(--serif);font-variation-settings:"opsz" 40;white-space:nowrap}
-.call span{font:400 14px/1.45 var(--sans);color:var(--ink)}
-.call.o{--len:48px} .call.r{--len:118px}
-@media (max-width:700px){
-  .sigmap{padding-block:230px 330px}
-  .call b{white-space:normal}
-  .call{--len:84px} .call.o{--len:36px} .call.r{--len:156px}
-  .call .txt{max-width:13.5em}
-  .call span{font-size:13px}
-}
-
-/* The header: the name, the whole range of the family under the pointer, then the client, the year and the work */
-.hero{padding-top:var(--s5);text-align:center}
-.hero h1{margin:0;font-family:var(--serif);font-weight:900;font-size:clamp(44px,12.4vw,196px);line-height:.92;letter-spacing:-.018em;
-  font-variation-settings:"wght" var(--w,900),"opsz" 72;white-space:nowrap;cursor:ew-resize;touch-action:pan-y;user-select:none;-webkit-user-select:none}
-.facts{margin:var(--s4) 0 0;display:flex;justify-content:center;flex-wrap:wrap;gap:var(--s2) var(--s5)}
-.facts div{display:grid;gap:2px;text-align:center}
-.facts dt{font:400 12px/1.4 var(--sans);color:var(--ink);letter-spacing:.02em}
-.facts dd{margin:0;font:400 14px/1.4 var(--sans)}
-.lede{max-width:31em;margin:var(--s5) auto 0;text-align:center;font:400 16px/1.6 var(--sans);text-wrap:balance}
-
-/* Each piece: a small label over the work, the work across the page */
-.piece{margin-top:var(--s6);display:grid;grid-template-columns:minmax(0,1fr);gap:var(--s3)}
-.work{min-width:0}
-/* 2026-10-14 (D: "I said all headers in margins"): from 1000 px every piece sits between two margins, its header in the
-   left one, held in view while the piece scrolls past; narrower, the header sits above the piece */
-@media (min-width:1000px){
-  .piece{grid-template-columns:var(--mcol) minmax(0,1fr) var(--mcol);column-gap:var(--mgap)}
-  .piece > .mh{grid-column:1;grid-row:1}
-  .piece > .work{grid-column:2;grid-row:1}
-}
-.controls{display:flex;flex-wrap:wrap;gap:var(--s1) var(--s3);margin-top:var(--s3);align-items:center}
-.seg{display:inline-flex;gap:var(--s2)}
-.seg button{appearance:none;background:none;border:0;padding:4px 0;cursor:pointer;font:400 13px/1.3 var(--sans);color:var(--graphite);
-  border-bottom:1px solid transparent;transition:color var(--t) var(--ease),border-color var(--t) var(--ease)}
-.seg button:hover{color:var(--ink)}
-.seg button[aria-pressed="true"]{color:var(--ink);border-bottom-color:var(--ink)}
-.seg .sep{width:1px;background:var(--rule)}
-svg{display:block;overflow:visible}
-
-/* The wink and Drawn as strokes: two pieces side by side, each named in its own margin, its words below it.
-   2026-10-14 (D: "the headers ... go in hte margins. have the wink and the strokes interactive examples side by side
-   with the text below it"). Each panel is a subgrid of four rows (the picture, the controls, the readout, the words),
-   so the two line up row by row. */
-.pair{margin-top:var(--s5);display:grid;grid-template-columns:minmax(0,1fr);gap:var(--s3)}
-.pair > section{display:contents}
-.mh{margin:0;font:400 13px/1.4 var(--sans);letter-spacing:.02em;color:var(--ink)}
-@media (min-width:1000px){ .mh{position:sticky;top:calc(env(safe-area-inset-top,0px) + 24px);align-self:start} }
-.panel{display:grid;gap:var(--s3);align-content:start;min-width:0}
-.vis{width:100%;max-width:100%;aspect-ratio:1;background:var(--paper-deep)}
-.vis svg{width:100%;height:100%}
-.ctl{display:flex;flex-wrap:wrap;align-items:center;align-content:start;gap:var(--s2) var(--s3)}
-.ctl .letters{flex:1 0 100%}
-.out{display:grid;gap:2px;align-content:start}
-.out span{font:400 13px/1.4 var(--sans)}
-.out b{font:300 clamp(30px,3vw,44px)/1.1 var(--serif);font-variation-settings:"opsz" 72;letter-spacing:-.01em}
-.txt{margin:0;font:400 15px/1.6 var(--sans);max-width:34em}
-.letters{display:flex;flex-wrap:wrap;gap:4px 0;margin-left:-6px}
-.letters button{appearance:none;border:0;background:none;cursor:pointer;padding:2px 6px 8px;font:400 clamp(28px,2.6vw,38px)/1.1 var(--serif);
-  font-variation-settings:"opsz" 40;color:var(--graphite);border-bottom:1.5px solid transparent;transition:color var(--t) var(--ease),border-color var(--t) var(--ease)}
-.letters button:hover{color:var(--ink)}
-.letters button[aria-pressed="true"]{color:var(--ink);border-bottom-color:var(--ink)}
-@media (min-width:1000px){
-  .pair{grid-template-columns:var(--mcol) minmax(0,1fr) minmax(0,1fr) var(--mcol);grid-template-rows:repeat(4,auto);column-gap:var(--mgap)}
-  .mh-w{grid-column:1;grid-row:1 / span 4}
-  .p-w{grid-column:2;grid-row:1 / span 4}
-  .mh-cx{grid-column:4;grid-row:1 / span 4;text-align:right}
-  .p-cx{grid-column:3;grid-row:1 / span 4}
-  .panel{grid-template-rows:subgrid}
-}
-@media (min-width:701px) and (max-width:999px){
-  .pair{grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:repeat(5,auto);column-gap:var(--s4)}
-  .mh-w{grid-column:1;grid-row:1} .mh-cx{grid-column:2;grid-row:1}
-  .p-w{grid-column:1;grid-row:2 / span 4} .p-cx{grid-column:2;grid-row:2 / span 4}
-  .panel{grid-template-rows:subgrid}
-}
-@media (max-width:700px){ .mh-cx{margin-top:var(--s5)} }
-
-/* The wink: a letter with a bowl, the Opmet Osserpse way or the regular way */
-.wink-g .glyph{fill:var(--ink);transition:opacity .3s var(--ease)}
-.wink-g .reg{opacity:0}
-.wink-g[data-way="reg"] .op{opacity:0}
-.wink-g[data-way="reg"] .reg{opacity:1}
-.wink-g .axes{transition:opacity .22s var(--ease)}
-.wink-g .axis{stroke:var(--graphite);stroke-width:3;stroke-dasharray:2 11;stroke-linecap:round;fill:none}
-.wink-g .tick{fill:var(--ink)}
-.wink-g.swap .glyph,.wink-g.swap .axes{opacity:0}
-
-/* Drawn as strokes: the outline and its points */
-.cx .ink{fill:var(--ink);transition:fill-opacity var(--t) var(--ease)}
-.cx[data-view="points"] .ink{fill-opacity:.07}
-.cx .ol{fill:none;stroke:var(--ink);stroke-width:1.6;opacity:0;transition:opacity var(--t) var(--ease)}
-.cx .pts{opacity:0;transition:opacity var(--t) var(--ease)}
-.cx[data-view="points"] .ol,.cx[data-view="points"] .pts{opacity:1}
-.cx .h{stroke:var(--graphite);stroke-width:1.2}
-.cx .on-c{fill:var(--paper);stroke:var(--ink);stroke-width:2.4}
-.cx .on-s{fill:var(--ink)}
-.cx .off{fill:var(--paper);stroke:var(--graphite);stroke-width:1.6}
-
-/* The whole font: the print tests' content, set large, one board after another. --u is px per point, fitted by script */
-.boards{display:grid;gap:var(--s5)}
-.board{margin:0;display:grid;gap:var(--s2)}
-.bbody{container-type:inline-size;--u:calc(86cqw / 504);padding:clamp(36px,7vw,112px) 3%;display:flex;flex-direction:column;align-items:center;text-align:center;overflow:hidden}
-.board.soft .bbody{background:var(--paper-deep)}
-.board.ink .bbody{background:var(--ink);color:var(--paper)}
-.board figcaption{text-align:center}
-.bl{font-family:var(--serif);white-space:nowrap;font-kerning:normal;line-height:1.5;color:inherit}
-.bl.lc{line-height:1.56} .bl.big{line-height:1.1} .bl.flow{line-height:1.17}
-.bl.nm{line-height:1.22} .bl.nm.ramp{line-height:1.5}
-.bgap{height:calc(var(--u) * 40)} .bgap.small{height:calc(var(--u) * 20)}
-@media (max-width:700px){ .bl.split span{display:block} }
-
-/* A line to try: the slider runs the whole range */
-.tester .work{display:grid}
-.tester-text{font-family:var(--serif);font-size:clamp(34px,5.4vw,80px);line-height:1.1;outline:none;min-height:1.1em;overflow-wrap:anywhere;text-wrap:balance;
-  font-variation-settings:"wght" var(--tw,400),"opsz" var(--to,72);font-style:var(--ts,normal);caret-color:var(--graphite)}
-.tester .range{display:flex;align-items:center;gap:var(--s2);flex:1 1 240px;min-width:200px}
-.tester input[type=range]{flex:1;accent-color:var(--ink);min-width:0}
-.tester-readout{min-width:11em}
-.tester .label{color:var(--ink)}
-
-/* In use */
-.use img{display:block;width:100%;height:auto;max-height:85vh;object-fit:contain;background:var(--paper-deep)}
-.use figcaption{margin-top:var(--s2);color:var(--graphite)}
-
-/* The numbers */
-.nums{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--s4) var(--gutter)}
-.nums div{display:grid;gap:4px}
-.nums b{font:300 clamp(40px,5vw,72px)/1 var(--serif);font-variation-settings:"opsz" 72;letter-spacing:-.01em}
-.nums span{color:var(--graphite);max-width:16em}
-
-.end{margin-top:var(--s6);display:flex;justify-content:center;gap:var(--s4)}
-.end a{font:400 13px/1.4 var(--sans);color:var(--graphite);border-bottom:1px solid var(--rule);transition:color var(--t) var(--ease),border-color var(--t) var(--ease)}
-.end a:hover{color:var(--ink);border-color:var(--ink)}
-.credit{margin-top:var(--s3);text-align:center}
-
-@media (max-width:900px){
-  .nums{grid-template-columns:repeat(2,minmax(0,1fr))}
-}
-@media (prefers-reduced-motion:reduce){*{transition:none!important}}
-</style>
+<link rel="stylesheet" href="/css/site.css?v=87b484b297">
 <link rel="alternate" type="application/json" href="/data/studio.json" title="Studio">
 <link rel="alternate" type="application/json" href="/data/work.json" title="Work">
 <script type="application/ld+json">
@@ -297,7 +101,7 @@ svg{display:block;overflow:visible}
    "image": [
     {
      "@type": "ImageObject",
-     "contentUrl": "https://opmetosserpse.com/media/opmet-serif/in-use.webp",
+     "contentUrl": "https://opmetosserpse.com/media/opmet-serif/p-eaa55614.webp",
      "description": "Two facing book pages set in Opmet Serif: a chapter opening in Display Italic, with justified text in Text Regular, small caps and a pull quote in italic.",
      "encodingFormat": "image/webp"
     }
@@ -337,262 +141,292 @@ svg{display:block;overflow:visible}
 </script>
 </head>
 <body>
-<div class="page" id="top" data-page-only>
-<header class="mast"><a href="/" aria-label="Opmet Osserpse"><svg class="mast-hand" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="53.6 15.5 793.4 1830.2"><path fill-rule="evenodd" d="M353.0,20.0C349.1,20.5 345.0,22.0 342.0,24.5C339.0,27.1 339.5,22.7 335.2,35.2C330.9,47.7 319.8,87.1 316.4,99.7C313.0,112.3 315.1,96.3 314.9,110.8C314.6,125.2 314.4,171.0 314.9,186.4C315.3,201.8 314.7,190.0 317.3,203.3C320.0,216.6 325.7,245.0 330.9,266.3C336.1,287.7 344.3,314.5 348.2,331.4C352.2,348.3 353.5,349.2 354.6,367.7C355.7,386.1 356.4,413.2 354.6,442.3C352.8,471.4 345.7,517.9 343.9,542.1C342.2,566.4 343.7,577.4 343.9,587.7C344.2,597.9 344.6,598.3 345.4,603.6C346.2,609.0 348.4,611.7 348.8,619.7C349.2,627.7 347.5,643.1 347.8,651.7C348.1,660.2 350.1,663.9 350.7,671.0C351.4,678.2 350.4,683.3 351.7,694.3C353.0,705.3 357.4,727.4 358.5,737.0C359.5,746.6 358.5,748.0 357.9,751.9C357.3,755.8 356.4,757.9 354.8,760.4C353.2,763.0 351.3,765.4 348.2,767.4C345.2,769.4 339.5,771.7 336.7,772.4C334.0,773.1 333.1,772.4 331.8,771.4C330.4,770.5 329.3,768.9 328.7,766.7C328.2,764.5 327.9,764.2 328.4,758.3C329.0,752.4 333.1,745.3 332.1,731.4C331.1,717.5 324.5,690.3 322.6,674.9C320.7,659.5 321.5,649.1 320.7,639.1C319.9,629.0 318.2,628.4 317.8,614.8C317.3,601.3 317.1,574.8 317.8,557.6C318.4,540.5 321.0,530.7 321.6,512.1C322.3,493.5 322.3,463.5 321.6,446.2C321.0,428.9 318.4,419.5 317.8,408.4C317.1,397.2 318.4,389.1 317.8,379.3C317.1,369.4 314.5,358.8 313.9,349.2C313.2,339.7 314.4,330.0 313.9,322.1C313.4,314.2 311.6,309.5 311.0,301.7C310.3,294.0 311.2,286.3 310.0,275.6C308.8,264.8 306.0,248.6 303.7,237.3C301.3,226.1 299.1,217.8 296.1,208.0C293.1,198.3 288.7,185.1 285.8,178.6C282.8,172.2 280.8,171.5 278.4,169.5C276.1,167.5 274.8,167.2 271.7,166.6C268.5,166.0 263.1,165.8 259.6,166.0C256.1,166.3 253.4,167.0 250.9,168.0C248.3,169.0 246.5,170.2 244.3,172.1C242.1,173.9 240.0,176.0 237.8,179.2C235.7,182.4 233.3,187.2 231.5,191.2C229.7,195.3 228.2,199.4 227.2,203.4C226.2,207.5 225.9,205.1 225.7,215.5C225.4,225.9 224.9,252.1 225.7,265.9C226.4,279.7 227.3,281.1 230.2,298.2C233.1,315.3 241.5,352.4 243.1,368.6C244.8,384.9 240.7,388.3 240.2,395.8C239.7,403.2 240.9,404.7 240.2,413.2C239.6,421.8 236.8,421.6 236.3,447.1C235.9,472.7 236.3,542.9 237.3,566.4C238.3,589.8 241.5,583.2 242.2,587.7C242.8,592.2 242.5,590.0 241.1,593.4C239.6,596.8 236.0,600.8 233.5,608.2C231.1,615.5 228.3,627.8 226.3,637.8C224.4,647.8 222.6,659.0 221.8,668.1C221.0,677.2 221.5,686.3 221.8,692.4C222.0,698.4 221.8,698.5 223.3,704.4C224.8,710.4 223.9,709.3 230.8,727.9C237.8,746.5 259.3,798.6 265.0,815.9C270.7,833.2 265.5,827.5 265.0,831.5C264.5,835.5 264.2,836.1 261.9,840.0C259.5,843.9 256.6,848.5 250.7,855.0C244.8,861.5 232.5,873.7 226.4,879.2C220.3,884.8 217.0,886.6 214.0,888.2C211.1,889.8 210.0,889.0 208.6,888.8C207.1,888.6 206.2,888.0 205.5,887.0C204.9,885.9 204.4,884.3 204.6,882.6C204.7,880.8 202.5,883.4 206.3,876.5C210.1,869.6 223.2,848.3 227.2,841.2C231.2,834.1 229.5,836.6 230.4,833.8C231.3,830.9 232.4,828.0 232.5,824.2C232.5,820.4 231.9,816.7 230.8,811.3C229.8,805.9 229.9,804.8 226.1,791.8C222.3,778.8 214.4,748.4 208.2,733.1C202.0,717.8 194.8,713.2 188.8,700.1C182.8,687.1 176.8,666.3 172.3,654.7C167.7,643.0 167.0,640.9 161.7,630.3C156.4,619.8 146.7,604.3 140.4,591.6C134.1,578.8 129.0,564.8 123.9,553.8C118.8,542.7 114.5,534.3 109.7,525.3C104.9,516.4 98.5,505.0 95.0,500.2C91.6,495.4 90.9,497.2 89.1,496.5C87.3,495.7 86.3,495.4 84.3,495.7C82.3,496.0 79.2,497.1 77.2,498.3C75.1,499.5 73.4,501.0 72.1,502.9C70.8,504.8 69.8,504.7 69.2,509.7C68.5,514.7 69.8,526.8 68.2,533.0C66.6,539.1 61.3,543.4 59.6,546.7C57.9,550.0 58.3,549.3 58.0,552.8C57.7,556.2 57.6,561.6 58.0,567.3C58.4,573.0 59.2,580.2 60.6,587.0C61.9,593.9 63.5,600.1 66.1,608.7C68.6,617.3 73.1,627.8 75.9,638.6C78.6,649.4 80.0,663.0 82.8,673.4C85.5,683.8 87.4,688.8 92.1,700.9C96.9,712.9 106.5,732.7 111.2,745.8C115.9,758.8 115.3,755.4 120.5,779.2C125.6,803.0 135.9,860.5 142.0,888.5C148.1,916.4 154.0,932.9 157.3,946.9C160.6,960.9 161.2,966.5 161.7,972.5C162.2,978.5 162.0,976.2 160.3,982.7C158.6,989.3 154.6,995.7 151.7,1011.9C148.7,1028.2 146.2,1057.0 142.5,1080.3C138.9,1103.6 131.8,1137.2 129.7,1151.8C127.7,1166.4 129.2,1162.4 130.3,1167.8C131.3,1173.2 135.1,1180.2 136.1,1184.2C137.0,1188.3 137.9,1187.0 136.1,1192.1C134.2,1197.2 127.5,1208.9 124.9,1214.8C122.3,1220.8 122.3,1215.2 120.6,1228.0C118.8,1240.7 115.1,1277.0 114.2,1291.4C113.3,1305.9 113.6,1299.9 115.2,1314.7C116.7,1329.5 121.1,1367.4 123.4,1380.1C125.6,1392.9 125.6,1388.7 128.5,1391.5C131.5,1394.2 138.4,1394.9 140.9,1396.5C143.5,1398.1 143.6,1398.9 143.8,1400.9C144.0,1402.9 145.0,1401.1 142.2,1408.6C139.4,1416.1 130.9,1433.6 127.1,1445.8C123.4,1458.1 121.2,1473.7 119.7,1482.0C118.2,1490.4 118.4,1490.4 118.1,1495.9C117.8,1501.5 117.3,1504.6 118.1,1515.3C118.9,1526.0 121.5,1551.0 122.7,1560.1C123.9,1569.3 123.0,1564.0 125.2,1570.2C127.4,1576.5 129.7,1583.6 135.7,1597.5C141.8,1611.3 153.2,1637.7 161.4,1653.3C169.5,1668.9 176.0,1678.2 184.5,1691.2C193.0,1704.2 204.2,1716.5 212.3,1731.3C220.5,1746.0 225.8,1763.4 233.4,1779.9C241.1,1796.5 253.7,1821.7 258.3,1830.7C262.9,1839.6 259.4,1832.8 261.0,1833.8C262.6,1834.8 262.7,1835.6 267.7,1836.8C272.6,1838.0 282.8,1840.3 290.6,1841.0C298.5,1841.7 306.9,1841.4 314.9,1841.0C322.8,1840.6 327.6,1840.2 338.3,1838.3C349.1,1836.4 364.8,1833.6 379.3,1829.8C393.7,1826.0 408.5,1821.7 425.2,1815.7C442.0,1809.6 461.7,1801.9 479.6,1793.5C497.6,1785.1 518.9,1773.5 533.1,1765.5C547.2,1757.5 556.8,1750.6 564.4,1745.5C572.0,1740.3 572.0,1740.3 578.8,1734.7C585.7,1729.1 598.1,1719.1 605.4,1711.9C612.7,1704.6 618.5,1696.8 622.6,1691.2C626.6,1685.5 628.0,1682.1 629.7,1677.9C631.3,1673.7 634.8,1675.7 632.4,1666.0C629.9,1656.3 620.2,1635.8 614.7,1619.7C609.2,1603.5 602.8,1583.1 599.5,1568.9C596.2,1554.8 595.5,1543.9 595.0,1534.7C594.5,1525.5 595.0,1521.3 596.6,1514.0C598.2,1506.8 596.7,1509.5 604.7,1491.1C612.6,1472.7 632.6,1431.3 644.2,1403.6C655.8,1376.0 667.8,1343.2 674.4,1325.2C680.9,1307.2 681.2,1305.0 683.6,1295.7C686.0,1286.5 685.7,1281.3 688.6,1269.6C691.5,1258.0 695.3,1251.3 701.1,1225.9C706.8,1200.5 718.7,1141.6 723.1,1117.1C727.6,1092.7 726.8,1090.5 727.8,1079.1C728.7,1067.8 727.8,1060.1 728.7,1049.1C729.7,1038.1 731.1,1026.4 733.4,1013.0C735.7,999.6 740.5,980.2 742.6,968.9C744.8,957.7 745.4,955.6 746.2,945.4C746.9,935.1 746.4,917.8 747.2,907.6C747.9,897.3 749.0,893.5 750.8,884.1C752.7,874.6 754.5,865.7 758.4,850.9C762.2,836.2 769.8,811.9 773.8,795.6C777.7,779.2 780.6,760.9 782.2,752.6C783.7,744.3 783.4,750.7 783.0,745.7C782.7,740.7 780.6,736.5 780.1,722.4C779.6,708.4 779.8,674.7 780.1,661.4C780.4,648.1 780.9,647.8 781.7,642.6C782.6,637.5 781.9,637.8 785.1,630.4C788.2,623.1 793.1,615.5 800.5,598.4C807.9,581.2 822.9,544.7 829.4,527.5C836.0,510.3 837.4,503.3 839.7,495.1C841.9,486.8 843.0,483.0 843.0,478.1C843.0,473.1 840.9,467.9 839.7,465.1C838.5,462.3 837.3,462.1 835.9,461.1C834.5,460.1 832.8,459.4 831.2,459.1C829.5,458.8 830.0,458.2 826.1,459.2C822.2,460.2 815.8,464.1 807.8,465.1C799.8,466.2 784.8,465.2 778.2,465.6C771.6,465.9 773.4,465.3 768.1,467.1C762.7,468.8 753.1,472.0 745.9,475.9C738.6,479.8 729.9,486.3 724.5,490.4C719.1,494.6 717.0,496.4 713.5,500.7C709.9,504.9 706.7,508.6 703.3,515.7C700.0,522.9 696.4,532.1 693.4,543.6C690.5,555.2 687.6,575.9 685.6,585.2C683.5,594.5 682.8,595.0 681.1,599.2C679.5,603.4 678.8,605.4 675.6,610.2C672.5,615.0 666.2,622.4 662.4,628.0C658.6,633.6 655.7,638.3 652.9,643.7C650.1,649.1 647.4,655.2 645.5,660.5C643.5,665.8 643.7,661.9 641.2,675.6C638.7,689.3 632.5,729.4 630.6,742.6C628.7,755.7 629.7,751.4 629.9,754.4C630.0,757.4 629.6,757.1 631.5,760.5C633.4,764.0 639.7,770.7 641.4,774.9C643.1,779.1 646.4,767.3 641.8,785.8C637.3,804.2 620.7,859.6 613.9,885.8C607.2,912.0 604.9,923.8 601.4,943.1C598.0,962.4 594.8,984.7 593.0,1001.6C591.3,1018.4 591.7,1035.5 591.1,1044.2C590.5,1053.0 590.2,1051.0 589.2,1053.9C588.1,1056.9 587.3,1058.5 584.6,1062.0C582.0,1065.5 580.3,1067.9 573.4,1075.0C566.6,1082.2 557.9,1092.2 543.4,1105.1C528.9,1117.9 498.5,1141.8 486.6,1152.0C474.8,1162.3 478.3,1159.3 472.1,1166.6C465.8,1173.9 455.3,1186.8 449.2,1196.0C443.0,1205.2 439.3,1211.8 435.3,1221.8C431.2,1231.9 428.3,1246.2 425.0,1256.2C421.8,1266.2 421.6,1268.9 415.7,1281.7C409.8,1294.5 396.8,1314.3 389.6,1333.2C382.4,1352.0 377.9,1378.3 372.7,1394.8C367.5,1411.3 363.2,1421.8 358.5,1432.0C353.7,1442.1 348.8,1449.2 344.4,1455.6C340.0,1462.1 335.4,1467.5 332.1,1470.5C328.8,1473.5 326.9,1473.5 324.5,1473.6C322.2,1473.8 319.7,1472.8 318.0,1471.5C316.2,1470.2 315.1,1468.1 314.0,1465.8C312.9,1463.5 312.5,1462.7 311.5,1457.6C310.5,1452.5 308.6,1445.2 307.9,1435.1C307.1,1425.0 306.5,1407.8 307.1,1397.1C307.7,1386.3 308.2,1382.3 311.5,1370.5C314.9,1358.6 323.3,1338.7 327.1,1326.0C331.0,1313.2 332.1,1303.2 334.8,1293.9C337.4,1284.6 335.0,1284.9 343.0,1270.1C350.9,1255.2 372.1,1220.5 382.3,1204.7C392.5,1188.9 395.9,1185.1 404.2,1175.3C412.6,1165.6 426.2,1152.3 432.4,1146.2C438.5,1140.1 438.0,1141.1 441.4,1138.8C444.8,1136.5 446.2,1135.2 452.7,1132.7C459.2,1130.1 474.1,1126.3 480.5,1123.6C486.9,1121.0 484.8,1124.4 491.0,1116.7C497.3,1109.0 511.4,1087.8 517.8,1077.5C524.1,1067.2 525.9,1061.9 529.1,1054.9C532.2,1047.9 529.4,1057.8 536.6,1035.3C543.8,1012.8 562.1,954.0 572.4,919.8C582.6,885.7 593.4,848.2 598.3,830.4C603.2,812.7 604.0,829.2 601.8,813.5C599.5,797.8 589.2,759.3 585.0,736.3C580.8,713.4 578.0,688.1 576.6,675.9C575.2,663.7 577.2,671.7 576.6,663.3C575.9,654.9 573.4,646.6 572.7,625.5C572.0,604.4 575.3,561.8 572.1,536.9C569.0,511.9 557.7,491.0 553.7,475.8C549.7,460.5 551.7,471.2 548.2,445.4C544.8,419.6 535.8,345.9 532.9,321.1C530.1,296.4 533.1,311.2 531.1,296.8C529.2,282.4 522.9,248.1 521.3,234.9C519.7,221.6 522.0,225.3 521.3,217.4C520.7,209.5 518.2,196.3 517.4,187.4C516.6,178.5 517.7,173.3 516.5,164.1C515.3,154.9 511.9,139.4 510.3,132.4C508.7,125.5 508.2,125.3 506.8,122.4C505.3,119.5 503.7,116.8 501.7,114.9C499.8,112.9 497.7,111.6 495.1,110.8C492.6,109.9 490.0,109.5 486.4,109.8C482.9,110.2 478.5,111.0 473.9,112.8C469.3,114.7 462.6,118.5 458.7,120.9C454.9,123.4 453.5,124.5 450.8,127.5C448.1,130.4 444.7,135.3 442.6,138.7C440.5,142.1 439.5,143.9 438.1,147.7C436.6,151.6 435.2,154.1 433.8,161.8C432.3,169.6 430.0,186.7 429.2,194.2C428.5,201.6 428.7,200.8 429.2,206.8C429.7,212.7 431.7,221.1 432.1,230.0C432.6,238.9 432.4,252.8 432.1,260.1C431.8,267.4 430.9,271.0 430.3,273.7C429.7,276.5 429.1,276.0 428.4,276.4C427.6,276.8 426.6,277.1 425.7,276.2C424.8,275.4 423.5,274.2 422.9,271.3C422.2,268.4 423.6,270.3 421.7,258.9C419.8,247.4 413.7,218.6 411.2,202.4C408.8,186.3 407.8,179.4 406.9,162.2C406.1,145.0 407.2,114.9 406.0,99.2C404.7,83.4 401.2,74.8 399.6,67.7C398.0,60.6 397.6,60.3 396.2,56.6C394.7,52.9 393.1,49.2 390.8,45.5C388.5,41.8 385.7,37.8 382.5,34.4C379.3,31.0 374.4,27.2 371.5,25.1C368.6,22.9 368.3,22.5 365.3,21.6C362.2,20.8 356.9,19.5 353.0,20.0ZM425.8,348.9C426.9,348.6 427.9,348.7 429.2,349.2C430.6,349.8 431.6,350.1 433.9,352.4C436.2,354.6 440.0,359.8 443.0,362.6C446.0,365.4 449.7,367.2 451.7,369.4C453.7,371.6 455.6,368.8 455.1,375.7C454.6,382.7 450.0,398.4 448.6,411.3C447.2,424.1 446.8,440.2 446.7,453.0C446.5,465.7 446.8,476.0 447.6,487.9C448.5,499.7 450.9,517.3 452.0,524.3C453.0,531.3 453.0,528.0 454.1,529.9C455.2,531.7 456.5,533.4 458.5,535.1C460.5,536.8 462.5,538.4 466.2,540.1C469.8,541.8 477.5,543.9 480.3,545.4C483.1,546.8 482.3,547.5 482.9,548.6C483.4,549.7 483.6,550.3 483.4,551.7C483.2,553.1 486.0,550.4 481.9,557.0C477.8,563.6 463.4,583.4 459.0,591.2C454.5,599.1 456.2,596.7 455.4,604.2C454.6,611.7 453.3,618.7 454.4,636.2C455.6,653.6 459.4,686.1 462.2,708.9C464.9,731.6 469.5,760.6 470.9,772.8C472.3,785.1 471.2,779.5 470.6,782.2C469.9,784.9 468.8,787.3 467.0,789.3C465.3,791.3 465.1,792.2 460.1,794.0C455.2,795.9 444.0,798.9 437.4,800.4C430.8,801.9 424.1,802.6 420.5,802.9C416.9,803.1 417.2,802.6 415.7,801.9C414.1,801.2 412.2,799.6 411.4,798.5C410.5,797.3 410.5,796.5 410.6,795.2C410.7,793.9 411.2,792.3 412.2,790.7C413.3,789.1 411.9,789.6 416.8,785.6C421.8,781.7 437.2,770.9 441.8,767.0C446.5,763.1 443.9,764.4 444.7,762.2C445.5,759.9 446.4,757.5 446.7,753.4C447.0,749.4 447.4,748.3 446.7,737.9C445.9,727.5 444.3,704.9 442.2,691.1C440.0,677.2 436.9,671.2 433.8,654.9C430.6,638.5 424.6,604.7 423.0,593.0C421.3,581.2 422.4,589.7 423.8,584.2C425.3,578.8 430.2,565.7 431.6,560.0C433.0,554.3 434.2,561.2 432.1,549.9C430.1,538.6 422.3,508.7 419.2,492.1C416.1,475.4 414.6,462.2 413.7,450.0C412.8,437.9 413.1,430.7 413.7,419.0C414.4,407.4 417.0,388.8 417.6,380.3C418.2,371.7 417.3,371.9 417.6,367.7C417.9,363.5 418.8,357.8 419.5,355.1C420.3,352.3 421.2,352.0 422.2,351.0C423.3,349.9 424.6,349.2 425.8,348.9Z"/></svg><span><span>Opmet</span><span>Osserpse</span></span></a></header>
+<svg class="ink-defs" width="0" height="0" aria-hidden="true" focusable="false"><defs><filter id="ink-light" x="-10%" y="-10%" width="120%" height="120%" color-interpolation-filters="sRGB"><feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="2" seed="7" result="edge"/><feDisplacementMap in="SourceGraphic" in2="edge" scale="1.5" xChannelSelector="R" yChannelSelector="G" result="wobble"/><feGaussianBlur in="wobble" stdDeviation="0.4" result="soft"/><feComponentTransfer in="soft" result="bleed"><feFuncA type="linear" slope="2.2" intercept="-0.45"/></feComponentTransfer><feTurbulence type="fractalNoise" baseFrequency="0.03" numOctaves="3" seed="11" result="low"/><feColorMatrix in="low" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  -0.5 0 0 0 1.25" result="density"/><feComposite in="bleed" in2="density" operator="in"/></filter><filter id="ink-medium" x="-10%" y="-10%" width="120%" height="120%" color-interpolation-filters="sRGB"><feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="2" seed="7" result="edge"/><feDisplacementMap in="SourceGraphic" in2="edge" scale="2.2" xChannelSelector="R" yChannelSelector="G" result="wobble"/><feGaussianBlur in="wobble" stdDeviation="0.6" result="soft"/><feComponentTransfer in="soft" result="bleed"><feFuncA type="linear" slope="1.8" intercept="-0.25"/></feComponentTransfer><feTurbulence type="fractalNoise" baseFrequency="0.03" numOctaves="3" seed="11" result="low"/><feColorMatrix in="low" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  -0.9 0 0 0 1.45" result="density"/><feComposite in="bleed" in2="density" operator="in"/></filter><filter id="ink-heavy" x="-10%" y="-10%" width="120%" height="120%" color-interpolation-filters="sRGB"><feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="2" seed="7" result="edge"/><feDisplacementMap in="SourceGraphic" in2="edge" scale="3.0" xChannelSelector="R" yChannelSelector="G" result="wobble"/><feGaussianBlur in="wobble" stdDeviation="0.8" result="soft"/><feComponentTransfer in="soft" result="bleed"><feFuncA type="linear" slope="1.6" intercept="-0.12"/></feComponentTransfer><feTurbulence type="fractalNoise" baseFrequency="0.03" numOctaves="3" seed="11" result="low"/><feColorMatrix in="low" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  -1.4 0 0 0 1.7" result="density"/><feComposite in="bleed" in2="density" operator="in"/></filter></defs></svg>
+<a class="skip" href="#main">Skip to content</a>
 
-<section class="hero" id="hero" aria-labelledby="title">
-  <h1 id="title">Opmet Serif</h1>
-  <dl class="facts">
+<main id="main">
+<div class="pp" data-lightbox>
+<header class="mast"><a class="mast-name mast-lockup" href="/" data-cover><span class="mast-hand" data-pose="mark" aria-hidden="true"><svg class="mast-hand-art" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="53.6 15.5 793.4 1830.2"><path fill-rule="evenodd" d="M353.0,20.0C349.1,20.5 345.0,22.0 342.0,24.5C339.0,27.1 339.5,22.7 335.2,35.2C330.9,47.7 319.8,87.1 316.4,99.7C313.0,112.3 315.1,96.3 314.9,110.8C314.6,125.2 314.4,171.0 314.9,186.4C315.3,201.8 314.7,190.0 317.3,203.3C320.0,216.6 325.7,245.0 330.9,266.3C336.1,287.7 344.3,314.5 348.2,331.4C352.2,348.3 353.5,349.2 354.6,367.7C355.7,386.1 356.4,413.2 354.6,442.3C352.8,471.4 345.7,517.9 343.9,542.1C342.2,566.4 343.7,577.4 343.9,587.7C344.2,597.9 344.6,598.3 345.4,603.6C346.2,609.0 348.4,611.7 348.8,619.7C349.2,627.7 347.5,643.1 347.8,651.7C348.1,660.2 350.1,663.9 350.7,671.0C351.4,678.2 350.4,683.3 351.7,694.3C353.0,705.3 357.4,727.4 358.5,737.0C359.5,746.6 358.5,748.0 357.9,751.9C357.3,755.8 356.4,757.9 354.8,760.4C353.2,763.0 351.3,765.4 348.2,767.4C345.2,769.4 339.5,771.7 336.7,772.4C334.0,773.1 333.1,772.4 331.8,771.4C330.4,770.5 329.3,768.9 328.7,766.7C328.2,764.5 327.9,764.2 328.4,758.3C329.0,752.4 333.1,745.3 332.1,731.4C331.1,717.5 324.5,690.3 322.6,674.9C320.7,659.5 321.5,649.1 320.7,639.1C319.9,629.0 318.2,628.4 317.8,614.8C317.3,601.3 317.1,574.8 317.8,557.6C318.4,540.5 321.0,530.7 321.6,512.1C322.3,493.5 322.3,463.5 321.6,446.2C321.0,428.9 318.4,419.5 317.8,408.4C317.1,397.2 318.4,389.1 317.8,379.3C317.1,369.4 314.5,358.8 313.9,349.2C313.2,339.7 314.4,330.0 313.9,322.1C313.4,314.2 311.6,309.5 311.0,301.7C310.3,294.0 311.2,286.3 310.0,275.6C308.8,264.8 306.0,248.6 303.7,237.3C301.3,226.1 299.1,217.8 296.1,208.0C293.1,198.3 288.7,185.1 285.8,178.6C282.8,172.2 280.8,171.5 278.4,169.5C276.1,167.5 274.8,167.2 271.7,166.6C268.5,166.0 263.1,165.8 259.6,166.0C256.1,166.3 253.4,167.0 250.9,168.0C248.3,169.0 246.5,170.2 244.3,172.1C242.1,173.9 240.0,176.0 237.8,179.2C235.7,182.4 233.3,187.2 231.5,191.2C229.7,195.3 228.2,199.4 227.2,203.4C226.2,207.5 225.9,205.1 225.7,215.5C225.4,225.9 224.9,252.1 225.7,265.9C226.4,279.7 227.3,281.1 230.2,298.2C233.1,315.3 241.5,352.4 243.1,368.6C244.8,384.9 240.7,388.3 240.2,395.8C239.7,403.2 240.9,404.7 240.2,413.2C239.6,421.8 236.8,421.6 236.3,447.1C235.9,472.7 236.3,542.9 237.3,566.4C238.3,589.8 241.5,583.2 242.2,587.7C242.8,592.2 242.5,590.0 241.1,593.4C239.6,596.8 236.0,600.8 233.5,608.2C231.1,615.5 228.3,627.8 226.3,637.8C224.4,647.8 222.6,659.0 221.8,668.1C221.0,677.2 221.5,686.3 221.8,692.4C222.0,698.4 221.8,698.5 223.3,704.4C224.8,710.4 223.9,709.3 230.8,727.9C237.8,746.5 259.3,798.6 265.0,815.9C270.7,833.2 265.5,827.5 265.0,831.5C264.5,835.5 264.2,836.1 261.9,840.0C259.5,843.9 256.6,848.5 250.7,855.0C244.8,861.5 232.5,873.7 226.4,879.2C220.3,884.8 217.0,886.6 214.0,888.2C211.1,889.8 210.0,889.0 208.6,888.8C207.1,888.6 206.2,888.0 205.5,887.0C204.9,885.9 204.4,884.3 204.6,882.6C204.7,880.8 202.5,883.4 206.3,876.5C210.1,869.6 223.2,848.3 227.2,841.2C231.2,834.1 229.5,836.6 230.4,833.8C231.3,830.9 232.4,828.0 232.5,824.2C232.5,820.4 231.9,816.7 230.8,811.3C229.8,805.9 229.9,804.8 226.1,791.8C222.3,778.8 214.4,748.4 208.2,733.1C202.0,717.8 194.8,713.2 188.8,700.1C182.8,687.1 176.8,666.3 172.3,654.7C167.7,643.0 167.0,640.9 161.7,630.3C156.4,619.8 146.7,604.3 140.4,591.6C134.1,578.8 129.0,564.8 123.9,553.8C118.8,542.7 114.5,534.3 109.7,525.3C104.9,516.4 98.5,505.0 95.0,500.2C91.6,495.4 90.9,497.2 89.1,496.5C87.3,495.7 86.3,495.4 84.3,495.7C82.3,496.0 79.2,497.1 77.2,498.3C75.1,499.5 73.4,501.0 72.1,502.9C70.8,504.8 69.8,504.7 69.2,509.7C68.5,514.7 69.8,526.8 68.2,533.0C66.6,539.1 61.3,543.4 59.6,546.7C57.9,550.0 58.3,549.3 58.0,552.8C57.7,556.2 57.6,561.6 58.0,567.3C58.4,573.0 59.2,580.2 60.6,587.0C61.9,593.9 63.5,600.1 66.1,608.7C68.6,617.3 73.1,627.8 75.9,638.6C78.6,649.4 80.0,663.0 82.8,673.4C85.5,683.8 87.4,688.8 92.1,700.9C96.9,712.9 106.5,732.7 111.2,745.8C115.9,758.8 115.3,755.4 120.5,779.2C125.6,803.0 135.9,860.5 142.0,888.5C148.1,916.4 154.0,932.9 157.3,946.9C160.6,960.9 161.2,966.5 161.7,972.5C162.2,978.5 162.0,976.2 160.3,982.7C158.6,989.3 154.6,995.7 151.7,1011.9C148.7,1028.2 146.2,1057.0 142.5,1080.3C138.9,1103.6 131.8,1137.2 129.7,1151.8C127.7,1166.4 129.2,1162.4 130.3,1167.8C131.3,1173.2 135.1,1180.2 136.1,1184.2C137.0,1188.3 137.9,1187.0 136.1,1192.1C134.2,1197.2 127.5,1208.9 124.9,1214.8C122.3,1220.8 122.3,1215.2 120.6,1228.0C118.8,1240.7 115.1,1277.0 114.2,1291.4C113.3,1305.9 113.6,1299.9 115.2,1314.7C116.7,1329.5 121.1,1367.4 123.4,1380.1C125.6,1392.9 125.6,1388.7 128.5,1391.5C131.5,1394.2 138.4,1394.9 140.9,1396.5C143.5,1398.1 143.6,1398.9 143.8,1400.9C144.0,1402.9 145.0,1401.1 142.2,1408.6C139.4,1416.1 130.9,1433.6 127.1,1445.8C123.4,1458.1 121.2,1473.7 119.7,1482.0C118.2,1490.4 118.4,1490.4 118.1,1495.9C117.8,1501.5 117.3,1504.6 118.1,1515.3C118.9,1526.0 121.5,1551.0 122.7,1560.1C123.9,1569.3 123.0,1564.0 125.2,1570.2C127.4,1576.5 129.7,1583.6 135.7,1597.5C141.8,1611.3 153.2,1637.7 161.4,1653.3C169.5,1668.9 176.0,1678.2 184.5,1691.2C193.0,1704.2 204.2,1716.5 212.3,1731.3C220.5,1746.0 225.8,1763.4 233.4,1779.9C241.1,1796.5 253.7,1821.7 258.3,1830.7C262.9,1839.6 259.4,1832.8 261.0,1833.8C262.6,1834.8 262.7,1835.6 267.7,1836.8C272.6,1838.0 282.8,1840.3 290.6,1841.0C298.5,1841.7 306.9,1841.4 314.9,1841.0C322.8,1840.6 327.6,1840.2 338.3,1838.3C349.1,1836.4 364.8,1833.6 379.3,1829.8C393.7,1826.0 408.5,1821.7 425.2,1815.7C442.0,1809.6 461.7,1801.9 479.6,1793.5C497.6,1785.1 518.9,1773.5 533.1,1765.5C547.2,1757.5 556.8,1750.6 564.4,1745.5C572.0,1740.3 572.0,1740.3 578.8,1734.7C585.7,1729.1 598.1,1719.1 605.4,1711.9C612.7,1704.6 618.5,1696.8 622.6,1691.2C626.6,1685.5 628.0,1682.1 629.7,1677.9C631.3,1673.7 634.8,1675.7 632.4,1666.0C629.9,1656.3 620.2,1635.8 614.7,1619.7C609.2,1603.5 602.8,1583.1 599.5,1568.9C596.2,1554.8 595.5,1543.9 595.0,1534.7C594.5,1525.5 595.0,1521.3 596.6,1514.0C598.2,1506.8 596.7,1509.5 604.7,1491.1C612.6,1472.7 632.6,1431.3 644.2,1403.6C655.8,1376.0 667.8,1343.2 674.4,1325.2C680.9,1307.2 681.2,1305.0 683.6,1295.7C686.0,1286.5 685.7,1281.3 688.6,1269.6C691.5,1258.0 695.3,1251.3 701.1,1225.9C706.8,1200.5 718.7,1141.6 723.1,1117.1C727.6,1092.7 726.8,1090.5 727.8,1079.1C728.7,1067.8 727.8,1060.1 728.7,1049.1C729.7,1038.1 731.1,1026.4 733.4,1013.0C735.7,999.6 740.5,980.2 742.6,968.9C744.8,957.7 745.4,955.6 746.2,945.4C746.9,935.1 746.4,917.8 747.2,907.6C747.9,897.3 749.0,893.5 750.8,884.1C752.7,874.6 754.5,865.7 758.4,850.9C762.2,836.2 769.8,811.9 773.8,795.6C777.7,779.2 780.6,760.9 782.2,752.6C783.7,744.3 783.4,750.7 783.0,745.7C782.7,740.7 780.6,736.5 780.1,722.4C779.6,708.4 779.8,674.7 780.1,661.4C780.4,648.1 780.9,647.8 781.7,642.6C782.6,637.5 781.9,637.8 785.1,630.4C788.2,623.1 793.1,615.5 800.5,598.4C807.9,581.2 822.9,544.7 829.4,527.5C836.0,510.3 837.4,503.3 839.7,495.1C841.9,486.8 843.0,483.0 843.0,478.1C843.0,473.1 840.9,467.9 839.7,465.1C838.5,462.3 837.3,462.1 835.9,461.1C834.5,460.1 832.8,459.4 831.2,459.1C829.5,458.8 830.0,458.2 826.1,459.2C822.2,460.2 815.8,464.1 807.8,465.1C799.8,466.2 784.8,465.2 778.2,465.6C771.6,465.9 773.4,465.3 768.1,467.1C762.7,468.8 753.1,472.0 745.9,475.9C738.6,479.8 729.9,486.3 724.5,490.4C719.1,494.6 717.0,496.4 713.5,500.7C709.9,504.9 706.7,508.6 703.3,515.7C700.0,522.9 696.4,532.1 693.4,543.6C690.5,555.2 687.6,575.9 685.6,585.2C683.5,594.5 682.8,595.0 681.1,599.2C679.5,603.4 678.8,605.4 675.6,610.2C672.5,615.0 666.2,622.4 662.4,628.0C658.6,633.6 655.7,638.3 652.9,643.7C650.1,649.1 647.4,655.2 645.5,660.5C643.5,665.8 643.7,661.9 641.2,675.6C638.7,689.3 632.5,729.4 630.6,742.6C628.7,755.7 629.7,751.4 629.9,754.4C630.0,757.4 629.6,757.1 631.5,760.5C633.4,764.0 639.7,770.7 641.4,774.9C643.1,779.1 646.4,767.3 641.8,785.8C637.3,804.2 620.7,859.6 613.9,885.8C607.2,912.0 604.9,923.8 601.4,943.1C598.0,962.4 594.8,984.7 593.0,1001.6C591.3,1018.4 591.7,1035.5 591.1,1044.2C590.5,1053.0 590.2,1051.0 589.2,1053.9C588.1,1056.9 587.3,1058.5 584.6,1062.0C582.0,1065.5 580.3,1067.9 573.4,1075.0C566.6,1082.2 557.9,1092.2 543.4,1105.1C528.9,1117.9 498.5,1141.8 486.6,1152.0C474.8,1162.3 478.3,1159.3 472.1,1166.6C465.8,1173.9 455.3,1186.8 449.2,1196.0C443.0,1205.2 439.3,1211.8 435.3,1221.8C431.2,1231.9 428.3,1246.2 425.0,1256.2C421.8,1266.2 421.6,1268.9 415.7,1281.7C409.8,1294.5 396.8,1314.3 389.6,1333.2C382.4,1352.0 377.9,1378.3 372.7,1394.8C367.5,1411.3 363.2,1421.8 358.5,1432.0C353.7,1442.1 348.8,1449.2 344.4,1455.6C340.0,1462.1 335.4,1467.5 332.1,1470.5C328.8,1473.5 326.9,1473.5 324.5,1473.6C322.2,1473.8 319.7,1472.8 318.0,1471.5C316.2,1470.2 315.1,1468.1 314.0,1465.8C312.9,1463.5 312.5,1462.7 311.5,1457.6C310.5,1452.5 308.6,1445.2 307.9,1435.1C307.1,1425.0 306.5,1407.8 307.1,1397.1C307.7,1386.3 308.2,1382.3 311.5,1370.5C314.9,1358.6 323.3,1338.7 327.1,1326.0C331.0,1313.2 332.1,1303.2 334.8,1293.9C337.4,1284.6 335.0,1284.9 343.0,1270.1C350.9,1255.2 372.1,1220.5 382.3,1204.7C392.5,1188.9 395.9,1185.1 404.2,1175.3C412.6,1165.6 426.2,1152.3 432.4,1146.2C438.5,1140.1 438.0,1141.1 441.4,1138.8C444.8,1136.5 446.2,1135.2 452.7,1132.7C459.2,1130.1 474.1,1126.3 480.5,1123.6C486.9,1121.0 484.8,1124.4 491.0,1116.7C497.3,1109.0 511.4,1087.8 517.8,1077.5C524.1,1067.2 525.9,1061.9 529.1,1054.9C532.2,1047.9 529.4,1057.8 536.6,1035.3C543.8,1012.8 562.1,954.0 572.4,919.8C582.6,885.7 593.4,848.2 598.3,830.4C603.2,812.7 604.0,829.2 601.8,813.5C599.5,797.8 589.2,759.3 585.0,736.3C580.8,713.4 578.0,688.1 576.6,675.9C575.2,663.7 577.2,671.7 576.6,663.3C575.9,654.9 573.4,646.6 572.7,625.5C572.0,604.4 575.3,561.8 572.1,536.9C569.0,511.9 557.7,491.0 553.7,475.8C549.7,460.5 551.7,471.2 548.2,445.4C544.8,419.6 535.8,345.9 532.9,321.1C530.1,296.4 533.1,311.2 531.1,296.8C529.2,282.4 522.9,248.1 521.3,234.9C519.7,221.6 522.0,225.3 521.3,217.4C520.7,209.5 518.2,196.3 517.4,187.4C516.6,178.5 517.7,173.3 516.5,164.1C515.3,154.9 511.9,139.4 510.3,132.4C508.7,125.5 508.2,125.3 506.8,122.4C505.3,119.5 503.7,116.8 501.7,114.9C499.8,112.9 497.7,111.6 495.1,110.8C492.6,109.9 490.0,109.5 486.4,109.8C482.9,110.2 478.5,111.0 473.9,112.8C469.3,114.7 462.6,118.5 458.7,120.9C454.9,123.4 453.5,124.5 450.8,127.5C448.1,130.4 444.7,135.3 442.6,138.7C440.5,142.1 439.5,143.9 438.1,147.7C436.6,151.6 435.2,154.1 433.8,161.8C432.3,169.6 430.0,186.7 429.2,194.2C428.5,201.6 428.7,200.8 429.2,206.8C429.7,212.7 431.7,221.1 432.1,230.0C432.6,238.9 432.4,252.8 432.1,260.1C431.8,267.4 430.9,271.0 430.3,273.7C429.7,276.5 429.1,276.0 428.4,276.4C427.6,276.8 426.6,277.1 425.7,276.2C424.8,275.4 423.5,274.2 422.9,271.3C422.2,268.4 423.6,270.3 421.7,258.9C419.8,247.4 413.7,218.6 411.2,202.4C408.8,186.3 407.8,179.4 406.9,162.2C406.1,145.0 407.2,114.9 406.0,99.2C404.7,83.4 401.2,74.8 399.6,67.7C398.0,60.6 397.6,60.3 396.2,56.6C394.7,52.9 393.1,49.2 390.8,45.5C388.5,41.8 385.7,37.8 382.5,34.4C379.3,31.0 374.4,27.2 371.5,25.1C368.6,22.9 368.3,22.5 365.3,21.6C362.2,20.8 356.9,19.5 353.0,20.0ZM425.8,348.9C426.9,348.6 427.9,348.7 429.2,349.2C430.6,349.8 431.6,350.1 433.9,352.4C436.2,354.6 440.0,359.8 443.0,362.6C446.0,365.4 449.7,367.2 451.7,369.4C453.7,371.6 455.6,368.8 455.1,375.7C454.6,382.7 450.0,398.4 448.6,411.3C447.2,424.1 446.8,440.2 446.7,453.0C446.5,465.7 446.8,476.0 447.6,487.9C448.5,499.7 450.9,517.3 452.0,524.3C453.0,531.3 453.0,528.0 454.1,529.9C455.2,531.7 456.5,533.4 458.5,535.1C460.5,536.8 462.5,538.4 466.2,540.1C469.8,541.8 477.5,543.9 480.3,545.4C483.1,546.8 482.3,547.5 482.9,548.6C483.4,549.7 483.6,550.3 483.4,551.7C483.2,553.1 486.0,550.4 481.9,557.0C477.8,563.6 463.4,583.4 459.0,591.2C454.5,599.1 456.2,596.7 455.4,604.2C454.6,611.7 453.3,618.7 454.4,636.2C455.6,653.6 459.4,686.1 462.2,708.9C464.9,731.6 469.5,760.6 470.9,772.8C472.3,785.1 471.2,779.5 470.6,782.2C469.9,784.9 468.8,787.3 467.0,789.3C465.3,791.3 465.1,792.2 460.1,794.0C455.2,795.9 444.0,798.9 437.4,800.4C430.8,801.9 424.1,802.6 420.5,802.9C416.9,803.1 417.2,802.6 415.7,801.9C414.1,801.2 412.2,799.6 411.4,798.5C410.5,797.3 410.5,796.5 410.6,795.2C410.7,793.9 411.2,792.3 412.2,790.7C413.3,789.1 411.9,789.6 416.8,785.6C421.8,781.7 437.2,770.9 441.8,767.0C446.5,763.1 443.9,764.4 444.7,762.2C445.5,759.9 446.4,757.5 446.7,753.4C447.0,749.4 447.4,748.3 446.7,737.9C445.9,727.5 444.3,704.9 442.2,691.1C440.0,677.2 436.9,671.2 433.8,654.9C430.6,638.5 424.6,604.7 423.0,593.0C421.3,581.2 422.4,589.7 423.8,584.2C425.3,578.8 430.2,565.7 431.6,560.0C433.0,554.3 434.2,561.2 432.1,549.9C430.1,538.6 422.3,508.7 419.2,492.1C416.1,475.4 414.6,462.2 413.7,450.0C412.8,437.9 413.1,430.7 413.7,419.0C414.4,407.4 417.0,388.8 417.6,380.3C418.2,371.7 417.3,371.9 417.6,367.7C417.9,363.5 418.8,357.8 419.5,355.1C420.3,352.3 421.2,352.0 422.2,351.0C423.3,349.9 424.6,349.2 425.8,348.9Z"/></svg></span> <span class="mast-words"><span>Opmet</span> <span>Osserpse</span></span></a><p class="mast-link"><a class="ctl" href="/#archive" data-all-work><span class="ctl-w" aria-hidden="true">All work</span><span class="ctl-v">All work</span></a> <a class="ctl" href="/" data-cover><span class="ctl-w" aria-hidden="true">Home</span><span class="ctl-v">Home</span></a></p></header>
+<style>
+/* A project page of opmetosserpse.com, made for one typeface: a standard header, the quote and the hand it came from,
+   then the work, centered. Paper and ink only; the type is the only image that moves. */
+.os{
+  --paper:#F7F6F2; --paper-deep:#EEEDE8; --sheet:#FFFFFF; --ink:#161512; --graphite:#635E57; --rule:#D8D5CD; --wash:rgba(22,21,18,.08);
+  --serif:"Opmet Serif",Georgia,"Times New Roman",serif;
+  --sans:"Instrument Sans","Helvetica Neue",Arial,sans-serif;
+  --margin:clamp(20px,3.4vw,56px); --gutter:clamp(14px,1.7vw,24px);
+  --t:.5s; --ease:cubic-bezier(.3,.1,.2,1);
+  --mcol:clamp(104px,9vw,140px); --mgap:clamp(32px,3.2vw,48px);
+  --s1:8px; --s2:16px; --s3:24px; --s4:40px; --s5:72px; --s6:clamp(96px,13vw,184px);
+  color-scheme:light;
+}
+.os,.os *,.os *::before,.os *::after{box-sizing:border-box}
+
+.os{margin:0;background:var(--paper);color:var(--ink);font:400 13px/1.55 var(--sans);-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+.os{max-width:1440px;margin:0 auto;padding-inline:var(--margin);padding-block:0 var(--s5);overflow-x:clip}
+.os button,.os input{font:inherit;color:inherit}
+.os :focus-visible{outline:1.5px solid var(--ink);outline-offset:4px}
+.os a{color:inherit;text-decoration:none}
+.os .os-grid{display:block}
+.os .os-label{font:400 12px/1.4 var(--sans);letter-spacing:.02em;color:var(--graphite)}
+.os .os-num{font-variant-numeric:tabular-nums}
+
+/* The nameplate: the hand, then Opmet over Osserpse, centered */
+.os .os-mast{display:flex;justify-content:center;padding-top:clamp(28px,5vh,56px)}
+.os .os-mast a{display:flex;align-items:flex-end;gap:.24em;font:900 clamp(22px,2.4vw,32px)/1.02 var(--serif);font-optical-sizing:auto;letter-spacing:-.005em;transition:color var(--t) var(--ease)}
+.os .os-mast a:hover{color:var(--graphite)}
+.os .os-mast-hand{height:2.05em;width:auto;margin-bottom:.06em}
+.os .os-mast-hand path{fill:currentColor}
+.os .os-mast span{display:block}
+
+/* It started by hand: the quote, then the handwriting with lines pointing to what the serif took from it */
+.os .os-hand{margin-top:var(--s6);display:grid;justify-items:center;text-align:center}
+.os .os-quote{margin:0;max-width:22em;font:italic 400 clamp(24px,3vw,40px)/1.25 var(--serif);font-variation-settings:"opsz" 48;text-wrap:balance}
+.os .os-quote p{margin:0}
+.os .os-quote cite{display:block;margin-top:var(--s2);font:400 15px/1.4 var(--sans);font-style:normal;color:var(--ink)}
+.os .os-sigmap{margin:0;width:min(100%,1000px);padding-block:190px 270px}
+.os .os-sig-box{position:relative}
+.os .os-sig-box > svg{display:block;width:100%;height:auto}
+.os .os-sig-box > svg path{fill:var(--ink)}
+.os .os-call{position:absolute;left:var(--x);top:var(--y);width:0;height:0;--len:64px}
+.os .os-call::before{content:"";position:absolute;left:-3.5px;top:-3.5px;width:7px;height:7px;border-radius:50%;background:var(--ink)}
+.os .os-call .os-lead{position:absolute;left:-.5px;width:1px;height:var(--len);background:var(--ink)}
+.os .os-call.os-up .os-lead{bottom:0} .os .os-call.os-down .os-lead{top:0}
+.os .os-call .os-txt{position:absolute;width:max-content;max-width:19em;display:grid;gap:4px;text-align:left}
+.os .os-call.os-up .os-txt{bottom:calc(var(--len) + 12px)} .os .os-call.os-down .os-txt{top:calc(var(--len) + 12px)}
+.os .os-call.os-left .os-txt{left:-2px} .os .os-call.os-right .os-txt{right:-2px;text-align:right;justify-items:end}
+.os .os-call b{font:400 clamp(19px,2vw,26px)/1.15 var(--serif);font-variation-settings:"opsz" 40;white-space:nowrap}
+.os .os-call span{font:400 14px/1.45 var(--sans);color:var(--ink)}
+.os .os-call.os-o{--len:48px} .os .os-call.os-r{--len:118px}
+@media (max-width:700px){
+  .os .os-sigmap{padding-block:230px 330px}
+  .os .os-call b{white-space:normal}
+  .os .os-call{--len:84px} .os .os-call.os-o{--len:36px} .os .os-call.os-r{--len:156px}
+  .os .os-call .os-txt{max-width:13.5em}
+  .os .os-call span{font-size:13px}
+}
+
+/* The header: the name, the whole range of the family under the pointer, then the client, the year and the work */
+.os .os-hero{padding-top:var(--s5);text-align:center}
+.os .os-hero h1{margin:0;font-family:var(--serif);font-weight:900;font-size:clamp(44px,12.4vw,196px);line-height:.92;letter-spacing:-.018em;
+  font-variation-settings:"wght" var(--w,900),"opsz" 72;white-space:nowrap;cursor:ew-resize;touch-action:pan-y;user-select:none;-webkit-user-select:none}
+.os .os-facts{margin:var(--s4) 0 0;display:flex;justify-content:center;flex-wrap:wrap;gap:var(--s2) var(--s5)}
+.os .os-facts div{display:grid;gap:2px;text-align:center}
+.os .os-facts dt{font:400 12px/1.4 var(--sans);color:var(--ink);letter-spacing:.02em}
+.os .os-facts dd{margin:0;font:400 14px/1.4 var(--sans)}
+.os .os-lede{max-width:31em;margin:var(--s5) auto 0;text-align:center;font:400 16px/1.6 var(--sans);text-wrap:balance}
+
+/* Each piece: a small label over the work, the work across the page */
+.os .os-piece{margin-top:var(--s6);display:grid;grid-template-columns:minmax(0,1fr);gap:var(--s3)}
+.os .os-work{min-width:0}
+/* 2026-10-14 (D: "I said all headers in margins"): from 1000 px every piece sits between two margins, its header in the
+   left one, held in view while the piece scrolls past; narrower, the header sits above the piece */
+@media (min-width:1000px){
+  .os .os-piece{grid-template-columns:var(--mcol) minmax(0,1fr) var(--mcol);column-gap:var(--mgap)}
+  .os .os-piece > .os-mh{grid-column:1;grid-row:1}
+  .os .os-piece > .os-work{grid-column:2;grid-row:1}
+}
+.os .os-controls{display:flex;flex-wrap:wrap;gap:var(--s1) var(--s3);margin-top:var(--s3);align-items:center}
+.os .os-seg{display:inline-flex;gap:var(--s2)}
+.os .os-seg button{appearance:none;background:none;border:0;padding:4px 0;cursor:pointer;font:400 13px/1.3 var(--sans);color:var(--graphite);
+  border-bottom:1px solid transparent;transition:color var(--t) var(--ease),border-color var(--t) var(--ease)}
+.os .os-seg button:hover{color:var(--ink)}
+.os .os-seg button[aria-pressed="true"]{color:var(--ink);border-bottom-color:var(--ink)}
+.os .os-seg .os-sep{width:1px;background:var(--rule)}
+.os svg{display:block;overflow:visible}
+
+/* The wink and Drawn as strokes: two pieces side by side, each named in its own margin, its words below it.
+   2026-10-14 (D: "the headers ... go in hte margins. have the wink and the strokes interactive examples side by side
+   with the text below it"). Each panel is a subgrid of four rows (the picture, the controls, the readout, the words),
+   so the two line up row by row. */
+.os .os-pair{margin-top:var(--s5);display:grid;grid-template-columns:minmax(0,1fr);gap:var(--s3)}
+.os .os-pair > section{display:contents}
+.os .os-mh{margin:0;font:400 13px/1.4 var(--sans);letter-spacing:.02em;color:var(--ink)}
+@media (min-width:1000px){ .os .os-mh{position:sticky;top:calc(env(safe-area-inset-top,0px) + 24px);align-self:start} }
+.os .os-panel{display:grid;gap:var(--s3);align-content:start;min-width:0}
+.os .os-vis{width:100%;max-width:100%;aspect-ratio:1;background:var(--paper-deep)}
+.os .os-vis svg{width:100%;height:100%}
+.os .os-ctl{display:flex;flex-wrap:wrap;align-items:center;align-content:start;gap:var(--s2) var(--s3)}
+.os .os-ctl .os-letters{flex:1 0 100%}
+.os .os-out{display:grid;gap:2px;align-content:start}
+.os .os-out span{font:400 13px/1.4 var(--sans)}
+.os .os-out b{font:300 clamp(30px,3vw,44px)/1.1 var(--serif);font-variation-settings:"opsz" 72;letter-spacing:-.01em}
+.os .os-txt{margin:0;font:400 15px/1.6 var(--sans);max-width:34em}
+.os .os-letters{display:flex;flex-wrap:wrap;gap:4px 0;margin-left:-6px}
+.os .os-letters button{appearance:none;border:0;background:none;cursor:pointer;padding:2px 6px 8px;font:400 clamp(28px,2.6vw,38px)/1.1 var(--serif);
+  font-variation-settings:"opsz" 40;color:var(--graphite);border-bottom:1.5px solid transparent;transition:color var(--t) var(--ease),border-color var(--t) var(--ease)}
+.os .os-letters button:hover{color:var(--ink)}
+.os .os-letters button[aria-pressed="true"]{color:var(--ink);border-bottom-color:var(--ink)}
+@media (min-width:1000px){
+  .os .os-pair{grid-template-columns:var(--mcol) minmax(0,1fr) minmax(0,1fr) var(--mcol);grid-template-rows:repeat(4,auto);column-gap:var(--mgap)}
+  .os .os-mh-w{grid-column:1;grid-row:1 / span 4}
+  .os .os-p-w{grid-column:2;grid-row:1 / span 4}
+  .os .os-mh-cx{grid-column:4;grid-row:1 / span 4;text-align:right}
+  .os .os-p-cx{grid-column:3;grid-row:1 / span 4}
+  .os .os-panel{grid-template-rows:subgrid}
+}
+@media (min-width:701px) and (max-width:999px){
+  .os .os-pair{grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:repeat(5,auto);column-gap:var(--s4)}
+  .os .os-mh-w{grid-column:1;grid-row:1} .os .os-mh-cx{grid-column:2;grid-row:1}
+  .os .os-p-w{grid-column:1;grid-row:2 / span 4} .os .os-p-cx{grid-column:2;grid-row:2 / span 4}
+  .os .os-panel{grid-template-rows:subgrid}
+}
+@media (max-width:700px){ .os .os-mh-cx{margin-top:var(--s5)} }
+
+/* The wink: a letter with a bowl, the Opmet Osserpse way or the regular way */
+.os .os-wink-g .os-glyph{fill:var(--ink);transition:opacity .3s var(--ease)}
+.os .os-wink-g .os-reg{opacity:0}
+.os .os-wink-g[data-way="reg"] .os-op{opacity:0}
+.os .os-wink-g[data-way="reg"] .os-reg{opacity:1}
+.os .os-wink-g .os-axes{transition:opacity .22s var(--ease)}
+.os .os-wink-g .os-axis{stroke:var(--graphite);stroke-width:3;stroke-dasharray:2 11;stroke-linecap:round;fill:none}
+.os .os-wink-g .os-tick{fill:var(--ink)}
+.os .os-wink-g.os-swap .os-glyph,.os .os-wink-g.os-swap .os-axes{opacity:0}
+
+/* Drawn as strokes: the outline and its points */
+.os .os-cx .os-ink{fill:var(--ink);transition:fill-opacity var(--t) var(--ease)}
+.os .os-cx[data-view="points"] .os-ink{fill-opacity:.07}
+.os .os-cx .os-ol{fill:none;stroke:var(--ink);stroke-width:1.6;opacity:0;transition:opacity var(--t) var(--ease)}
+.os .os-cx .os-pts{opacity:0;transition:opacity var(--t) var(--ease)}
+.os .os-cx[data-view="points"] .os-ol,.os .os-cx[data-view="points"] .os-pts{opacity:1}
+.os .os-cx .os-h{stroke:var(--graphite);stroke-width:1.2}
+.os .os-cx .os-on-c{fill:var(--paper);stroke:var(--ink);stroke-width:2.4}
+.os .os-cx .os-on-s{fill:var(--ink)}
+.os .os-cx .os-off{fill:var(--paper);stroke:var(--graphite);stroke-width:1.6}
+
+/* The whole font: the print tests' content, set large, one board after another. --u is px per point, fitted by script */
+.os .os-boards{display:grid;gap:var(--s5)}
+.os .os-board{margin:0;display:grid;gap:var(--s2)}
+.os .os-bbody{container-type:inline-size;--u:calc(86cqw / 504);padding:clamp(36px,7vw,112px) 3%;display:flex;flex-direction:column;align-items:center;text-align:center;overflow:hidden}
+.os .os-board.os-soft .os-bbody{background:var(--paper-deep)}
+.os .os-board.os-ink .os-bbody{background:var(--ink);color:var(--paper)}
+.os .os-board figcaption{text-align:center}
+.os .os-bl{font-family:var(--serif);white-space:nowrap;font-kerning:normal;line-height:1.5;color:inherit}
+.os .os-bl.os-lc{line-height:1.56} .os .os-bl.os-big{line-height:1.1} .os .os-bl.os-flow{line-height:1.17}
+.os .os-bl.os-nm{line-height:1.22} .os .os-bl.os-nm.os-ramp{line-height:1.5}
+.os .os-bgap{height:calc(var(--u) * 40)} .os .os-bgap.os-small{height:calc(var(--u) * 20)}
+@media (max-width:700px){ .os .os-bl.os-split span{display:block} }
+
+/* A line to try: the slider runs the whole range */
+.os .os-tester .os-work{display:grid}
+.os .os-tester-text{font-family:var(--serif);font-size:clamp(34px,5.4vw,80px);line-height:1.1;outline:none;min-height:1.1em;overflow-wrap:anywhere;text-wrap:balance;
+  font-variation-settings:"wght" var(--tw,400),"opsz" var(--to,72);font-style:var(--ts,normal);caret-color:var(--graphite)}
+.os .os-tester .os-range{display:flex;align-items:center;gap:var(--s2);flex:1 1 240px;min-width:200px}
+.os .os-tester input[type=range]{flex:1;accent-color:var(--ink);min-width:0}
+.os .os-tester-readout{min-width:11em}
+.os .os-tester .os-label{color:var(--ink)}
+
+/* In use */
+.os .os-use img{display:block;width:100%;height:auto;max-height:85vh;object-fit:contain;background:var(--paper-deep)}
+.os .os-use figcaption{margin-top:var(--s2);color:var(--graphite)}
+
+/* The numbers */
+.os .os-nums{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--s4) var(--gutter)}
+.os .os-nums div{display:grid;gap:4px}
+.os .os-nums b{font:300 clamp(40px,5vw,72px)/1 var(--serif);font-variation-settings:"opsz" 72;letter-spacing:-.01em}
+.os .os-nums span{color:var(--graphite);max-width:16em}
+
+.os .os-end{margin-top:var(--s6);display:flex;justify-content:center;gap:var(--s4)}
+.os .os-end a{font:400 13px/1.4 var(--sans);color:var(--graphite);border-bottom:1px solid var(--rule);transition:color var(--t) var(--ease),border-color var(--t) var(--ease)}
+.os .os-end a:hover{color:var(--ink);border-color:var(--ink)}
+.os .os-credit{margin-top:var(--s3);text-align:center}
+
+@media (max-width:900px){
+  .os .os-nums{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media (prefers-reduced-motion:reduce){.os *{transition:none!important}}
+</style>
+<div class="os" data-page="opmet-serif" data-page-js="/js/pages/opmet-serif.js?v=5b8782e2a9">
+<section class="os-hero" id="os-hero" aria-labelledby="os-title">
+  <h1 id="os-title">Opmet Serif</h1>
+  <dl class="os-facts">
     <div><dt>Client</dt><dd>Opmet Osserpse</dd></div>
     <div><dt>Year</dt><dd>2026</dd></div>
     <div><dt>Work</dt><dd>Typeface, 36 styles and two variable fonts</dd></div>
   </dl>
 </section>
 
-<section class="hand" aria-label="It started by hand">
-  <blockquote class="quote"><p>“It started by hand. I wanted Opmet Serif to feel like my real handwriting.”</p><cite>Dalton, Opmet Osserpse founder</cite></blockquote>
-  <figure class="sigmap">
-    <div class="sig-box"><svg role="img" aria-label="The founder’s handwriting" xmlns="http://www.w3.org/2000/svg" viewBox="14.6 13.7 199.9 15.6"><path d="M18.38 28.14C17.78 27.81 17.31 26.72 17.00 24.92C16.73 23.40 16.58 22.94 16.18 22.43C15.75 21.89 15.69 21.68 15.64 20.56C15.56 19.05 15.80 18.59 16.60 18.70C17.94 18.88 17.96 18.88 19.25 18.42C20.53 17.97 21.76 17.71 23.92 17.47C24.54 17.39 25.45 17.24 25.96 17.13C27.47 16.79 29.09 16.64 30.71 16.69C32.71 16.75 33.03 16.87 34.07 17.87C34.97 18.74 35.08 19.15 34.92 21.05C34.81 22.40 34.69 22.87 34.24 23.78C33.50 25.24 31.28 26.85 29.52 27.21C29.14 27.28 28.50 27.46 28.10 27.59C26.40 28.18 25.98 28.22 21.50 28.29C18.72 28.33 18.71 28.33 18.38 28.14ZM134.91 28.30C134.89 28.28 134.01 28.22 132.96 28.17C127.95 27.93 126.40 27.31 125.47 25.12C124.97 23.96 124.97 23.56 125.45 22.51C125.66 22.05 125.83 21.65 125.83 21.62C125.83 20.94 130.08 18.30 131.65 17.99C132.33 17.86 134.14 17.94 134.75 18.13C135.62 18.39 137.44 18.39 138.74 18.12C140.32 17.80 141.08 17.88 141.08 18.38C141.08 18.66 140.66 18.97 140.11 19.08C139.04 19.30 137.52 19.84 137.13 20.14C136.52 20.60 136.36 20.61 135.48 20.31C134.45 19.96 132.88 19.93 131.75 20.24C131.36 20.34 130.78 20.45 130.46 20.47C129.68 20.53 129.42 20.62 128.62 21.09C127.48 21.77 126.76 22.71 126.68 23.65C126.64 24.19 127.09 25.19 127.57 25.58C128.99 26.76 133.11 27.01 136.95 26.16C137.91 25.95 138.84 25.80 139.57 25.74C140.41 25.68 140.86 25.60 141.29 25.44C141.61 25.33 142.05 25.20 142.25 25.15C143.11 24.96 143.60 25.56 142.98 26.03C142.42 26.45 141.04 26.92 139.35 27.26C138.40 27.45 137.44 27.70 137.00 27.87C136.10 28.22 135.04 28.43 134.91 28.30ZM206.21 28.07C205.20 28.01 204.90 27.93 203.96 27.49C202.91 27.00 201.03 26.36 199.83 26.08C199.26 25.95 198.42 25.71 197.97 25.55C197.37 25.33 196.72 25.18 195.56 25.00C192.99 24.60 192.87 24.65 193.08 25.97C193.28 27.22 192.85 27.93 192.06 27.67C191.48 27.48 191.16 26.95 190.92 25.79C190.73 24.91 190.68 24.77 190.28 24.29C189.86 23.76 189.80 23.56 189.92 22.83C190.01 22.29 190.00 22.03 189.88 21.12C189.67 19.58 189.62 19.39 189.18 18.46C188.52 17.06 188.63 16.37 189.62 15.63C190.62 14.87 191.20 14.74 193.46 14.74C195.58 14.75 196.66 14.85 197.34 15.12C199.56 15.97 199.90 16.16 200.72 16.96C201.35 17.57 201.55 18.44 201.31 19.59C201.23 19.93 201.15 20.43 201.12 20.71C201.04 21.47 200.92 21.66 200.05 22.46C199.61 22.87 199.22 23.29 199.20 23.39C199.09 23.81 199.55 24.14 200.54 24.33C201.58 24.54 202.83 24.95 203.79 25.42C205.01 26.01 205.29 26.07 207.25 26.18C208.10 26.22 209.05 26.32 209.38 26.38C210.51 26.63 212.13 26.92 212.62 26.97C213.47 27.06 213.86 27.42 213.46 27.75C213.05 28.09 209.22 28.26 206.21 28.07ZM166.54 27.13C165.76 26.79 165.24 25.46 164.87 22.92C164.80 22.44 164.61 21.54 164.45 20.93C163.89 18.72 164.13 17.67 165.36 16.95C165.64 16.78 166.03 16.51 166.21 16.34C166.39 16.17 166.99 15.80 167.53 15.51C168.52 14.98 168.52 14.98 169.68 14.86C171.19 14.70 173.53 14.81 174.10 15.06C174.88 15.41 176.01 16.38 176.53 17.15C176.85 17.62 176.86 18.09 176.56 18.60C176.44 18.80 176.27 19.28 176.17 19.67C176.08 20.05 175.94 20.46 175.86 20.58C175.55 21.05 174.82 21.92 174.55 22.12C174.00 22.54 173.94 23.17 174.44 23.32C174.59 23.37 175.33 23.43 176.08 23.46C176.84 23.49 177.85 23.59 178.33 23.68C178.81 23.76 179.79 23.89 180.51 23.95C181.95 24.08 182.19 24.16 182.84 24.74C183.33 25.17 183.55 25.61 183.43 25.89C183.28 26.20 183.00 26.18 181.99 25.79C181.48 25.59 181.04 25.48 180.44 25.42C179.98 25.38 179.12 25.24 178.53 25.13C177.22 24.87 176.90 24.87 176.09 25.09C175.38 25.30 174.67 25.29 171.58 25.03C169.78 24.88 168.36 24.92 167.89 25.11C167.46 25.29 167.38 25.54 167.59 26.13C167.79 26.74 167.79 26.80 167.55 27.05C167.31 27.28 166.94 27.31 166.54 27.13ZM150.28 27.08C148.84 26.96 146.88 25.61 145.48 23.79C144.91 23.06 144.81 22.71 144.81 21.62C144.81 20.54 144.87 20.33 145.50 19.45C146.20 18.46 146.48 18.18 147.25 17.68C148.51 16.87 148.48 16.87 150.29 16.88C152.64 16.88 152.56 16.84 155.30 19.55C157.01 21.24 157.17 21.48 157.17 22.35C157.17 23.36 156.82 24.16 155.92 25.24C155.43 25.82 155.16 26.02 154.54 26.22C154.31 26.29 153.79 26.50 153.38 26.68C152.70 26.99 151.71 27.19 151.12 27.15C151.03 27.15 150.66 27.12 150.28 27.08ZM24.10 26.79C25.58 26.75 26.39 26.63 27.29 26.30C27.61 26.19 28.19 26.01 28.58 25.92C28.97 25.82 29.43 25.70 29.60 25.66C29.92 25.58 31.18 24.76 32.00 24.10C32.83 23.44 33.16 22.82 33.38 21.54C33.44 21.18 33.54 20.67 33.59 20.42C33.78 19.57 33.46 18.94 32.61 18.48C31.82 18.05 30.10 17.97 28.21 18.28C27.84 18.34 26.64 18.53 25.54 18.70C21.74 19.28 21.38 19.35 20.71 19.59C20.34 19.73 19.69 19.93 19.27 20.04C17.76 20.42 17.78 20.37 18.29 22.94C18.79 25.47 18.99 26.18 19.30 26.51C19.70 26.93 19.62 26.92 24.10 26.79ZM40.16 26.05C39.40 25.89 38.12 25.04 37.88 24.55C37.52 23.78 37.68 23.20 38.44 22.62C39.05 22.14 39.32 22.01 39.97 21.92C42.03 21.61 42.06 21.61 43.01 21.17C44.24 20.61 44.33 20.55 44.33 20.27C44.33 20.10 44.26 19.99 44.06 19.87C43.63 19.61 40.28 19.63 39.51 19.90C38.85 20.13 38.58 20.13 38.30 19.91C37.95 19.63 38.04 19.11 38.48 18.89C39.15 18.55 40.48 18.38 42.33 18.40C46.70 18.46 47.58 18.72 47.58 19.95C47.59 20.23 47.61 20.50 47.65 20.55C47.72 20.66 48.54 21.18 49.38 21.66C49.70 21.84 50.18 22.14 50.46 22.33C50.73 22.52 51.15 22.80 51.39 22.94C52.62 23.71 53.67 24.67 53.67 25.06C53.67 25.75 52.53 25.60 51.58 24.78C51.38 24.60 50.88 24.26 50.48 24.02C49.43 23.38 49.16 23.41 47.77 24.34C46.92 24.91 46.63 25.05 45.63 25.33C45.15 25.46 44.49 25.67 44.17 25.78C43.16 26.15 41.21 26.28 40.16 26.05ZM59.97 25.73C59.64 25.44 59.12 24.44 58.87 23.62C58.75 23.21 58.52 22.55 58.36 22.15C58.20 21.72 58.00 20.95 57.88 20.24C57.76 19.58 57.59 18.68 57.49 18.23C57.32 17.44 57.32 17.42 57.47 17.11C57.61 16.83 57.66 16.79 57.96 16.77C58.63 16.72 58.92 17.16 59.12 18.50C59.31 19.70 59.52 20.66 59.83 21.58C59.97 22.02 60.17 22.71 60.26 23.12C60.35 23.54 60.55 24.13 60.71 24.44C61.06 25.11 61.10 25.59 60.81 25.79C60.55 25.97 60.21 25.95 59.97 25.73ZM72.16 25.63C71.69 25.37 70.97 23.39 70.71 21.67C70.63 21.12 70.53 20.71 70.43 20.58C69.97 19.96 68.75 19.85 67.25 20.32C66.27 20.63 65.97 20.61 65.87 20.21C65.66 19.40 66.60 18.75 68.23 18.58C69.36 18.46 69.58 18.28 69.76 17.27C69.87 16.70 69.94 16.54 70.20 16.37C70.56 16.14 70.79 16.32 71.16 17.13C71.59 18.05 71.71 18.11 73.50 18.24C74.21 18.30 75.19 18.37 75.67 18.42C76.15 18.46 77.03 18.49 77.63 18.50C78.85 18.50 79.42 18.62 79.83 18.97C80.17 19.26 80.16 19.69 79.81 19.95C79.53 20.15 78.03 20.16 74.71 19.99C71.91 19.84 71.90 19.86 72.29 22.60C72.37 23.18 72.50 23.71 72.66 24.09C73.13 25.19 72.87 26.01 72.16 25.63ZM152.17 25.54C152.82 25.38 154.37 24.79 154.68 24.58C154.96 24.38 155.56 23.37 155.65 22.93C155.81 22.25 155.66 21.94 154.78 21.06C154.18 20.46 154.02 20.35 152.79 19.75C151.98 19.35 151.29 18.95 151.02 18.72C150.46 18.24 150.14 18.15 149.40 18.25C148.68 18.35 148.44 18.46 147.71 18.98C146.42 19.89 145.92 21.03 146.26 22.29C146.41 22.86 148.63 24.91 149.72 25.49C150.12 25.70 151.35 25.73 152.17 25.54ZM42.92 24.66C43.21 24.61 43.68 24.48 43.96 24.36C44.23 24.25 44.86 24.01 45.36 23.84C46.74 23.36 47.12 22.87 46.92 21.87C46.74 21.05 46.26 20.97 45.48 21.63C45.16 21.90 44.89 22.05 44.46 22.17C44.14 22.26 43.67 22.42 43.42 22.51C42.23 22.96 41.82 23.08 41.04 23.17C40.10 23.28 39.85 23.37 39.68 23.67C39.47 24.05 39.71 24.54 40.19 24.68C40.49 24.77 42.33 24.76 42.92 24.66ZM88.02 23.90C87.47 23.83 85.65 23.25 85.10 22.97C84.39 22.60 83.88 21.75 83.88 20.96C83.89 20.25 84.07 19.84 84.71 19.06C85.48 18.12 85.87 17.92 87.37 17.70C89.02 17.45 90.02 17.50 91.54 17.91C93.91 18.55 94.88 18.95 95.46 19.55C96.40 20.51 96.43 21.67 95.55 22.49C95.05 22.94 94.80 23.05 93.55 23.30C92.98 23.41 92.36 23.56 92.16 23.63C91.20 23.97 89.46 24.08 88.02 23.90ZM114.87 23.09C114.78 23.05 114.58 22.88 114.44 22.72C114.13 22.37 114.05 22.02 113.84 20.22C113.67 18.76 113.57 18.52 112.84 17.78C112.52 17.46 112.31 17.33 112.02 17.26C111.80 17.20 111.16 17.00 110.58 16.81C109.21 16.36 108.59 16.34 107.68 16.74C107.34 16.89 106.74 17.08 106.33 17.17C105.38 17.38 105.34 17.40 104.45 17.98C103.59 18.55 103.39 18.78 102.87 19.79C102.46 20.59 102.42 20.90 102.63 21.64C102.95 22.74 102.28 22.99 101.55 22.04C101.01 21.33 101.00 20.65 101.50 19.35C101.82 18.51 102.06 18.17 102.83 17.45C103.95 16.41 104.63 16.06 106.07 15.79C106.45 15.72 107.07 15.54 107.44 15.40C108.32 15.08 109.67 15.09 110.79 15.44C111.16 15.56 111.70 15.71 111.99 15.79C113.10 16.06 113.61 16.42 114.38 17.46C114.93 18.20 115.05 18.44 115.34 19.37C115.78 20.76 116.09 22.27 115.99 22.61C115.86 23.09 115.39 23.30 114.87 23.09ZM170.33 22.83C170.95 22.76 171.17 22.69 172.08 22.24C172.66 21.96 173.21 21.69 173.32 21.64C173.43 21.59 173.59 21.44 173.69 21.31C173.78 21.17 174.03 20.87 174.24 20.63C174.45 20.39 174.68 20.04 174.74 19.86C174.80 19.69 174.98 19.25 175.14 18.89C175.55 17.98 175.51 17.81 174.67 16.99C173.77 16.10 173.68 16.08 171.17 16.08C169.09 16.09 168.68 16.14 168.34 16.41C168.22 16.50 167.83 16.78 167.46 17.03C166.42 17.73 166.26 18.00 166.25 19.09C166.25 19.78 166.44 21.47 166.58 21.99C166.68 22.36 167.02 22.81 167.28 22.92C167.47 23.00 169.20 22.95 170.33 22.83ZM197.62 22.61C198.28 22.35 199.48 21.54 199.62 21.25C199.69 21.12 199.89 20.62 200.05 20.16C200.41 19.15 200.40 18.84 200.00 18.17C199.60 17.50 199.44 17.35 198.92 17.16C198.67 17.07 198.13 16.84 197.73 16.66C197.08 16.36 196.91 16.32 195.98 16.24C195.42 16.20 194.50 16.08 193.93 15.99C192.47 15.76 191.59 15.95 191.22 16.58C190.99 16.97 191.13 20.22 191.41 21.09C191.62 21.75 192.11 22.36 192.56 22.51C193.60 22.85 196.86 22.92 197.62 22.61ZM91.42 22.25C91.99 22.11 92.83 21.95 93.28 21.88C94.18 21.75 94.45 21.62 94.53 21.29C94.65 20.85 94.37 20.50 93.58 20.10C92.73 19.67 92.01 19.52 90.33 19.41C89.67 19.37 88.99 19.30 88.83 19.25C87.00 18.71 84.67 20.18 85.45 21.38C85.63 21.64 85.88 21.76 87.19 22.13C88.98 22.65 89.61 22.67 91.42 22.25Z" fill-rule="evenodd"/></svg>
-      <div class="call up left" style="--x:15.5%;--y:27%"><i class="lead"></i><div class="txt"><b>Traditional but simple strokes</b><span>A classic serif a, built from a few pen strokes.</span></div></div>
-      <div class="call down left o" style="--x:37.7%;--y:66%"><i class="lead"></i><div class="txt"><b>Squat, wide letters</b><span>Every round and bowl drawn 12% wider than the first drawings.</span></div></div>
-      <div class="call down right r" style="--x:96.2%;--y:84%"><i class="lead"></i><div class="txt"><b>Expressive, friendly</b><span>Round ball terminals instead of sharp cuts, and a wink in every bowl.</span></div></div>
+<section class="os-hand" aria-label="It started by hand">
+  <blockquote class="os-quote"><p>“It started by hand. I wanted Opmet Serif to feel like my real handwriting.”</p><cite>Dalton, Opmet Osserpse founder</cite></blockquote>
+  <figure class="os-sigmap">
+    <div class="os-sig-box"><svg role="img" aria-label="The founder’s handwriting" xmlns="http://www.w3.org/2000/svg" viewBox="14.6 13.7 199.9 15.6"><path d="M18.38 28.14C17.78 27.81 17.31 26.72 17.00 24.92C16.73 23.40 16.58 22.94 16.18 22.43C15.75 21.89 15.69 21.68 15.64 20.56C15.56 19.05 15.80 18.59 16.60 18.70C17.94 18.88 17.96 18.88 19.25 18.42C20.53 17.97 21.76 17.71 23.92 17.47C24.54 17.39 25.45 17.24 25.96 17.13C27.47 16.79 29.09 16.64 30.71 16.69C32.71 16.75 33.03 16.87 34.07 17.87C34.97 18.74 35.08 19.15 34.92 21.05C34.81 22.40 34.69 22.87 34.24 23.78C33.50 25.24 31.28 26.85 29.52 27.21C29.14 27.28 28.50 27.46 28.10 27.59C26.40 28.18 25.98 28.22 21.50 28.29C18.72 28.33 18.71 28.33 18.38 28.14ZM134.91 28.30C134.89 28.28 134.01 28.22 132.96 28.17C127.95 27.93 126.40 27.31 125.47 25.12C124.97 23.96 124.97 23.56 125.45 22.51C125.66 22.05 125.83 21.65 125.83 21.62C125.83 20.94 130.08 18.30 131.65 17.99C132.33 17.86 134.14 17.94 134.75 18.13C135.62 18.39 137.44 18.39 138.74 18.12C140.32 17.80 141.08 17.88 141.08 18.38C141.08 18.66 140.66 18.97 140.11 19.08C139.04 19.30 137.52 19.84 137.13 20.14C136.52 20.60 136.36 20.61 135.48 20.31C134.45 19.96 132.88 19.93 131.75 20.24C131.36 20.34 130.78 20.45 130.46 20.47C129.68 20.53 129.42 20.62 128.62 21.09C127.48 21.77 126.76 22.71 126.68 23.65C126.64 24.19 127.09 25.19 127.57 25.58C128.99 26.76 133.11 27.01 136.95 26.16C137.91 25.95 138.84 25.80 139.57 25.74C140.41 25.68 140.86 25.60 141.29 25.44C141.61 25.33 142.05 25.20 142.25 25.15C143.11 24.96 143.60 25.56 142.98 26.03C142.42 26.45 141.04 26.92 139.35 27.26C138.40 27.45 137.44 27.70 137.00 27.87C136.10 28.22 135.04 28.43 134.91 28.30ZM206.21 28.07C205.20 28.01 204.90 27.93 203.96 27.49C202.91 27.00 201.03 26.36 199.83 26.08C199.26 25.95 198.42 25.71 197.97 25.55C197.37 25.33 196.72 25.18 195.56 25.00C192.99 24.60 192.87 24.65 193.08 25.97C193.28 27.22 192.85 27.93 192.06 27.67C191.48 27.48 191.16 26.95 190.92 25.79C190.73 24.91 190.68 24.77 190.28 24.29C189.86 23.76 189.80 23.56 189.92 22.83C190.01 22.29 190.00 22.03 189.88 21.12C189.67 19.58 189.62 19.39 189.18 18.46C188.52 17.06 188.63 16.37 189.62 15.63C190.62 14.87 191.20 14.74 193.46 14.74C195.58 14.75 196.66 14.85 197.34 15.12C199.56 15.97 199.90 16.16 200.72 16.96C201.35 17.57 201.55 18.44 201.31 19.59C201.23 19.93 201.15 20.43 201.12 20.71C201.04 21.47 200.92 21.66 200.05 22.46C199.61 22.87 199.22 23.29 199.20 23.39C199.09 23.81 199.55 24.14 200.54 24.33C201.58 24.54 202.83 24.95 203.79 25.42C205.01 26.01 205.29 26.07 207.25 26.18C208.10 26.22 209.05 26.32 209.38 26.38C210.51 26.63 212.13 26.92 212.62 26.97C213.47 27.06 213.86 27.42 213.46 27.75C213.05 28.09 209.22 28.26 206.21 28.07ZM166.54 27.13C165.76 26.79 165.24 25.46 164.87 22.92C164.80 22.44 164.61 21.54 164.45 20.93C163.89 18.72 164.13 17.67 165.36 16.95C165.64 16.78 166.03 16.51 166.21 16.34C166.39 16.17 166.99 15.80 167.53 15.51C168.52 14.98 168.52 14.98 169.68 14.86C171.19 14.70 173.53 14.81 174.10 15.06C174.88 15.41 176.01 16.38 176.53 17.15C176.85 17.62 176.86 18.09 176.56 18.60C176.44 18.80 176.27 19.28 176.17 19.67C176.08 20.05 175.94 20.46 175.86 20.58C175.55 21.05 174.82 21.92 174.55 22.12C174.00 22.54 173.94 23.17 174.44 23.32C174.59 23.37 175.33 23.43 176.08 23.46C176.84 23.49 177.85 23.59 178.33 23.68C178.81 23.76 179.79 23.89 180.51 23.95C181.95 24.08 182.19 24.16 182.84 24.74C183.33 25.17 183.55 25.61 183.43 25.89C183.28 26.20 183.00 26.18 181.99 25.79C181.48 25.59 181.04 25.48 180.44 25.42C179.98 25.38 179.12 25.24 178.53 25.13C177.22 24.87 176.90 24.87 176.09 25.09C175.38 25.30 174.67 25.29 171.58 25.03C169.78 24.88 168.36 24.92 167.89 25.11C167.46 25.29 167.38 25.54 167.59 26.13C167.79 26.74 167.79 26.80 167.55 27.05C167.31 27.28 166.94 27.31 166.54 27.13ZM150.28 27.08C148.84 26.96 146.88 25.61 145.48 23.79C144.91 23.06 144.81 22.71 144.81 21.62C144.81 20.54 144.87 20.33 145.50 19.45C146.20 18.46 146.48 18.18 147.25 17.68C148.51 16.87 148.48 16.87 150.29 16.88C152.64 16.88 152.56 16.84 155.30 19.55C157.01 21.24 157.17 21.48 157.17 22.35C157.17 23.36 156.82 24.16 155.92 25.24C155.43 25.82 155.16 26.02 154.54 26.22C154.31 26.29 153.79 26.50 153.38 26.68C152.70 26.99 151.71 27.19 151.12 27.15C151.03 27.15 150.66 27.12 150.28 27.08ZM24.10 26.79C25.58 26.75 26.39 26.63 27.29 26.30C27.61 26.19 28.19 26.01 28.58 25.92C28.97 25.82 29.43 25.70 29.60 25.66C29.92 25.58 31.18 24.76 32.00 24.10C32.83 23.44 33.16 22.82 33.38 21.54C33.44 21.18 33.54 20.67 33.59 20.42C33.78 19.57 33.46 18.94 32.61 18.48C31.82 18.05 30.10 17.97 28.21 18.28C27.84 18.34 26.64 18.53 25.54 18.70C21.74 19.28 21.38 19.35 20.71 19.59C20.34 19.73 19.69 19.93 19.27 20.04C17.76 20.42 17.78 20.37 18.29 22.94C18.79 25.47 18.99 26.18 19.30 26.51C19.70 26.93 19.62 26.92 24.10 26.79ZM40.16 26.05C39.40 25.89 38.12 25.04 37.88 24.55C37.52 23.78 37.68 23.20 38.44 22.62C39.05 22.14 39.32 22.01 39.97 21.92C42.03 21.61 42.06 21.61 43.01 21.17C44.24 20.61 44.33 20.55 44.33 20.27C44.33 20.10 44.26 19.99 44.06 19.87C43.63 19.61 40.28 19.63 39.51 19.90C38.85 20.13 38.58 20.13 38.30 19.91C37.95 19.63 38.04 19.11 38.48 18.89C39.15 18.55 40.48 18.38 42.33 18.40C46.70 18.46 47.58 18.72 47.58 19.95C47.59 20.23 47.61 20.50 47.65 20.55C47.72 20.66 48.54 21.18 49.38 21.66C49.70 21.84 50.18 22.14 50.46 22.33C50.73 22.52 51.15 22.80 51.39 22.94C52.62 23.71 53.67 24.67 53.67 25.06C53.67 25.75 52.53 25.60 51.58 24.78C51.38 24.60 50.88 24.26 50.48 24.02C49.43 23.38 49.16 23.41 47.77 24.34C46.92 24.91 46.63 25.05 45.63 25.33C45.15 25.46 44.49 25.67 44.17 25.78C43.16 26.15 41.21 26.28 40.16 26.05ZM59.97 25.73C59.64 25.44 59.12 24.44 58.87 23.62C58.75 23.21 58.52 22.55 58.36 22.15C58.20 21.72 58.00 20.95 57.88 20.24C57.76 19.58 57.59 18.68 57.49 18.23C57.32 17.44 57.32 17.42 57.47 17.11C57.61 16.83 57.66 16.79 57.96 16.77C58.63 16.72 58.92 17.16 59.12 18.50C59.31 19.70 59.52 20.66 59.83 21.58C59.97 22.02 60.17 22.71 60.26 23.12C60.35 23.54 60.55 24.13 60.71 24.44C61.06 25.11 61.10 25.59 60.81 25.79C60.55 25.97 60.21 25.95 59.97 25.73ZM72.16 25.63C71.69 25.37 70.97 23.39 70.71 21.67C70.63 21.12 70.53 20.71 70.43 20.58C69.97 19.96 68.75 19.85 67.25 20.32C66.27 20.63 65.97 20.61 65.87 20.21C65.66 19.40 66.60 18.75 68.23 18.58C69.36 18.46 69.58 18.28 69.76 17.27C69.87 16.70 69.94 16.54 70.20 16.37C70.56 16.14 70.79 16.32 71.16 17.13C71.59 18.05 71.71 18.11 73.50 18.24C74.21 18.30 75.19 18.37 75.67 18.42C76.15 18.46 77.03 18.49 77.63 18.50C78.85 18.50 79.42 18.62 79.83 18.97C80.17 19.26 80.16 19.69 79.81 19.95C79.53 20.15 78.03 20.16 74.71 19.99C71.91 19.84 71.90 19.86 72.29 22.60C72.37 23.18 72.50 23.71 72.66 24.09C73.13 25.19 72.87 26.01 72.16 25.63ZM152.17 25.54C152.82 25.38 154.37 24.79 154.68 24.58C154.96 24.38 155.56 23.37 155.65 22.93C155.81 22.25 155.66 21.94 154.78 21.06C154.18 20.46 154.02 20.35 152.79 19.75C151.98 19.35 151.29 18.95 151.02 18.72C150.46 18.24 150.14 18.15 149.40 18.25C148.68 18.35 148.44 18.46 147.71 18.98C146.42 19.89 145.92 21.03 146.26 22.29C146.41 22.86 148.63 24.91 149.72 25.49C150.12 25.70 151.35 25.73 152.17 25.54ZM42.92 24.66C43.21 24.61 43.68 24.48 43.96 24.36C44.23 24.25 44.86 24.01 45.36 23.84C46.74 23.36 47.12 22.87 46.92 21.87C46.74 21.05 46.26 20.97 45.48 21.63C45.16 21.90 44.89 22.05 44.46 22.17C44.14 22.26 43.67 22.42 43.42 22.51C42.23 22.96 41.82 23.08 41.04 23.17C40.10 23.28 39.85 23.37 39.68 23.67C39.47 24.05 39.71 24.54 40.19 24.68C40.49 24.77 42.33 24.76 42.92 24.66ZM88.02 23.90C87.47 23.83 85.65 23.25 85.10 22.97C84.39 22.60 83.88 21.75 83.88 20.96C83.89 20.25 84.07 19.84 84.71 19.06C85.48 18.12 85.87 17.92 87.37 17.70C89.02 17.45 90.02 17.50 91.54 17.91C93.91 18.55 94.88 18.95 95.46 19.55C96.40 20.51 96.43 21.67 95.55 22.49C95.05 22.94 94.80 23.05 93.55 23.30C92.98 23.41 92.36 23.56 92.16 23.63C91.20 23.97 89.46 24.08 88.02 23.90ZM114.87 23.09C114.78 23.05 114.58 22.88 114.44 22.72C114.13 22.37 114.05 22.02 113.84 20.22C113.67 18.76 113.57 18.52 112.84 17.78C112.52 17.46 112.31 17.33 112.02 17.26C111.80 17.20 111.16 17.00 110.58 16.81C109.21 16.36 108.59 16.34 107.68 16.74C107.34 16.89 106.74 17.08 106.33 17.17C105.38 17.38 105.34 17.40 104.45 17.98C103.59 18.55 103.39 18.78 102.87 19.79C102.46 20.59 102.42 20.90 102.63 21.64C102.95 22.74 102.28 22.99 101.55 22.04C101.01 21.33 101.00 20.65 101.50 19.35C101.82 18.51 102.06 18.17 102.83 17.45C103.95 16.41 104.63 16.06 106.07 15.79C106.45 15.72 107.07 15.54 107.44 15.40C108.32 15.08 109.67 15.09 110.79 15.44C111.16 15.56 111.70 15.71 111.99 15.79C113.10 16.06 113.61 16.42 114.38 17.46C114.93 18.20 115.05 18.44 115.34 19.37C115.78 20.76 116.09 22.27 115.99 22.61C115.86 23.09 115.39 23.30 114.87 23.09ZM170.33 22.83C170.95 22.76 171.17 22.69 172.08 22.24C172.66 21.96 173.21 21.69 173.32 21.64C173.43 21.59 173.59 21.44 173.69 21.31C173.78 21.17 174.03 20.87 174.24 20.63C174.45 20.39 174.68 20.04 174.74 19.86C174.80 19.69 174.98 19.25 175.14 18.89C175.55 17.98 175.51 17.81 174.67 16.99C173.77 16.10 173.68 16.08 171.17 16.08C169.09 16.09 168.68 16.14 168.34 16.41C168.22 16.50 167.83 16.78 167.46 17.03C166.42 17.73 166.26 18.00 166.25 19.09C166.25 19.78 166.44 21.47 166.58 21.99C166.68 22.36 167.02 22.81 167.28 22.92C167.47 23.00 169.20 22.95 170.33 22.83ZM197.62 22.61C198.28 22.35 199.48 21.54 199.62 21.25C199.69 21.12 199.89 20.62 200.05 20.16C200.41 19.15 200.40 18.84 200.00 18.17C199.60 17.50 199.44 17.35 198.92 17.16C198.67 17.07 198.13 16.84 197.73 16.66C197.08 16.36 196.91 16.32 195.98 16.24C195.42 16.20 194.50 16.08 193.93 15.99C192.47 15.76 191.59 15.95 191.22 16.58C190.99 16.97 191.13 20.22 191.41 21.09C191.62 21.75 192.11 22.36 192.56 22.51C193.60 22.85 196.86 22.92 197.62 22.61ZM91.42 22.25C91.99 22.11 92.83 21.95 93.28 21.88C94.18 21.75 94.45 21.62 94.53 21.29C94.65 20.85 94.37 20.50 93.58 20.10C92.73 19.67 92.01 19.52 90.33 19.41C89.67 19.37 88.99 19.30 88.83 19.25C87.00 18.71 84.67 20.18 85.45 21.38C85.63 21.64 85.88 21.76 87.19 22.13C88.98 22.65 89.61 22.67 91.42 22.25Z" fill-rule="evenodd"/></svg>
+      <div class="os-call os-up os-left" style="--x:15.5%;--y:27%"><i class="os-lead"></i><div class="os-txt"><b>Traditional but simple strokes</b><span>A classic serif a, built from a few pen strokes.</span></div></div>
+      <div class="os-call os-down os-left os-o" style="--x:37.7%;--y:66%"><i class="os-lead"></i><div class="os-txt"><b>Squat, wide letters</b><span>Every round and bowl drawn 12% wider than the first drawings.</span></div></div>
+      <div class="os-call os-down os-right os-r" style="--x:96.2%;--y:84%"><i class="os-lead"></i><div class="os-txt"><b>Expressive, friendly</b><span>Round ball terminals instead of sharp cuts, and a wink in every bowl.</span></div></div>
     </div>
   </figure>
 </section>
 
-<div class="pair">
-  <section aria-labelledby="h-wink">
-    <h2 class="mh mh-w" id="h-wink">The wink</h2>
-    <div class="panel p-w">
-      <div class="vis"><svg class="wink-g" id="wink-svg" viewBox="0 0 1120 1120" data-way="op" role="img" aria-label="A letter of Opmet Serif with its stress"></svg></div>
-      <div class="ctl">
-        <div class="letters" id="wink-row" role="group" aria-label="Pick a letter"></div>
-        <div class="seg" role="group" aria-label="Which way" id="wink-way"></div>
+<div class="os-pair">
+  <section aria-labelledby="os-h-wink">
+    <h2 class="os-mh os-mh-w" id="os-h-wink">The wink</h2>
+    <div class="os-panel os-p-w">
+      <div class="os-vis"><svg class="os-wink-g" id="os-wink-svg" viewBox="0 0 1120 1120" data-way="op" role="img" aria-label="A letter of Opmet Serif with its stress"></svg></div>
+      <div class="os-ctl">
+        <div class="os-letters" id="os-wink-row" role="group" aria-label="Pick a letter"></div>
+        <div class="os-seg" role="group" aria-label="Which way" id="os-wink-way"></div>
       </div>
-      <div class="out"><span id="wink-label">The O’s stress, from upright</span><b class="num" id="wink-angle"></b></div>
-      <p class="txt">Classic stress tilts the thin parts of a bowl to the left, toward 11 and 5 o’clock. Opmet Serif tilts them to the right, toward 1 and 7, on the O, the e, the p and every letter with a bowl. The studio’s name runs backward, and so, slightly, do its letters.</p>
+      <div class="os-out"><span id="os-wink-label">The O’s stress, from upright</span><b class="os-num" id="os-wink-angle"></b></div>
+      <p class="os-txt">Classic stress tilts the thin parts of a bowl to the left, toward 11 and 5 o’clock. Opmet Serif tilts them to the right, toward 1 and 7, on the O, the e, the p and every letter with a bowl. The studio’s name runs backward, and so, slightly, do its letters.</p>
     </div>
   </section>
-  <section aria-labelledby="h-cx">
-    <h2 class="mh mh-cx" id="h-cx">Drawn as strokes</h2>
-    <div class="panel p-cx">
-      <div class="vis cx" id="cx" data-view="points"><svg id="cx-svg" viewBox="-80 -800 1110 1110" role="img" aria-label="A letter of Opmet Serif and its outline points"></svg></div>
-      <div class="ctl">
-        <div class="letters" id="cx-ch" role="group" aria-label="Pick a letter"></div>
-        <div class="seg" role="group" aria-label="Weight" id="cx-w"></div>
-        <div class="seg" role="group" aria-label="View" id="cx-v"></div>
+  <section aria-labelledby="os-h-cx">
+    <h2 class="os-mh os-mh-cx" id="os-h-cx">Drawn as strokes</h2>
+    <div class="os-panel os-p-cx">
+      <div class="os-vis os-cx" id="os-cx" data-view="points"><svg id="os-cx-svg" viewBox="-80 -800 1110 1110" role="img" aria-label="A letter of Opmet Serif and its outline points"></svg></div>
+      <div class="os-ctl">
+        <div class="os-letters" id="os-cx-ch" role="group" aria-label="Pick a letter"></div>
+        <div class="os-seg" role="group" aria-label="Weight" id="os-cx-w"></div>
+        <div class="os-seg" role="group" aria-label="View" id="os-cx-v"></div>
       </div>
-      <div class="out"><span id="cx-label">The g, Text Regular</span><b class="num" id="cx-count"></b></div>
-      <p class="txt">Each letter is built from a few pen strokes, each a line of points with a heading and a width, at three weights and two sizes. The outline comes last, and every weight between is its interpolation.</p>
+      <div class="os-out"><span id="os-cx-label">The g, Text Regular</span><b class="os-num" id="os-cx-count"></b></div>
+      <p class="os-txt">Each letter is built from a few pen strokes, each a line of points with a heading and a width, at three weights and two sizes. The outline comes last, and every weight between is its interpolation.</p>
     </div>
   </section>
 </div>
 
-<section class="piece boards-piece" aria-labelledby="h-print">
-  <h2 class="mh" id="h-print">The whole font</h2>
-  <div class="work boards"><figure class="board " aria-label="Upright, Display Regular"><div class="bbody" data-fill="0.8"><div class="bl big" style="font-size:calc(var(--u) * 60);font-weight:400;font-style:normal;font-variation-settings:'wght' 400,'opsz' 72"><span>abcdefg</span></div><div class="bl big" style="font-size:calc(var(--u) * 60);font-weight:400;font-style:normal;font-variation-settings:'wght' 400,'opsz' 72"><span>hijklmnopqr</span></div><div class="bl big" style="font-size:calc(var(--u) * 60);font-weight:400;font-style:normal;font-variation-settings:'wght' 400,'opsz' 72"><span>stuvwxyz</span></div><div class="bl big" style="font-size:calc(var(--u) * 60);font-weight:400;font-style:normal;font-variation-settings:'wght' 400,'opsz' 72;font-feature-settings:'onum'"><span>0123456789</span></div><div class="bgap"></div><div class="bl big" style="font-size:calc(var(--u) * 60);font-weight:400;font-style:normal;font-variation-settings:'wght' 400,'opsz' 72"><span>ABCDEFGHI</span></div><div class="bl big" style="font-size:calc(var(--u) * 60);font-weight:400;font-style:normal;font-variation-settings:'wght' 400,'opsz' 72"><span>JKLMNOPQR</span></div><div class="bl big" style="font-size:calc(var(--u) * 60);font-weight:400;font-style:normal;font-variation-settings:'wght' 400,'opsz' 72"><span>STUVWXYZ</span></div><div class="bl big" style="font-size:calc(var(--u) * 60);font-weight:400;font-style:normal;font-variation-settings:'wght' 400,'opsz' 72"><span>0123456789</span></div></div><figcaption class="label">Upright, Display Regular</figcaption></figure><figure class="board soft" aria-label="Italic, Display Regular"><div class="bbody" data-fill="0.8"><div class="bl big" style="font-size:calc(var(--u) * 60);font-weight:400;font-style:italic;font-variation-settings:'wght' 400,'opsz' 72"><span>abcdefg</span></div><div class="bl big" style="font-size:calc(var(--u) * 60);font-weight:400;font-style:italic;font-variation-settings:'wght' 400,'opsz' 72"><span>hijklmnopqr</span></div><div class="bl big" style="font-size:calc(var(--u) * 60);font-weight:400;font-style:italic;font-variation-settings:'wght' 400,'opsz' 72"><span>stuvwxyz</span></div><div class="bl big" style="font-size:calc(var(--u) * 60);font-weight:400;font-style:italic;font-variation-settings:'wght' 400,'opsz' 72"><span>0123456789</span></div><div class="bgap"></div><div class="bl big" style="font-size:calc(var(--u) * 60);font-weight:400;font-style:italic;font-variation-settings:'wght' 400,'opsz' 72"><span>ABCDEFGHI</span></div><div class="bl big" style="font-size:calc(var(--u) * 60);font-weight:400;font-style:italic;font-variation-settings:'wght' 400,'opsz' 72"><span>JKLMNOPQR</span></div><div class="bl big" style="font-size:calc(var(--u) * 60);font-weight:400;font-style:italic;font-variation-settings:'wght' 400,'opsz' 72"><span>STUVWXYZ</span></div><div class="bl big" style="font-size:calc(var(--u) * 60);font-weight:400;font-style:italic;font-variation-settings:'wght' 400,'opsz' 72"><span>ff fi ffi &amp;</span></div></div><figcaption class="label">Italic, Display Regular</figcaption></figure><figure class="board ink" aria-label="The name, 7 to 66 pt"><div class="bbody" data-fill="0.86"><div class="bl nm" style="font-size:calc(var(--u) * 66);font-weight:100;font-style:normal;font-variation-settings:'wght' 100,'opsz' 72"><span>Opmet Osserpse</span></div><div class="bl nm" style="font-size:calc(var(--u) * 56);font-weight:300;font-style:italic;font-variation-settings:'wght' 300,'opsz' 72"><span>Opmet Osserpse</span></div><div class="bl nm" style="font-size:calc(var(--u) * 44);font-weight:900;font-style:normal;font-variation-settings:'wght' 900,'opsz' 72"><span>Opmet Osserpse</span></div><div class="bl nm" style="font-size:calc(var(--u) * 24);font-weight:200;font-style:italic;font-variation-settings:'wght' 200,'opsz' 72"><span>Opmet Osserpse</span></div><div class="bl nm" style="font-size:calc(var(--u) * 34);font-weight:700;font-style:italic;font-variation-settings:'wght' 700,'opsz' 72"><span>Opmet Osserpse</span></div><div class="bl nm" style="font-size:calc(var(--u) * 26);font-weight:500;font-style:normal;font-variation-settings:'wght' 500,'opsz' 72"><span>Opmet Osserpse</span></div><div class="bgap small"></div><div class="bl nm ramp" style="font-size:calc(var(--u) * 24);font-weight:400;font-style:normal;font-variation-settings:'wght' 400,'opsz' 10"><span>Opmet Osserpse</span></div><div class="bl nm ramp" style="font-size:calc(var(--u) * 18);font-weight:400;font-style:normal;font-variation-settings:'wght' 400,'opsz' 10"><span>Opmet Osserpse</span></div><div class="bl nm ramp" style="font-size:calc(var(--u) * 14);font-weight:400;font-style:normal;font-variation-settings:'wght' 400,'opsz' 10"><span>Opmet Osserpse</span></div><div class="bl nm ramp" style="font-size:calc(var(--u) * 11);font-weight:400;font-style:normal;font-variation-settings:'wght' 400,'opsz' 10"><span>Opmet Osserpse</span></div><div class="bl nm ramp" style="font-size:calc(var(--u) * 9);font-weight:400;font-style:normal;font-variation-settings:'wght' 400,'opsz' 10"><span>Opmet Osserpse</span></div><div class="bl nm ramp" style="font-size:calc(var(--u) * 7);font-weight:400;font-style:normal;font-variation-settings:'wght' 400,'opsz' 10"><span>Opmet Osserpse</span></div></div><figcaption class="label">The name, 7 to 66 pt</figcaption></figure></div>
+<section class="os-piece os-boards-piece" aria-labelledby="os-h-print">
+  <h2 class="os-mh" id="os-h-print">The whole font</h2>
+  <div class="os-work os-boards"><figure class="os-board" aria-label="Upright, Display Regular"><div class="os-bbody" data-fill="0.8"><div class="os-bl os-big" style="font-size:calc(var(--u) * 60);font-weight:400;font-style:normal;font-variation-settings:'wght' 400,'opsz' 72"><span>abcdefg</span></div><div class="os-bl os-big" style="font-size:calc(var(--u) * 60);font-weight:400;font-style:normal;font-variation-settings:'wght' 400,'opsz' 72"><span>hijklmnopqr</span></div><div class="os-bl os-big" style="font-size:calc(var(--u) * 60);font-weight:400;font-style:normal;font-variation-settings:'wght' 400,'opsz' 72"><span>stuvwxyz</span></div><div class="os-bl os-big" style="font-size:calc(var(--u) * 60);font-weight:400;font-style:normal;font-variation-settings:'wght' 400,'opsz' 72;font-feature-settings:'onum'"><span>0123456789</span></div><div class="os-bgap"></div><div class="os-bl os-big" style="font-size:calc(var(--u) * 60);font-weight:400;font-style:normal;font-variation-settings:'wght' 400,'opsz' 72"><span>ABCDEFGHI</span></div><div class="os-bl os-big" style="font-size:calc(var(--u) * 60);font-weight:400;font-style:normal;font-variation-settings:'wght' 400,'opsz' 72"><span>JKLMNOPQR</span></div><div class="os-bl os-big" style="font-size:calc(var(--u) * 60);font-weight:400;font-style:normal;font-variation-settings:'wght' 400,'opsz' 72"><span>STUVWXYZ</span></div><div class="os-bl os-big" style="font-size:calc(var(--u) * 60);font-weight:400;font-style:normal;font-variation-settings:'wght' 400,'opsz' 72"><span>0123456789</span></div></div><figcaption class="os-label">Upright, Display Regular</figcaption></figure><figure class="os-board os-soft" aria-label="Italic, Display Regular"><div class="os-bbody" data-fill="0.8"><div class="os-bl os-big" style="font-size:calc(var(--u) * 60);font-weight:400;font-style:italic;font-variation-settings:'wght' 400,'opsz' 72"><span>abcdefg</span></div><div class="os-bl os-big" style="font-size:calc(var(--u) * 60);font-weight:400;font-style:italic;font-variation-settings:'wght' 400,'opsz' 72"><span>hijklmnopqr</span></div><div class="os-bl os-big" style="font-size:calc(var(--u) * 60);font-weight:400;font-style:italic;font-variation-settings:'wght' 400,'opsz' 72"><span>stuvwxyz</span></div><div class="os-bl os-big" style="font-size:calc(var(--u) * 60);font-weight:400;font-style:italic;font-variation-settings:'wght' 400,'opsz' 72"><span>0123456789</span></div><div class="os-bgap"></div><div class="os-bl os-big" style="font-size:calc(var(--u) * 60);font-weight:400;font-style:italic;font-variation-settings:'wght' 400,'opsz' 72"><span>ABCDEFGHI</span></div><div class="os-bl os-big" style="font-size:calc(var(--u) * 60);font-weight:400;font-style:italic;font-variation-settings:'wght' 400,'opsz' 72"><span>JKLMNOPQR</span></div><div class="os-bl os-big" style="font-size:calc(var(--u) * 60);font-weight:400;font-style:italic;font-variation-settings:'wght' 400,'opsz' 72"><span>STUVWXYZ</span></div><div class="os-bl os-big" style="font-size:calc(var(--u) * 60);font-weight:400;font-style:italic;font-variation-settings:'wght' 400,'opsz' 72"><span>ff fi ffi &amp;</span></div></div><figcaption class="os-label">Italic, Display Regular</figcaption></figure><figure class="os-board os-ink" aria-label="The name, 7 to 66 pt"><div class="os-bbody" data-fill="0.86"><div class="os-bl os-nm" style="font-size:calc(var(--u) * 66);font-weight:100;font-style:normal;font-variation-settings:'wght' 100,'opsz' 72"><span>Opmet Osserpse</span></div><div class="os-bl os-nm" style="font-size:calc(var(--u) * 56);font-weight:300;font-style:italic;font-variation-settings:'wght' 300,'opsz' 72"><span>Opmet Osserpse</span></div><div class="os-bl os-nm" style="font-size:calc(var(--u) * 44);font-weight:900;font-style:normal;font-variation-settings:'wght' 900,'opsz' 72"><span>Opmet Osserpse</span></div><div class="os-bl os-nm" style="font-size:calc(var(--u) * 24);font-weight:200;font-style:italic;font-variation-settings:'wght' 200,'opsz' 72"><span>Opmet Osserpse</span></div><div class="os-bl os-nm" style="font-size:calc(var(--u) * 34);font-weight:700;font-style:italic;font-variation-settings:'wght' 700,'opsz' 72"><span>Opmet Osserpse</span></div><div class="os-bl os-nm" style="font-size:calc(var(--u) * 26);font-weight:500;font-style:normal;font-variation-settings:'wght' 500,'opsz' 72"><span>Opmet Osserpse</span></div><div class="os-bgap os-small"></div><div class="os-bl os-nm os-ramp" style="font-size:calc(var(--u) * 24);font-weight:400;font-style:normal;font-variation-settings:'wght' 400,'opsz' 10"><span>Opmet Osserpse</span></div><div class="os-bl os-nm os-ramp" style="font-size:calc(var(--u) * 18);font-weight:400;font-style:normal;font-variation-settings:'wght' 400,'opsz' 10"><span>Opmet Osserpse</span></div><div class="os-bl os-nm os-ramp" style="font-size:calc(var(--u) * 14);font-weight:400;font-style:normal;font-variation-settings:'wght' 400,'opsz' 10"><span>Opmet Osserpse</span></div><div class="os-bl os-nm os-ramp" style="font-size:calc(var(--u) * 11);font-weight:400;font-style:normal;font-variation-settings:'wght' 400,'opsz' 10"><span>Opmet Osserpse</span></div><div class="os-bl os-nm os-ramp" style="font-size:calc(var(--u) * 9);font-weight:400;font-style:normal;font-variation-settings:'wght' 400,'opsz' 10"><span>Opmet Osserpse</span></div><div class="os-bl os-nm os-ramp" style="font-size:calc(var(--u) * 7);font-weight:400;font-style:normal;font-variation-settings:'wght' 400,'opsz' 10"><span>Opmet Osserpse</span></div></div><figcaption class="os-label">The name, 7 to 66 pt</figcaption></figure></div>
 </section>
 
-<section class="piece tester" aria-label="Try Opmet Serif">
-  <div class="work">
-  <div class="tester-text" id="tt" contenteditable="true" spellcheck="false" role="textbox" aria-label="Type to try Opmet Serif">Most of the season was spent waiting for the room to sound like the morning.</div>
-  <div class="controls">
-    <div class="range"><label class="label" for="tt-w">Weight</label><input id="tt-w" type="range" min="100" max="900" step="1" value="400"></div>
-    <div class="seg" role="group" aria-label="Size"><button type="button" id="tt-text" aria-pressed="false">Text</button><button type="button" id="tt-disp" aria-pressed="true">Display</button></div>
-    <div class="seg" role="group" aria-label="Style"><button type="button" id="tt-up" aria-pressed="true">Roman</button><button type="button" id="tt-it" aria-pressed="false">Italic</button></div>
-    <span class="label num tester-readout" id="tt-read">Display Regular</span>
+<section class="os-piece os-tester" aria-label="Try Opmet Serif">
+  <div class="os-work">
+  <div class="os-tester-text" id="os-tt" contenteditable="true" spellcheck="false" role="textbox" aria-label="Type to try Opmet Serif">Most of the season was spent waiting for the room to sound like the morning.</div>
+  <div class="os-controls">
+    <div class="os-range"><label class="os-label" for="os-tt-w">Weight</label><input id="os-tt-w" type="range" min="100" max="900" step="1" value="400"></div>
+    <div class="os-seg" role="group" aria-label="Size"><button type="button" id="os-tt-text" aria-pressed="false">Text</button><button type="button" id="os-tt-disp" aria-pressed="true">Display</button></div>
+    <div class="os-seg" role="group" aria-label="Style"><button type="button" id="os-tt-up" aria-pressed="true">Roman</button><button type="button" id="os-tt-it" aria-pressed="false">Italic</button></div>
+    <span class="os-label os-num os-tester-readout" id="os-tt-read">Display Regular</span>
   </div>
   </div>
 </section>
 
-<section class="piece" aria-labelledby="h-use">
-  <h2 class="mh" id="h-use">In use</h2>
-  <figure class="work use" style="margin:0">
-    <img src="/media/opmet-serif/in-use.webp" width="1320" height="990" alt="Two facing book pages set in Opmet Serif: a chapter opening in Display Italic, with justified text in Text Regular, small caps and a pull quote in italic.">
-    <figcaption class="label">espresso tempo, Season One, 6 by 9 in. The text is a stand-in.</figcaption>
+<section class="os-piece" aria-labelledby="os-h-use">
+  <h2 class="os-mh" id="os-h-use">In use</h2>
+  <figure class="os-work os-use" style="margin:0">
+    <img src="/media/opmet-serif/p-eaa55614.webp" width="1320" height="990" alt="Two facing book pages set in Opmet Serif: a chapter opening in Display Italic, with justified text in Text Regular, small caps and a pull quote in italic.">
+    <figcaption class="os-label">espresso tempo, Season One, 6 by 9 in. The text is a stand-in.</figcaption>
   </figure>
 </section>
 
-<section class="piece" aria-labelledby="h-nums">
-  <h2 class="mh" id="h-nums">What’s in it</h2>
-  <div class="work nums">
-    <div><b class="num">36</b><span>static styles, in OTF and in TTF hinted for Windows</span></div>
-    <div><b class="num">2</b><span>variable fonts, with weight and optical size axes</span></div>
-    <div><b class="num">635</b><span>glyphs in each, 438 of them characters</span></div>
-    <div><b class="num">270</b><span>languages written in the Latin alphabet</span></div>
-    <div><b class="num">8</b><span>local forms, from Dutch to Turkish</span></div>
-    <div><b class="num">120</b><span>layout tests passed in every font: small caps, figure sets, fractions, ligatures and marks</span></div>
+<section class="os-piece" aria-labelledby="os-h-nums">
+  <h2 class="os-mh" id="os-h-nums">What’s in it</h2>
+  <div class="os-work os-nums">
+    <div><b class="os-num">36</b><span>static styles, in OTF and in TTF hinted for Windows</span></div>
+    <div><b class="os-num">2</b><span>variable fonts, with weight and optical size axes</span></div>
+    <div><b class="os-num">635</b><span>glyphs in each, 438 of them characters</span></div>
+    <div><b class="os-num">270</b><span>languages written in the Latin alphabet</span></div>
+    <div><b class="os-num">8</b><span>local forms, from Dutch to Turkish</span></div>
+    <div><b class="os-num">120</b><span>layout tests passed in every font: small caps, figure sets, fractions, ligatures and marks</span></div>
   </div>
 </section>
 
-<p class="credit label">Opmet Serif 1.004. Design: Opmet Osserpse, Venice, California.</p>
-<nav class="end" aria-label="Page"><a href="/#archive">All work</a><a href="/">Home</a><a href="#top">Back to top</a></nav>
+<p class="os-credit os-label">Opmet Serif 1.004. Design: Opmet Osserpse, Venice, California.</p>
 </div>
-
-<script>
-const DATA = {"cx":{"a":{"Thin":{"d":"M382 0H446V12H422C412 12 406 18 406 28V308C402 396 352 480 254 480C172 480 88 434 72 347C72 346 72 345 72 344C72 333 81 324 92 324C103 324 112 333 112 344C112 351 108 357 102 361C123 424 188 462 254 462C345 462 382 375 382 296V214C351 263 291 296 221 296C121 296 40 227 40 143C40 59 121 -10 221 -10C291 -10 351 23 382 72ZM240 6C149 6 71 74 71 154C71 225 133 280 214 280C299 280 373 221 382 148V117C374 53 315 6 240 6Z","adv":460,"pts":[[412,12,2],[406,18,2],[402,396,2],[352,480,2],[172,480,2],[88,434,2],[72,346,2],[72,345,2],[72,333,2],[81,324,2],[103,324,2],[112,333,2],[112,351,2],[108,357,2],[123,424,2],[188,462,2],[345,462,2],[382,375,2],[351,263,2],[291,296,2],[121,296,2],[40,227,2],[40,59,2],[121,-10,2],[291,-10,2],[351,23,2],[382,0,0],[446,0,0],[446,12,0],[422,12,0],[406,28,0],[406,308,0],[254,480,1],[72,347,0],[72,344,1],[92,324,1],[112,344,1],[102,361,0],[254,462,1],[382,296,0],[382,214,0],[221,296,1],[40,143,1],[221,-10,1],[382,72,0],[149,6,2],[71,74,2],[71,225,2],[133,280,2],[299,280,2],[373,221,2],[374,53,2],[315,6,2],[240,6,1],[71,154,1],[214,280,1],[382,148,0],[382,117,0]],"handles":[[422,12,412,12],[406,18,406,28],[406,308,402,396],[352,480,254,480],[254,480,172,480],[88,434,72,347],[72,347,72,346],[72,345,72,344],[72,344,72,333],[81,324,92,324],[92,324,103,324],[112,333,112,344],[112,344,112,351],[108,357,102,361],[102,361,123,424],[188,462,254,462],[254,462,345,462],[382,375,382,296],[382,214,351,263],[291,296,221,296],[221,296,121,296],[40,227,40,143],[40,143,40,59],[121,-10,221,-10],[221,-10,291,-10],[351,23,382,72],[240,6,149,6],[71,74,71,154],[71,154,71,225],[133,280,214,280],[214,280,299,280],[373,221,382,148],[382,117,374,53],[315,6,240,6]]},"Regular":{"d":"M333 0H463V28H457C437 28 423 42 423 62V308C418 406 350 482 248 482C164 482 72 442 56 351H57C56 349 56 346 56 344C56 322 74 304 96 304C118 304 136 322 136 344C136 357 129 369 119 377C143 423 194 450 248 450C327 450 333 354 333 296V270C303 288 266 298 227 298C125 298 42 229 42 143C42 57 125 -12 227 -12C266 -12 303 -2 333 16ZM240 17C180 17 134 69 134 135C134 208 190 269 255 269C286 269 314 255 333 232V66C310 36 277 17 240 17Z","adv":477,"pts":[[437,28,2],[423,42,2],[418,406,2],[350,482,2],[164,482,2],[72,442,2],[56,349,2],[56,346,2],[56,322,2],[74,304,2],[118,304,2],[136,322,2],[136,357,2],[129,369,2],[143,423,2],[194,450,2],[327,450,2],[333,354,2],[303,288,2],[266,298,2],[125,298,2],[42,229,2],[42,57,2],[125,-12,2],[266,-12,2],[303,-2,2],[333,0,0],[463,0,0],[463,28,0],[457,28,0],[423,62,0],[423,308,0],[248,482,1],[56,351,0],[57,351,0],[56,344,1],[96,304,1],[136,344,1],[119,377,0],[248,450,1],[333,296,0],[333,270,0],[227,298,1],[42,143,1],[227,-12,1],[333,16,0],[180,17,2],[134,69,2],[134,208,2],[190,269,2],[286,269,2],[314,255,2],[310,36,2],[277,17,2],[240,17,1],[134,135,1],[255,269,1],[333,232,0],[333,66,0]],"handles":[[457,28,437,28],[423,42,423,62],[423,308,418,406],[350,482,248,482],[248,482,164,482],[72,442,56,351],[57,351,56,349],[56,346,56,344],[56,344,56,322],[74,304,96,304],[96,304,118,304],[136,322,136,344],[136,344,136,357],[129,369,119,377],[119,377,143,423],[194,450,248,450],[248,450,327,450],[333,354,333,296],[333,270,303,288],[266,298,227,298],[227,298,125,298],[42,229,42,143],[42,143,42,57],[125,-12,227,-12],[227,-12,266,-12],[303,-2,333,16],[240,17,180,17],[134,69,134,135],[134,135,134,208],[190,269,255,269],[255,269,286,269],[314,255,333,232],[333,66,310,36],[277,17,240,17]]},"Black":{"d":"M449 0H673V48H671C649 48 633 67 633 92V308C625 474 463 484 335 484C322 484 307 485 292 485C194 488 68 493 47 377H48C47 374 47 371 47 368C47 337 72 312 103 312C134 312 159 337 159 368C159 380 155 391 149 400C190 428 269 427 317 426C324 426 330 426 335 426C432 426 449 372 449 296V266C411 276 369 281 324 281C166 281 38 216 38 134C38 52 166 -14 324 -14C369 -14 411 -9 449 1ZM389 34C291 34 193 97 193 161C193 204 238 233 304 233C358 233 411 214 449 186V44C432 37 412 34 389 34Z","adv":687,"pts":[[649,48,2],[633,67,2],[625,474,2],[463,484,2],[322,484,2],[307,485,2],[194,488,2],[68,493,2],[47,374,2],[47,371,2],[47,337,2],[72,312,2],[134,312,2],[159,337,2],[159,380,2],[155,391,2],[190,428,2],[269,427,2],[324,426,2],[330,426,2],[432,426,2],[449,372,2],[411,276,2],[369,281,2],[166,281,2],[38,216,2],[38,52,2],[166,-14,2],[369,-14,2],[411,-9,2],[449,0,0],[673,0,0],[673,48,0],[671,48,0],[633,92,0],[633,308,0],[335,484,1],[292,485,1],[47,377,0],[48,377,0],[47,368,1],[103,312,1],[159,368,1],[149,400,0],[317,426,1],[335,426,1],[449,296,0],[449,266,0],[324,281,1],[38,134,1],[324,-14,1],[449,1,0],[291,34,2],[193,97,2],[193,204,2],[238,233,2],[358,233,2],[411,214,2],[432,37,2],[412,34,2],[389,34,1],[193,161,1],[304,233,1],[449,186,0],[449,44,0]],"handles":[[671,48,649,48],[633,67,633,92],[633,308,625,474],[463,484,335,484],[335,484,322,484],[307,485,292,485],[292,485,194,488],[68,493,47,377],[48,377,47,374],[47,371,47,368],[47,368,47,337],[72,312,103,312],[103,312,134,312],[159,337,159,368],[159,368,159,380],[155,391,149,400],[149,400,190,428],[269,427,317,426],[317,426,324,426],[330,426,335,426],[335,426,432,426],[449,372,449,296],[449,266,411,276],[369,281,324,281],[324,281,166,281],[38,216,38,134],[38,134,38,52],[166,-14,324,-14],[324,-14,369,-14],[411,-9,449,1],[389,34,291,34],[193,97,193,161],[193,161,193,204],[238,233,304,233],[304,233,358,233],[411,214,449,186],[449,44,432,37],[412,34,389,34]]}},"g":{"Thin":{"d":"M260 155C362 155 445 229 445 319C445 367 421 411 383 441C412 450 445 446 477 441C494 439 511 437 527 437V467C517 467 507 467 497 467C458 468 417 469 380 456C372 455 361 456 353 460C326 474 294 482 260 482C158 482 75 409 75 319C75 270 100 226 139 195C129 165 126 133 137 103C149 71 177 52 209 43C112 24 42 -31 42 -95C42 -175 151 -240 286 -240C421 -240 530 -175 530 -95C530 -15 421 50 286 50C265 50 245 51 224 56C193 63 165 80 154 110C145 135 150 159 158 182C187 165 222 155 260 155ZM323 -219C191 -219 70 -150 70 -74C70 -15 145 29 249 29C381 29 503 -40 503 -116C503 -175 427 -219 323 -219ZM268 170C176 170 99 241 99 326C99 405 166 467 252 467C344 467 422 396 422 311C422 232 354 170 268 170Z","adv":560,"pts":[[362,155,2],[445,229,2],[445,367,2],[421,411,2],[412,450,2],[445,446,2],[494,439,2],[511,437,2],[517,467,2],[507,467,2],[458,468,2],[417,469,2],[372,455,2],[361,456,2],[326,474,2],[294,482,2],[158,482,2],[75,409,2],[75,270,2],[100,226,2],[129,165,2],[126,133,2],[149,71,2],[177,52,2],[112,24,2],[42,-31,2],[42,-175,2],[151,-240,2],[421,-240,2],[530,-175,2],[530,-15,2],[421,50,2],[265,50,2],[245,51,2],[193,63,2],[165,80,2],[145,135,2],[150,159,2],[187,165,2],[222,155,2],[260,155,1],[445,319,1],[383,441,0],[477,441,1],[527,437,0],[527,467,0],[497,467,1],[380,456,0],[353,460,1],[260,482,1],[75,319,1],[139,195,0],[137,103,1],[209,43,0],[42,-95,1],[286,-240,1],[530,-95,1],[286,50,1],[224,56,1],[154,110,1],[158,182,0],[191,-219,2],[70,-150,2],[70,-15,2],[145,29,2],[381,29,2],[503,-40,2],[503,-175,2],[427,-219,2],[323,-219,1],[70,-74,1],[249,29,1],[503,-116,1],[176,170,2],[99,241,2],[99,405,2],[166,467,2],[344,467,2],[422,396,2],[422,232,2],[354,170,2],[268,170,1],[99,326,1],[252,467,1],[422,311,1]],"handles":[[260,155,362,155],[445,229,445,319],[445,319,445,367],[421,411,383,441],[383,441,412,450],[445,446,477,441],[477,441,494,439],[511,437,527,437],[527,467,517,467],[507,467,497,467],[497,467,458,468],[417,469,380,456],[380,456,372,455],[361,456,353,460],[353,460,326,474],[294,482,260,482],[260,482,158,482],[75,409,75,319],[75,319,75,270],[100,226,139,195],[139,195,129,165],[126,133,137,103],[137,103,149,71],[177,52,209,43],[209,43,112,24],[42,-31,42,-95],[42,-95,42,-175],[151,-240,286,-240],[286,-240,421,-240],[530,-175,530,-95],[530,-95,530,-15],[421,50,286,50],[286,50,265,50],[245,51,224,56],[224,56,193,63],[165,80,154,110],[154,110,145,135],[150,159,158,182],[158,182,187,165],[222,155,260,155],[323,-219,191,-219],[70,-150,70,-74],[70,-74,70,-15],[145,29,249,29],[249,29,381,29],[503,-40,503,-116],[503,-116,503,-175],[427,-219,323,-219],[268,170,176,170],[99,241,99,326],[99,326,99,405],[166,467,252,467],[252,467,344,467],[422,396,422,311],[422,311,422,232],[354,170,268,170]]},"Regular":{"d":"M269 155C374 155 459 229 459 319C459 365 437 406 402 436C429 443 462 439 493 435C511 432 528 430 544 430V474C533 474 522 474 511 475C471 476 431 477 394 464C383 461 367 461 355 464C329 476 300 482 269 482C164 482 78 409 78 319C78 267 106 221 151 191C150 188 149 186 148 184C136 158 125 132 136 101C147 71 167 51 196 38C107 16 44 -35 44 -95C44 -175 157 -240 296 -240C435 -240 547 -175 547 -95C547 -15 435 50 296 50C269 50 243 53 217 63C194 72 175 87 166 112C160 130 171 152 181 173C208 162 238 155 269 155ZM329 -215C226 -215 130 -145 130 -71C130 -15 185 25 262 25C365 25 461 -45 461 -119C461 -175 406 -215 329 -215ZM256 187C201 187 159 238 159 304C159 382 216 450 281 450C336 450 379 400 379 334C379 256 321 187 256 187Z","adv":579,"pts":[[374,155,2],[459,229,2],[459,365,2],[437,406,2],[429,443,2],[462,439,2],[511,432,2],[528,430,2],[533,474,2],[522,474,2],[471,476,2],[431,477,2],[383,461,2],[367,461,2],[329,476,2],[300,482,2],[164,482,2],[78,409,2],[78,267,2],[106,221,2],[150,188,2],[149,186,2],[136,158,2],[125,132,2],[147,71,2],[167,51,2],[107,16,2],[44,-35,2],[44,-175,2],[157,-240,2],[435,-240,2],[547,-175,2],[547,-15,2],[435,50,2],[269,50,2],[243,53,2],[194,72,2],[175,87,2],[160,130,2],[171,152,2],[208,162,2],[238,155,2],[269,155,1],[459,319,1],[402,436,0],[493,435,1],[544,430,0],[544,474,0],[511,475,0],[394,464,0],[355,464,0],[269,482,1],[78,319,1],[151,191,0],[148,184,1],[136,101,1],[196,38,0],[44,-95,1],[296,-240,1],[547,-95,1],[296,50,1],[217,63,1],[166,112,1],[181,173,0],[226,-215,2],[130,-145,2],[130,-15,2],[185,25,2],[365,25,2],[461,-45,2],[461,-175,2],[406,-215,2],[329,-215,1],[130,-71,1],[262,25,1],[461,-119,1],[201,187,2],[159,238,2],[159,382,2],[216,450,2],[336,450,2],[379,400,2],[379,256,2],[321,187,2],[256,187,1],[159,304,1],[281,450,1],[379,334,1]],"handles":[[269,155,374,155],[459,229,459,319],[459,319,459,365],[437,406,402,436],[402,436,429,443],[462,439,493,435],[493,435,511,432],[528,430,544,430],[544,474,533,474],[522,474,511,475],[511,475,471,476],[431,477,394,464],[394,464,383,461],[367,461,355,464],[355,464,329,476],[300,482,269,482],[269,482,164,482],[78,409,78,319],[78,319,78,267],[106,221,151,191],[151,191,150,188],[149,186,148,184],[148,184,136,158],[125,132,136,101],[136,101,147,71],[167,51,196,38],[196,38,107,16],[44,-35,44,-95],[44,-95,44,-175],[157,-240,296,-240],[296,-240,435,-240],[547,-175,547,-95],[547,-95,547,-15],[435,50,296,50],[296,50,269,50],[243,53,217,63],[217,63,194,72],[175,87,166,112],[166,112,160,130],[171,152,181,173],[181,173,208,162],[238,155,269,155],[329,-215,226,-215],[130,-145,130,-71],[130,-71,130,-15],[185,25,262,25],[262,25,365,25],[461,-45,461,-119],[461,-119,461,-175],[406,-215,329,-215],[256,187,201,187],[159,238,159,304],[159,304,159,382],[216,450,281,450],[281,450,336,450],[379,400,379,334],[379,334,379,256],[321,187,256,187]]},"Black":{"d":"M344 155C501 155 629 229 629 319C629 361 600 400 554 429C587 435 626 429 662 424C687 420 710 417 731 417V487C711 487 691 488 671 489C620 492 569 495 521 478L522 479C502 472 475 466 454 469C420 478 383 482 344 482C187 482 59 409 59 319C59 266 103 219 171 189C171 188 170 187 169 186C147 164 124 141 140 97C151 66 170 44 197 28C103 2 40 -43 40 -95C40 -175 191 -240 377 -240C563 -240 713 -175 713 -95C713 -15 563 50 377 50C332 50 276 51 236 71C216 81 203 94 195 116C192 124 207 141 223 159C226 162 229 165 232 168C266 160 304 155 344 155ZM431 -192C325 -192 214 -125 214 -62C214 -23 257 2 322 2C428 2 539 -65 539 -128C539 -167 496 -192 431 -192ZM349 210C284 210 229 262 229 323C229 381 278 427 340 427C405 427 459 375 459 314C459 256 411 210 349 210Z","adv":759,"pts":[[501,155,2],[629,229,2],[629,361,2],[600,400,2],[587,435,2],[626,429,2],[687,420,2],[710,417,2],[711,487,2],[691,488,2],[620,492,2],[569,495,2],[502,472,2],[475,466,2],[420,478,2],[383,482,2],[187,482,2],[59,409,2],[59,266,2],[103,219,2],[171,188,2],[170,187,2],[147,164,2],[124,141,2],[151,66,2],[170,44,2],[103,2,2],[40,-43,2],[40,-175,2],[191,-240,2],[563,-240,2],[713,-175,2],[713,-15,2],[563,50,2],[332,50,2],[276,51,2],[216,81,2],[203,94,2],[192,124,2],[207,141,2],[226,162,2],[229,165,2],[266,160,2],[304,155,2],[344,155,1],[629,319,1],[554,429,0],[662,424,1],[731,417,0],[731,487,0],[671,489,1],[521,478,0],[522,479,0],[454,469,0],[344,482,1],[59,319,1],[171,189,0],[169,186,1],[140,97,1],[197,28,0],[40,-95,1],[377,-240,1],[713,-95,1],[377,50,1],[236,71,1],[195,116,1],[223,159,0],[232,168,0],[325,-192,2],[214,-125,2],[214,-23,2],[257,2,2],[428,2,2],[539,-65,2],[539,-167,2],[496,-192,2],[431,-192,1],[214,-62,1],[322,2,1],[539,-128,1],[284,210,2],[229,262,2],[229,381,2],[278,427,2],[405,427,2],[459,375,2],[459,256,2],[411,210,2],[349,210,1],[229,323,1],[340,427,1],[459,314,1]],"handles":[[344,155,501,155],[629,229,629,319],[629,319,629,361],[600,400,554,429],[554,429,587,435],[626,429,662,424],[662,424,687,420],[710,417,731,417],[731,487,711,487],[691,488,671,489],[671,489,620,492],[569,495,521,478],[522,479,502,472],[475,466,454,469],[454,469,420,478],[383,482,344,482],[344,482,187,482],[59,409,59,319],[59,319,59,266],[103,219,171,189],[171,189,171,188],[170,187,169,186],[169,186,147,164],[124,141,140,97],[140,97,151,66],[170,44,197,28],[197,28,103,2],[40,-43,40,-95],[40,-95,40,-175],[191,-240,377,-240],[377,-240,563,-240],[713,-175,713,-95],[713,-95,713,-15],[563,50,377,50],[377,50,332,50],[276,51,236,71],[236,71,216,81],[203,94,195,116],[195,116,192,124],[207,141,223,159],[223,159,226,162],[229,165,232,168],[232,168,266,160],[304,155,344,155],[431,-192,325,-192],[214,-125,214,-62],[214,-62,214,-23],[257,2,322,2],[322,2,428,2],[539,-65,539,-128],[539,-128,539,-167],[496,-192,431,-192],[349,210,284,210],[229,262,229,323],[229,323,229,381],[278,427,340,427],[340,427,405,427],[459,375,459,314],[459,314,459,256],[411,210,349,210]]}},"Q":{"Thin":{"d":"M492 -1C642 38 752 176 752 340C752 534 597 692 405 692C213 692 58 534 58 340C58 149 208 -7 396 -12C502 -85 638 -86 766 -95C671 -76 579 -44 492 -1ZM395 2C222 2 85 147 85 329C85 520 234 678 415 678C588 678 726 533 726 351C726 160 576 2 395 2Z","adv":810,"pts":[[642,38,2],[752,176,2],[752,534,2],[597,692,2],[213,692,2],[58,534,2],[58,149,2],[208,-7,2],[502,-85,2],[638,-86,2],[671,-76,2],[579,-44,2],[492,-1,0],[752,340,1],[405,692,1],[58,340,1],[396,-12,0],[766,-95,0],[222,2,2],[85,147,2],[85,520,2],[234,678,2],[588,678,2],[726,533,2],[726,160,2],[576,2,2],[395,2,1],[85,329,1],[415,678,1],[726,351,1]],"handles":[[492,-1,642,38],[752,176,752,340],[752,340,752,534],[597,692,405,692],[405,692,213,692],[58,534,58,340],[58,340,58,149],[208,-7,396,-12],[396,-12,502,-85],[638,-86,766,-95],[766,-95,671,-76],[579,-44,492,-1],[395,2,222,2],[85,147,85,329],[85,329,85,520],[234,678,415,678],[415,678,588,678],[726,533,726,351],[726,351,726,160],[576,2,395,2]]},"Regular":{"d":"M169 -47 171 -53C231 -29 294 -8 360 -13C442 -19 511 -84 596 -99C680 -114 764 -94 837 -52L835 -48C783 -79 722 -62 665 -47C645 -41 626 -36 608 -33C567 -26 527 -14 488 -4C642 33 758 173 758 340C758 536 599 694 404 694C209 694 50 536 50 340C50 186 148 55 285 6C265 -1 244 -11 224 -21C206 -31 188 -40 169 -47ZM368 21C243 21 149 138 149 295C149 487 287 659 440 659C565 659 659 542 659 385C659 193 521 21 368 21Z","adv":808,"pts":[[231,-29,2],[294,-8,2],[442,-19,2],[511,-84,2],[680,-114,2],[764,-94,2],[783,-79,2],[722,-62,2],[645,-41,2],[626,-36,2],[567,-26,2],[527,-14,2],[642,33,2],[758,173,2],[758,536,2],[599,694,2],[209,694,2],[50,536,2],[50,186,2],[148,55,2],[265,-1,2],[244,-11,2],[206,-31,2],[188,-40,2],[169,-47,0],[171,-53,0],[360,-13,1],[596,-99,1],[837,-52,0],[835,-48,0],[665,-47,1],[608,-33,1],[488,-4,0],[758,340,1],[404,694,1],[50,340,1],[285,6,0],[224,-21,1],[243,21,2],[149,138,2],[149,487,2],[287,659,2],[565,659,2],[659,542,2],[659,193,2],[521,21,2],[368,21,1],[149,295,1],[440,659,1],[659,385,1]],"handles":[[171,-53,231,-29],[294,-8,360,-13],[360,-13,442,-19],[511,-84,596,-99],[596,-99,680,-114],[764,-94,837,-52],[835,-48,783,-79],[722,-62,665,-47],[665,-47,645,-41],[626,-36,608,-33],[608,-33,567,-26],[527,-14,488,-4],[488,-4,642,33],[758,173,758,340],[758,340,758,536],[599,694,404,694],[404,694,209,694],[50,536,50,340],[50,340,50,186],[148,55,285,6],[285,6,265,-1],[244,-11,224,-21],[224,-21,206,-31],[188,-40,169,-47],[368,21,243,21],[149,138,149,295],[149,295,149,487],[287,659,440,659],[440,659,565,659],[659,542,659,385],[659,385,659,193],[521,21,368,21]]},"Black":{"d":"M203 -47 205 -53C283 -21 362 -13 446 -19C548 -26 637 -114 744 -133C855 -153 962 -106 1056 -52L1054 -48C992 -83 925 -56 859 -29C828 -17 797 -4 768 1C741 6 714 10 687 15C845 70 955 195 955 340C955 537 752 696 502 696C252 696 50 537 50 340C50 194 161 69 321 14C306 6 292 -2 278 -9C253 -23 229 -37 203 -47ZM473 44C351 44 259 156 259 304C259 480 387 636 532 636C654 636 746 524 746 376C746 200 618 44 473 44Z","adv":1005,"pts":[[283,-21,2],[362,-13,2],[548,-26,2],[637,-114,2],[855,-153,2],[962,-106,2],[992,-83,2],[925,-56,2],[828,-17,2],[797,-4,2],[741,6,2],[714,10,2],[845,70,2],[955,195,2],[955,537,2],[752,696,2],[252,696,2],[50,537,2],[50,194,2],[161,69,2],[306,6,2],[292,-2,2],[253,-23,2],[229,-37,2],[203,-47,0],[205,-53,0],[446,-19,1],[744,-133,1],[1056,-52,0],[1054,-48,0],[859,-29,1],[768,1,1],[687,15,0],[955,340,1],[502,696,1],[50,340,1],[321,14,0],[278,-9,1],[351,44,2],[259,156,2],[259,480,2],[387,636,2],[654,636,2],[746,524,2],[746,200,2],[618,44,2],[473,44,1],[259,304,1],[532,636,1],[746,376,1]],"handles":[[205,-53,283,-21],[362,-13,446,-19],[446,-19,548,-26],[637,-114,744,-133],[744,-133,855,-153],[962,-106,1056,-52],[1054,-48,992,-83],[925,-56,859,-29],[859,-29,828,-17],[797,-4,768,1],[768,1,741,6],[714,10,687,15],[687,15,845,70],[955,195,955,340],[955,340,955,537],[752,696,502,696],[502,696,252,696],[50,537,50,340],[50,340,50,194],[161,69,321,14],[321,14,306,6],[292,-2,278,-9],[278,-9,253,-23],[229,-37,203,-47],[473,44,351,44],[259,156,259,304],[259,304,259,480],[387,636,532,636],[532,636,654,636],[746,524,746,376],[746,376,746,200],[618,44,473,44]]}},"e":{"Thin":{"d":"M498 262C485 386 386 480 270 480C144 480 42 370 42 235C42 100 144 -10 270 -10C357 -10 438 43 476 128L470 147C430 58 379 4 271 4C153 4 64 105 64 220C64 234 65 248 67 262ZM70 276C94 382 182 464 284 464C384 464 464 384 475 276Z","adv":534,"pts":[[485,386,2],[386,480,2],[144,480,2],[42,370,2],[42,100,2],[144,-10,2],[357,-10,2],[438,43,2],[430,58,2],[379,4,2],[153,4,2],[64,105,2],[64,234,2],[65,248,2],[498,262,0],[270,480,1],[42,235,1],[270,-10,1],[476,128,0],[470,147,0],[271,4,1],[64,220,1],[67,262,0],[94,382,2],[182,464,2],[384,464,2],[464,384,2],[70,276,0],[284,464,1],[475,276,0]],"handles":[[498,262,485,386],[386,480,270,480],[270,480,144,480],[42,370,42,235],[42,235,42,100],[144,-10,270,-10],[270,-10,357,-10],[438,43,476,128],[470,147,430,58],[379,4,271,4],[271,4,153,4],[64,105,64,220],[64,220,64,234],[65,248,67,262],[70,276,94,382],[182,464,284,464],[284,464,384,464],[464,384,475,276]]},"Regular":{"d":"M513 262C500 387 399 482 279 482C149 482 44 371 44 235C44 99 149 -12 279 -12C369 -12 451 42 491 127L478 170C433 71 410 16 278 16C186 16 129 102 129 187C129 212 132 238 138 262ZM146 290C177 380 244 449 313 449C380 449 428 383 430 290Z","adv":551,"pts":[[500,387,2],[399,482,2],[149,482,2],[44,371,2],[44,99,2],[149,-12,2],[369,-12,2],[451,42,2],[433,71,2],[410,16,2],[186,16,2],[129,102,2],[129,212,2],[132,238,2],[513,262,0],[279,482,1],[44,235,1],[279,-12,1],[491,127,0],[478,170,0],[278,16,1],[129,187,1],[138,262,0],[177,380,2],[244,449,2],[380,449,2],[428,383,2],[146,290,0],[313,449,1],[430,290,0]],"handles":[[513,262,500,387],[399,482,279,482],[279,482,149,482],[44,371,44,235],[44,235,44,99],[149,-12,279,-12],[279,-12,369,-12],[451,42,491,127],[478,170,433,71],[410,16,278,16],[278,16,186,16],[129,102,129,187],[129,187,129,212],[132,238,138,262],[146,290,177,380],[244,449,313,449],[313,449,380,449],[428,383,430,290]]},"Black":{"d":"M692 262C674 388 534 484 367 484C186 484 40 373 40 235C40 97 186 -14 367 -14C492 -14 606 40 661 126L636 212C555 85 559 40 367 40C264 40 223 111 223 201C223 222 226 242 230 262ZM249 316C281 380 335 426 393 426C450 426 493 382 507 316Z","adv":726,"pts":[[674,388,2],[534,484,2],[186,484,2],[40,373,2],[40,97,2],[186,-14,2],[492,-14,2],[606,40,2],[555,85,2],[559,40,2],[264,40,2],[223,111,2],[223,222,2],[226,242,2],[692,262,0],[367,484,1],[40,235,1],[367,-14,1],[661,126,0],[636,212,0],[367,40,1],[223,201,1],[230,262,0],[281,380,2],[335,426,2],[450,426,2],[493,382,2],[249,316,0],[393,426,1],[507,316,0]],"handles":[[692,262,674,388],[534,484,367,484],[367,484,186,484],[40,373,40,235],[40,235,40,97],[186,-14,367,-14],[367,-14,492,-14],[606,40,661,126],[636,212,555,85],[559,40,367,40],[367,40,264,40],[223,111,223,201],[223,201,223,222],[226,242,230,262],[249,316,281,380],[335,426,393,426],[393,426,450,426],[493,382,507,316]]}}},"wp":{"O":{"op":{"d":"M735 340C735 534 580 691 388 691C196 691 41 534 41 340C41 146 196 -11 388 -11C580 -11 735 146 735 340ZM139 284C139 484 278 667 431 667C551 667 638 553 638 396C638 196 499 13 346 13C226 13 139 127 139 284Z","c":[388.5,340.0],"a":16.0},"reg":{"d":"M735 340C735 534 580 691 388 691C196 691 41 534 41 340C41 146 196 -11 388 -11C580 -11 735 146 735 340ZM139 396C139 553 226 667 346 667C499 667 638 484 638 284C638 127 551 13 431 13C278 13 139 196 139 396Z","c":[388.5,340.0],"a":-16.0}},"e":{"op":{"d":"M267 480C140 480 36 370 36 235C36 100 140 -10 267 -10C355 -10 436 43 474 128L467 154C425 63 382 8 268 8C176 8 119 92 119 177C119 206 123 235 130 262L496 262C483 386 385 480 267 480ZM135 280C165 379 234 457 305 457C373 457 418 382 414 280L135 280Z","c":[266.0,235.0],"a":16.4},"reg":{"d":"M267 480C140 480 36 370 36 235C36 100 140 -10 267 -10C355 -10 436 43 474 128L467 154C424 61 381 8 266 8C155 8 125 164 120 262L496 262C483 386 385 480 267 480ZM119 280C119 285 119 289 119 293C119 390 164 457 228 457C296 457 367 382 398 280L119 280Z","c":[266.0,235.0],"a":-17.2}},"p":{"op":{"d":"M59 -240L195 -240L195 -222L177 -222C161 -222 149 -210 149 -194L149 51C190 13 244 -10 303 -10C432 -10 536 100 536 235C536 370 432 480 303 480C244 480 190 457 149 419L149 448L13 480L13 438L28 438C44 438 59 417 59 401L59 -194C59 -210 45 -222 31 -222L13 -222L13 -240L59 -240ZM149 310L149 333C186 406 248 458 313 458C391 458 448 381 448 276C448 139 353 12 251 12C209 12 173 34 149 71L149 310Z","c":[288.1,235.4],"a":12.7},"reg":{"d":"M59 -240L195 -240L195 -222L177 -222C161 -222 149 -210 149 -194L149 51C190 13 244 -10 303 -10C432 -10 536 100 536 235C536 370 432 480 303 480C244 480 190 457 149 419L149 448L13 480L13 438L28 438C44 438 59 417 59 401L59 -194C59 -210 45 -222 31 -222L13 -222L13 -240L59 -240ZM149 310L149 399C173 436 209 458 251 458C353 458 448 331 448 194C448 89 391 12 313 12C248 12 186 64 149 137L149 310Z","c":[288.1,234.7],"a":-12.7}},"a":{"op":{"d":"M320 17L320 0L450 0L450 18L438 18C422 18 410 30 410 46L410 308L410 308C405 405 338 480 237 480C156 480 68 443 49 357C48 353 47 349 47 344C47 322 65 304 87 304C109 304 127 322 127 344C127 358 120 370 110 377C132 425 181 458 237 458C320 458 320 354 320 296L320 269C291 286 255 296 217 296C116 296 34 227 34 143C34 59 116 -10 217 -10C255 -10 291 0 320 17ZM320 65C297 32 262 10 225 10C169 10 126 61 126 128C126 207 184 276 250 276C278 276 302 263 320 243L320 65Z","c":[231.4,142.6],"a":9.9},"reg":{"d":"M320 17L320 0L450 0L450 18L438 18C422 18 410 30 410 46L410 308L410 308C405 405 338 480 237 480C156 480 68 443 49 357C48 353 47 349 47 344C47 322 65 304 87 304C109 304 127 322 127 344C127 358 120 370 110 377C132 425 181 458 237 458C320 458 320 354 320 296L320 269C291 286 255 296 217 296C116 296 34 227 34 143C34 59 116 -10 217 -10C255 -10 291 0 320 17ZM320 43C302 23 278 10 250 10C184 10 126 79 126 158C126 225 169 276 225 276C262 276 297 254 320 221L320 43Z","c":[231.4,143.2],"a":-10.1}},"b":{"op":{"d":"M537 235C537 370 433 480 304 480C245 480 191 457 150 419L150 738L14 770L14 728L29 728C45 728 60 707 60 691L60 46C60 30 46 18 32 18L8 18L8 0L150 0L150 51C191 13 245 -10 304 -10C433 -10 537 100 537 235ZM150 333C187 406 249 458 314 458C392 458 449 381 449 276C449 139 354 12 252 12C210 12 174 34 150 71L150 333Z","c":[289.1,235.4],"a":12.7},"reg":{"d":"M537 235C537 370 433 480 304 480C245 480 191 457 150 419L150 738L14 770L14 728L29 728C45 728 60 707 60 691L60 46C60 30 46 18 32 18L8 18L8 0L150 0L150 51C191 13 245 -10 304 -10C433 -10 537 100 537 235ZM150 137L150 399C174 436 210 458 252 458C354 458 449 331 449 194C449 89 392 12 314 12C249 12 187 64 150 137Z","c":[289.1,234.6],"a":-12.7}},"d":{"op":{"d":"M422 50L422 0L564 0L564 18L540 18C524 18 512 30 512 46L512 738L376 770L376 728L392 728C408 728 422 707 422 691L422 420C381 457 328 480 269 480C140 480 36 370 36 235C36 100 140 -10 269 -10C328 -10 381 13 422 50ZM422 135C385 63 324 12 259 12C181 12 124 89 124 194C124 331 218 458 320 458C362 458 398 436 422 400L422 135Z","c":[283.5,234.5],"a":12.4},"reg":{"d":"M422 50L422 0L564 0L564 18L540 18C524 18 512 30 512 46L512 738L376 770L376 728L392 728C408 728 422 707 422 691L422 420C381 457 328 480 269 480C140 480 36 370 36 235C36 100 140 -10 269 -10C328 -10 381 13 422 50ZM422 70C398 34 362 12 320 12C218 12 124 139 124 276C124 381 181 458 259 458C324 458 385 407 422 335L422 70Z","c":[283.5,235.3],"a":-12.5}},"g":{"op":{"d":"M529 -95C529 -15 419 50 283 50C260 50 236 52 214 58C185 66 162 80 151 110C144 128 156 152 166 173C167 174 167 174 167 175C194 162 224 155 256 155C359 155 443 229 443 319C443 367 419 410 381 440C410 449 443 444 475 440C493 437 510 435 526 435L526 469C516 469 505 469 494 470C456 471 417 472 380 459C370 457 355 458 346 462L346 462C320 475 289 482 256 482C153 482 70 409 70 319C70 265 100 217 146 187C144 185 143 182 142 180C131 155 120 130 130 103C142 71 167 52 198 41C104 21 36 -32 36 -95C36 -175 147 -240 283 -240C419 -240 529 -175 529 -95ZM122 -77C122 -14 181 33 260 33C357 33 444 -36 444 -113C444 -176 385 -223 306 -223C209 -223 122 -154 122 -77ZM149 294C149 380 209 459 275 459C326 459 364 410 364 343C364 257 304 178 238 178C187 178 149 227 149 294Z","c":[256.4,318.5],"a":16.3},"reg":{"d":"M529 -95C529 -15 419 50 283 50C260 50 236 52 214 58C185 66 162 80 151 110C146 123 161 134 176 145C184 151 192 156 199 163C217 158 236 155 256 155C359 155 443 229 443 319C443 367 419 410 381 440C410 449 443 444 475 440C493 437 510 435 526 435L526 469C516 469 505 469 494 470C456 471 417 472 380 459C370 457 355 458 346 462L346 462C320 475 289 482 256 482C153 482 70 409 70 319C70 255 112 199 173 172C169 168 164 165 159 161C139 148 119 134 130 103C142 71 167 52 198 41C104 21 36 -32 36 -95C36 -175 147 -240 283 -240C419 -240 529 -175 529 -95ZM122 -113C122 -36 209 33 306 33C385 33 444 -14 444 -77C444 -154 357 -223 260 -223C181 -223 122 -176 122 -113ZM149 343C149 410 187 459 238 459C304 459 364 380 364 294C364 227 326 178 275 178C209 178 149 257 149 343Z","c":[256.4,318.5],"a":-16.3}},"o":{"op":{"d":"M515 235C515 370 408 480 276 480C144 480 36 370 36 235C36 100 144 -10 276 -10C408 -10 515 100 515 235ZM124 182C124 322 216 457 312 457C380 457 428 387 428 288C428 148 335 13 239 13C171 13 124 83 124 182Z","c":[275.8,235.0],"a":15.8},"reg":{"d":"M515 235C515 370 408 480 276 480C144 480 36 370 36 235C36 100 144 -10 276 -10C408 -10 515 100 515 235ZM124 288C124 387 171 457 239 457C335 457 428 322 428 182C428 83 380 13 312 13C216 13 124 148 124 288Z","c":[275.8,235.0],"a":-15.8}},"q":{"op":{"d":"M422 -240L558 -240L558 -222L540 -222C524 -222 512 -210 512 -194L512 478L494 478L420 448L420 422C379 458 327 480 269 480C140 480 36 370 36 235C36 100 140 -10 269 -10C328 -10 381 13 422 50L422 -194C422 -210 408 -222 394 -222L376 -222L376 -240L422 -240ZM422 135C385 63 324 12 259 12C181 12 124 89 124 194C124 331 218 458 320 458C360 458 396 437 420 403L420 400L422 400C422 400 422 400 422 400L422 135Z","c":[283.6,234.7],"a":12.5},"reg":{"d":"M422 -240L558 -240L558 -222L540 -222C524 -222 512 -210 512 -194L512 478L494 478L420 448L420 422C379 458 327 480 269 480C140 480 36 370 36 235C36 100 140 -10 269 -10C328 -10 381 13 422 50L422 -194C422 -210 408 -222 394 -222L376 -222L376 -240L422 -240ZM422 70C398 34 362 12 320 12C218 12 124 139 124 276C124 381 181 458 259 458C324 458 385 407 422 335L422 70Z","c":[283.5,235.3],"a":-12.5}}}};
-const WEIGHTS = [[100,"Thin"],[200,"ExtraLight"],[300,"Light"],[400,"Regular"],[500,"Medium"],[600,"SemiBold"],[700,"Bold"],[800,"ExtraBold"],[900,"Black"]];
-const nearest = w => WEIGHTS.reduce((a, b) => Math.abs(b[0] - w) < Math.abs(a[0] - w) ? b : a)[1];
-const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
-const $ = id => document.getElementById(id);
-const NS = "http://www.w3.org/2000/svg";
-const el = (tag, attrs = {}, parent) => { const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); if (parent) parent.appendChild(e); return e; };
-
-function seg(container, items, current, onPick) {
-  container.innerHTML = "";
-  const btns = items.map(([v, label]) => {
-    const b = document.createElement("button"); b.type = "button"; b.textContent = label; b.setAttribute("aria-pressed", String(v === current));
-    b.addEventListener("click", () => { btns.forEach(x => x.setAttribute("aria-pressed", String(x === b))); onPick(v); });
-    container.appendChild(b); return b;
-  });
-}
-
-/* The title follows the pointer across the range, then settles back on Black */
-(() => {
-  const hero = $("hero"), title = $("title");
-  let target = 900, cur = 900, raf = 0;
-  const show = w => { title.style.setProperty("--w", w.toFixed(1)); };
-  const tick = () => { cur += (target - cur) * 0.12; if (Math.abs(target - cur) < 0.4) cur = target; show(cur); raf = cur === target ? 0 : requestAnimationFrame(tick); };
-  const aim = w => { target = w; if (reduce) { cur = w; show(w); return; } if (!raf) raf = requestAnimationFrame(tick); };
-  hero.addEventListener("pointermove", e => {
-    if (e.pointerType === "touch") return;
-    const r = title.getBoundingClientRect(); const x = Math.min(1, Math.max(0, (e.clientX - r.left) / r.width));
-    aim(100 + 800 * x);
-  });
-  hero.addEventListener("pointerleave", () => aim(900));
-  show(900);
-  const fit = () => {
-    const probe = title.cloneNode(true); probe.removeAttribute("id");
-    Object.assign(probe.style, {position: "absolute", visibility: "hidden", fontSize: "100px", width: "auto", left: "0", top: "0",
-      display: "inline-block", whiteSpace: "nowrap", pointerEvents: "none"});
-    probe.style.setProperty("--w", "900"); probe.setAttribute("aria-hidden", "true"); hero.appendChild(probe);
-    const ratio = probe.getBoundingClientRect().width / 100; probe.remove();
-    const room = hero.getBoundingClientRect().width * 0.97;
-    if (ratio > 0) title.style.fontSize = Math.min(232, room / ratio) + "px";
-  };
-  (document.fonts ? document.fonts.ready : Promise.resolve()).then(fit); addEventListener("resize", fit);
-})();
-
-function letters(container, items, current, onPick) {
-  container.innerHTML = "";
-  const btns = items.map(ch => {
-    const b = document.createElement("button"); b.type = "button"; b.textContent = ch; b.setAttribute("aria-pressed", String(ch === current));
-    b.setAttribute("aria-label", "Show the " + ch);
-    b.addEventListener("click", () => { if (b.getAttribute("aria-pressed") === "true") return; btns.forEach(x => x.setAttribute("aria-pressed", String(x === b))); onPick(ch); });
-    container.appendChild(b); return b;
-  });
-}
-
-/* The wink: a letter with a bowl, drawn the Opmet Osserpse way (stress turned right) or the regular way (turned left).
-   Both are the font's own outlines, from the same strokes; the regular way only turns the stress back. */
-(() => {
-  const P = DATA.wp, order = ["O", "e", "p", "a", "b", "d", "g", "o", "q"];
-  const svg = $("wink-svg"), label = $("wink-label"), ang = $("wink-angle");
-  const H = 560;
-  let ch = "O", way = "op", axes = null, shown = null, raf = 0;
-  const target = () => { const g = P[ch][way]; return {x: g.c[0], y: -g.c[1], a: g.a}; };
-  const apply = () => axes.setAttribute("transform", "translate(" + shown.x.toFixed(2) + " " + shown.y.toFixed(2) + ") rotate(" + shown.a.toFixed(2) + ")");
-  const turn = animate => {
-    const to = target(); cancelAnimationFrame(raf);
-    if (!animate || reduce || !shown) { shown = to; apply(); return; }
-    const from = {...shown}, t0 = performance.now(), T = 520;
-    const step = now => {
-      const k = Math.min(1, (now - t0) / T), e = k < .5 ? 2 * k * k : 1 - Math.pow(-2 * k + 2, 2) / 2;
-      shown = {x: from.x + (to.x - from.x) * e, y: from.y + (to.y - from.y) * e, a: from.a + (to.a - from.a) * e}; apply();
-      if (k < 1) raf = requestAnimationFrame(step);
-    };
-    raf = requestAnimationFrame(step);
-  };
-  const read = () => {
-    const a = P[ch][way].a, side = a >= 0 ? "right" : "left";
-    svg.dataset.way = way;
-    label.textContent = "The " + ch + "’s stress, from upright";
-    ang.textContent = Math.abs(a).toFixed(1) + "° " + side;
-    svg.setAttribute("aria-label", "The letter " + ch + " of Opmet Serif, drawn " + (way === "op" ? "the Opmet Osserpse way" : "the regular way") +
-      ", its stress turned " + Math.abs(a).toFixed(1) + " degrees " + side + " of upright");
-  };
-  const draw = () => {
-    const g = P[ch], c = g.op.c;
-    svg.innerHTML = "";
-    svg.setAttribute("viewBox", (c[0] - H) + " " + (-c[1] - H) + " " + 2 * H + " " + 2 * H);
-    const flip = el("g", {transform: "scale(1,-1)"}, svg);
-    el("path", {d: g.op.d, class: "glyph op"}, flip);
-    el("path", {d: g.reg.d, class: "glyph reg"}, flip);
-    const R = ch === "O" ? 430 : 330;
-    axes = el("g", {class: "axes"}, svg);
-    el("line", {x1: 0, y1: -R, x2: 0, y2: R, class: "axis"}, axes);
-    for (const s of [1, -1]) el("circle", {cx: 0, cy: s * (R + 16), r: 8, class: "tick"}, axes);
-    shown = null; turn(false); read();
-  };
-  letters($("wink-row"), order, ch, v => {
-    ch = v;
-    if (reduce) { draw(); return; }
-    svg.classList.add("swap"); setTimeout(() => { draw(); requestAnimationFrame(() => svg.classList.remove("swap")); }, 220);
-  });
-  seg($("wink-way"), [["op", "Opmet Osserpse"], ["reg", "The regular way"]], way, v => { way = v; read(); turn(true); });
-  draw();
-})();
-
-/* Drawn as strokes: the outline and its points */
-(() => {
-  const cx = DATA.cx, box = $("cx"), svg = $("cx-svg"), count = $("cx-count"), label = $("cx-label");
-  let ch = "g", w = "Regular", view = "points";
-  const draw = () => {
-    const g = cx[ch][w]; svg.innerHTML = "";
-    const W = Math.max(1110, g.adv + 180);
-    svg.setAttribute("viewBox", (g.adv / 2 - W / 2) + " -800 " + W + " 1110");
-    const root = el("g", {transform: "scale(1,-1)"}, svg);
-    el("line", {x1: -40, y1: 0, x2: g.adv + 40, y2: 0, stroke: "var(--rule)", "stroke-width": 1.5}, root);
-    el("path", {d: g.d, class: "ink"}, root);
-    el("path", {d: g.d, class: "ol"}, root);
-    const pts = el("g", {class: "pts"}, root);
-    for (const h of g.handles) el("line", {x1: h[0], y1: h[1], x2: h[2], y2: h[3], class: "h"}, pts);
-    let on = 0, off = 0;
-    for (const p of g.pts) {
-      if (p[2] === 2) { off++; el("circle", {cx: p[0], cy: p[1], r: 5.5, class: "off"}, pts); }
-      else if (p[2] === 1) { on++; el("circle", {cx: p[0], cy: p[1], r: 8, class: "on-s"}, pts); }
-      else { on++; el("rect", {x: p[0] - 7.5, y: p[1] - 7.5, width: 15, height: 15, class: "on-c"}, pts); }
-    }
-    label.textContent = "The " + ch + ", Text " + w;
-    count.textContent = on + " points, " + off + " handles";
-    svg.setAttribute("aria-label", "The letter " + ch + " of Opmet Serif at Text " + w + ", " + on + " points on its outline and " + off + " handles");
-  };
-  letters($("cx-ch"), ["a", "e", "g", "Q"], ch, v => { ch = v; draw(); });
-  seg($("cx-w"), [["Thin", "Thin"], ["Regular", "Regular"], ["Black", "Black"]], w, v => { w = v; draw(); });
-  seg($("cx-v"), [["ink", "Ink"], ["points", "Points"]], view, v => { view = v; box.dataset.view = v; });
-  draw();
-})();
-
-/* The whole font: each board's type set as large as the board allows, keeping the print tests' proportions */
-(() => {
-  const boards = [...document.querySelectorAll(".bbody")];
-  const fit = () => boards.forEach(b => {
-    b.style.setProperty("--u", "1px");
-    const cs = getComputedStyle(b), px = k => parseFloat(cs[k]) || 0;
-    const W = b.clientWidth - px("paddingLeft") - px("paddingRight"), h = b.scrollHeight - px("paddingTop") - px("paddingBottom");
-    const maxw = Math.max(...[...b.querySelectorAll(".bl")].map(l => l.getBoundingClientRect().width));
-    const H = innerHeight * (innerWidth < 700 ? 2.2 : 1.3);
-    if (maxw > 0 && h > 0) b.style.setProperty("--u", Math.min((+b.dataset.fill || .86) * W / maxw, H / h).toFixed(3) + "px");
-    else b.style.removeProperty("--u");
-  });
-  (document.fonts ? document.fonts.ready : Promise.resolve()).then(fit);
-  let t = 0; addEventListener("resize", () => { clearTimeout(t); t = setTimeout(fit, 120); });
-})();
-
-/* A line to try */
-(() => {
-  const tt = $("tt"), wr = $("tt-w"), read = $("tt-read");
-  let size = "Display", ital = false;
-  const upd = () => { const w = +wr.value; tt.style.setProperty("--tw", w); tt.style.setProperty("--to", size === "Text" ? 10 : 72);
-    tt.style.setProperty("--ts", ital ? "italic" : "normal"); tt.style.fontWeight = w;
-    const n = nearest(w); read.textContent = size + " " + (ital ? (n === "Regular" ? "Italic" : n + " Italic") : n) + " · " + w; };
-  wr.addEventListener("input", upd);
-  const pick = (a, b, f) => { a.addEventListener("click", () => { a.setAttribute("aria-pressed", "true"); b.setAttribute("aria-pressed", "false"); f(); upd(); }); };
-  pick($("tt-text"), $("tt-disp"), () => size = "Text"); pick($("tt-disp"), $("tt-text"), () => size = "Display");
-  pick($("tt-up"), $("tt-it"), () => ital = false); pick($("tt-it"), $("tt-up"), () => ital = true);
-  tt.addEventListener("keydown", e => { if (e.key === "Enter") e.preventDefault(); });
-  upd();
-})();
-</script>
+<nav class="g pfoot" aria-label="All work"><a class="ctl" href="/#archive" data-all-work><span class="ctl-w" aria-hidden="true">All work</span><span class="ctl-v">All work</span></a> <a class="ctl" href="/" data-cover><span class="ctl-w" aria-hidden="true">Home</span><span class="ctl-v">Home</span></a> <a class="ctl" href="#main" data-top><span class="ctl-w" aria-hidden="true">Back to top</span><span class="ctl-v">Back to top</span></a></nav>
+</div>
+</main>
+<script src="/js/site.js?v=87b484b297" defer></script>
 </body>
 </html>
