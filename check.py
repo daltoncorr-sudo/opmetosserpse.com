@@ -45,7 +45,7 @@ for f in glob.glob(D + '/**/*.html', recursive=True):
     # and only that. Everywhere else on the site (work pages, home, the Journal's own chrome) they still fail.
     # The body runs to the end of its article (it holds paragraphs, notes and rows of pictures, so it can't end at a </div>)
     # A type specimen's boards (Opmet Serif's "The whole font") set the alphabet in capitals: left out of the all-caps check
-    plain = strip(re.sub(r'<div class="article-body"[^>]*>[\s\S]*?</article>|<div class="work boards"[^>]*>[\s\S]*?</section>', ' ', t2))
+    plain = strip(re.sub(r'<div class="article-body"[^>]*>[\s\S]*?</article>|<div class="os-work os-boards"[^>]*>[\s\S]*?</section>', ' ', t2))
     if not drafts:
         bare = strip(re.sub(r'<div class="fd-img" data-placeholder[^>]*>[^<]*</div>', ' ', t))
         problems += ['%s: a bracketed placeholder (%s)' % (rel, m.group(0)) for m in re.finditer(BRACKETS, bare) if m.group(0) not in ALLOWED]
@@ -86,13 +86,32 @@ order = json.load(open(os.path.join(ROOT, 'content', 'index.json'), encoding='ut
 # The finished pages (content/pages/<slug>.json): project pages D designed whole, built as they are. They keep the checks
 # every page has (links, words, alt text, the data); the template's own (the lightbox, the masthead, project_order) skip them
 finished = {os.path.basename(f)[:-5]: json.load(open(f, encoding='utf-8')) for f in glob.glob(os.path.join(ROOT, 'content', 'pages', '*.json'))}
+# The frame every project page has: the masthead (the Journal's component), linking home, with All work and Home under it;
+# at the end All work, Home and Back to top; no Back, no Home or Back to top without their hooks
+def frame(rel, t):
+    mast = re.search(r'<header class="mast"><a class="mast-name[^"]*" href="/" data-cover>([\s\S]*?)</header>', t)
+    if not mast: problems.append('%s: no masthead linking home' % rel)
+    elif not re.search(r'<a class="ctl" href="/#archive" data-all-work>', mast.group(1)): problems.append('%s: no All work under the masthead' % rel)
+    elif not re.search(r'<a class="ctl" href="/" data-cover>', mast.group(1)): problems.append('%s: no Home beside All work under the masthead' % rel)
+    if not re.search(r'class="g pfoot"[^>]*><a class="ctl" href="/#archive" data-all-work>', t): problems.append('%s: no All work at the end' % rel)
+    foot = t.split('class="g pfoot"', 1)[-1].split('</nav>', 1)[0]
+    if 'data-top>' not in foot: problems.append('%s: no Back to top at the end' % rel)
+    if 'href="/" data-cover>' not in foot: problems.append('%s: no Home at the end' % rel)
+    for m in re.finditer(r'<(a|button)\b[^>]*>([\s\S]*?)</\1>', t):
+        words = ' '.join(re.sub(r'<span class="ctl-w"[^>]*>[^<]*</span>', ' ', m.group(2)).split())
+        words = ' '.join(re.sub(r'<[^>]+>', ' ', words).split())
+        if words == 'Back' or (words == 'Home' and 'data-cover' not in m.group(0)) or (words == 'Back to top' and 'data-top' not in m.group(0)): problems.append('%s: a "%s" control (project pages have the masthead, All work and, at the end, Back to top)' % (rel, words))
 for s in finished:
     f = os.path.join(D, 'projects', s + '.html')
     if not os.path.exists(f): problems.append('projects/%s: a finished page that was not built' % s); continue
-    if 'data-page-only' not in open(f, encoding='utf-8').read(): problems.append('projects/%s.html: a finished page home would open in its panel (no data-page-only)' % s)
+    t = open(f, encoding='utf-8').read(); rel = 'projects/%s.html' % s
+    frame(rel, t)
+    if 'data-page-only' in t: problems.append('%s: a finished page slides down from home like the rest (no data-page-only)' % rel)
+    if not re.search(r'<div class="os" data-page="%s" data-page-js="/js/pages/%s\.js\?v=\w+">' % (s, s), t): problems.append('%s: no part for its script (data-page)' % rel)
 # The order of each project's daltoncorr.com page, as recorded on Oct. 8, 2026 (v02), with the pages D changed on purpose
-# at their new orders (v03, Oct. 10, 2026; the lists in their notes files): the pages must show it, item for item
-record = json.load(open(os.path.join(ROOT, '_review', '2026-10-10_media-order-record_v03.json'), encoding='utf-8'))
+# at their new orders (v03, Oct. 10, 2026; the lists in their notes files; v04, Oct. 14: Sunny's studies last): the pages must
+# show it, item for item
+record = json.load(open(os.path.join(ROOT, '_review', '2026-10-14_media-order-record_v04.json'), encoding='utf-8'))
 for i, slug in enumerate(order):
     f = os.path.join(D, 'projects', slug + '.html')
     if not os.path.exists(f): problems.append('projects/%s: in project_order but not built' % slug); continue
@@ -117,19 +136,7 @@ for i, slug in enumerate(order):
     got = [H.unescape(k) for k in re.findall(r'data-i="([^"]+)"', body)]
     if got != want: problems.append('%s: media order differs from daltoncorr.com (%d items, expected %d)' % (rel, len(got), len(want)))
     if 'Next project' in t: problems.append('%s: a "Next project" (pages end on All work)' % rel)
-    # The masthead (the Journal's component), linking home, with All work under it; All work at the end; no Back or Home
-    mast = re.search(r'<header class="mast"><a class="mast-name[^"]*" href="/" data-cover>([\s\S]*?)</header>', t)
-    if not mast: problems.append('%s: no masthead linking home' % rel)
-    elif not re.search(r'<a class="ctl" href="/#archive" data-all-work>', mast.group(1)): problems.append('%s: no All work under the masthead' % rel)
-    elif not re.search(r'<a class="ctl" href="/" data-cover>', mast.group(1)): problems.append('%s: no Home beside All work under the masthead' % rel)
-    if not re.search(r'class="g pfoot"[^>]*><a class="ctl" href="/#archive" data-all-work>', t): problems.append('%s: no All work at the end' % rel)
-    foot = t.split('class="g pfoot"', 1)[-1].split('</nav>', 1)[0]
-    if 'data-top>' not in foot: problems.append('%s: no Back to top at the end' % rel)
-    if 'href="/" data-cover>' not in foot: problems.append('%s: no Home at the end' % rel)
-    for m in re.finditer(r'<(a|button)\b[^>]*>([\s\S]*?)</\1>', t):
-        words = ' '.join(re.sub(r'<span class="ctl-w"[^>]*>[^<]*</span>', ' ', m.group(2)).split())
-        words = ' '.join(re.sub(r'<[^>]+>', ' ', words).split())
-        if words == 'Back' or (words == 'Home' and 'data-cover' not in m.group(0)) or (words == 'Back to top' and 'data-top' not in m.group(0)): problems.append('%s: a "%s" control (project pages have the masthead, All work and, at the end, Back to top)' % (rel, words))
+    frame(rel, t)
 # Whole pictures: nothing styles a project page's picture (or the lightbox's) to crop. In site.css, no rule for .pp or
 # .lightbox uses object-fit other than contain, clip-path or object-view-box, and no picture's frame (.m, .row, .cut,
 # .cuts, a block .b) hides what spills over; on the pages, no inline style does either.
@@ -163,7 +170,7 @@ class LB(HTMLParser):
     def handle_endtag(self, tag):
         if tag not in ('img', 'br', 'hr', 'source', 'meta', 'link', 'input', 'wbr', 'path', 'use', 'circle', 'rect', 'line', 'polyline', 'ellipse', 'stop') and self.stack: self.stack.pop()
 for f in glob.glob(D + '/projects/*.html'):
-    if f.endswith('index.html') or os.path.basename(f)[:-5] in finished: continue
+    if f.endswith('index.html'): continue
     t = open(f, encoding='utf-8').read(); rel = os.path.relpath(f, D)
     if not re.search(r'<div class="pp(?: [\w-]+)*" data-lightbox[\s>]', t): problems.append('%s: the page is not marked data-lightbox' % rel)
     body = re.split(r'class="pp[ "]', t, 1)[-1].split('class="g pfoot"', 1)[0]
@@ -336,7 +343,6 @@ for f in sorted(glob.glob(D + '/**/*.html', recursive=True)):
         if (cw.get('isPartOf') or {}).get('@id') != BASE + '/projects/': problems.append('%s: the CreativeWork is not part of /projects/' % rel)
         pics = Pics(); pics.feed(t)
         shown = {(BASE + src, alt) for src, piece, _, alt in pics.out if not piece}
-        if slug in finished: shown = {(BASE + src, H.unescape(alt)) for src, alt in re.findall(r'<img\b[^>]*?\ssrc="([^"]+)"[^>]*?\salt="([^"]*)"', t)}
         listed = {(x.get('contentUrl'), x.get('description', '')) for x in cw.get('image') or []}
         if shown != listed: problems.append('%s: the CreativeWork pictures differ from the page (%d listed, %d shown)' % (rel, len(listed), len(shown)))
         problems += ['%s: a CreativeWork picture that is not in docs/ (%s)' % (rel, u) for u, _ in listed if not in_docs((u or '')[len(BASE):])]

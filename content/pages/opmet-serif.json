@@ -1,5 +1,5 @@
 {
- "_note": "A finished page: D's own design, built as it is from pages/opmet-serif/index.html (only its <style> and <body> are used; the build writes the head). Its files beside it go to /media/opmet-serif/. Its list title, year and tags are in work.json.",
+ "_note": "A finished page: D's own design, in the studio's project frame (see build.py, Finished pages). Its page is pages/opmet-serif/ (page.html, page.css, page.js), written by pages.py from D's file; its other files go to /media/opmet-serif/. Its list title, year and tags are in work.json.",
  "slug": "opmet-serif",
  "title": "Opmet Serif",
  "client": "Opmet Osserpse",
@@ -10,7 +10,7 @@
   "description": "Opmet Serif, the typeface of Opmet Osserpse: how it started from the founder’s handwriting, its wink, how its letters are drawn and the whole font."
  },
  "card": {
-  "src": "in-use.webp",
+  "src": "p-eaa55614.webp",
   "alt": "Two facing book pages set in Opmet Serif: a chapter opening in Display Italic, with justified text in Text Regular, small caps and a pull quote in italic."
  }
 }
