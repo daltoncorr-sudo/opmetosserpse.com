@@ -452,6 +452,11 @@ html:not(.js) .stage:has(#about:target){transform:translateX(-66.6667%)}
 .pp .lbl{margin:12px 0 0;font:400 var(--s)/1.4 var(--sans);color:var(--ink);text-align:left}
 .pp .lbl-n{margin-right:.45em;font:italic 400 1.2em/1 var(--ctl-font);font-variant-numeric:oldstyle-nums;color:#CBA65E}
 .pp .lbl-s{display:block;color:var(--gray)}
+/* research (Red Mask, D, Oct. 14): under each poster its name and year, then why it belongs to that year and the films
+   studied for it, each a short paragraph in gray; more room between the rows, for the words */
+.pp-research .lbl{margin-top:16px;max-width:34em;text-wrap:pretty}
+.pp-research .lbl-s{margin-top:.5em}
+.pp-research .ch>.b+.b,.pp-research>.b+.b{margin-top:calc(var(--u) * 1.5)}
 .pp .b-wide .note{grid-row:2}  /* its note in the right margin, under the picture's corner */
 .pp .row{display:flex;gap:var(--g);align-items:flex-start}.pp .row .m{flex:1 1 0;min-width:0}
 .pp .b-full{display:block}.pp .b-full .fcap{margin-top:10px}
@@ -497,6 +502,7 @@ html:not(.js) .stage:has(#about:target){transform:translateX(-66.6667%)}
   .pp .row-stack{flex-direction:column;gap:var(--u)}.pp .row-stack .m{flex:none!important;width:100%}  /* a notes file's row: stacked */
   .pp .cuts.end .cut,.pp .cuts.top .cut{flex-basis:max(var(--cw),120px)}
   .pp .cut-xl{--cw:100%}  /* an xl cut-out (a wordmark, a type specimen) runs the full width on a phone */
+  .pp-research .row-stack{gap:calc(var(--u) * 1.5)}  /* each poster and its research the same distance from the next */
 }
 /* The foundry: objects in space. An approved exception to the one motion value (see the build report): products float
    at scattered depths, bob and turn, and open in place. Every object is plain CSS 3D; site.js places them. */
