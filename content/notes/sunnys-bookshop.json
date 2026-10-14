@@ -40,9 +40,9 @@
    "src": "Brand Bible, VII · In use: Stationery and the shop"
   },
   {
-   "label": "The studies",
-   "starts_at": "sb-10-studies-page-06",
-   "src": "D, Oct. 10: the studies back, the Checkpoint 3 picks"
+   "label": "The delivery",
+   "starts_at": "sb-11-assets-01-16x9",
+   "src": "D, Oct. 10: the delivery sheets back"
   },
   {
    "label": "In use",
@@ -50,9 +50,9 @@
    "src": "Brand Bible, VII · In use"
   },
   {
-   "label": "The delivery",
-   "starts_at": "sb-11-assets-01-16x9",
-   "src": "D, Oct. 10: the delivery sheets back"
+   "label": "The studies",
+   "starts_at": "sb-10-studies-page-06",
+   "src": "D, Oct. 10: the studies back, the Checkpoint 3 picks"
   }
  ],
  "notes": {},
@@ -73,7 +73,7 @@
  },
  "hide": [],
  "hide_src": "D, Oct. 10, 2026: the page's own media list (below) replaces the hide list; the eight repeats it hid stay out, with the rest D cut.",
- "media_src": "D, Oct. 10, 2026 (Checkpoint 3b): the page rebuilt after the Brand Bible, the work straight on the paper. The signature written on, first, looping (Final Assets/Video/SB-Video-Logo-Script-16x9-White.mp4, 7.5 to 13 s: the book, then the script, before the film's closing credit; cropped, its white mapped to the paper, no sound); the book drawn by hand (03 Source/Sketches/Hand drawing/SB-Book-Drawing-Timelapse.mov, cut before its last clean frame and fade, cropped to the drawing, twice the speed, its white mapped to the site's paper and under the grain); the fourteen marks, numbered and labeled with the Bible's words and sizes (transparent PNGs from 01 Deliverables/Final Assets/Logos, copied at 1600 px); the six colors as plain swatches with the Bible's names and roles; in use, the tote, the cap and the tags, then the announcement film. Then (D, Oct. 10, more room and order after the Bible): the type, five faces and the hierarchy, as transparent specimens rendered once from the package's fonts with the Bible's own lines (never shipped as fonts); Journal & Press on its own; stationery and the shop, each piece cut on its own from the Bible's page source at its real relative size; the studies and the delivery sheets back. The client's name and email are censored (D, Oct. 10): on the business card and the email signature (re-cut with solid bars in place of the text) and on study page 30 (a copy, its first word under a bar).",
+ "media_src": "D, Oct. 10, 2026 (Checkpoint 3b): the page rebuilt after the Brand Bible, the work straight on the paper. The signature written on, first, looping (Final Assets/Video/SB-Video-Logo-Script-16x9-White.mp4, 7.5 to 13 s: the book, then the script, before the film's closing credit; cropped, its white mapped to the paper, no sound); the book drawn by hand (03 Source/Sketches/Hand drawing/SB-Book-Drawing-Timelapse.mov, cut before its last clean frame and fade, cropped to the drawing, twice the speed, its white mapped to the site's paper and under the grain); the fourteen marks, numbered and labeled with the Bible's words and sizes (transparent PNGs from 01 Deliverables/Final Assets/Logos, copied at 1600 px); the six colors as plain swatches with the Bible's names and roles; in use, the tote, the cap and the tags, then the announcement film. Then (D, Oct. 10, more room and order after the Bible): the type, five faces and the hierarchy, as transparent specimens rendered once from the package's fonts with the Bible's own lines (never shipped as fonts); Journal & Press on its own; stationery and the shop, each piece cut on its own from the Bible's page source at its real relative size; the studies and the delivery sheets back. The client's name and email are censored (D, Oct. 10): on the business card and the email signature (re-cut with solid bars in place of the text) and on study page 30 (a copy, its first word under a bar). Then (D, Oct. 14): the delivery, then in use, ending on the announcement film, and the studies last.",
  "media": [
   {
    "src": "content/media/sunnys-bookshop/sb-signature-script.mp4",
@@ -420,6 +420,31 @@
    "note": "80 mm · the Black logo"
   },
   {
+   "src": "images/design/sunnys-bookshop/sb-11-assets-01-16x9-2400.jpg"
+  },
+  {
+   "src": "images/design/sunnys-bookshop/sb-11-sheets-page-02-2200.webp",
+   "alt": "Final delivery sheets, page 2: Identity.",
+   "row": "delivery"
+  },
+  {
+   "src": "images/design/sunnys-bookshop/sb-11-sheets-page-03-2200.webp",
+   "alt": "Final delivery sheets, page 3: Signature.",
+   "row": "delivery"
+  },
+  {
+   "src": "images/design/sunnys-bookshop/sb-13-world-01-16x9-2400.jpg"
+  },
+  {
+   "src": "images/design/sunnys-bookshop/sb-13-world-02-4x5-2400.jpg"
+  },
+  {
+   "src": "images/design/sunnys-bookshop/sb-13-world-03-4x5-2400.jpg"
+  },
+  {
+   "src": "media/sunnys-bookshop/sb-14-film-01-9x16.mp4"
+  },
+  {
    "src": "images/design/sunnys-bookshop/sb-10-studies-page-06-1600.webp",
    "alt": "The studies, page 3: Bookseller tickets II: Britain, Europe, America.",
    "row": "studies-research"
@@ -468,31 +493,6 @@
    "src": "images/design/sunnys-bookshop/sb-10-studies-page-37-1600.webp",
    "alt": "The studies, page 34: Half inked.",
    "row": "studies-seal"
-  },
-  {
-   "src": "images/design/sunnys-bookshop/sb-13-world-01-16x9-2400.jpg"
-  },
-  {
-   "src": "images/design/sunnys-bookshop/sb-13-world-02-4x5-2400.jpg"
-  },
-  {
-   "src": "images/design/sunnys-bookshop/sb-13-world-03-4x5-2400.jpg"
-  },
-  {
-   "src": "media/sunnys-bookshop/sb-14-film-01-9x16.mp4"
-  },
-  {
-   "src": "images/design/sunnys-bookshop/sb-11-assets-01-16x9-2400.jpg"
-  },
-  {
-   "src": "images/design/sunnys-bookshop/sb-11-sheets-page-02-2200.webp",
-   "alt": "Final delivery sheets, page 2: Identity.",
-   "row": "delivery"
-  },
-  {
-   "src": "images/design/sunnys-bookshop/sb-11-sheets-page-03-2200.webp",
-   "alt": "Final delivery sheets, page 3: Signature.",
-   "row": "delivery"
   }
  ],
  "air": true
