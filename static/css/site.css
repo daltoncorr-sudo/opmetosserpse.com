@@ -26,7 +26,7 @@
   /* The home page's two longer motions: the stage slide and the Archive opening */
   --slide:.9s; --slide-ease:cubic-bezier(.65,0,.35,1); --open:.7s;
   /* The cover */
-  --hand-h:42px; --hand-w:calc(var(--hand-h) * .484); --lockup-gap:clamp(18px,2vw,32px);
+  --hand-h:clamp(120px,24vh,260px); --hand-w:calc(var(--hand-h) * .484); --lockup-gap:clamp(18px,2vw,32px);
   /* One spacing scale, used everywhere on home */
   --s1:8px; --s2:16px; --s3:24px; --s4:40px; --s5:64px; --s6:104px;
   --margin:clamp(20px,3.4vw,56px);
@@ -258,36 +258,35 @@ html:not(.js) .stage:has(#about:target){transform:translateX(-66.6667%)}
 .about-press .press-title{margin-top:0}
 @media (max-width:860px){.about-grid{grid-template-columns:minmax(0,1fr)}.about-main,.about-press{grid-column:1/-1}.about-press{padding-top:0}}
 
-/* The top of home, one line (D, Oct. 13, 2026): the hand beside the name, the pair centered on the page, About just
-   to their right, the hand centered on the line; a little way down, so it and the work list below read as two
-   similar blocks, both centered. One type size on home, --one (the
-   list's): the name, the menu, the list's head, its rows, tags and years */
-[data-home]{--one:clamp(17px,1.3vw,19px);--ctl-size:var(--one)}
-.cover{display:grid;grid-template-columns:minmax(0,1fr) auto auto minmax(0,1fr);align-items:center;padding:clamp(64px,18vh,200px) var(--gutter) 0;animation:arrive 1.6s var(--ease) both}
-.cover .mark{grid-column:2;grid-row:1;margin-right:13px;position:relative;display:block;height:var(--hand-h);width:var(--hand-w);transform-origin:50% 96%}
+/* The cover: centered. The hand and the name side by side, the words below, then three lines in bold. */
+.cover{height:100vh;height:100svh;min-height:420px;display:flex;align-items:center;justify-content:center;text-align:center}
+.cover-inner{display:flex;flex-direction:column;align-items:center;animation:arrive 1.6s var(--ease) both}
+.cover h1{display:flex;flex-direction:column;align-items:center;gap:var(--s3)}
+.cover .mark{position:relative;display:block;flex:none;height:var(--hand-h);width:var(--hand-w);transform-origin:50% 96%}
 .cover .hand{display:block;width:100%;height:100%}
 .cover .pose{position:absolute;left:0;top:0;width:100%;height:auto;opacity:0}
-.cover .name{grid-column:3;grid-row:1;margin:0;color:var(--ink);font:var(--title-weight) var(--one)/1.2 var(--title-font);white-space:nowrap}
-.cover-nav{grid-column:4;grid-row:1;justify-self:start;margin-left:var(--s4);display:flex;gap:var(--s1) var(--s4)}
-@media (max-width:719px){.cover{padding-top:clamp(48px,10vh,96px)}.cover-nav{margin-left:var(--s3)}}
-.work .work-label{font:400 var(--one)/1.25 var(--sans)}  /* in the sans, like the names (D, Oct. 13) */
-.work .tags,.work .yr{font-size:var(--one);line-height:1.25;letter-spacing:0}
-.work .yr{padding-top:0}
+/* The name: live text in Opmet Serif Black, upright, 1.4 times as wide as the wordmark was (D, Oct. 13, 2026). --wm-w
+   is its width: the name is about 9.76em in the upright Black (measured at 375 and 1440 px), in a box 1.17em tall */
+.cover .name{display:block;color:var(--ink);--wm-w:clamp(322px,46.2vw,784px);font:var(--title-weight) calc(var(--wm-w) / 9.76)/1.17 var(--title-font);white-space:nowrap}
+.cover-nav{display:flex;flex-wrap:wrap;justify-content:center;gap:var(--s1) var(--s4);margin:var(--s4) 0 0}
 /* The hand on the cover. Each move lives in its own folder under moves/; build.py gathers them into /css/moves.css. */
 @keyframes arrive{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
 @media (max-width:719px){
+  :root{--hand-h:clamp(100px,18vh,160px)}
+  .cover .name{--wm-w:min(70vw,336px)}
 }
 
 /* Work: one list on a grid (title, tags, year). Collapsed, only the Selected rows show; See more opens the rest in place. */
 /* The blog list (.blog-list) is the same list, above home. */
 .work,.blog-list{width:min(var(--work-w,44rem),100%);margin:0 auto}
-.work{padding:var(--s5) 0 50vh;scroll-margin-top:0}
+.work{padding:var(--s6) 0 50vh;scroll-margin-top:0}
 /* site.js sizes the column to its widest row (all projects, tags included) so it sits centered; this measures it */
 .works.measuring{width:max-content}.works.measuring .work-row{display:flex!important}.works.measuring .work-row{flex-wrap:nowrap}
 .work:focus{outline:none}
 .work-head{display:flex;flex-wrap:wrap;align-items:baseline;gap:0 var(--s3);margin:0 0 var(--s4)}
 .work-head>*{white-space:nowrap}  /* the label and its options never break mid-phrase; site.js widens the column to fit them */
 .work-label{font:400 clamp(24px,2.3vw,34px)/1.15 var(--serif);margin:0}
+.work .work-label{font-family:var(--sans)}  /* the work list's label in the sans, like its names (D, Oct. 13) */
 .work-row{position:relative;display:flex;flex-wrap:wrap;align-items:baseline;column-gap:.9em;padding:0 0 14px}
 .work-row>a,.work-row .plain{font-family:var(--serif);font-size:clamp(17px,1.3vw,19px);line-height:1.25}
 /* The case studies' names in the sans, regular (D, Oct. 13, 2026); the Journal's list keeps the serif */
@@ -311,15 +310,7 @@ html:not(.js) .stage:has(#about:target){transform:translateX(-66.6667%)}
 .tags,.yr{opacity:0;visibility:hidden;transition:opacity .5s var(--ease) .15s,visibility 0s .65s}
 .works.is-open .tags,.works.is-open .yr{opacity:1;visibility:visible;transition:opacity .5s var(--ease) .15s,visibility 0s}
 .works:not(.is-open) .extra,.works .out{display:none}
-.works:not(.is-open) .tags{position:absolute}  /* hidden tags take no room, so a closed list's rows sit evenly */
-/* The column is as wide as the widest name, so the names sit centered on the page (D, Oct. 13); on a wide screen an
-   open list's tags hang to the right of it, on the names' line */
-.works.measuring .tags{display:none}
-@media (min-width:1000px){.work .work-row{flex-wrap:nowrap}.work .work-row>a,.work .work-row .plain,.work .tags{flex:none}}
-/* Phones: See more under Selected work, its word on the label's left edge (the heavy
-   copy holds the width to the right) (D, Oct. 13) */
-@media (max-width:719px){.work-head{flex-direction:column;align-items:flex-start;row-gap:var(--s1)}.work-head .ctl{justify-items:start}}
-@media (max-width:599px){.works{padding-left:3.2rem}.yr{right:auto;left:-3.2rem}.work .work-head{padding-left:3.2rem}}  /* the head on the names' left edge (D, Oct. 13) */
+@media (max-width:599px){.works{padding-left:3.2rem}.yr{right:auto;left:-3.2rem}}
 /* The motion: rows already showing glide to their new places while the others fade in between (transform and opacity) */
 .work .glide,.blog-list .glide{transition:transform var(--open) var(--slide-ease)}
 .works .rise{opacity:0;transform:translateY(-4px)}
@@ -357,7 +348,7 @@ html:not(.js) .stage:has(#about:target){transform:translateX(-66.6667%)}
 
 .fade{opacity:0;transition:opacity var(--t) var(--ease)}.fade.in{opacity:1}
 @media (prefers-reduced-motion:reduce){
-  .cover,.cover .mark,.cover .mark *{animation:none!important}
+  .cover-inner,.cover .mark,.cover .mark *{animation:none!important}
   *,*::before,*::after{transition:none!important;animation:none!important}
   .fade{opacity:1}
 }
@@ -374,9 +365,9 @@ html:not(.js) .stage:has(#about:target){transform:translateX(-66.6667%)}
 /* The masthead on a project page is the studio's nameplate, small (D, Oct. 10): the hand mark to the left of Opmet
    Osserpse, the two words left-justified on each other, the pair centered. The project's title is the focus. */
 .pp .mast{--mh:clamp(17px,1.3vw,19px);padding-top:clamp(28px,5vh,56px)}
-/* The nameplate looks as the name does on home (D, Oct. 13): the hand beside Opmet Osserpse, one line, centered on it */
+/* The nameplate: the hand beside Opmet Osserpse, one line, the hand centered on it (D, Oct. 13) */
 .mast .mast-lockup{display:flex;align-items:center;gap:13px;line-height:1.2;letter-spacing:0;width:max-content;max-width:100%;margin:0 auto;text-align:left}
-.mast-lockup .mast-hand{position:static;flex:none;height:var(--hand-h)}
+.mast-lockup .mast-hand{position:static;flex:none;height:42px}
 .pp .mast .mast-link{margin-top:14px}
 .pp figure,.pp h1,.pp h2,.pp p,.pp dl,.pp dd{margin:0}.pp h1,.pp h2{font-weight:400}
 .pp .ph{color:var(--gray);font-style:italic}

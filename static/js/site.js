@@ -488,6 +488,13 @@
     history.replaceState(history.state, '', url(st.open ? '#archive' : (location.hash === '#archive' ? '#work' : location.hash)));
   } }), rows = workList.rows;
   var setOpen = function (open, animate) { workList.set({ open: open, topic: 'All' }, animate); };
+  // Home, beside See more: up to the top of home, focus on the Work option
+  $('[data-top]').addEventListener('click', function (e) {
+    e.preventDefault();
+    history.replaceState(history.state, '', location.pathname + location.search);
+    window.scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' });
+    var w = $('[data-go="work"]'); if (w) place(w);
+  });
 
   // A project opens as a screen below home. Its page is fetched once, its content dropped into the panel, and the view
   // slides down to it; Esc or the browser's back button slide up to the list exactly as it was. In the panel the
@@ -539,10 +546,10 @@
     if (ppPushed) history.back();  // popstate slides up
     else { history.replaceState(null, '', '/' + (list.classList.contains('is-open') ? '#archive' : '#work')); showProject(false, true); }
   }
-  // The cover: the top of home (the name, then the work list), the address plain /, focus on the list
+  // The cover: the top of home, the address plain /, focus on the Work option
   function toCover() {
     history.replaceState(history.state, '', location.pathname + location.search);
-    landAt(0, work);
+    landAt(0, $('[data-go="work"]'));
   }
   list.addEventListener('click', function (e) {
     var a = e.target.closest('.work-row a');
