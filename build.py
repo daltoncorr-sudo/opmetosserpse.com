@@ -681,7 +681,9 @@ def project_body(p, blocks, chapters, notes, all_work='All work', top='Back to t
     # data-page-only: a page with a 3D or interactive piece opens as its own page from home, so its scripts run.
     # data-lightbox: every picture on the page opens in the site lightbox, the page's pictures one group (its pieces stay out)
     # air: a page with more room between its sections and its rows (the notes file's "air": Sunny's, after its Bible)
-    out = ['<div class="pp%s" data-lightbox%s>' % (' pp-air' if notes.get('air') else '', ' data-page-only' if p.get('_scripts') else ''),
+    # research: each picture's label is a short paragraph, its research (the notes file's "research": Red Mask, D, Oct. 14)
+    out = ['<div class="pp%s%s" data-lightbox%s>' % (' pp-air' if notes.get('air') else '', ' pp-research' if notes.get('research') else '',
+                                                    ' data-page-only' if p.get('_scripts') else ''),
            masthead(list(NAME), studio_hand(), ' data-cover', link=('/#archive', all_work), lockup=True, home=home),
            '<section class="open g">%s<h1>%s</h1><p class="lede">%s</p><div class="info">%s%s</div></section>' % (
                '<p class="kicker">%s</p>' % typo(notes['kicker']) if notes.get('kicker') else '', typo(p['title']), typo(notes.get('lede') or p['lede']), dl(facts, 'facts'), dl(credits, 'cr'))]
