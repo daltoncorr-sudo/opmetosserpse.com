@@ -40,6 +40,8 @@
   /* Controls: one face and size for every list link, toggle and filter; pure black only for the chosen filter */
   --ctl-font:var(--serif); --ctl-size:clamp(17px,1.35vw,20px); --black:#000;
 }
+/* Phones: one margin, 20px, on both sides of every page (Oct. 14) */
+@media (max-width:640px){:root{--gutter:20px}}
 *,*::before,*::after{box-sizing:border-box}
 [hidden]{display:none!important}
 html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
@@ -261,6 +263,18 @@ html:not(.js) .stage:has(#about:target){transform:translateX(-66.6667%)}
 .about-press{grid-column:9/13;text-align:left;padding-top:clamp(120px,30vh,320px)}
 .about-press .press-title{margin-top:0}
 @media (max-width:860px){.about-grid{grid-template-columns:minmax(0,1fr)}.about-main,.about-press{grid-column:1/-1}.about-press{padding-top:0}}
+/* Phones (Oct. 14): the press as the work list is there, on the paragraphs' left edge: each year on its own line above
+   its outlets, each outlet on its line with its headline under it */
+@media (max-width:599px){
+  .about-grid{padding-left:0;padding-right:0}
+  .about-press{padding-left:0}
+  .press-group+.press-group{margin-top:var(--s4)}
+  .press-year{position:static;padding:0;margin:0 0 12px}
+  .press li{margin:0 0 14px}
+  .press .outlet,.press .headline{display:block}
+  .press .outlet{margin:0;line-height:1.3}
+  .press .headline{margin-top:2px;line-height:1.4}
+}
 
 /* The cover: centered. The hand and the name side by side, the words below, then three lines in bold. */
 .cover{height:100vh;height:100svh;min-height:420px;display:flex;align-items:center;justify-content:center;text-align:center}
@@ -316,8 +330,21 @@ html:not(.js) .stage:has(#about:target){transform:translateX(-66.6667%)}
 .works:not(.is-open) .extra,.works .out{display:none}
 @media (max-width:599px){.works{padding-left:3.2rem}.yr{right:auto;left:-3.2rem}.work .work-head{padding-left:3.2rem}}
 /* With no label, the head starts with See more: its word on the names' left edge (the heavy copy holds the width to
-   its right), and on phones indented like the names (D, Oct. 13) */
+   its right) (D, Oct. 13) */
 .work .work-head .ctl{justify-items:start}
+/* Phones (Oct. 14): the work list is one column with the same margin on both sides, nothing in a margin. Closed, each
+   row is the name alone, the rows evenly apart; open, the tags sit on their own line under each name and each year on
+   its own line above the first name of its year, with more room above it. Hidden tags and years take no room. */
+@media (max-width:599px){
+  .work .works,.work .work-head{padding-left:0}
+  .work .work-row{display:block;padding:0 0 22px}
+  .work .work-row>a,.work .work-row .plain{display:block;line-height:1.3;text-wrap:pretty}
+  .work .tags,.work .yr{display:none}
+  .work .works.is-open .tags{display:flex;margin-top:6px}
+  .work .works.is-open .yr{display:block;position:static;padding:0;margin:0 0 10px}
+  .work .works.is-open .work-row:has(.yr):not(:first-child){padding-top:var(--s3)}
+  @starting-style{.work .works.is-open .tags,.work .works.is-open .yr{opacity:0}}
+}
 /* The motion: rows already showing glide to their new places while the others fade in between (transform and opacity) */
 .work .glide,.blog-list .glide{transition:transform var(--open) var(--slide-ease)}
 .works .rise{opacity:0;transform:translateY(-4px)}
@@ -449,16 +476,24 @@ html:not(.js) .stage:has(#about:target){transform:translateX(-66.6667%)}
   .pp .note,.pp .b-wide .note{grid-column:8/13;grid-row:2;margin:10px 0 0}.pp .fcap .note{grid-row:1;margin-top:0}
 }
 @media (prefers-reduced-motion:reduce){.pp [data-read] .note{color:var(--ink)}}
+/* Phones (rebuilt Oct. 14): one centered column, the same 20px margin on both sides on the page by itself and in the
+   panel on home. The opening centered under the nameplate, as on wider screens: the title, the paragraph, then the facts
+   and credits, each name over its value, side by side where they fit. The way out centered, like All work and Home. */
 @media (max-width:640px){
-  .pp{--m:16px;--g:12px;--u:24px;--U:64px;--t1:34px}
+  main:has(>.pp){padding:0}
+  .pp{--m:20px;--g:12px;--u:24px;--U:64px;--t1:34px}
   .pp .g{grid-template-columns:1fr 1fr}
   .pp .g>*,.pp .b .m,.pp .b .row,.pp .open h1,.pp .open .lede,.pp .open .info,.pp .note,.pp .chap{grid-column:1/-1!important;grid-row:auto!important}
-  .pp .open .kicker{text-align:left}.pp .open h1{grid-row:auto;text-align:left}.pp .open{padding-top:56px}.pp .open .lede{margin-top:28px;padding-right:0}.pp .open .info{margin-top:16px}
-  .pp .facts div,.pp .cr div{grid-template-columns:7.6em minmax(0,1fr)}
-  .pp>.open+.ch,.pp>.open+.b{margin-top:32px}
+  .pp .open{padding-top:64px}.pp .open h1{grid-row:auto}
+  .pp .open .lede{max-width:22em;margin:32px auto 0;padding-right:0;text-align:center;text-wrap:pretty}
+  .pp .open .info{margin-top:36px}
+  .pp .facts,.pp .cr{display:flex;flex-wrap:wrap;justify-content:center;gap:16px 32px;text-align:center}
+  .pp .facts div,.pp .cr div{display:block;max-width:100%;padding:0;text-wrap:balance}
+  .pp .facts dt,.pp .cr dt{margin-bottom:1px}
+  .pp .cr{margin-top:24px}
+  .pp>.open+.ch,.pp>.open+.b{margin-top:48px}
   .pp .nt,.pp .note:not(:has(.again)),.pp .fcap:not(:has(.again)){display:none}.pp .note{margin:6px 0 0}
   .pp .chl{display:none}
-  .pp .pfoot{justify-content:flex-start}
   .pp .row-stack{flex-direction:column;gap:var(--u)}.pp .row-stack .m{flex:none!important;width:100%}  /* a notes file's row: stacked */
   .pp .cuts.end .cut,.pp .cuts.top .cut{flex-basis:max(var(--cw),120px)}
   .pp .cut-xl{--cw:100%}  /* an xl cut-out (a wordmark, a type specimen) runs the full width on a phone */
