@@ -44,7 +44,8 @@ for f in glob.glob(D + '/**/*.html', recursive=True):
     # "AI" and all caps are allowed in editorial writing: the body of a Journal article is left out of those two checks,
     # and only that. Everywhere else on the site (work pages, home, the Journal's own chrome) they still fail.
     # The body runs to the end of its article (it holds paragraphs, notes and rows of pictures, so it can't end at a </div>)
-    plain = strip(re.sub(r'<div class="article-body"[^>]*>[\s\S]*?</article>', ' ', t2))
+    # A type specimen's boards (Opmet Serif's "The whole font") set the alphabet in capitals: left out of the all-caps check
+    plain = strip(re.sub(r'<div class="article-body"[^>]*>[\s\S]*?</article>|<div class="work boards"[^>]*>[\s\S]*?</section>', ' ', t2))
     if not drafts:
         bare = strip(re.sub(r'<div class="fd-img" data-placeholder[^>]*>[^<]*</div>', ' ', t))
         problems += ['%s: a bracketed placeholder (%s)' % (rel, m.group(0)) for m in re.finditer(BRACKETS, bare) if m.group(0) not in ALLOWED]
@@ -82,6 +83,13 @@ for f in glob.glob(D + '/**/*.html', recursive=True):
         if re.search(r'\sloop(?=[\s>=])', tag) and not (srcs and all(re.search(r'/(%s)\.(webm|mp4)$' % '|'.join(LOOPS), x) for x in srcs)):
             problems.append('%s: a <video> that loops (only %s may)' % (rel, ' and '.join(LOOPS)))
 order = json.load(open(os.path.join(ROOT, 'content', 'index.json'), encoding='utf-8')).get('project_order', [])
+# The finished pages (content/pages/<slug>.json): project pages D designed whole, built as they are. They keep the checks
+# every page has (links, words, alt text, the data); the template's own (the lightbox, the masthead, project_order) skip them
+finished = {os.path.basename(f)[:-5]: json.load(open(f, encoding='utf-8')) for f in glob.glob(os.path.join(ROOT, 'content', 'pages', '*.json'))}
+for s in finished:
+    f = os.path.join(D, 'projects', s + '.html')
+    if not os.path.exists(f): problems.append('projects/%s: a finished page that was not built' % s); continue
+    if 'data-page-only' not in open(f, encoding='utf-8').read(): problems.append('projects/%s.html: a finished page home would open in its panel (no data-page-only)' % s)
 # The order of each project's daltoncorr.com page, as recorded on Oct. 8, 2026 (v02), with the pages D changed on purpose
 # at their new orders (v03, Oct. 10, 2026; the lists in their notes files): the pages must show it, item for item
 record = json.load(open(os.path.join(ROOT, '_review', '2026-10-10_media-order-record_v03.json'), encoding='utf-8'))
@@ -155,7 +163,7 @@ class LB(HTMLParser):
     def handle_endtag(self, tag):
         if tag not in ('img', 'br', 'hr', 'source', 'meta', 'link', 'input', 'wbr', 'path', 'use', 'circle', 'rect', 'line', 'polyline', 'ellipse', 'stop') and self.stack: self.stack.pop()
 for f in glob.glob(D + '/projects/*.html'):
-    if f.endswith('index.html'): continue
+    if f.endswith('index.html') or os.path.basename(f)[:-5] in finished: continue
     t = open(f, encoding='utf-8').read(); rel = os.path.relpath(f, D)
     if not re.search(r'<div class="pp(?: [\w-]+)*" data-lightbox[\s>]', t): problems.append('%s: the page is not marked data-lightbox' % rel)
     body = re.split(r'class="pp[ "]', t, 1)[-1].split('class="g pfoot"', 1)[0]
@@ -180,6 +188,7 @@ for page_, pat in (('index.html', r'class="work-row[^"]*" data-project="([^"]+)"
         if shown != sel: problems.append('index.html: Selected work is not in the order of work.json "selected"')
         if [x for x, _, _ in rows][:len(sel)] != sel: problems.append('index.html: the Selected rows do not come first')
     else: got = re.findall(pat, t)
+    got = [x for x in got if x not in finished]
     if got != order: problems.append('%s: the project list does not follow project_order' % page_)
 # The Journal: every published post has its page and is in the sitemap; a draft has neither (in a drafts build its
 # page is a preview, never shipped); /journal/ is in the sitemap once a post is published; /blog/ sends to /journal/
@@ -256,6 +265,7 @@ FORBIDDEN = {'challenge', 'work', 'system', 'deliverables', 'press', 'credits'} 
 STUBS = {'blog/index.html'}  # the old address: a redirect to /journal/, not a page
 LITERAL = re.compile(r'(?:https?://|mailto:|/)\S*|[^@\s]+@[^@\s]+\.[a-z]+|\d{4}(?:-\d{2}){0,2}|[a-z]+/[\w.+-]+|[a-z]{2}')
 projects_c = {os.path.basename(f)[:-5]: json.load(open(f, encoding='utf-8')) for f in glob.glob(os.path.join(ROOT, 'content', 'projects', '*.json'))}
+projects_c.update(finished)  # a finished page's facts are held to its data like any project's
 notes_c = {os.path.basename(f)[:-5]: json.load(open(f, encoding='utf-8')) for f in glob.glob(os.path.join(ROOT, 'content', 'notes', '*.json'))}
 wjs = {e['slug']: e for e in json.load(open(os.path.join(ROOT, 'content', 'work.json'), encoding='utf-8'))['projects']}
 lede = lambda s: notes_c.get(s, {}).get('lede') or projects_c[s]['lede']  # the paragraph the page shows
@@ -326,6 +336,7 @@ for f in sorted(glob.glob(D + '/**/*.html', recursive=True)):
         if (cw.get('isPartOf') or {}).get('@id') != BASE + '/projects/': problems.append('%s: the CreativeWork is not part of /projects/' % rel)
         pics = Pics(); pics.feed(t)
         shown = {(BASE + src, alt) for src, piece, _, alt in pics.out if not piece}
+        if slug in finished: shown = {(BASE + src, H.unescape(alt)) for src, alt in re.findall(r'<img\b[^>]*?\ssrc="([^"]+)"[^>]*?\salt="([^"]*)"', t)}
         listed = {(x.get('contentUrl'), x.get('description', '')) for x in cw.get('image') or []}
         if shown != listed: problems.append('%s: the CreativeWork pictures differ from the page (%d listed, %d shown)' % (rel, len(listed), len(shown)))
         problems += ['%s: a CreativeWork picture that is not in docs/ (%s)' % (rel, u) for u, _ in listed if not in_docs((u or '')[len(BASE):])]
@@ -334,8 +345,9 @@ for f in sorted(glob.glob(D + '/**/*.html', recursive=True)):
     if kind == 'projects':
         il = (g[2].get('mainEntity') or {}).get('itemListElement') or []
         got = [(x.get('position'), (x.get('item') or {}).get('@id'), (x.get('item') or {}).get('url'), (x.get('item') or {}).get('name')) for x in il]
-        if got != [(n, '%s/projects/%s#work' % (BASE, s), '%s/projects/%s' % (BASE, s), projects_c[s]['title']) for n, s in enumerate(order, 1)]:
-            problems.append('%s: the CollectionPage does not list every project page, in project_order' % rel)
+        on_list = re.findall(r'<li id="([^"]+)"><a href="/projects/', t)
+        if got != [(n, '%s/projects/%s#work' % (BASE, s), '%s/projects/%s' % (BASE, s), projects_c[s]['title']) for n, s in enumerate(on_list, 1)]:
+            problems.append('%s: the CollectionPage does not list every project page, in the list\'s order' % rel)
 # the feeds: public fields only, every project on /projects/ in its order, nothing hidden
 dd = os.path.join(D, 'data')
 extra_files = sorted(set(os.listdir(dd) if os.path.isdir(dd) else []) - {'studio.json', 'work.json'})
@@ -375,7 +387,7 @@ if not os.path.exists(lp): problems.append('docs/llms.txt is missing')
 else:
     lt = open(lp, encoding='utf-8').read()
     if not lt.startswith('# %s\n\n> %s\n' % (ent['name'], ent['description'])): problems.append('docs/llms.txt: not the name, then the one line')
-    problems += ['docs/llms.txt: %s is missing' % s for s in order if '](%s/projects/%s)' % (BASE, s) not in lt]
+    problems += ['docs/llms.txt: %s is missing' % s for s in order + sorted(finished) if '](%s/projects/%s)' % (BASE, s) not in lt]
     if '](mailto:%s)' % ent['email'] not in lt: problems.append('docs/llms.txt: no contact address')
     problems += ['docs/llms.txt: a link to nowhere (%s)' % u for u in re.findall(r'\]\((%s[^)]*)\)' % BASE, lt) if not in_docs(u[len(BASE):] or '/')]
     for line in lt.splitlines(): style('docs/llms.txt', re.sub(r'\]\([^)]*\)', ']', line).lstrip('#>- ').replace('[', '').replace(']', ''))
@@ -412,6 +424,8 @@ def section_of(u):  # as build.py's: the section an on-site address leads into, 
     m = re.match(r'/?#?([a-z]+)', u) if u[0] in '/#' else None
     return m.group(1) if m else None
 SECTION = {'foundry': 'Foundry', 'journal': 'Journal'}
+# Words of a hidden section a page may carry: Opmet Serif's "In use" caption names the Foundry's book, unlinked (D, Oct. 14)
+HIDDEN_OK = {('projects/opmet-serif.html', 'Season One')}
 FILES = {'foundry': ('foundry.html', 'foundry', 'media/foundry-*'), 'journal': ('journal', 'media/journal-*')}
 MARKUP = {  # what build.py writes for each one: its panel on home, its pages and its name among the panels in the early script
     'foundry': r'\bid="foundry(?:-title)?"|\bfoundry-panel\b|\bdata-foundry\b|\bdata-fd-|\bclass="(?:[^"]*\s)?fd-|\bdata-go="foundry"'
@@ -450,7 +464,8 @@ for f in sorted(glob.glob(D + '/**/*.html', recursive=True)):
     for sec in hidden:
         if sec not in SECTION: continue
         problems += ['%s: the %s is hidden but the page carries its markup (%s)' % (rel, SECTION[sec], m.group(0)[:40]) for m in re.finditer(MARKUP[sec], t)]
-        problems += ['%s: the %s is hidden but the page carries its words (%s)' % (rel, SECTION[sec], s) for s in said[sec] if re.search(r'(?<!\w)%s(?!\w)' % re.escape(s), shown)]
+        problems += ['%s: the %s is hidden but the page carries its words (%s)' % (rel, SECTION[sec], s) for s in said[sec] if re.search(r'(?<!\w)%s(?!\w)' % re.escape(s), shown)
+                     and (rel, s) not in HIDDEN_OK]
         problems += ['%s: a link into the hidden %s (%s)' % (rel, SECTION[sec], u) for u in targets if u and section_of(u) == sec]
 if os.path.exists(rd):
     for line in open(rd, encoding='utf-8').read().splitlines():

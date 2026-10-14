@@ -227,8 +227,10 @@ def ink_filters():
         for n, (d, b, sl, ic, k) in INK.items())
     return '<svg class="ink-defs" width="0" height="0" aria-hidden="true" focusable="false"><defs>%s</defs></svg>' % f
 
-def page(site, title, desc, path, body, og_image=None, current=None, extra_head='', main_cls='', header=True, og_type='website', ld=()):
-    """ld: the page's own JSON-LD nodes, after the studio and the site, which every page carries (see ld_graph)."""
+def page(site, title, desc, path, body, og_image=None, current=None, extra_head='', main_cls='', header=True, og_type='website', ld=(), bare=False):
+    """ld: the page's own JSON-LD nodes, after the studio and the site, which every page carries (see ld_graph).
+    bare: a finished page (content/pages/): the same head, but none of the site's stylesheet, script or frame; the body
+    goes in as it is."""
     url = 'https://%s%s' % (site['domain'], path)
     # The machine-readable layer, last in the head and invisible: the data feeds, then one JSON-LD block
     data = ''.join('<link rel="alternate" type="application/json" href="%s" title="%s">\n' % f for f in FEEDS) + ld_script(ld_graph(site) + list(ld))
@@ -262,23 +264,20 @@ def page(site, title, desc, path, body, og_image=None, current=None, extra_head=
 <link rel="preload" href="/fonts/instrument-sans/instrument-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/fonts/opmet-serif/opmet-serif.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/fonts/opmet-serif/opmet-serif-italic.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="/css/site.css?v=%(v)s">
-%(extra)s%(data)s</head>
+%(css)s%(extra)s%(data)s</head>
 <body>
-%(ink)s
-<a class="skip" href="#main">Skip to content</a>
-%(nav)s
-<main id="main"%(main_cls)s>
-%(body)s
-</main>
-<script src="/js/site.js?v=%(v)s" defer></script>
+%(content)s
 </body>
 </html>
-''' % dict(title=esc(title), desc=esc(desc), url=url, domain=site['domain'], og=og, nav=nav, tz=site['clock_timezone'],
-           place=esc(site['clock_place']), body=body, name=esc(site['name']), descr=esc(site['description'].rstrip('.')),
-           email=site['email'], line=esc(site['line']), copy=esc(site['copyright']), privacy=esc(site['privacy_line']),
-           v=site['_v'], extra=extra_head, ink=ink_filters(), page_cls=page_cls, og_type=og_type, main_cls=' class="%s"' % main_cls if main_cls else '',
-           data=data)
+''' % dict(title=esc(title), desc=esc(desc), url=url, domain=site['domain'], og=og, page_cls=page_cls, og_type=og_type, extra=extra_head, data=data,
+           css='' if bare else '<link rel="stylesheet" href="/css/site.css?v=%s">\n' % site['_v'],
+           content=body if bare else '''%s
+<a class="skip" href="#main">Skip to content</a>
+%s
+<main id="main"%s>
+%s
+</main>
+<script src="/js/site.js?v=%s" defer></script>''' % (ink_filters(), nav, ' class="%s"' % main_cls if main_cls else '', body, site['_v']))
 
 def write(path, text):
     full = os.path.join(DIST, path.lstrip('/'))
@@ -771,6 +770,40 @@ def work_section(items, w):
             '<ul class="works" id="works">%s</ul></section>') % (
         esc(w['label']), esc(w['selected']), esc(w['all']), esc(w['selected']), esc(w['more']), esc(w['less']), ctl(w['more']), ctl(w['back']), ''.join(rows))
 
+# Finished pages: a project page D designed whole, built as it is (Opmet Serif, D, Oct. 14). Its facts are
+# content/pages/<slug>.json; its page is content/pages/<slug>/index.html, of which the build keeps the <style> and the
+# <body> and writes the head every page has (the address, the cards, the feeds, the data). The files beside it go to
+# /media/<slug>/. It sits in the work lists by work.json like any project, and opens as itself from home (data-page-only).
+def load_finished(projects):
+    out, d = {}, os.path.join(CONTENT, 'pages')
+    for fn in sorted(os.listdir(d)) if os.path.isdir(d) else []:
+        if not fn.endswith('.json'): continue
+        p = load(os.path.join(d, fn)); s = p['slug']; src = os.path.join(d, s, 'index.html')
+        if fn != s + '.json' or not os.path.exists(src): sys.exit('content/pages/%s: needs content/pages/%s/index.html' % (fn, s))
+        if s in projects: sys.exit('content/pages/%s: a project page has that slug too' % fn)
+        t = open(src, encoding='utf-8').read()
+        p['_styles'] = ''.join(re.findall(r'<style>[\s\S]*?</style>\n?', t.split('</head>', 1)[0]))
+        p['_body'] = re.search(r'<body>\n?([\s\S]*?)\n?</body>', t).group(1)
+        if 'data-page-only' not in p['_body']: sys.exit('content/pages/%s/index.html: mark it data-page-only, so home opens it as its own page' % s)
+        # its pictures and their alt text, for its data (work_ld)
+        p['_items'] = [{'kind': 'img', 'r': (u,), 'alt': html.unescape(alt)} for u, alt in re.findall(r'<img\b[^>]*?\ssrc="(/media/[^"]+)"[^>]*?\salt="([^"]*)"', p['_body'])]
+        p['_notes'] = {}
+        out[s] = p
+    return out
+
+def finished_files(p):
+    """Its files to /media/<slug>/, fresh each build; from its card picture, the lists' preview and the share image."""
+    s = p['slug']; src = os.path.join(CONTENT, 'pages', s); out = os.path.join(DIST, 'media', s)
+    if os.path.isdir(out): shutil.rmtree(out)
+    os.makedirs(out)
+    for f in sorted(os.listdir(src)):
+        if f != 'index.html' and os.path.isfile(os.path.join(src, f)): shutil.copy2(os.path.join(src, f), os.path.join(out, f))
+    im = ImageOps.exif_transpose(Image.open(os.path.join(src, p['card']['src']))).convert('RGB')
+    card = im.copy(); card.thumbnail((800, 800), Image.LANCZOS); card.save(os.path.join(out, 'card.webp'), 'WEBP', quality=82)
+    ImageOps.fit(im, (1200, 630), Image.LANCZOS).save(os.path.join(out, 'og.jpg'), 'JPEG', quality=85)
+    p['preview'] = '/media/%s/card.webp' % s
+    return '/media/%s/og.jpg' % s
+
 AP_MONTHS = ('Jan.', 'Feb.', 'March', 'April', 'May', 'June', 'July', 'Aug.', 'Sept.', 'Oct.', 'Nov.', 'Dec.')
 
 def ap_date(d):
@@ -1042,6 +1075,7 @@ def main():
     projects = {}
     for fn in sorted(os.listdir(os.path.join(CONTENT, 'projects'))):
         if fn.endswith('.json'): p = load(os.path.join(CONTENT, 'projects', fn)); projects[p['slug']] = p
+    finished = load_finished(projects)  # the pages D designed whole (content/pages/)
 
     # fresh dist, keeping already-encoded media to save time on rebuilds
     os.makedirs(DIST, exist_ok=True)
@@ -1169,18 +1203,27 @@ def main():
         json.dump({p['slug']: p['_record'] for p in ordered}, fh, indent=1, ensure_ascii=False)
     media.tidy([p['slug'] for p in ordered])
 
+    # the finished pages, with their files, as they are
+    for s, p in finished.items():
+        og = finished_files(p)
+        write('/projects/%s.html' % s, page(site, p['seo']['title'], p['seo']['description'], '/projects/%s' % s, p['_body'], og, '/projects',
+                                            extra_head=p['_styles'], header=False, ld=work_ld(site, p, wj), bare=True))
+    every = dict(projects, **finished)
+
     # projects list: pages and rows, newest first
-    items, vocab = load_work(projects)  # vocab: the tag list, checked inside load_work
-    # The rows with a page take the order of project_order, in the places pages hold in work.json
+    items, vocab = load_work(every)  # vocab: the tag list, checked inside load_work
+    # The rows with a project page take the order of project_order, in the places those pages hold in work.json; a
+    # finished page keeps its own place
     pages = iter(order); slots = {e['slug']: e for e in items}
-    items = [slots[next(pages)] if e['page'] else e for e in items]
+    items = [slots[next(pages)] if e['page'] and e['slug'] not in finished else e for e in items]
     for e in items:
-        if e['page']: e['preview'] = projects[e['slug']].get('preview')
+        if e['page']: e['preview'] = every[e['slug']].get('preview')
     entries = items
+    listed = [every[e['slug']] for e in entries if e['page']]  # every page, in the list's order
     pr = site['projects']
     body = '<section class="index">%s</section><div class="preview" aria-hidden="true"><img alt=""></div>' % list_rows(entries)
     write('/projects/index.html', page(site, pr['og_title'], pr['og_description'], '/projects/', body, so, '/projects',
-                                       ld=collection_ld(site, ordered, wj)))
+                                       ld=collection_ld(site, listed, wj)))
 
     # home: the hand and the name, alone on the first screen. Scroll for the studio, then the index.
     h = site['home']
@@ -1291,13 +1334,14 @@ def main():
     write('/_headers', headers_file())
     write('/robots.txt', robots_file(site))
     published = [e for e in posts if not e.get('draft')] if 'journal' not in hidden else []
-    urls = ['/', '/projects/', '/privacy'] + ['/projects/%s' % p['slug'] for p in ordered] + (
+    urls = ['/', '/projects/', '/privacy'] + ['/projects/%s' % p['slug'] for p in ordered] + ['/projects/%s' % s for s in finished] + (
         ['/journal/'] + ['/journal/%s' % e['slug'] for e in published] if published else [])
     # lastmod: when the content a page is built from last changed (last_changed); for a post, its own date if later
     src = {'/': ('content/site.json', 'content/work.json', 'content/index.json', 'content/press.json'),
            '/projects/': ('content/work.json', 'content/index.json'), '/privacy': ('content/site.json',)}
     src.update({'/projects/%s' % p['slug']: ('content/projects/%s.json' % p['slug'], 'content/notes/%s.json' % p['slug'],
                                              'content/media/%s' % p['slug']) for p in ordered})
+    src.update({'/projects/%s' % s: ('content/pages/%s.json' % s, 'content/pages/%s' % s) for s in finished})
     lastmod = {u: last_changed(*x) for u, x in src.items()}
     lastmod.update({'/journal/%s' % e['slug']: max(e['date'], last_changed('content/journal/%s.txt' % e['slug'])) for e in published})
     if published: lastmod['/journal/'] = max(lastmod['/journal/%s' % e['slug']] for e in published)
@@ -1305,11 +1349,11 @@ def main():
         '  <url><loc>https://%s%s</loc><lastmod>%s</lastmod></url>\n' % (site['domain'], u, lastmod.get(u) or date.today().isoformat()) for u in urls))
     # The feeds (the Opmet API, level 1) and the guide for language models: public facts only, nothing hidden
     write('/data/studio.json', studio_data(site))
-    write('/data/work.json', work_data(site, entries, projects))
-    write('/llms.txt', llms_file(site, ordered, wj))
+    write('/data/work.json', work_data(site, entries, every))
+    write('/llms.txt', llms_file(site, listed, wj))
 
     size = sum(os.path.getsize(os.path.join(dp, f)) for dp, _, fs in os.walk(DIST) for f in fs)
-    print('Built %d project pages, %d list rows, %d articles, into %s (%.0f MB).%s' % (len(ordered), len(entries), len(posts), DIST, size / 1e6,
+    print('Built %d project pages, %d list rows, %d articles, into %s (%.0f MB).%s' % (len(ordered) + len(finished), len(entries), len(posts), DIST, size / 1e6,
           ' Hidden, not built: %s.' % ', '.join(sorted(hidden)) if hidden else ''))
     if media.log: print('\n'.join(media.log))
 

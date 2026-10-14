@@ -10,11 +10,13 @@
   "Packaging",
   "Print",
   "Social",
+  "Type design",
   "Web design"
  ],
  "selected": [
   "sunnys-bookshop",
   "hollyshorts-22",
+  "opmet-serif",
   "hollyshorts-comedy-2026",
   "weissman-character-edition",
   "hdtracks",
@@ -41,6 +43,15 @@
    "tags": [
     "Art direction",
     "Artwork"
+   ],
+   "media": []
+  },
+  {
+   "slug": "opmet-serif",
+   "title": "Opmet Serif",
+   "year": "2026",
+   "tags": [
+    "Type design"
    ],
    "media": []
   },
