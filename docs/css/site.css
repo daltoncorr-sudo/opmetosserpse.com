@@ -313,7 +313,7 @@ html:not(.js) .stage:has(#about:target){transform:translateX(-66.6667%)}
 .tags,.yr{opacity:0;visibility:hidden;transition:opacity .5s var(--ease) .15s,visibility 0s .65s}
 .works.is-open .tags,.works.is-open .yr{opacity:1;visibility:visible;transition:opacity .5s var(--ease) .15s,visibility 0s}
 .works:not(.is-open) .extra,.works .out{display:none}
-@media (max-width:599px){.works{padding-left:3.2rem}.yr{right:auto;left:-3.2rem}}
+@media (max-width:599px){.works{padding-left:3.2rem}.yr{right:auto;left:-3.2rem}.work .work-head{padding-left:3.2rem}}  /* the head on the names' left edge (D, Oct. 13) */
 /* The motion: rows already showing glide to their new places while the others fade in between (transform and opacity) */
 .work .glide,.blog-list .glide{transition:transform var(--open) var(--slide-ease)}
 .works .rise{opacity:0;transform:translateY(-4px)}
