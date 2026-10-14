@@ -34,8 +34,8 @@
   --mh:clamp(48px,6.5vw,96px); --mast-top:clamp(40px,9vh,104px);
   /* The titles: Opmet Serif Black, the heaviest it has (D, Oct. 13, 2026) */
   --bold-font:var(--serif); --bold-weight:900;
-  /* The name, Opmet Osserpse, in Opmet Serif Black: upright on the cover (D, Oct. 13), italic in the inner pages'
-     header. The masthead sets it in the upright Black, like the other titles (D, Oct. 10) */
+  /* The name, Opmet Osserpse, in Opmet Serif Black, upright everywhere: the cover, the inner pages' header and the
+     masthead. Only buttons are italic (D, Oct. 13) */
   --title-font:var(--serif); --title-weight:900;
   /* Controls: one face and size for every list link, toggle and filter; pure black only for the chosen filter */
   --ctl-font:var(--serif); --ctl-size:clamp(17px,1.35vw,20px); --black:#000;
@@ -100,7 +100,7 @@ ul{list-style:none;margin:0;padding:0}
 .site-header{position:relative;display:flex;justify-content:center;padding:28px var(--gutter) 0}
 .lockup{display:flex;align-items:flex-end;gap:13px;color:var(--ink)}
 .lockup-hand{display:block;height:42px;width:auto}
-.lockup .wordmark{display:block;margin-bottom:4px;font:italic var(--title-weight) calc(168px / 8.31)/1.17 var(--title-font);white-space:nowrap}
+.lockup .wordmark{display:block;margin-bottom:4px;font:var(--title-weight) calc(168px / 9.95)/1.17 var(--title-font);white-space:nowrap}  /* 168px wide, upright (9.95em) */
 main{padding:0 var(--gutter);flex:1}
 
 /* Home: a stage of three panels. The foundry is one screen to the left of home, About one screen to the right. */
@@ -148,7 +148,7 @@ html.is-locked{overflow:hidden}
 .mast-hand-art{display:block;height:100%;width:auto}
 .mast-hand[data-pose="stand-in"]{height:1em;transform:rotate(-24deg);transform-origin:0 100%}
 .mast-hand[data-pose="mark"]{left:calc(100% + .1em)}
-.journal-line{margin:18px 0 0;font:italic 400 20px/1.4 var(--serif);letter-spacing:.01em;color:var(--tag-gray)}
+.journal-line{margin:18px 0 0;font:400 20px/1.4 var(--serif);letter-spacing:.01em;color:var(--tag-gray)}
 .mast .mast-link{display:flex;flex-wrap:wrap;justify-content:center;gap:0 var(--s3);margin:var(--s3) 0 0}  /* All work, and Home beside it */
 @media (max-width:599px){.journal-line{font-size:18px}}
 /* The list: the same list and behavior, with more air (masthead to label about 160px, label row to topics 48px, topics
@@ -236,8 +236,8 @@ html:not(.js) .stage:has(#about:target){transform:translateX(-66.6667%)}
 .about-body{font-size:var(--size-m)}
 .about-body{font-family:var(--serif);line-height:1.6}
 .about-body a{text-decoration:underline;text-underline-offset:.2em;text-decoration-thickness:1px}
-.press-title{font:italic 400 var(--size-m) var(--serif);margin:3.2em 0 1.2em}
-.press-year{font:italic 400 var(--size-s) var(--serif);color:var(--tag-gray);margin:1.8em 0 .4em}
+.press-title{font:400 var(--size-m) var(--serif);margin:3.2em 0 1.2em}
+.press-year{font:400 var(--size-s) var(--serif);color:var(--tag-gray);margin:1.8em 0 .4em}
 .press li{margin:0 0 .3em}
 .press{font-size:15px}
 .press .outlet{font-family:var(--sans);font-size:19px;margin-right:.35em}
