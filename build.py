@@ -1220,7 +1220,7 @@ def main():
                    '<div class="about-grid"><div class="title-row">'
                    '<h2 class="vh" id="about-title">%s</h2><p class="home-big"><a class="ctl" href="#" data-studio>%s</a></p></div>'
                    '<div class="about-main"><div class="about-body">%s</div></div>'
-                   '<div class="about-press"><h3 class="press-title vh">%s</h3>%s</div></div></section>') % (  # the list without its heading on screen (D, Oct. 13)
+                   '<div class="about-press"><h3 class="press-title">%s</h3>%s</div></div></section>') % (
         ' '.join('<span>%s</span>' % esc(x) for x in ap['title'].split()), ctl(site['back']), ''.join('<p>%s</p>' % link(typo(x)) for x in ap['lines']) + ''.join('<p class="contact">%s</p>' % link(typo(x)) for x in ap['contact']), esc(ap['press_title']), press_list(press))
     # The Journal: a panel one screen above home, and its own pages at /journal/ and /journal/<slug>, all with the same
     # masthead, slot and list. Until a post is published it's out of the menu and the sitemap, and /journal/ is noindex.
