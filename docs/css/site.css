@@ -276,6 +276,8 @@ html:not(.js) .stage:has(#about:target){transform:translateX(-66.6667%)}
   :root{--hand-h:clamp(85px,15.3vh,136px)}
   .cover .name{--wm-w:min(59.5vw,286px)}
   .work{padding-top:var(--s6)}
+  .work-head{flex-direction:column;align-items:flex-start;row-gap:var(--s1)}  /* See more under Selected work (D, Oct. 13) */
+  .work-head .ctl{justify-items:start}  /* its word on the label's left edge (the heavy copy holds the width to the right) */
 }
 
 /* Work: one list on a grid (title, tags, year). Collapsed, only the Selected rows show; See more opens the rest in place. */
