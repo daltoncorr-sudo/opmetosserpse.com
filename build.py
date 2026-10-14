@@ -234,7 +234,7 @@ def page(site, title, desc, path, body, og_image=None, current=None, extra_head=
     data = ''.join('<link rel="alternate" type="application/json" href="%s" title="%s">\n' % f for f in FEEDS) + ld_script(ld_graph(site) + list(ld))
     og = og_image or '/media/site/og.jpg'
     # No menu bar. Inner pages carry only the hand and the name (live text, in Opmet Serif Black Italic), centered, back to the cover.
-    header = '' if path == '/' or not header else ('<header class="site-header"><a class="lockup" href="/">%s<span class="wordmark ink">%s</span></a></header>'
+    header = '' if path == '/' or not header else ('<header class="site-header"><a class="lockup" href="/">%s<span class="wordmark">%s</span></a></header>'
                                      % (brand_svg('hand-mark.svg', 'lockup-hand'), esc(site['name'])))
     # Which way the page flips: forward onto a project, back onto home
     page_cls = ' class="page-home"' if path == '/' else ' class="page-project"' if path.startswith('/projects/') and path != '/projects/' else ''
@@ -763,8 +763,9 @@ def work_section(items, w):
             ' extra' if extra else '', e['slug'], n, ' style="--i:%d"' % i if extra else '', yr, work_title(e), tag_list(e['tags']))))
         if extra: i += 1
     rows = [r for _, r in sorted(rows)]
+    # The head shows only See more and Home: the label (Selected work, All work) is for screen readers (D, Oct. 13)
     return ('<section class="work" id="work" tabindex="-1" aria-label="%s"><div class="work-head">'
-            '<h2 class="work-label" data-closed="%s" data-open="%s">%s</h2>'
+            '<h2 class="work-label vh" data-closed="%s" data-open="%s">%s</h2>'
             '<button type="button" class="ctl archive-toggle" aria-expanded="false" aria-controls="works" data-open-label="%s" data-close-label="%s">%s</button>'
             '<a class="ctl work-back" href="#" data-top>%s</a></div>'
             '<ul class="works" id="works">%s</ul></section>') % (
@@ -937,7 +938,7 @@ def masthead(words, hand, hook='', line=None, link=None, last_attr='', lockup=Fa
     first = ' '.join('<span>%s</span>' % word(x) for x in words[:-1])
     last = '<span class="mast-last"><span class="mast-word"%s>%s</span>%s</span>' % (last_attr, word(words[-1]), hand)
     if lockup:  # the hand, then the words, one a line
-        first, last = hand, '<span class="mast-words ink">%s</span>' % ' '.join('<span>%s</span>' % word(x) for x in words)
+        first, last = hand, '<span class="mast-words">%s</span>' % ' '.join('<span>%s</span>' % word(x) for x in words)
     under = '<p class="journal-line">%s</p>' % typo(line) if line else ''
     # home: Home beside All work (a project page, D, Oct. 9), back to the cover like the nameplate (data-cover)
     if link: under += '<p class="mast-link"><a class="ctl" href="%s" data-all-work>%s</a>%s</p>' % (
@@ -1219,7 +1220,7 @@ def main():
                    '<div class="about-grid"><div class="title-row">'
                    '<h2 class="vh" id="about-title">%s</h2><p class="home-big"><a class="ctl" href="#" data-studio>%s</a></p></div>'
                    '<div class="about-main"><div class="about-body">%s</div></div>'
-                   '<div class="about-press"><h3 class="press-title">%s</h3>%s</div></div></section>') % (
+                   '<div class="about-press"><h3 class="press-title vh">%s</h3>%s</div></div></section>') % (  # the list without its heading on screen (D, Oct. 13)
         ' '.join('<span>%s</span>' % esc(x) for x in ap['title'].split()), ctl(site['back']), ''.join('<p>%s</p>' % link(typo(x)) for x in ap['lines']) + ''.join('<p class="contact">%s</p>' % link(typo(x)) for x in ap['contact']), esc(ap['press_title']), press_list(press))
     # The Journal: a panel one screen above home, and its own pages at /journal/ and /journal/<slug>, all with the same
     # masthead, slot and list. Until a post is published it's out of the menu and the sitemap, and /journal/ is noindex.
@@ -1254,7 +1255,7 @@ def main():
           '<meta name="robots" content="noindex"><script>location.replace("%s")</script></head>'
           '<body><p><a href="%s">%s</a></p></body></html>\n' % (esc(to_title), site['domain'], to, to, to, to, esc(to_name)))
     # The hand and the name: the name is live text in Opmet Serif Black, upright (static/fonts/opmet-serif/opmet-serif.woff2)
-    cover = ('<section class="cover"><div class="cover-inner"><h1><span class="mark" %s>%s</span><span class="name ink">%s</span></h1>'
+    cover = ('<section class="cover"><div class="cover-inner"><h1><span class="mark" %s>%s</span><span class="name">%s</span></h1>'
              '<nav class="cover-nav" aria-label="Site">%s</nav></div></section>') % (
         moves.mark_attrs(mv), hand + mv['layers'], esc(site['name']), nav)
     body = ('<div class="stage-clip"><div class="stage" data-stage>%s<div class="panel home-panel">%s<div data-home>%s%s</div></div>%s</div></div>'
