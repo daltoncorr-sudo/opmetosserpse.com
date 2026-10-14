@@ -275,12 +275,13 @@ html:not(.js) .stage:has(#about:target){transform:translateX(-66.6667%)}
 @media (max-width:719px){
   :root{--hand-h:clamp(85px,15.3vh,136px)}
   .cover .name{--wm-w:min(59.5vw,286px)}
+  .work{padding-top:var(--s6)}
 }
 
 /* Work: one list on a grid (title, tags, year). Collapsed, only the Selected rows show; See more opens the rest in place. */
 /* The blog list (.blog-list) is the same list, above home. */
 .work,.blog-list{width:min(var(--work-w,44rem),100%);margin:0 auto}
-.work{padding:var(--s5) 0 50vh;scroll-margin-top:0}
+.work{padding:calc(var(--s6) * 2) 0 50vh;scroll-margin-top:0}  /* well below the name (D, Oct. 13) */
 /* site.js sizes the column to its widest row (all projects, tags included) so it sits centered; this measures it */
 .works.measuring{width:max-content}.works.measuring .work-row{display:flex!important}.works.measuring .work-row{flex-wrap:nowrap}
 .work:focus{outline:none}
