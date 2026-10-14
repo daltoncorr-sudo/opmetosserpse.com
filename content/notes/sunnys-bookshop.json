@@ -1,6 +1,12 @@
 {
  "status": "draft",
  "work": "Book mark, seal, signature, brand bible, announcement film",
+ "credits": [
+  [
+   "Creative direction",
+   "Dalton Corr"
+  ]
+ ],
  "work_src": "deliverables",
  "chapters": [
   {

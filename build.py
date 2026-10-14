@@ -930,13 +930,13 @@ def masthead(words, hand, hook='', line=None, link=None, last_attr='', lockup=Fa
     On the Journal the lines are left-justified on each other and the block is centered. Under it,
     the Journal's small line, or a project's All work. hook: how the panels on home take the link (data-studio slides the
     Journal's panel back to the cover; data-cover closes a project to the cover); without it, a plain link to /.
-    lockup: the studio's nameplate (a project page): the hand first, to the left of the words, which are left-justified
-    on each other, the pair centered, and small (D, Oct. 10)."""
+    lockup: the studio's nameplate (a project page), as the name looks on home (D, Oct. 13): the hand first, then the
+    words on one line, small, the pair centered."""
     word = esc
     first = ' '.join('<span>%s</span>' % word(x) for x in words[:-1])
     last = '<span class="mast-last"><span class="mast-word"%s>%s</span>%s</span>' % (last_attr, word(words[-1]), hand)
     if lockup:  # the hand, then the words, one a line
-        first, last = hand, '<span class="mast-words">%s</span>' % ''.join('<span>%s</span>' % word(x) for x in words)
+        first, last = hand, '<span class="mast-words ink">%s</span>' % ' '.join('<span>%s</span>' % word(x) for x in words)
     under = '<p class="journal-line">%s</p>' % typo(line) if line else ''
     # home: Home beside All work (a project page, D, Oct. 9), back to the cover like the nameplate (data-cover)
     if link: under += '<p class="mast-link"><a class="ctl" href="%s" data-all-work>%s</a>%s</p>' % (
@@ -1253,8 +1253,8 @@ def main():
           '<link rel="canonical" href="https://%s%s"><meta http-equiv="refresh" content="0; url=%s">'
           '<meta name="robots" content="noindex"><script>location.replace("%s")</script></head>'
           '<body><p><a href="%s">%s</a></p></body></html>\n' % (esc(to_title), site['domain'], to, to, to, to, esc(to_name)))
-    # The top of home, one row (D, Oct. 13, 2026): the hand small at the left, the name very small in the center (live
-    # text in Opmet Serif Black, upright), the menu at the right; the work list centered below
+    # The top of home, one line (D, Oct. 13, 2026): About, then the hand beside the name (live text in Opmet Serif Black,
+    # upright), the hand and the name centered; the work list centered below
     cover = ('<header class="cover"><span class="mark" %s>%s</span><h1 class="name ink">%s</h1>'
              '<nav class="cover-nav" aria-label="Site">%s</nav></header>') % (
         moves.mark_attrs(mv), hand + mv['layers'], esc(site['name']), nav)

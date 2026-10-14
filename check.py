@@ -36,8 +36,9 @@ for f in glob.glob(D + '/**/*.html', recursive=True):
         p = D + u
         if not (os.path.exists(p) or os.path.exists(p + '.html') or os.path.exists(p.rstrip('/') + '/index.html')):
             problems.append('%s: broken link %s' % (rel, u))
-    # Dalton's name appears only in a project's credits, as "Dalton Corr, Opmet Osserpse"; anywhere else it's a problem
-    t2 = re.sub(r'<dl class="cr">[\s\S]*?</dl>', lambda m: m.group(0).replace('Dalton Corr, Opmet Osserpse', 'Opmet Osserpse'), t)
+    # Dalton's name appears only in a project's credits, as "Dalton Corr, Opmet Osserpse", or "Dalton Corr" alone where D
+    # asked for it (Sunny's Bookshop, Oct. 13); anywhere else it's a problem
+    t2 = re.sub(r'<dl class="cr">[\s\S]*?</dl>', lambda m: m.group(0).replace('Dalton Corr, Opmet Osserpse', 'Opmet Osserpse').replace('<dd>Dalton Corr</dd>', '<dd></dd>'), t)
     strip = lambda h: re.sub(r'<[^>]+>', ' ', re.sub(r'<(script|style|svg)[\s\S]*?</\1>', ' ', h))
     text = strip(t2)
     # "AI" and all caps are allowed in editorial writing: the body of a Journal article is left out of those two checks,
