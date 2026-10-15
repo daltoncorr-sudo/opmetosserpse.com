@@ -37,6 +37,8 @@
   /* The name, Opmet Osserpse, in Opmet Serif Black, upright everywhere: the cover, the inner pages' header and the
      masthead. Only buttons are italic (D, Oct. 13) */
   --title-font:var(--serif); --title-weight:900;
+  /* The exception (D, Oct. 15): the cover's name and the About text are Opmet Serif regular, not Black */
+  --name-weight:400;
   /* Controls: one face and size for every list link, toggle and filter; pure black only for the chosen filter */
   --ctl-font:var(--serif); --ctl-size:clamp(17px,1.35vw,20px); --black:#000;
 }
@@ -257,7 +259,7 @@ html:not(.js) .stage:has(#about:target){transform:translateX(-66.6667%)}
 .title-row{display:flex;flex-wrap:wrap;align-items:flex-end;column-gap:.42em;font-size:clamp(17px,1.35vw,20px);margin:0 0 var(--s5)}
 .about-grid .title-row{grid-column:1/-1;margin:0}
 .home-big{margin:0}
-.about-panel .about-body{font-family:var(--bold-font);font-weight:var(--bold-weight);font-size:clamp(min(5.4vw,26px),3.5vw,50px);line-height:1.12;letter-spacing:-.01em;max-width:16em}
+.about-panel .about-body{font-family:var(--bold-font);font-weight:var(--name-weight);font-size:clamp(min(5.4vw,26px),3.5vw,50px);line-height:1.12;letter-spacing:-.01em;max-width:16em}
 .about-body p{margin:0 0 .75em}
 .about-body p.contact{margin-top:.75em}
 .about-press{grid-column:9/13;text-align:left;padding-top:clamp(120px,30vh,320px)}
@@ -286,7 +288,7 @@ html:not(.js) .stage:has(#about:target){transform:translateX(-66.6667%)}
 .cover .pose{position:absolute;left:0;top:0;width:100%;height:auto;opacity:0}
 /* The name: live text in Opmet Serif Black, upright, 1.4 times as wide as the wordmark was (D, Oct. 13, 2026). --wm-w
    is its width: the name is about 9.76em in the upright Black (measured at 375 and 1440 px), in a box 1.17em tall */
-.cover .name{display:block;color:var(--ink);--wm-w:clamp(322px,46.2vw,784px);font:var(--title-weight) calc(var(--wm-w) / 9.76)/1.17 var(--title-font);white-space:nowrap}
+.cover .name{display:block;color:var(--ink);--wm-w:clamp(322px,46.2vw,784px);font:var(--name-weight) calc(var(--wm-w) / 9.76)/1.17 var(--title-font);white-space:nowrap}
 .cover-nav{display:flex;flex-wrap:wrap;justify-content:center;gap:var(--s1) var(--s4);margin:var(--s4) 0 0}
 /* The hand on the cover. Each move lives in its own folder under moves/; build.py gathers them into /css/moves.css. */
 @keyframes arrive{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
