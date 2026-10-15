@@ -22,6 +22,19 @@
   };
 })();
 
+// Work on a project page loaded by itself (the five with 3D or interactive pieces, a reload, a shared link): when the
+// visitor came from home it is a step back to it, so the list is as they left it, open or closed (D, Oct. 15); with no
+// home to go back to (a shared link, a new tab) it stays the plain link to the list, /#work.
+(function () {
+  document.addEventListener('click', function (e) {
+    var a = e.target.closest && e.target.closest('a[data-all-work]');
+    if (!a || e.defaultPrevented || document.querySelector('[data-stage]') || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button) return;
+    var from; try { from = new URL(document.referrer); } catch (x) { return; }
+    if (from.origin !== location.origin || !/^\/(index\.html)?$/.test(from.pathname) || history.length < 2) return;
+    e.preventDefault(); history.back();
+  });
+})();
+
 (function () {
   var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -523,10 +536,11 @@
 
   // A project opens as a screen below home. Its page is fetched once, its content dropped into the panel, and the view
   // slides down to it; Esc or the browser's back button slide up to the list exactly as it was. In the panel the
-  // masthead (data-cover) slides up to the cover, and All work (data-all-work, under the masthead and at the end) to
-  // the full list, centered; on a project page loaded by itself they are plain links to / and /#archive. The address
-  // is the project's own, so a reload or a shared link simply opens the project page.
-  //   ppThen: where closing leads: '' the list as it was, 'cover' the cover, 'archive' the full list
+  // masthead (data-cover) slides up to the cover, and Work (data-all-work, under the masthead and at the end; D, Oct. 15:
+  // it was All work, which forced the full list open) to the work list, centered, as the visitor left it, open or closed;
+  // on a project page loaded by itself they are links to / and /#work (and a step back to home the way it was, below).
+  // The address is the project's own, so a reload or a shared link simply opens the project page.
+  //   ppThen: where closing leads: '' the list as it was, 'cover' the cover, 'work' the list, centered, as it is
   var pp = $('#project'), ppInner = $('.project-inner', pp), ppOpen = false, ppPushed = false, ppFrom = null, ppThen = '', cache = {};
   pp.inert = true;
   var projectOf = function (u) { var m = u && new URL(u, location.href).pathname.match(/^\/projects\/([^\/]+)$/); return m && m[1]; };
@@ -550,12 +564,11 @@
     var then = ppThen; ppThen = '';
     document.title = homeTitle;
     if (then === 'cover') { toCover(); return; }
-    if (then === 'archive') setOpen(true, false);
     if (list.classList.contains('is-open') && location.hash !== '#archive') history.replaceState(history.state, '', location.pathname + location.search + '#archive');
     // Back onto the work list, as it was; centered if it's off screen (wherever the project came from), and always for
-    // All work, which lands on the full list
-    var r = inFlow(work), y = then === 'archive' || r.bottom < 0 || r.top > innerHeight ? workY() : Math.round(window.scrollY);
-    landAt(y, then === 'archive' ? work : ppFrom && animate ? ppFrom : null);
+    // Work, which lands on the list as it is, open or closed
+    var r = inFlow(work), y = then === 'work' || r.bottom < 0 || r.top > innerHeight ? workY() : Math.round(window.scrollY);
+    landAt(y, then === 'work' ? work : ppFrom && animate ? ppFrom : null);
   }
   function openProject(slug, animate, push) {
     return fetchProject(slug).then(function (p) {
@@ -585,7 +598,7 @@
   pp.addEventListener('click', function (e) {
     var a = e.target.closest('a'); if (!a || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button) return;
     if (a.hasAttribute('data-cover')) { e.preventDefault(); closeProject('cover'); return; }  // the masthead: up to the cover
-    if (a.hasAttribute('data-all-work')) { e.preventDefault(); closeProject('archive'); return; }  // All work: up to the full list
+    if (a.hasAttribute('data-all-work')) { e.preventDefault(); closeProject('work'); return; }  // Work: up to the list, as it is
     var slug = projectOf(a.href);
     if (slug) { e.preventDefault(); fetchProject(slug).then(function () { openProject(slug, false, false).then(function () { history.replaceState({ project: slug }, '', '/projects/' + slug); }); }); }
   });
@@ -621,7 +634,7 @@
   }
   Object.keys(panels).forEach(function (k) { panels[k].inert = true; });
   sync(true);
-  // Arriving at #work or #archive (All work, from a project page loaded by itself): the list, centered (again once its
+  // Arriving at #work or #archive (Work, from a project page loaded by itself): the list, centered (again once its
   // type and pictures have settled), with the focus on it
   if (/^#(work|archive)$/.test(location.hash)) {
     centerWork(false); work.focus({ preventScroll: true });

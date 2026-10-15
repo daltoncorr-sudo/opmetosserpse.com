@@ -676,8 +676,9 @@ def block_html(b, slug, research=False):
 
 def project_body(p, blocks, chapters, notes, all_work='All work', top='Back to top', home='Home'):
     """The masthead (the Journal's, without "Journal": Opmet and Osserpse with the hand mark, to the studio home) and
-    All work under it; the title; under it the paragraph, and one list of facts and credits. Then the work, centered,
-    with chapter labels in the left margin and notes in the right one. At the end, All work again. No next project."""
+    Work under it (the work list, as the visitor left it; the hook keeps its old name, data-all-work); the title; under it the
+    paragraph, and one list of facts and credits. Then the work, centered, with chapter labels in the left margin and
+    notes in the right one. At the end, Work again. No next project."""
     facts = [('Client', typo(p['client'])), ('Year', esc(p['year']))]
     if notes.get('work'): facts.append(('Work', typo(notes['work'])))
     facts.append(('Role', typo(p['role'])))
@@ -692,7 +693,7 @@ def project_body(p, blocks, chapters, notes, all_work='All work', top='Back to t
     # research: each picture's label is a short paragraph, its research (the notes file's "research": Red Mask, D, Oct. 14)
     out = ['<div class="pp%s%s" data-lightbox%s>' % (' pp-air' if notes.get('air') else '', ' pp-research' if notes.get('research') else '',
                                                     ' data-page-only' if p.get('_scripts') else ''),
-           masthead(list(NAME), studio_hand(), ' data-cover', link=('/#archive', all_work), lockup=True, home=home),
+           masthead(list(NAME), studio_hand(), ' data-cover', link=('/#work', all_work), lockup=True, home=home),
            '<section class="open g">%s<h1>%s</h1><p class="lede">%s</p><div class="info">%s%s</div></section>' % (
                '<p class="kicker">%s</p>' % typo(notes['kicker']) if notes.get('kicker') else '', typo(p['title']), typo(notes.get('lede') or p['lede']), dl(facts, 'facts'), dl(credits, 'cr'))]
     starts = {c['starts_at']: c for c in chapters}
@@ -717,8 +718,8 @@ def project_body(p, blocks, chapters, notes, all_work='All work', top='Back to t
     return '\n'.join(out)
 
 def project_foot(all_work='All work', top='Back to top', home='Home'):
-    """At the end of a project page: All work, Home and Back to top (D, Oct. 9)."""
-    return ('<nav class="g pfoot" aria-label="%s"><a class="ctl" href="/#archive" data-all-work>%s</a> <a class="ctl" href="/" data-cover>%s</a> <a class="ctl" href="#main" data-top>%s</a></nav>'
+    """At the end of a project page: Work, Home and Back to top (D, Oct. 9; Work, not All work, Oct. 15)."""
+    return ('<nav class="g pfoot" aria-label="%s"><a class="ctl" href="/#work" data-all-work>%s</a> <a class="ctl" href="/" data-cover>%s</a> <a class="ctl" href="#main" data-top>%s</a></nav>'
             % (esc(all_work), ctl(all_work), ctl(home), ctl(top)))
 
 def list_rows(entries):
@@ -794,7 +795,7 @@ def work_section(items, w):
         esc(w['label']), esc(w['selected']), esc(w['all']), esc(w['selected']), esc(w['more']), esc(w['less']), ctl(w['more']), ctl(w['back']), ''.join(rows))
 
 # Finished pages: a project page D designed whole (Opmet Serif, D, Oct. 14), in the studio's project frame like every
-# other: the nameplate with All work and Home, D's page, then All work, Home and Back to top; it slides down from home.
+# other: the nameplate with Work and Home, D's page, then Work, Home and Back to top; it slides down from home.
 # Its facts are content/pages/<slug>.json; its page is content/pages/<slug>/, as pages.py writes it from D's file:
 # page.html (the content), page.css (every rule inside .os) and page.js (window.opmetPages[<slug>], which site.js runs
 # when the page loads by itself or slides in). The other files there go to /media/<slug>/.
@@ -835,11 +836,11 @@ def finished_files(p):
     return '/media/%s/og.jpg' % s
 
 def finished_body(p, all_work='All work', top='Back to top', home='Home'):
-    """The project frame around D's page: the nameplate, All work and Home; the page, its styles with it (so they come
-    along when it slides in from home); All work, Home and Back to top."""
+    """The project frame around D's page: the nameplate, Work and Home; the page, its styles with it (so they come
+    along when it slides in from home); Work, Home and Back to top."""
     return '\n'.join([
         '<div class="pp" data-lightbox>',
-        masthead(list(NAME), studio_hand(), ' data-cover', link=('/#archive', all_work), lockup=True, home=home),
+        masthead(list(NAME), studio_hand(), ' data-cover', link=('/#work', all_work), lockup=True, home=home),
         '<style>\n%s</style>' % p['_css'],
         '<div class="os" data-page="%s" data-page-js="/js/pages/%s.js?v=%s">\n%s</div>' % (p['slug'], p['slug'], p['_jsv'], p['_html']),
         project_foot(all_work, top, home),

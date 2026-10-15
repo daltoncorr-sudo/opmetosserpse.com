@@ -87,14 +87,14 @@ order = json.load(open(os.path.join(ROOT, 'content', 'index.json'), encoding='ut
 # The finished pages (content/pages/<slug>.json): project pages D designed whole, built as they are. They keep the checks
 # every page has (links, words, alt text, the data); the template's own (the lightbox, the masthead, project_order) skip them
 finished = {os.path.basename(f)[:-5]: json.load(open(f, encoding='utf-8')) for f in glob.glob(os.path.join(ROOT, 'content', 'pages', '*.json'))}
-# The frame every project page has: the masthead (the Journal's component), linking home, with All work and Home under it;
-# at the end All work, Home and Back to top; no Back, no Home or Back to top without their hooks
+# The frame every project page has: the masthead (the Journal's component), linking home, with Work and Home under it;
+# at the end Work, Home and Back to top; no Back, no Home or Back to top without their hooks
 def frame(rel, t):
     mast = re.search(r'<header class="mast"><a class="mast-name[^"]*" href="/" data-cover>([\s\S]*?)</header>', t)
     if not mast: problems.append('%s: no masthead linking home' % rel)
-    elif not re.search(r'<a class="ctl" href="/#archive" data-all-work>', mast.group(1)): problems.append('%s: no All work under the masthead' % rel)
-    elif not re.search(r'<a class="ctl" href="/" data-cover>', mast.group(1)): problems.append('%s: no Home beside All work under the masthead' % rel)
-    if not re.search(r'class="g pfoot"[^>]*><a class="ctl" href="/#archive" data-all-work>', t): problems.append('%s: no All work at the end' % rel)
+    elif not re.search(r'<a class="ctl" href="/#work" data-all-work>', mast.group(1)): problems.append('%s: no Work under the masthead' % rel)
+    elif not re.search(r'<a class="ctl" href="/" data-cover>', mast.group(1)): problems.append('%s: no Home beside Work under the masthead' % rel)
+    if not re.search(r'class="g pfoot"[^>]*><a class="ctl" href="/#work" data-all-work>', t): problems.append('%s: no Work at the end' % rel)
     foot = t.split('class="g pfoot"', 1)[-1].split('</nav>', 1)[0]
     if 'data-top>' not in foot: problems.append('%s: no Back to top at the end' % rel)
     if 'href="/" data-cover>' not in foot: problems.append('%s: no Home at the end' % rel)
@@ -137,7 +137,7 @@ for i, slug in enumerate(order):
     body = re.split(r'class="pp[ "]', t, 1)[-1].split('class="g pfoot"', 1)[0]
     got = [H.unescape(k) for k in re.findall(r'data-i="([^"]+)"', body)]
     if got != want: problems.append('%s: media order differs from daltoncorr.com (%d items, expected %d)' % (rel, len(got), len(want)))
-    if 'Next project' in t: problems.append('%s: a "Next project" (pages end on All work)' % rel)
+    if 'Next project' in t: problems.append('%s: a "Next project" (pages end on Work)' % rel)
     frame(rel, t)
 # Whole pictures: nothing styles a project page's picture (or the lightbox's) to crop. In site.css, no rule for .pp or
 # .lightbox uses object-fit other than contain, clip-path or object-view-box, and no picture's frame (.m, .row, .cut,
@@ -182,9 +182,9 @@ for f in glob.glob(D + '/projects/*.html'):
     for src, piece, opens in lb.out:
         if piece and opens: problems.append('%s: a picture in a 3D or interactive piece opens in the lightbox (%s)' % (rel, src))
         if not piece and not opens: problems.append('%s: a picture that does not open in the lightbox (%s)' % (rel, src))
-# All work resolves to the work list: /#archive opens the full list on home
+# Work resolves to the work list: /#work lands on it on home (/#archive opens the full list)
 home_t = open(os.path.join(D, 'index.html'), encoding='utf-8').read()
-if not ('id="work"' in home_t and 'id="works"' in home_t and 'class="ctl archive-toggle"' in home_t): problems.append('index.html: no work list for All work (/#archive) to open')
+if not ('id="work"' in home_t and 'id="works"' in home_t and 'class="ctl archive-toggle"' in home_t): problems.append('index.html: no work list for Work (/#work) to land on')
 # the home list and the projects index list the pages in project_order
 for page_, pat in (('index.html', r'class="work-row[^"]*" data-project="([^"]+)"><?(?:span class="yr">\d+</span>)?<a href'),
                    ('projects/index.html', r'<li id="([^"]+)"><a href="/projects/')):
