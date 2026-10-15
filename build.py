@@ -632,7 +632,9 @@ def block_html(b, slug, research=False):
     ms = []
     for it in b['items']:
         cls = 'm' + (' piece' if it['kind'] == 'widget' else '') + (' cut cut-%s' % it['cut'] if kind == 'cuts' else '') + (' grain' if it.get('grain') else '')
-        style = 'flex-grow:%.4f' % (it['w'] / it['h']) if kind == 'row' else '--w:%g' % it['pt'] if kind == 'cuts' and it.get('pt') else ''
+        # a row's pictures share its width by their shapes; scaled up so the shares always add to more than 1 (two tall
+        # phone captures add to 0.92, and flexbox then leaves the rest of the row empty, on one side)
+        style = 'flex-grow:%.4f' % (100 * it['w'] / it['h']) if kind == 'row' else '--w:%g' % it['pt'] if kind == 'cuts' and it.get('pt') else ''
         if kind in ('single', 'tall') and it['kind'] != 'widget' and it['h'] > it['w'] and it.get('cap', True):
             cls += ' cap'; style = '--ar:%.4f' % (it['w'] / it['h'])
         style = ' style="%s"' % style if style else ''

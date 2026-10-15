@@ -139,6 +139,41 @@
   setTimeout(function () { play(first); setInterval(function () { play(); }, every); }, delay);
 })();
 
+// Centered by their words (D, Oct. 14): left-aligned words in a centered column look off center when their lines run
+// short of it (the closed work list, a project's paragraph and facts). From 600px up, opmetCenter(box, parts, skip,
+// glide) moves parts sideways (translate, never the layout) so their words sit on box's center line, never past its
+// edges; skip leaves words out (the years in the margin, hidden tags). Phones keep their equal margins as they are.
+(function () {
+  var wide = window.matchMedia ? matchMedia('(min-width: 600px)') : { matches: true };
+  function ink(parts, skip) {
+    var L = Infinity, R = -Infinity;
+    parts.forEach(function (p) {
+      var w = document.createTreeWalker(p, NodeFilter.SHOW_TEXT), n;
+      while ((n = w.nextNode())) {
+        var el = n.parentElement;
+        if (!n.textContent.trim() || (el.checkVisibility && !el.checkVisibility()) || (skip && el.closest(skip))) continue;
+        var r = document.createRange(); r.selectNodeContents(n);
+        Array.prototype.forEach.call(r.getClientRects(), function (x) { if (x.width > 1) { L = Math.min(L, x.left); R = Math.max(R, x.right); } });
+      }
+    });
+    return L < R ? [L, R] : null;
+  }
+  window.opmetCenter = function (box, parts, skip, glide) {
+    parts = parts.filter(Boolean);
+    if (!box || !parts.length) return;
+    var cur = parseFloat(parts[0].style.translate) || 0, k = wide.matches && ink(parts, skip), s = 0;
+    if (k) {
+      var b = box.getBoundingClientRect(), l = k[0] - cur, r = k[1] - cur;
+      s = Math.round(Math.max(b.left - l, Math.min(b.right - r, (b.left + b.right - l - r) / 2)));
+    }
+    parts.forEach(function (p) {
+      if (!glide) p.style.transition = 'none';
+      p.style.translate = s ? s + 'px 0' : '';
+      if (!glide) { void p.offsetWidth; p.style.transition = ''; }
+    });
+  };
+})();
+
 // Home: the side panels (foundry to the left, About to the right, the Journal above), the Work link, the two lists that
 // open in place (work and the Journal), projects and articles, and the project hover hook. The Journal's own pages use
 // the list and the article engine too.
@@ -197,6 +232,7 @@
       L.state = st;
       arrange(st.open);
       L.list.classList.toggle('is-open', st.open);
+      if (L.center) L.center(animate);
       if (L.topics) {
         L.topics.hidden = !st.open;
         L.rows.forEach(function (r) { r.classList.toggle('out', !L.shows(r, st)); });
@@ -252,7 +288,10 @@
       var w = Math.ceil(Math.max(L.list.getBoundingClientRect().width, L.head.getBoundingClientRect().width));
       L.list.classList.remove('measuring'); L.head.style.width = '';
       section.style.setProperty('--work-w', w + 'px');
+      if (L.center) L.center(false);
     };
+    // The work list centered by its words: closed, by its names (the column is sized for the open list, tags and all)
+    if (o.center) L.center = function (glide) { opmetCenter(section, [L.head, L.list], L.list.classList.contains('is-open') ? '.yr' : '.yr, .tags', glide); };
     L.fit();
     if (document.fonts && document.fonts.ready) document.fonts.ready.then(L.fit);
     var rt; window.addEventListener('resize', function () { clearTimeout(rt); rt = setTimeout(L.fit, 150); });
@@ -484,7 +523,7 @@
   });
 
   // The work list opens in place; See more puts #archive in the address, See less takes it out
-  var list = $('#works'), workList = List(work, { address: function (st) {
+  var list = $('#works'), workList = List(work, { center: true, address: function (st) {
     history.replaceState(history.state, '', url(st.open ? '#archive' : (location.hash === '#archive' ? '#work' : location.hash)));
   } }), rows = workList.rows;
   var setOpen = function (open, animate) { workList.set({ open: open, topic: 'All' }, animate); };
@@ -700,8 +739,14 @@
       pageJs[src].push(run);
     });
   }
-  window.opmetProject = function (root) { films(root); read(); pages(root); };
+  // A project's paragraph and facts, centered by their words under the title (opmetCenter)
+  function opening(root) {
+    Array.prototype.forEach.call((root || document).querySelectorAll('.pp .open'), function (o) { opmetCenter(o, [o.querySelector('.lede'), o.querySelector('.info')]); });
+  }
+  window.opmetProject = function (root) { films(root); read(); pages(root); opening(root); };
   if (document.querySelector('.pp')) window.opmetProject(document);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { opening(); });
+  var ot; window.addEventListener('resize', function () { clearTimeout(ot); ot = setTimeout(function () { opening(); }, 150); });
   document.addEventListener('scroll', soon, { passive: true, capture: true });  // the page, or the project panel on home
   window.addEventListener('resize', soon);
 })();

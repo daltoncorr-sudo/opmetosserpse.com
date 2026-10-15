@@ -155,7 +155,7 @@ def _keep(items):
             if inner: out.append('%s{%s}' % (pre, ''.join(inner)))
         elif pre.startswith('@keyframes'):
             if any(k in pre for k in ('bf-', 'car-', 'cue-', 'ls', 'badge', 'wine', 'phone')): out.append('%s{%s}' % (pre, body))
-        elif any(k in pre for k in KEYS):
+        elif any(k in pre for k in KEYS) or re.search(r'\.car(?![\w])', pre):  # the badge carousel's own classes (.car, .car-track, .car-slot...), which center its ring
             out.append('%s{%s}' % (pre, body.strip()))
     return out
 
