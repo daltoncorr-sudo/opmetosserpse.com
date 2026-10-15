@@ -263,6 +263,7 @@ html:not(.js) .stage:has(#about:target){transform:translateX(-66.6667%)}
 .about-press{grid-column:9/13;text-align:left;padding-top:clamp(120px,30vh,320px)}
 .about-press .press-title{margin-top:0}
 @media (max-width:860px){.about-grid{grid-template-columns:minmax(0,1fr)}.about-main,.about-press{grid-column:1/-1}.about-press{padding-top:0}}
+@media (min-width:600px) and (max-width:860px){.about-grid{grid-template-columns:minmax(0,30rem);justify-content:center}}  /* one column, centered (Oct. 14) */
 /* Phones (Oct. 14): the press as the work list is there, on the paragraphs' left edge: each year on its own line above
    its outlets, each outlet on its line with its headline under it */
 @media (max-width:599px){
@@ -301,6 +302,7 @@ html:not(.js) .stage:has(#about:target){transform:translateX(-66.6667%)}
 /* site.js sizes the column to its widest row (all projects, tags included) so it sits centered; this measures it */
 .works.measuring{width:max-content}.works.measuring .work-row{display:flex!important}.works.measuring .work-row{flex-wrap:nowrap}
 .work:focus{outline:none}
+.work .work-head,.work .works{transition:translate var(--open) var(--slide-ease)}  /* centered by their words (site.js opmetCenter): the list glides sideways as it opens and closes */
 .work-head{display:flex;flex-wrap:wrap;align-items:baseline;gap:0 var(--s3);margin:0 0 var(--s4)}
 .work-head>*{white-space:nowrap}  /* the label and its options never break mid-phrase; site.js widens the column to fit them */
 .work-label{font:400 clamp(24px,2.3vw,34px)/1.15 var(--serif);margin:0}
@@ -373,7 +375,7 @@ html:not(.js) .stage:has(#about:target){transform:translateX(-66.6667%)}
 
 /* Simple pages */
 .index:first-child{padding-top:16vh}
-.page{max-width:var(--measure);margin:12vh auto 14vh;font-size:var(--size-m)}
+.page{width:fit-content;max-width:var(--measure);margin:12vh auto 14vh;font-size:var(--size-m)}  /* as wide as its lines, so short text sits centered */
 .page a{text-decoration:underline;text-underline-offset:3px;text-decoration-thickness:1px}
 .notfound,.single{text-align:center;padding:20vh 0;font-size:var(--size-m)}
 .single p{margin:0 0 .6em}

@@ -8,6 +8,77 @@
 .weissman-hero img{width: 100%; height: auto; border-radius: 4px;}
 @media (min-width: 768px){.weissman-hero{flex-direction: row; align-items: center;}.weissman-hero img{flex: 1; min-width: 0; object-fit: cover; max-height: 400px; order: -1;}.weissman-hero-catalog{flex: 1; min-width: 0;}.weissman-hero-catalog #catalog-3d{height: 500px;}}
 #badge-carousel{width: 100%; margin-top: 1.5rem;}
+.car{--ink-rgb: 17, 17, 17;
+  --shadow-rgb: 0, 0, 0;
+  position: relative;
+  margin: 0 auto;
+  font-family: var(--font);
+  -webkit-user-select: none;
+  user-select: none;}
+.car-track{position: absolute;
+  inset: 0;
+  touch-action: pan-y;
+  cursor: grab;
+  -webkit-tap-highlight-color: transparent;}
+.car-track[data-held="true"]{cursor: grabbing;}
+.car-track:focus-visible{outline: none;}
+.car-slot{position: absolute;
+  left: 50%;
+  top: 50%;
+  transform-origin: center;}
+.car-float{width: 100%;
+  height: 100%;
+  perspective: 760px;
+  animation: car-bob 5s ease-in-out infinite;}
+.car-card{position: relative;
+  width: 100%;
+  height: 100%;
+  
+  transform-style: preserve-3d;}
+.car-flip{position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+  transition: transform 0.5s cubic-bezier(0.2, 0, 0, 1);}
+.car-slot.is-flipped .car-flip{transform: rotateY(180deg);}
+.car-face{position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  overflow: hidden;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;}
+.car-face--front{background: #1a1a1a;}
+.car-face--front img{width: 100%;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none;}
+.car-face--back{transform: rotateY(180deg);
+  background: #fff;
+  border: 1px solid #e5e5e5;}
+.car-sheen{position: absolute;
+  inset: 0;
+  display: block;
+  pointer-events: none;
+  transform: translateZ(1px);}
+.car-card::before{content: '';
+  position: absolute;
+  top: -6px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 20px;
+  height: 10px;
+  background: linear-gradient(180deg, #aaa, #888);
+  border-radius: 2px 2px 0 0;
+  opacity: 0.45;}
+.car-card::after{content: '';
+  position: absolute;
+  top: -14px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 10px;
+  height: 10px;
+  border: 2px solid rgba(150,150,150,0.35);
+  border-radius: 50%;}
+@media (prefers-reduced-motion: reduce){.car-float{animation: none;}.car-flip{transition: none;}}
 @keyframes car-bob{
   0%, 100% {
     transform: translateY(calc(var(--lift, 4px) * -1)) rotate(calc(var(--sway, 1deg) * -1));
@@ -15,6 +86,7 @@
   50% {
     transform: translateY(var(--lift, 4px)) rotate(var(--sway, 1deg));
   }}
+@media (max-width: 767px){.car-card::before{width: 14px; height: 8px; top: -5px;}.car-card::after{width: 8px; height: 8px; top: -11px;}}
 .logo-switch{margin-top: 1.5rem;}
 .logo-switch-btn{position: relative; display: block; width: 100%; max-width: 520px; aspect-ratio: 1 / 1; margin: 0 auto; padding: 0; border: 0; background: #fff; border-radius: 2px; overflow: hidden; cursor: pointer; font: inherit; color: inherit; -webkit-tap-highlight-color: transparent;}
 .logo-switch-btn:focus-visible{outline: 2px solid var(--text); outline-offset: 4px;}
