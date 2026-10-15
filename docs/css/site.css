@@ -456,6 +456,7 @@ html:not(.js) .stage:has(#about:target){transform:translateX(-66.6667%)}
    studied for it, each a short paragraph in gray; more room between the rows, for the words */
 .pp-research .lbl{margin-top:16px;max-width:34em;text-wrap:pretty}
 .pp-research .lbl-s{margin-top:.5em}
+.pp-research .lbl-k{color:var(--ink)}  /* the line's lead word, Art: or Period:, in ink */
 .pp-research .ch>.b+.b,.pp-research>.b+.b{margin-top:calc(var(--u) * 1.5)}
 .pp .b-wide .note{grid-row:2}  /* its note in the right margin, under the picture's corner */
 .pp .row{display:flex;gap:var(--g);align-items:flex-start}.pp .row .m{flex:1 1 0;min-width:0}
