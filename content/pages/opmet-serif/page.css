@@ -150,7 +150,7 @@
 .os .os-bbody{container-type:inline-size;--u:calc(86cqw / 504);padding:clamp(36px,7vw,112px) 3%;display:flex;flex-direction:column;align-items:center;text-align:center;overflow:hidden}
 .os .os-board.os-soft .os-bbody{background:var(--paper-deep)}
 .os .os-board.os-ink .os-bbody{background:var(--ink);color:var(--paper)}
-.os .os-board figcaption{text-align:center}
+
 .os .os-bl{font-family:var(--serif);white-space:nowrap;font-kerning:normal;line-height:1.5;color:inherit}
 .os .os-bl.os-lc{line-height:1.56} .os .os-bl.os-big{line-height:1.1} .os .os-bl.os-flow{line-height:1.17}
 .os .os-bl.os-nm{line-height:1.22} .os .os-bl.os-nm.os-ramp{line-height:1.5}
