@@ -91,7 +91,8 @@
    "client": null,
    "lede": null,
    "url": null,
-   "image": null
+   "image": null,
+   "samples": true
   },
   {
    "slug": "polish-film-festival",
@@ -231,7 +232,8 @@
    "client": null,
    "lede": null,
    "url": null,
-   "image": null
+   "image": null,
+   "samples": true
   },
   {
    "slug": "tremor-house",
@@ -243,7 +245,8 @@
    "client": null,
    "lede": null,
    "url": null,
-   "image": null
+   "image": null,
+   "samples": true
   },
   {
    "slug": "hollyshorts-london-2024",
@@ -350,7 +353,8 @@
    "client": null,
    "lede": null,
    "url": null,
-   "image": null
+   "image": null,
+   "samples": true
   },
   {
    "slug": "anonymous-poetry",
@@ -362,7 +366,8 @@
    "client": null,
    "lede": null,
    "url": null,
-   "image": null
+   "image": null,
+   "samples": true
   },
   {
    "slug": "cannes-2023",
@@ -453,7 +458,8 @@
    "client": null,
    "lede": null,
    "url": null,
-   "image": null
+   "image": null,
+   "samples": true
   },
   {
    "slug": "hallelujah",
@@ -466,7 +472,8 @@
    "client": null,
    "lede": null,
    "url": null,
-   "image": null
+   "image": null,
+   "samples": true
   },
   {
    "slug": "hollyshorts-18",
@@ -508,7 +515,8 @@
    "client": null,
    "lede": null,
    "url": null,
-   "image": null
+   "image": null,
+   "samples": true
   },
   {
    "slug": "hdtracks",

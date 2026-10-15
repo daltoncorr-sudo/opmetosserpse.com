@@ -198,6 +198,26 @@ for page_, pat in (('index.html', r'class="work-row[^"]*" data-project="([^"]+)"
     else: got = re.findall(pat, t)
     got = [x for x in got if x not in finished]
     if got != order: problems.append('%s: the project list does not follow project_order' % page_)
+# Samples rows (work.json "samples": true, D, Oct. 15): no page and no link; on home "Samples available upon request" sits
+# in place of their tags, set like a tag. Every other project has a page (build.py stops otherwise).
+_w = json.load(open(os.path.join(ROOT, 'content', 'work.json'), encoding='utf-8'))['projects']
+_samples = json.load(open(os.path.join(ROOT, 'content', 'site.json'), encoding='utf-8'))['home']['work']['samples']
+_sm = open(os.path.join(D, 'sitemap.xml'), encoding='utf-8').read() if os.path.exists(os.path.join(D, 'sitemap.xml')) else ''
+_proj = open(os.path.join(D, 'projects', 'index.html'), encoding='utf-8').read()
+for e in _w:
+    s_ = e['slug']; row = re.search(r'<li class="work-row[^"]*" data-project="%s"[^>]*>([\s\S]*?)</li>' % re.escape(s_), home_t)
+    li = re.search(r'<li id="%s"[^>]*>([\s\S]*?)</li>' % re.escape(s_), _proj)
+    if not e.get('samples'):
+        if row and '<span class="tag samples">' in row.group(1): problems.append('index.html: %s reads "%s" but is not a samples row' % (s_, _samples))
+        continue
+    if s_ in order or s_ in finished or os.path.exists(os.path.join(D, 'projects', s_ + '.html')): problems.append('projects/%s: a samples row has a page' % s_)
+    if '/projects/%s<' % s_ in _sm: problems.append('sitemap.xml: lists %s, a samples row' % s_)
+    if not row: problems.append('index.html: no row for %s' % s_)
+    else:
+        if '<a ' in row.group(1): problems.append('index.html: the samples row %s links' % s_)
+        if '<span class="tags"><span class="tag samples">%s</span></span>' % _samples not in row.group(1): problems.append('index.html: %s does not read "%s" in place of its tags' % (s_, _samples))
+    if not li: problems.append('projects/index.html: no row for %s' % s_)
+    elif '<a ' in li.group(1): problems.append('projects/index.html: the samples row %s links' % s_)
 # The Journal: every published post has its page and is in the sitemap; a draft has neither (in a drafts build its
 # page is a preview, never shipped); /journal/ is in the sitemap once a post is published; /blog/ sends to /journal/
 journal = json.load(open(os.path.join(ROOT, 'content', 'journal.json'), encoding='utf-8'))
@@ -388,6 +408,7 @@ if 'work' in feeds:
             if (x.get('client'), x.get('lede'), x.get('url')) != (projects_c[s]['client'], lede(s), '%s/projects/%s' % (BASE, s)): problems.append('docs/data/work.json: %s differs from its page' % s)
             if not x.get('image') or not in_docs(x['image'].get('url', '')[len(BASE):]): problems.append('docs/data/work.json: %s has no lead picture in docs/' % s)
         elif any(x.get(k) is not None for k in ('client', 'lede', 'url', 'image')): problems.append('docs/data/work.json: %s has no page but page fields' % s)
+        if bool(x.get('samples')) != bool(w.get('samples')): problems.append('docs/data/work.json: %s is %sa samples row in work.json' % (s, '' if w.get('samples') else 'not '))
 # /llms.txt: the name, the one line, every project page, the address; nothing hidden
 lp = os.path.join(D, 'llms.txt')
 if not os.path.exists(lp): problems.append('docs/llms.txt is missing')

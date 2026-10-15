@@ -386,6 +386,7 @@ def work_data(site, entries, projects):
                     'client': p['client'] if p else None, 'lede': shown_lede(p) if p else None,
                     'url': '%s/projects/%s' % (base, p['slug']) if p else None,
                     'image': {'url': base + p['preview'], 'alt': p['card'].get('alt', '')} if p and p.get('preview') else None})
+        if w.get('samples'): out[-1]['samples'] = True  # no page: samples available upon request
     return data_json({'studio': e['id'], 'url': base + '/projects/', 'projects': out})
 
 def llms_file(site, ordered, wj):
@@ -751,6 +752,10 @@ def load_work(projects):
         p = projects.get(s); e['page'] = bool(p)
         if p and p['year'][-4:] != e['year']: errs.append('%s: year %s here, %s on its page' % (s, e['year'], p['year']))
         if e['selected'] and not p: errs.append('%s: Selected needs a project page' % s)
+        # every project has a page, or is "samples": true (no page, no link; D, Oct. 15), never both
+        if e.get('samples', False) not in (True, False): errs.append('%s: "samples" is true or left out' % s)
+        elif e.get('samples') and p: errs.append('%s: has a project page, so it is not a samples row' % s)
+        elif not e.get('samples') and not p: errs.append('%s: has no project page (give it one, or "samples": true)' % s)
     errs += ['%s: has a page but is missing from work.json' % s for s in projects if s not in seen]
     if errs: sys.exit('Fix content/work.json first:\n  ' + '\n  '.join(errs))
     items = sorted(w['projects'], key=lambda e: -int(e['year']))  # stable: file order within a year
@@ -758,6 +763,11 @@ def load_work(projects):
 
 def tag_list(tags):
     return '<span class="tags">%s</span>' % ''.join('<span class="tag">%s</span>' % esc(x) for x in tags)
+
+def row_tags(e, w):
+    """A row's tags; a samples row (no page, no link: D, Oct. 15) reads "Samples available upon request" in their place,
+    set like a tag. Its own tags stay in work.json, for /data/work.json."""
+    return '<span class="tags"><span class="tag samples">%s</span></span>' % esc(w['samples']) if e.get('samples') else tag_list(e['tags'])
 
 def work_title(e):
     return '<a href="/projects/%s">%s</a>' % (e['slug'], typo(e['title'])) if e['page'] else '<span class="plain">%s</span>' % typo(e['title'])
@@ -772,7 +782,7 @@ def work_section(items, w):
         seen.add(e['year'])
         extra = not e['selected']
         rows.append((e['selected'] or 1000 + n, '<li class="work-row%s" data-project="%s" data-n="%d"%s>%s%s%s</li>' % (
-            ' extra' if extra else '', e['slug'], n, ' style="--i:%d"' % i if extra else '', yr, work_title(e), tag_list(e['tags']))))
+            ' extra' if extra else '', e['slug'], n, ' style="--i:%d"' % i if extra else '', yr, work_title(e), row_tags(e, w))))
         if extra: i += 1
     rows = [r for _, r in sorted(rows)]
     # The head shows only See more and Home: the label (Selected work, All work) is for screen readers (D, Oct. 13)

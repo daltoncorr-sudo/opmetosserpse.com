@@ -1,5 +1,5 @@
 {
- "_note": "One entry per project, newest first; order within a year is the display order. tags: one or two from \"tags\" below. selected: the Selected work list, in its order (every other project is in the archive only). media: for later. line: the old description, kept for rows without a page. A festival edition reads edition first: \"22nd Anniversary | ...\".",
+ "_note": "One entry per project, newest first; order within a year is the display order. tags: one or two from \"tags\" below. selected: the Selected work list, in its order (every other project is in the archive only). media: for later. line: the old description, kept for rows without a page. A festival edition reads edition first: \"22nd Anniversary | ...\". samples: true for a project shown without a page, unlinked, its tags replaced in the list by \"Samples available upon request\" (D, Oct. 15); every other project needs a page.",
  "tags": [
   "Art direction",
   "Artwork",
@@ -82,6 +82,7 @@
    "tags": [
     "Social"
    ],
+   "samples": true,
    "media": [],
    "line": "Design for a nonprofit campaign."
   },
@@ -172,6 +173,7 @@
    "tags": [
     "Identity"
    ],
+   "samples": true,
    "media": [],
    "line": "Brand identity for a private client."
   },
@@ -182,6 +184,7 @@
    "tags": [
     "Key art"
    ],
+   "samples": true,
    "media": [],
    "line": "Key art and pitch decks for a production company."
   },
@@ -252,6 +255,7 @@
     "Brand design",
     "Packaging"
    ],
+   "samples": true,
    "media": [],
    "line": "Branding and packaging for a best-selling author."
   },
@@ -262,6 +266,7 @@
    "tags": [
     "Book design"
    ],
+   "samples": true,
    "media": [],
    "line": "Book design for a private client."
   },
@@ -323,6 +328,7 @@
    "tags": [
     "Web design"
    ],
+   "samples": true,
    "media": [],
    "line": "Website design for the festival."
   },
@@ -334,6 +340,7 @@
     "Key art",
     "Social"
    ],
+   "samples": true,
    "media": [],
    "line": "Award campaign and social graphics for a short film."
   },
@@ -363,6 +370,7 @@
    "tags": [
     "Art direction"
    ],
+   "samples": true,
    "media": [],
    "line": "Art department for a short film."
   },
