@@ -416,6 +416,15 @@ html:not(.js) .stage:has(#about:target){transform:translateX(-66.6667%)}
 .pp .open .info{grid-column:7/11;grid-row:3;margin-top:68px}
 /* On screens wider than 1440 px the opening keeps the width it has at 1440 (1360 px inside main's padding), so the paragraph and the facts stay together right under the title (D, Oct. 14) */
 .pp .open{max-width:1360px;margin-inline:auto}
+/* The paragraph and the facts each as wide as their words (the paragraph at most 22em, the facts at most 30em of
+   their size) and centered as a pair under the title, so the opening keeps the title's axis however short the facts
+   are (D, Oct. 14). The title keeps the ten middle columns' width, so it wraps as before. Phones stack (below). */
+@media (min-width:641px){
+  .pp .open{grid-template-columns:minmax(0,1fr) fit-content(calc(22 * var(--b))) clamp(40px,5vw,96px) fit-content(calc(30 * var(--s))) minmax(0,1fr)}
+  .pp .open .kicker,.pp .open h1{grid-column:1/-1;width:calc(100% * 10 / 12 - var(--g) / 6);justify-self:center}
+  .pp .open .lede{grid-column:2;padding-right:0}
+  .pp .open .info{grid-column:4}
+}
 .pp .facts,.pp .cr{font-size:var(--s);line-height:1.45}
 .pp .facts div,.pp .cr div{display:grid;grid-template-columns:8.6em minmax(0,1fr);column-gap:12px;padding:0 0 5px}
 .pp .cr{margin-top:14px}
