@@ -1,0 +1,66 @@
+{
+ "slug": "nice-knives",
+ "title": "“Nice Knives”",
+ "deck": "A still life for a short film, distributed by BAM In Motion.",
+ "client": "“Nice Knives,” directed by Connor Copeland",
+ "year": "2023",
+ "role": "Poster designer",
+ "sector": "Film",
+ "location": "New York City",
+ "lede": "“Nice Knives” is a short film directed by Connor Copeland and distributed by BAM In Motion. Its poster is a still life: a ham on a cutting board with bread, cheese and butter, a knife standing upright, under the title in bright yellow.",
+ "challenge": "“Nice Knives,” a short film directed by Connor Copeland in New York City and distributed by BAM In Motion, needed a poster.",
+ "work": [
+  "The poster is a still life: a ham on a cutting board, with sliced bread, cheese, butter and a glass of eggs, and a knife standing upright. The title runs above it in tall yellow letters."
+ ],
+ "system": [
+  [
+   "The still life",
+   "A ham, bread, cheese and a knife."
+  ],
+  [
+   "The title",
+   "Tall yellow letters."
+  ]
+ ],
+ "deliverables": [
+  "Poster"
+ ],
+ "credits": [
+  [
+   "Design",
+   [
+    "Dalton Corr: poster design"
+   ]
+  ],
+  [
+   "Client",
+   [
+    "“Nice Knives,” directed by Connor Copeland"
+   ]
+  ],
+  [
+   "Partners",
+   [
+    "BAM In Motion: distribution"
+   ]
+  ]
+ ],
+ "links": [],
+ "press": [],
+ "seo": {
+  "title": "Nice Knives, film poster | Opmet Osserpse",
+  "description": "Poster design for Nice Knives, a short film directed by Connor Copeland and distributed by BAM In Motion. New York City, 2023."
+ },
+ "media": [
+  {
+   "slot": "P",
+   "src": "images/cdn/nice-knives/Nice-Knives-poster-copy-2-abc3f0.webp",
+   "alt": "The “Nice Knives” poster: a ham on a cutting board with bread, cheese and butter, a knife standing upright, under the title in yellow."
+  }
+ ],
+ "card": {
+  "src": "images/cards/nice-knives-lg.webp",
+  "alt": "The “Nice Knives” poster."
+ },
+ "og": "images/og/nice-knives.jpg"
+}

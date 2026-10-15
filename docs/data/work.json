@@ -331,10 +331,13 @@
    "tags": [
     "Key art"
    ],
-   "client": null,
-   "lede": null,
-   "url": null,
-   "image": null
+   "client": "“LiTTLE iSSUES,” created by Jana Miley and directed by Jerah Milligan",
+   "lede": "“LiTTLE iSSUES,” created by Jana Miley and directed by Jerah Milligan, is a short film that has won over a dozen awards. Its poster looks in on three people in a warm, dim living room, under the title in round yellow letters.",
+   "url": "https://opmetosserpse.com/projects/little-issues",
+   "image": {
+    "url": "https://opmetosserpse.com/media/little-issues/card-800.webp",
+    "alt": "The “LiTTLE iSSUES” poster."
+   }
   },
   {
    "slug": "kimberla-lawson-roby",
@@ -416,10 +419,13 @@
    "tags": [
     "Key art"
    ],
-   "client": null,
-   "lede": null,
-   "url": null,
-   "image": null
+   "client": "“Nice Knives,” directed by Connor Copeland",
+   "lede": "“Nice Knives” is a short film directed by Connor Copeland and distributed by BAM In Motion. Its poster is a still life: a ham on a cutting board with bread, cheese and butter, a knife standing upright, under the title in bright yellow.",
+   "url": "https://opmetosserpse.com/projects/nice-knives",
+   "image": {
+    "url": "https://opmetosserpse.com/media/nice-knives/card-800.webp",
+    "alt": "The “Nice Knives” poster."
+   }
   },
   {
    "slug": "let-this-feeling-go",
@@ -429,10 +435,13 @@
     "Artwork",
     "Key art"
    ],
-   "client": null,
-   "lede": null,
-   "url": null,
-   "image": null
+   "client": "“Let This Feeling Go,” directed by Andrew De Zen",
+   "lede": "“Let This Feeling Go” was directed by Andrew De Zen in Los Angeles. Its original artwork and poster paint a woman in thick strokes, in two versions, one yellow and white, one red, the title in hand lettering beside her face.",
+   "url": "https://opmetosserpse.com/projects/let-this-feeling-go",
+   "image": {
+    "url": "https://opmetosserpse.com/media/let-this-feeling-go/card-800.webp",
+    "alt": "The “Let This Feeling Go” poster, in yellow and white."
+   }
   },
   {
    "slug": "hollyshorts-website",
@@ -481,10 +490,13 @@
    "tags": [
     "Key art"
    ],
-   "client": null,
-   "lede": null,
-   "url": null,
-   "image": null
+   "client": "“Welcome Home,” directed by Jo Rochelle",
+   "lede": "“Welcome Home” is a short film written and directed by Jo Rochelle. Its poster paints two people sitting on the grass, their backs to us, facing a white house under palm trees and a blue sky, in two versions.",
+   "url": "https://opmetosserpse.com/projects/welcome-home",
+   "image": {
+    "url": "https://opmetosserpse.com/media/welcome-home/card-800.webp",
+    "alt": "The “Welcome Home” poster."
+   }
   },
   {
    "slug": "timewriter",
@@ -522,10 +534,13 @@
     "Web design",
     "Social"
    ],
-   "client": null,
-   "lede": null,
-   "url": null,
-   "image": null
+   "client": "Chop Suey Club",
+   "lede": "Chop Suey Club is a contemporary gallery and design boutique in Manhattan, focused on Chinese artists. The work covered its website and social media, content strategy, sponsorships and live events.",
+   "url": "https://opmetosserpse.com/projects/chop-suey-club",
+   "image": {
+    "url": "https://opmetosserpse.com/media/chop-suey-club/card-180.webp",
+    "alt": "A plain red square."
+   }
   }
  ]
 }

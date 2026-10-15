@@ -1,0 +1,60 @@
+{
+ "slug": "little-issues",
+ "title": "“LiTTLE iSSUES”",
+ "deck": "A poster for a short film that has won over a dozen awards.",
+ "client": "“LiTTLE iSSUES,” created by Jana Miley and directed by Jerah Milligan",
+ "year": "2024",
+ "role": "Poster designer",
+ "sector": "Film",
+ "location": "Los Angeles",
+ "lede": "“LiTTLE iSSUES,” created by Jana Miley and directed by Jerah Milligan, is a short film that has won over a dozen awards. Its poster looks in on three people in a warm, dim living room, under the title in round yellow letters.",
+ "challenge": "“LiTTLE iSSUES,” a short film created by Jana Miley and directed by Jerah Milligan in Los Angeles, needed its poster.",
+ "work": [
+  "The poster looks in on three people in a warm, dim living room, past a figure in the foreground, with the title above them in round yellow letters and the billing below. The film has won over a dozen awards."
+ ],
+ "system": [
+  [
+   "The scene",
+   "Three people in a warm living room."
+  ],
+  [
+   "The title",
+   "Round yellow letters."
+  ]
+ ],
+ "deliverables": [
+  "Poster"
+ ],
+ "credits": [
+  [
+   "Design",
+   [
+    "Dalton Corr: poster design"
+   ]
+  ],
+  [
+   "Client",
+   [
+    "“LiTTLE iSSUES,” created by Jana Miley and directed by Jerah Milligan"
+   ]
+  ]
+ ],
+ "links": [],
+ "press": [],
+ "seo": {
+  "title": "LiTTLE iSSUES, film poster | Opmet Osserpse",
+  "description": "Poster design for LiTTLE iSSUES, a short film created by Jana Miley and directed by Jerah Milligan, winner of over a dozen awards. Los Angeles, 2024."
+ },
+ "media": [
+  {
+   "slot": "P",
+   "src": "images/cdn/little-issues/Little-Issues-2x3-30068c.webp",
+   "alt": "The “LiTTLE iSSUES” poster: three people in a warm, dim living room, under the title in round yellow letters."
+  }
+ ],
+ "card": {
+  "src": "images/cards/little-issues-lg.webp",
+  "alt": "The “LiTTLE iSSUES” poster."
+ },
+ "og": "images/og/little-issues.jpg"
+}

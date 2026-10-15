@@ -1,0 +1,66 @@
+{
+ "slug": "welcome-home",
+ "title": "“Welcome Home”",
+ "deck": "A painted poster for a short film, in two versions.",
+ "client": "“Welcome Home,” directed by Jo Rochelle",
+ "year": "2022",
+ "role": "Poster designer",
+ "sector": "Film",
+ "location": "",
+ "lede": "“Welcome Home” is a short film written and directed by Jo Rochelle. Its poster paints two people sitting on the grass, their backs to us, facing a white house under palm trees and a blue sky, in two versions.",
+ "challenge": "“Welcome Home,” a short film written and directed by Jo Rochelle, needed a poster.",
+ "work": [
+  "The poster is a painting: two people sit on the grass with their backs to us, facing a white house under palm trees and a blue sky, with the title above in tall yellow letters.",
+  "A second version sets the same painting inside a white border, with the title in black."
+ ],
+ "system": [
+  [
+   "The painting",
+   "Two people facing a white house."
+  ],
+  [
+   "Two versions",
+   "Full bleed, and inside a white border."
+  ]
+ ],
+ "deliverables": [
+  "Poster, two versions"
+ ],
+ "credits": [
+  [
+   "Design",
+   [
+    "Dalton Corr: poster design"
+   ]
+  ],
+  [
+   "Client",
+   [
+    "“Welcome Home,” directed by Jo Rochelle"
+   ]
+  ]
+ ],
+ "links": [],
+ "press": [],
+ "seo": {
+  "title": "Welcome Home, film poster | Opmet Osserpse",
+  "description": "Poster design for Welcome Home, a short film directed by Jo Rochelle: two people facing a white house under palm trees, in two versions. 2022."
+ },
+ "media": [
+  {
+   "slot": "P",
+   "src": "images/cdn/welcome-home/Welcome-Home-poster-B1-35c312.webp",
+   "alt": "The “Welcome Home” poster: two people sitting on the grass, their backs to us, facing a white house under palm trees and a blue sky, the title in yellow above."
+  },
+  {
+   "slot": "P",
+   "src": "images/cdn/welcome-home/Welcome-Home-poster-3A-e87fed.webp",
+   "alt": "The second version: the same painting inside a white border, the title in black."
+  }
+ ],
+ "card": {
+  "src": "images/cards/welcome-home-lg.webp",
+  "alt": "The “Welcome Home” poster."
+ },
+ "og": "images/og/welcome-home.jpg"
+}

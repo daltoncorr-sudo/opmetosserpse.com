@@ -1,0 +1,72 @@
+{
+ "slug": "let-this-feeling-go",
+ "title": "“Let This Feeling Go”",
+ "deck": "Original artwork and a poster, in two versions.",
+ "client": "“Let This Feeling Go,” directed by Andrew De Zen",
+ "year": "2023",
+ "role": "Poster designer",
+ "sector": "Film",
+ "location": "Los Angeles",
+ "lede": "“Let This Feeling Go” was directed by Andrew De Zen in Los Angeles. Its original artwork and poster paint a woman in thick strokes, in two versions, one yellow and white, one red, the title in hand lettering beside her face.",
+ "challenge": "“Let This Feeling Go,” directed by Andrew De Zen in Los Angeles, needed original artwork and a poster.",
+ "work": [
+  "The artwork is a portrait of a woman, painted in thick, layered strokes, with the title in hand lettering beside her face.",
+  "It comes in two versions: one in yellow and white around her dark hair, and one in red and orange, in profile, with a long white earring."
+ ],
+ "system": [
+  [
+   "The portrait",
+   "A woman, in thick, layered strokes."
+  ],
+  [
+   "Two versions",
+   "Yellow and white; red and orange."
+  ]
+ ],
+ "deliverables": [
+  "Original artwork",
+  "Poster, two versions"
+ ],
+ "credits": [
+  [
+   "Design",
+   [
+    "Dalton Corr: original artwork and poster design"
+   ]
+  ],
+  [
+   "Client",
+   [
+    "“Let This Feeling Go,” directed by Andrew De Zen"
+   ]
+  ]
+ ],
+ "links": [],
+ "press": [],
+ "seo": {
+  "title": "Let This Feeling Go, artwork and poster | Opmet Osserpse",
+  "description": "Original artwork and poster design for Let This Feeling Go, directed by Andrew De Zen: a woman painted in thick strokes, in two versions. Los Angeles, 2023."
+ },
+ "media": [
+  {
+   "slot": "P",
+   "src": "images/cdn/feeling/Poster-5-title-copy-2-8c4f31.webp",
+   "alt": "The poster in yellow and white: a woman with dark hair, painted in thick strokes, the title lettered beside her face."
+  },
+  {
+   "slot": "P",
+   "src": "images/cdn/feeling/Poster-1G-title-copy-b677f9.webp",
+   "alt": "The poster in red and orange: the woman in profile, with a long white earring."
+  },
+  {
+   "slot": "P",
+   "src": "images/cdn/feeling/Poster-5-title-copy-f24903.webp",
+   "alt": "The yellow and white poster again, at a smaller size."
+  }
+ ],
+ "card": {
+  "src": "images/cards/let-this-feeling-go-lg.webp",
+  "alt": "The “Let This Feeling Go” poster, in yellow and white."
+ },
+ "og": "images/og/let-this-feeling-go.png"
+}

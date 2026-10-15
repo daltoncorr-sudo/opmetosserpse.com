@@ -1007,6 +1007,20 @@
   "photo": false,
   "videos": []
  },
+ "little-issues": {
+  "order": [
+   "Little-Issues-2x3-30068c"
+  ],
+  "blocks": [
+   "single"
+  ],
+  "full": 0,
+  "runs": [],
+  "pieces": [],
+  "lede_words": 42,
+  "photo": false,
+  "videos": []
+ },
  "cannes-2023": {
   "order": [
    "Cannes-Invite-Alt-4-babb06",
@@ -1107,6 +1121,37 @@
   "photo": true,
   "videos": []
  },
+ "nice-knives": {
+  "order": [
+   "Nice-Knives-poster-copy-2-abc3f0"
+  ],
+  "blocks": [
+   "single"
+  ],
+  "full": 0,
+  "runs": [],
+  "pieces": [],
+  "lede_words": 43,
+  "photo": false,
+  "videos": []
+ },
+ "let-this-feeling-go": {
+  "order": [
+   "Poster-5-title-copy-2-8c4f31",
+   "Poster-1G-title-copy-b677f9",
+   "Poster-5-title-copy-f24903"
+  ],
+  "blocks": [
+   "row",
+   "single"
+  ],
+  "full": 0,
+  "runs": [],
+  "pieces": [],
+  "lede_words": 41,
+  "photo": false,
+  "videos": []
+ },
  "hollyshorts-18": {
   "order": [
    "Hollyshorts18-101aba",
@@ -1138,6 +1183,21 @@
   "pieces": [],
   "lede_words": 28,
   "photo": true,
+  "videos": []
+ },
+ "welcome-home": {
+  "order": [
+   "Welcome-Home-poster-B1-35c312",
+   "Welcome-Home-poster-3A-e87fed"
+  ],
+  "blocks": [
+   "row"
+  ],
+  "full": 0,
+  "runs": [],
+  "pieces": [],
+  "lede_words": 39,
+  "photo": false,
   "videos": []
  },
  "hdtracks": {
@@ -1172,6 +1232,16 @@
   ],
   "pieces": [],
   "lede_words": 54,
+  "photo": false,
+  "videos": []
+ },
+ "chop-suey-club": {
+  "order": [],
+  "blocks": [],
+  "full": 0,
+  "runs": [],
+  "pieces": [],
+  "lede_words": 30,
   "photo": false,
   "videos": []
  }
