@@ -111,8 +111,9 @@ for s in finished:
     if not re.search(r'<div class="os" data-page="%s" data-page-js="/js/pages/%s\.js\?v=\w+">' % (s, s), t): problems.append('%s: no part for its script (data-page)' % rel)
 # The order of each project's daltoncorr.com page, as recorded on Oct. 8, 2026 (v02), with the pages D changed on purpose
 # at their new orders (v03, Oct. 10, 2026; the lists in their notes files; v04, Oct. 14: Sunny's studies last; v05, Oct. 15:
-# v04 plus five new pages at their daltoncorr.com orders): the pages must show it, item for item
-record = json.load(open(os.path.join(ROOT, '_review', '2026-10-15_media-order-record_v05.json'), encoding='utf-8'))
+# v04 plus five new pages at their daltoncorr.com orders; v06, Oct. 15: Chop Suey Club's logo, D's): the pages must show it,
+# item for item
+record = json.load(open(os.path.join(ROOT, '_review', '2026-10-15_media-order-record_v06.json'), encoding='utf-8'))
 for i, slug in enumerate(order):
     f = os.path.join(D, 'projects', slug + '.html')
     if not os.path.exists(f): problems.append('projects/%s: in project_order but not built' % slug); continue

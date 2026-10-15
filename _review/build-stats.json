@@ -1236,12 +1236,16 @@
   "videos": []
  },
  "chop-suey-club": {
-  "order": [],
-  "blocks": [],
+  "order": [
+   "csc-logo-lockup-black"
+  ],
+  "blocks": [
+   "cuts"
+  ],
   "full": 0,
   "runs": [],
   "pieces": [],
-  "lede_words": 30,
+  "lede_words": 35,
   "photo": false,
   "videos": []
  }

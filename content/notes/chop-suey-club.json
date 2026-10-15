@@ -5,5 +5,13 @@
  "chapters": [],
  "notes": {},
  "video": {},
- "hide": []
+ "hide": [],
+ "media_src": "D, Oct. 15, 2026: its daltoncorr.com page has no pictures, so the page shows the club's logo, from D (CSC_Logolockup_Black.svg), as a cut-out on the paper. content/media/chop-suey-club/: the SVG as D sent it, and the PNG made from it once for the build.",
+ "media": [
+  {
+   "src": "content/media/chop-suey-club/csc-logo-lockup-black.png",
+   "alt": "The Chop Suey Club logo: a round CSC monogram beside the name, stacked on three lines in squared letters.",
+   "cut": "large"
+  }
+ ]
 }
