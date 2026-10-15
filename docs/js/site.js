@@ -1,31 +1,17 @@
 // Opmet Osserpse: controls, clock, hover previews, quiet video. No tracking, no cookies.
 
-// Controls: one system for every list link, toggle and filter (build.py ctl(), site.css .ctl). The hover sweeps the
-// word's weight with the cursor, thin at its left edge to black at its right; a hidden copy at the heaviest weight holds
-// the width, so nothing moves. Only with a fine pointer that hovers; with reduced motion the word simply turns bold.
+// Controls: one system for every list link, toggle and filter (build.py ctl(), site.css .ctl). The hover turns the word
+// bold, in CSS: a hidden copy at the heaviest weight holds the width, so nothing moves (D, Oct. 15).
 //   opmetCtl.label(el, text): change a control's words (both copies)
 //   opmetFilters(group, pick): one filter row (buttons with data-filter and aria-pressed); pick(key) on a click;
 //     returns set(key), which marks the chosen one
 (function () {
-  var mq = function (q) { return !!(window.matchMedia && matchMedia(q).matches); };
-  var fine = mq('(hover: hover) and (pointer: fine)'), reduce = mq('(prefers-reduced-motion: reduce)'), cur = null;
   window.opmetCtl = {
     label: function (el, text) {
       var w = el.querySelector('.ctl-w'), v = el.querySelector('.ctl-v');
       if (w && v) { w.textContent = v.textContent = text; } else el.textContent = text;
     }
   };
-  function rest(c) { var v = c && c.querySelector('.ctl-v'); if (v) v.style.fontWeight = ''; }
-  if (fine) {
-    document.addEventListener('mousemove', function (e) {
-      var c = e.target.closest ? e.target.closest('.ctl') : null;
-      if (c !== cur) { rest(cur); cur = c; }
-      var v = c && c.querySelector('.ctl-v'); if (!v) return;
-      var r = c.getBoundingClientRect(), t = Math.min(1, Math.max(0, (e.clientX - r.left) / r.width));
-      v.style.fontWeight = reduce ? 700 : Math.round(200 + t * 700);
-    }, { passive: true });
-    document.addEventListener('mouseout', function (e) { if (cur && !(e.relatedTarget && cur.contains(e.relatedTarget))) { rest(cur); cur = null; } });
-  }
   window.opmetFilters = function (group, pick) {
     var buttons = Array.prototype.slice.call(group.querySelectorAll('button[data-filter]'));
     group.addEventListener('click', function (e) {

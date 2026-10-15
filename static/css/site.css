@@ -55,8 +55,8 @@ a:hover{color:var(--graphite)}
 :focus-visible{outline:1px solid var(--ink);outline-offset:3px}
 /* Controls: one system (build.py ctl(), site.js opmetCtl and opmetFilters). Every list link and toggle (See more, See
    less, Home, All work, All articles, the cover's options) and every filter (the Journal's topics, the foundry's row)
-   is a .ctl: the serif italic at one size, in ink. Hover sweeps the word's weight with the cursor, thin at its left to
-   black at its right; a hidden copy at 900 holds the width, so nothing moves. A filter is a .ctl.filter: tag gray, the
+   is a .ctl: the serif italic at one size, in ink. Hover turns the word bold (700), in the one motion value (D, Oct. 15:
+   it used to sweep with the cursor, wider toward its right); a hidden copy at 900 holds the width, so nothing moves. A filter is a .ctl.filter: tag gray, the
    chosen one pure black and bold. Every control is at least 44px square to touch: an invisible target around the word,
    so it takes no more room in its line and a short word (All) still lines up with the words around it. */
 .ctl{position:relative;display:inline-grid;align-items:center;justify-items:center;padding:0;
@@ -66,7 +66,8 @@ a:hover{color:var(--graphite)}
 .ctl:hover,.pp .ctl:hover{color:var(--ink)}
 .ctl-w,.ctl-v{grid-area:1/1;white-space:nowrap}
 .ctl-w{visibility:hidden;font-weight:900}
-.ctl-v{font-weight:400;transition:font-weight .3s var(--ease)}
+.ctl-v{font-weight:400;transition:font-weight var(--t) var(--ease)}
+@media (hover:hover) and (pointer:fine){.ctl:hover .ctl-v{font-weight:700}}
 .ctl.filter{color:var(--tag-gray)}
 .ctl.filter[aria-pressed="true"]{color:var(--black)}
 .ctl.filter[aria-pressed="true"] .ctl-v{font-weight:700}

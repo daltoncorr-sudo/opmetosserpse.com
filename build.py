@@ -193,7 +193,7 @@ def video_tag(v, vid, alt, rest, sound, eager=False, loop=False):
 
 def ctl(text):
     """A control's words (site.css .ctl): the visible word, and a hidden copy at the heaviest weight that holds its
-    width, so the hover sweep (site.js) never moves its neighbors. Every list link, toggle and filter uses it."""
+    width, so the hover to bold (site.css) never moves its neighbors. Every list link, toggle and filter uses it."""
     return '<span class="ctl-w" aria-hidden="true">%s</span><span class="ctl-v">%s</span>' % (esc(text), esc(text))
 
 def brand_svg(name, cls, label=None):
