@@ -168,7 +168,6 @@
 
 /* In use */
 .os .os-use img{display:block;width:100%;height:auto;max-height:85vh;object-fit:contain;background:var(--paper-deep)}
-.os .os-use figcaption{margin-top:var(--s2);color:var(--graphite)}
 
 /* The numbers */
 .os .os-nums{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--s4) var(--gutter)}
@@ -185,3 +184,7 @@
   .os .os-nums{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
 @media (prefers-reduced-motion:reduce){.os *{transition:none!important}}
+/* D, Oct. 15: the pictures speak for themselves. The section headings stay for screen readers (each section is named by
+   its heading) and the demos' readouts stay in the page, out of sight, because the script writes into them. */
+.os h2.os-mh{position:absolute;top:auto;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);clip-path:inset(50%);white-space:nowrap}
+.os .os-out,.os .os-tester-readout{display:none}
