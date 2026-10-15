@@ -619,7 +619,12 @@ def make_blocks(items, notes):
         out.append(dict(kind=kind, items=grp, note=note, cont=bool(cont), stack=kind == 'row' and bool(it.get('row'))))
     return out
 
-def block_html(b, slug):
+def lead(x, research):
+    """On a research page (Red Mask), a line's lead word, as "Art:" or "Fine print:", in ink before the gray"""
+    m = re.match(r'([A-Z][a-z]+(?: [a-z]+)?):\s', x) if research else None
+    return '<span class="lbl-k">%s</span>%s' % (x[:m.end(1) + 1], x[m.end(1) + 1:]) if m else x
+
+def block_html(b, slug, research=False):
     """A block, with its note (if it has one) in the right margin, beside its top. Every picture shows whole: a portrait
     picture or film (.cap) and a row are never taller than about 85vh, centered in their columns (--ar, its width over
     its height; a row's is the sum of its pictures', so they keep one height)."""
@@ -638,7 +643,7 @@ def block_html(b, slug):
             n, t, note = it['lbl']
             notes = [note] if isinstance(note, str) else note or []
             lbl = '<p class="lbl">%s<span class="lbl-t">%s</span>%s</p>' % (
-                '<span class="lbl-n">%s</span>' % esc(n) if n else '', typo(t), ''.join('<span class="lbl-s">%s</span>' % typo(x) for x in notes))
+                '<span class="lbl-n">%s</span>' % esc(n) if n else '', typo(t), ''.join('<span class="lbl-s">%s</span>' % lead(typo(x), research) for x in notes))
         ms.append('<div class="%s" data-i="%s"%s%s>%s%s</div>' % (cls, esc(it['key']), style, skip, it['html'](sizes), lbl))
     if kind == 'row':
         ar = sum(it['w'] / it['h'] for it in b['items'])
@@ -702,7 +707,7 @@ def project_body(p, blocks, chapters, notes, all_work='All work', top='Back to t
             # the label sits in the left margin beside its first block; above it, on its own line, when that block is a full bleed
             out.append('<section class="ch%s" aria-label="%s"><div class="chl g"><h2 class="chap"><span class="n">%d</span>%s</h2></div>'
                        % (' ch-above' if b['kind'] == 'full' or b.get('wide') else '', esc(c['label']), n, typo(c['label'])))
-        out.append(block_html(b, p['slug']))
+        out.append(block_html(b, p['slug'], notes.get('research')))
     if open_ch: out.append('</section>')
     out.append(project_foot(all_work, top, home))
     out.append('</div>')

@@ -8,7 +8,7 @@ import glob, json, os, re, sys
 ROOT = os.path.dirname(os.path.abspath(__file__))
 D = os.path.join(ROOT, 'docs')
 ACRONYMS = {'ASCAP', 'BAFTA', 'NYU', 'IMGN', 'LLC', 'SVG', 'EPS', 'PNG', 'PDF', 'TCL', 'LOOK', 'BAM', 'SCL', 'HTML',
-            'VIII'}  # a Roman numeral, not a word in caps: Red Mask VIII, as its poster prints it (D, Oct. 14)
+            'VIII', 'SDDS'}  # a Roman numeral and a sound format, as Red Mask's posters print them (D, Oct. 14)
 CHECKS = [(r'\bAI\b', 'the word "AI"'), (r'\bBlog\b', 'the word "Blog" (it is the Journal)'), (r'\bvibes?\b', '"vibes"'), (r'Opmetosserpse', 'the name written as one word'), (r'Dalton Corr', "Dalton's name outside the credits"),
           (r'\[D\?|\[DC|\[DB|TODO|Lorem|ipsum', 'a leftover note or placeholder'), (r'\b[A-Z]{4,}\b', 'a word in all caps')]
 
