@@ -324,7 +324,10 @@ html:not(.js) .stage:has(#about:target){transform:translateX(-66.6667%)}
 .cover .mark .coins-still{transition:opacity var(--t) var(--ease);animation:coins-still-in var(--t) var(--ease) .7s both}
 @keyframes coins-still-in{from{opacity:0}}
 .cover .mark.is-live .coins-still{opacity:0;animation:none}
-.coin-over,.coin-over *{cursor:grab}
+/* Each coin's grip (coins.js): an invisible round target riding on the coin, so a touch on a coin never scrolls the
+   page and the cursor reads grab; a tap passes through to whatever is under it */
+.coin-grips{position:absolute;left:0;top:0;width:100%;height:100%;overflow:hidden;pointer-events:none;z-index:2}
+.coin-grip{position:absolute;left:0;top:0;border-radius:50%;pointer-events:auto;touch-action:none;cursor:grab;-webkit-tap-highlight-color:transparent;-webkit-user-select:none;user-select:none}
 .coin-held,.coin-held *{cursor:grabbing;-webkit-user-select:none;user-select:none}
 /* About's rings (D, Oct. 15): Opmet and Osserpse in script, two rings overlapping in the top right corner, the pair
    running down to the right (--loops-tilt, D: a diagonal, down to the right), most of each ring in view (D: we didn't
@@ -360,9 +363,11 @@ html:not(.js) .stage:has(#about:target){transform:translateX(-66.6667%)}
 .coins-work{left:0;bottom:var(--s5)}
 main>.coins-work{left:var(--gutter)}
 [data-home]:has(>.coins-spot),main:has(>.coins-spot){position:relative}
-.coins-area{position:absolute;left:0;right:0;height:min(100%,100vh);height:min(100%,100svh);pointer-events:none;z-index:1}
-.coins-area-bottom{bottom:0}
-[data-home]>.coins-area{left:calc(var(--gutter) * -1);right:calc(var(--gutter) * -1)}  /* the full width of the screen */
+/* Its stage: a track over the list's part of the page (coins.js sets its top) with a window onto it, as tall as the
+   browser window and pinned to it while the page scrolls through the track; the coin lives on the page, the camera pans */
+.coins-track{position:absolute;left:0;right:0;top:0;bottom:0;pointer-events:none;z-index:1}
+[data-home]>.coins-track{left:calc(var(--gutter) * -1);right:calc(var(--gutter) * -1)}  /* the full width of the screen */
+.coins-track>.coins-area{position:sticky;top:0;width:100%;height:100vh;height:100svh;max-height:100%;pointer-events:none}
 .cover .coins-still{position:absolute;left:50%;top:50%;height:calc(100% * var(--coins-scale) * 1.1);width:auto;max-width:none;transform:translate(-50%,-50%)}
 @keyframes arrive{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
 @media (max-width:719px){

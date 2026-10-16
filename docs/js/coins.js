@@ -115,6 +115,12 @@ async function stage(o) {
   const ground = new THREE.Mesh(new THREE.PlaneGeometry(400, 400), new THREE.ShadowMaterial({ opacity: 0.14 }));
   ground.rotation.x = -Math.PI / 2; ground.receiveShadow = true; scene.add(ground);
   const cam = new THREE.PerspectiveCamera(26, 1, 0.5, 400);
+  scene.add(key.target);  // the light follows the stage's ground (frame)
+  // o.track: a track stage (the work list's coin). The scene is the whole track, the list's part of the page, with its
+  // origin at the track's top center, so the list growing below never moves it; the stage (o.area) is a window onto
+  // it that stays pinned to the browser window (sticky, site.css), and the camera pans with the page (view)
+  const track = o.track || null;
+  let dist = 1, camAt = null, placedW = 0;
 
   const world = new C.World({ gravity: new C.Vec3(0, -30, 0) });
   world.allowSleep = true; world.broadphase = new C.SAPBroadphase(world); world.solver.iterations = 14;
@@ -131,7 +137,22 @@ async function stage(o) {
     return { mesh, body };
   });
   const sync = () => coins.forEach(c => { c.mesh.position.copy(c.body.position); c.mesh.quaternion.copy(c.body.quaternion); });
-  const draw = () => r.render(scene, cam);
+  const draw = () => { r.render(scene, cam); placeGrips(); };
+  // Each coin's grip: an invisible round target riding on the coin (site.css .coin-grip). A touch that starts on a coin
+  // is the coin's from the start (touch-action: none), whatever the page was doing (a touch right after Work's smooth
+  // scroll can't be taken over by a script), and the cursor reads grab over a coin; a tap still passes through (through)
+  const grips = document.createElement('div'); grips.className = 'coin-grips'; area.appendChild(grips);
+  coins.forEach(c => { c.grip = document.createElement('span'); c.grip.className = 'coin-grip'; c.grip.hidden = true; grips.appendChild(c.grip); });
+  const gp = new THREE.Vector3();
+  function placeGrips() {
+    const w = canvas.clientWidth, h = canvas.clientHeight, d = 2 * R * kpx;
+    coins.forEach(c => {
+      if (!c.mesh.visible) return;
+      gp.copy(c.mesh.position).project(cam);
+      c.grip.hidden = false; c.grip.style.width = c.grip.style.height = d + 'px';
+      c.grip.style.transform = 'translate(' + ((gp.x + 1) / 2 * w - d / 2) + 'px,' + ((1 - gp.y) / 2 * h - d / 2) + 'px)';
+    });
+  }
   const awake = () => coins.some(c => c.body.world && c.body.sleepState !== C.Body.SLEEPING);
   // Coins resting on each other's edges can rock a hair forever and never fall asleep: once every coin has been nearly
   // still for a second (or the pile has settled off screen), they all sleep, so the drawing stops
@@ -148,24 +169,41 @@ async function stage(o) {
     return ray.ray.intersectPlane(new THREE.Plane(up, -h), new THREE.Vector3());
   }
   function frame() {
-    if (o.place) o.place();
+    if (o.place && placedW !== innerWidth) { o.place(); placedW = innerWidth; }  // placed on load and when the width changes: never as the list opens or closes
     const cr = area.getBoundingClientRect(), b = slot.getBoundingClientRect(), dy = o.shift ? o.shift() : 0;
     const sr = { left: b.left, top: b.top - dy, width: b.width, height: b.height };  // where the slot rests
     if (!cr.width || !cr.height || !sr.height) return null;
-    r.setSize(cr.width, cr.height, false); cam.aspect = cr.width / cr.height;
+    r.setSize(cr.width, cr.height, false); cam.aspect = cr.width / cr.height; cam.updateProjectionMatrix();
     const k = kpx = o.unit / 2 * sr.height * (o.scaled ? parseFloat(getComputedStyle(slot).getPropertyValue('--coins-scale')) || 1 : 1);  // pixels per unit
-    const dist = cr.height / 2 / k / Math.tan(13 * Math.PI / 180);
-    cam.position.set(0, dist * Math.cos(0.10), dist * Math.sin(0.10)); cam.lookAt(0, 0, 0); cam.updateProjectionMatrix(); cam.updateMatrixWorld();
+    dist = cr.height / 2 / k / Math.tan(13 * Math.PI / 180);
     const was = at;
-    at = onGround((sr.left + sr.width / 2 - cr.left) / cr.width * 2 - 1, 1 - (sr.top + sr.height / 2 - cr.top) / cr.height * 2, T / 2);
-    // Four walls at 94% of the visible stage (the cover; the others' at its edges), so no coin can leave it
-    const f = o.walls || 0.94;
-    box = { x0: onGround(-f, 0, 0).x, x1: onGround(f, 0, 0).x, z0: onGround(0, f, 0).z, z1: onGround(0, -f, 0).z };
+    if (track) {  // walls at the track's edges: the coin can go anywhere in the list's part of the page
+      const tr = track.getBoundingClientRect(), f = o.walls || 0.995;
+      at = new THREE.Vector3((sr.left + sr.width / 2 - tr.left - tr.width / 2) / k, T / 2, (sr.top + sr.height / 2 - tr.top) / k);
+      box = { x0: -tr.width / 2 / k * f, x1: tr.width / 2 / k * f, z0: 0.1, z1: tr.height / k - 0.1 };
+      camAt = null; view();
+    } else {
+      cam.position.set(0, dist * Math.cos(0.10), dist * Math.sin(0.10)); cam.lookAt(0, 0, 0); cam.updateMatrixWorld();
+      at = onGround((sr.left + sr.width / 2 - cr.left) / cr.width * 2 - 1, 1 - (sr.top + sr.height / 2 - cr.top) / cr.height * 2, T / 2);
+      // Four walls at 94% of the visible stage (the cover), so no coin can leave it
+      const f = o.walls || 0.94;
+      box = { x0: onGround(-f, 0, 0).x, x1: onGround(f, 0, 0).x, z0: onGround(0, f, 0).z, z1: onGround(0, -f, 0).z };
+    }
     walls[0].position.set(box.x0, 0, 0); walls[1].position.set(box.x1, 0, 0); walls[2].position.set(0, 0, box.z0); walls[3].position.set(0, 0, box.z1);
-    const s = key.shadow.camera, e = Math.hypot(box.x1 - box.x0, box.z1 - box.z0) / 2 + 2;
+    const s = key.shadow.camera, cx = (box.x0 + box.x1) / 2, cz = (box.z0 + box.z1) / 2, e = Math.hypot(box.x1 - box.x0, box.z1 - box.z0) / 2 + 2;
+    key.target.position.set(cx, 0, cz); key.position.set(cx - 8, 16, cz - 7); key.target.updateMatrixWorld();
     s.left = s.bottom = -e; s.right = s.top = e; s.updateProjectionMatrix();
     feel.n = 0;  // the stage may have moved with it: not the page moving
     return was || at;
+  }
+  function view() {  // a track stage: the camera over the part of the track the stage now shows; true when it moved
+    if (!track) return false;
+    const tr = track.getBoundingClientRect(), cr = area.getBoundingClientRect();
+    const cx = (cr.left + cr.width / 2 - tr.left - tr.width / 2) / kpx, cz = (cr.top + cr.height / 2 - tr.top) / kpx;
+    if (camAt && Math.abs(camAt.x - cx) + Math.abs(camAt.z - cz) < 1e-4) return false;
+    camAt = { x: cx, z: cz };
+    cam.position.set(cx, dist * Math.cos(0.10), cz + dist * Math.sin(0.10)); cam.lookAt(cx, 0, cz); cam.updateMatrixWorld();
+    return true;
   }
 
   const rnd = Math.random;
@@ -211,7 +249,7 @@ async function stage(o) {
   const feel = { n: 0, x: 0, y: 0, vx: 0, vy: 0, ax: 0, ay: 0, until: 0, boot: 0 };
   function carry(t, s) {
     if (reduce || !s) return false;
-    const r = area.getBoundingClientRect();
+    const r = (track || area).getBoundingClientRect();  // the page itself: a track stage's window stays put
     if (feel.n === 0) { feel.x = r.left; feel.y = r.top; feel.n = 1; feel.ax = feel.ay = 0; return false; }
     const vx = (r.left - feel.x) / s, vy = (r.top - feel.y) / s; feel.x = r.left; feel.y = r.top;
     const moving = Math.abs(vx) + Math.abs(vy) > 20;
@@ -225,16 +263,16 @@ async function stage(o) {
     world.frictionGravity = pulled || moving ? SLIP : undefined;
     return moving;
   }
-  const stir = () => { if (!reduce && dropped) { feel.until = Math.max(feel.until, performance.now() + 250); start(); } };
+  const stir = () => { if (dropped && (!reduce || track)) { feel.until = Math.max(feel.until, performance.now() + 250); start(); } };  // a track stage pans on every scroll
   addEventListener('scroll', stir, { passive: true, capture: true });
   document.addEventListener('transitionstart', e => { if (e.target.contains && e.target.contains(area)) stir(); }, true);  // a panel sliding
 
   // Render only while a coin is awake or held, or the page is carrying them; pause while the stage is out of sight
   // (scrolled away, a panel or a project open over it, the tab hidden)
-  let raf = 0, last = 0, seen = false, quiet = 0, waiting = false;
+  let raf = 0, last = 0, seen = false, quiet = 0, waiting = false, spotSeen = !o.dropWhen;
   const visible = () => seen && !area.closest('[inert]') && !document.hidden;
-  function start() {
-    if (!dropped) { if (!waiting && visible()) { waiting = true; Promise.resolve(o.ready && o.ready()).then(drop); } return; }
+  function start() {  // the drop waits for its spot to be on screen (o.dropWhen), however the visitor gets there
+    if (!dropped) { if (!waiting && visible() && spotSeen) { waiting = true; Promise.resolve(o.ready && o.ready()).then(drop); } return; }
     if (!raf && visible()) { last = performance.now(); feel.n = 0; feel.boot = 4; raf = requestAnimationFrame(tick); }  // a few frames to tell whether the page is moving
   }
   function tick(t) {
@@ -246,25 +284,27 @@ async function stage(o) {
     world.step(1 / 120, dt, 6);
     quiet = !joint && !carried && calm() ? quiet + dt : 0;
     if (quiet > 1) { rest(); quiet = 0; }
-    const live = joint || awake();
-    if (was || live) { sync(); draw(); }  // and the frame the coins fall asleep
+    const live = joint || awake(), panned = view();
+    if (was || live || panned) { sync(); draw(); }  // and the frame the coins fall asleep, and a track stage's pan
     if (live || carried) raf = requestAnimationFrame(tick);
     else { world.gravity.set(0, -30, 0); world.frictionGravity = undefined; }
   }
-  if ('IntersectionObserver' in window) new IntersectionObserver(e => { seen = e[e.length - 1].isIntersecting; start(); }, { threshold: o.threshold || 0 }).observe(area);
-  else seen = true;
+  if ('IntersectionObserver' in window) {
+    new IntersectionObserver(e => { seen = e[e.length - 1].isIntersecting; start(); }, { threshold: o.threshold || 0 }).observe(track || area);
+    if (o.dropWhen) new IntersectionObserver(e => { spotSeen = e[e.length - 1].isIntersecting; start(); }, { threshold: 0.6 }).observe(o.dropWhen);
+  } else seen = spotSeen = true;
   inertWatch.push(start);
   document.addEventListener('visibilitychange', start);
   let rs = 0;
   const later = () => { cancelAnimationFrame(rs); rs = requestAnimationFrame(reframe); };
   addEventListener('resize', later);
-  if ('ResizeObserver' in window) new ResizeObserver(later).observe(area);
+  if ('ResizeObserver' in window) { const ro = new ResizeObserver(later); ro.observe(area); if (track) ro.observe(track); }  // the track grows and shrinks with the list: its walls follow
 
   // Picking up: a point constraint hangs the coin from the grabbed point, so it tilts and swings with its weight.
   // A miss does nothing: the words and every link under the stage work as before.
   const grip = new C.Body({ mass: 0 }); grip.collisionFilterGroup = 0; grip.collisionFilterMask = 0; world.addBody(grip);
   const lift = 1.25, aim = new THREE.Vector3(), plane = new THREE.Plane(up, -lift);
-  let joint = null, held = null, over = false, hover = null, until = 0, press = null, passing = false;
+  let joint = null, held = null, until = 0, press = null, passing = false;
   function point(e) {
     const cr = area.getBoundingClientRect();
     ndc.set((e.clientX - cr.left) / cr.width * 2 - 1, 1 - (e.clientY - cr.top) / cr.height * 2); ray.setFromCamera(ndc, cam);
@@ -283,7 +323,11 @@ async function stage(o) {
   // through to whatever is under the coin, so a coin lying on See more, a name or a link never blocks it (D, Oct. 15)
   host.addEventListener('pointerdown', e => {
     if (joint || press || e.button !== 0) return;
-    const h = hit(e); if (!h) return;
+    let h = hit(e);
+    if (!h && e.target.classList && e.target.classList.contains('coin-grip') && dropped && visible()) {  // the grip's edge, past the coin's own: its middle
+      const c = coins.find(c => c.grip === e.target); h = { object: { parent: c.mesh }, point: c.mesh.position.clone() };
+    }
+    if (!h) return;
     e.preventDefault();
     try { host.setPointerCapture(e.pointerId); } catch (_) {}
     press = { x: e.clientX, y: e.clientY, h, hold: setTimeout(() => grab(), 200) };
@@ -298,7 +342,8 @@ async function stage(o) {
     aim.set(p.x, lift, p.z); host.classList.add('coin-held'); start();
   }
   function through(x, y) {  // a tap: the click goes to the link or button under the coin
-    const t = document.elementFromPoint(x, y), c = t && t.closest('a, button, summary, label, [role="button"]');
+    grips.style.display = 'none'; const t = document.elementFromPoint(x, y); grips.style.display = '';
+    const c = t && t.closest('a, button, summary, label, [role="button"]');
     until = performance.now() + 400;  // the browser's own click from this tap never lands twice
     if (c) { passing = true; c.click(); passing = false; }
   }
@@ -312,17 +357,9 @@ async function stage(o) {
       if (ray.ray.intersectPlane(plane, aim)) { aim.x = clamp(aim.x, box.x0 + R, box.x1 - R); aim.z = clamp(aim.z, box.z0 + R, box.z1 - R); }
       return;
     }
-    if (e.pointerType !== 'mouse') return;
-    if (!hover) requestAnimationFrame(() => {  // the cursor: grab over a coin, the default elsewhere
-      const o = !!hit(hover); hover = null;
-      if (o !== over) { over = o; host.classList.toggle('coin-over', o); }
-    });
-    hover = { clientX: e.clientX, clientY: e.clientY };
   });
-  host.addEventListener('pointerleave', () => { if (over) { over = false; host.classList.remove('coin-over'); } });
   ['pointercancel', 'lostpointercapture'].forEach(n => host.addEventListener(n, () => { if (press) { clearTimeout(press.hold); press = null; } release(); }));
-  // On a phone, a touch that starts on a coin drags it; anywhere else it scrolls the page as always
-  host.addEventListener('touchstart', e => { if (joint || press || (e.touches.length === 1 && hit(e.touches[0]))) e.preventDefault(); }, { passive: false });
+  // On a phone, a touch that starts on a coin drags it (its grip takes no scroll); anywhere else it scrolls as always
   // The click that ends a pick-up never reaches a link under the coin (a tap's own, passed through, does)
   addEventListener('click', e => { if (!passing && performance.now() < until && host.contains(e.target)) { e.preventDefault(); e.stopPropagation(); } }, true);
 
@@ -341,36 +378,41 @@ function cover(slot) {
   afterPaint().then(() => stage({ host: sec, area: sec, slot, unit: 0.56, scaled: true, pile: coverPile, shift,
     fail: () => still(slot), shown: () => slot.classList.add('is-live') }));
 }
-// The work list's coin (D, Oct. 15): a spot (build.py coins_spot) marks where and how big, placed beside the list's last
-// name; the stage covers the screen around it, the list's last. It loads when the stage nears the screen, and drops once
-// it is mostly in view.
+// The work list's coin (D, Oct. 15): a spot (build.py coins_spot) marks where and how big, right next to the list's last
+// name; the stage is a track over the list's part of the page with a window onto it pinned to the browser window, so the
+// coin can be seen, picked up and thrown wherever it is on screen, and dragged anywhere in that part of the page. It
+// loads as the list nears the screen and drops once its spot is on screen, however the visitor gets there (Work, a
+// scroll, a link to /#work).
 function spot(el) {
-  const host = el.parentElement, area = document.createElement('div');
-  area.className = 'coins-area coins-area-bottom';
-  area.setAttribute('aria-hidden', 'true'); host.insertBefore(area, el);
-  const list = document.querySelector(el.getAttribute('data-beside')), place = list ? () => beside(el, host, list, area) : null;
+  const host = el.parentElement, track = document.createElement('div'), area = document.createElement('div');
+  track.className = 'coins-track'; track.setAttribute('aria-hidden', 'true'); area.className = 'coins-area';
+  track.appendChild(area); host.insertBefore(track, el);
+  const list = document.querySelector(el.getAttribute('data-beside')), place = list ? () => beside(el, host, list, track) : null;
   if (place) place();
-  const go = () => stage({ host, area, slot: el, unit: 1, pile: onePile, threshold: 0.5, walls: 0.995, place });
+  const go = () => stage({ host, area, track, slot: el, unit: 1, pile: onePile, walls: 0.995, place, dropWhen: el, ready: () => atRest(track) });
   if (!('IntersectionObserver' in window)) return afterPaint().then(go);
   const io = new IntersectionObserver(e => { if (e.some(x => x.isIntersecting)) { io.disconnect(); afterPaint().then(go); } }, { rootMargin: '50% 0px' });
-  io.observe(area);
+  io.observe(track);
 }
 
-// At the list's bottom left, level with its last name (D, Oct. 15), in the margin left of where the open list's years
-// sit (the list glides left to its column's edge when it opens, its years 40px further out), so neither state covers
-// it; on a phone, with no margin, just under the last name. Opening or closing the list never moves a coin (D, Oct. 15):
-// its stage is pinned around it, so the list growing below doesn't carry it off, and rows that come under a coin stay
-// clickable through it (a tap passes through). Placed on load and on a resize only.
-function beside(el, host, list, area) {
+// The page at rest: the coin drops once the scroll that brought its spot into view (Work glides there) has stopped,
+// so the page's motion doesn't push it off its spot as it lands
+function atRest(el) {
+  return new Promise(ok => { let y = null, calm = 0; (function f() { const t = el.getBoundingClientRect().top; calm = t === y ? calm + 1 : 0; y = t; if (calm >= 8) ok(); else requestAnimationFrame(f); })(); });
+}
+
+// Right next to the list's last name, at its left, the coin's bottom on the name's (D, Oct. 15); on a phone, with no
+// margin, just under it. Placed on load and when the width changes, never as the list opens or closes: the coin stays
+// where it is (D), and rows that come under it stay clickable through it (a tap passes through). The track runs from
+// the top of the list's section to the bottom of the page.
+function beside(el, host, list, track) {
   const rows = [...list.children].filter(r => r.getClientRects().length), last = rows[rows.length - 1]; if (!last) return;
-  const name = last.querySelector(':scope > a, :scope > .plain') || last, yr = list.querySelector('.yr'), col = list.closest('section') || list;
+  const name = last.querySelector(':scope > a, :scope > .plain') || last, col = list.closest('section') || list;
   const at = n => { let x = 0, y = 0; for (let e = n; e && e !== host; e = e.offsetParent) { x += e.offsetLeft; y += e.offsetTop; if (!host.contains(e.offsetParent)) break; } return [x, y]; };
-  const [nx, ny] = at(name), bottom = ny + name.offsetHeight, margin = yr ? 40 + yr.offsetWidth : 0;
-  const d = el.offsetWidth, gap = 24, x = at(col)[0] - margin - gap - d, room = x + host.getBoundingClientRect().left >= 16;
-  const left = room ? x : nx + (parseFloat(list.style.translate) || 0), top = room ? bottom - d : bottom + gap;
-  el.style.left = left + 'px'; el.style.top = top + 'px'; el.style.bottom = 'auto';
-  const h = Math.min(host.clientHeight, innerHeight);  // the stage: a screen tall, centered on the coin, inside the host
-  area.style.height = h + 'px'; area.style.top = clamp(top + d / 2 - h / 2, 0, host.clientHeight - h) + 'px'; area.style.bottom = 'auto';
+  const [nx, ny] = at(name), left = nx + (parseFloat(list.style.translate) || 0), bottom = ny + name.offsetHeight;
+  const d = el.offsetWidth, gap = 24, x = left - gap - d, room = x + host.getBoundingClientRect().left >= 16;
+  el.style.left = (room ? x : left) + 'px'; el.style.top = (room ? bottom - d : bottom + gap) + 'px'; el.style.bottom = 'auto';
+  track.style.top = at(col)[1] + 'px';
 }
 
 /* ---------------- the headers: one coin where the hand was ---------------- */
