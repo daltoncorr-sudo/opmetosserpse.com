@@ -289,7 +289,9 @@ def page(site, title, desc, path, body, og_image=None, current=None, extra_head=
 <meta name="twitter:description" content="%(desc)s">
 <meta name="twitter:image" content="https://%(domain)s%(og)s">
 <meta name="theme-color" content="#F7F6F2">
-<link rel="icon" href="/brand/hand-mark.svg" type="image/svg+xml">
+<link rel="icon" href="%(fav32)s" type="image/png" sizes="32x32">
+<link rel="icon" href="%(fav64)s" type="image/png" sizes="64x64">
+<link rel="apple-touch-icon" href="%(fav180)s">
 <link rel="preload" href="/fonts/instrument-sans/instrument-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/fonts/opmet-serif/opmet-serif.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/fonts/opmet-serif/opmet-serif-italic.woff2" as="font" type="font/woff2" crossorigin>
@@ -309,7 +311,8 @@ def page(site, title, desc, path, body, og_image=None, current=None, extra_head=
            place=esc(site['clock_place']), body=body, name=esc(site['name']), descr=esc(site['description'].rstrip('.')),
            email=site['email'], line=esc(site['line']), copy=esc(site['copyright']), privacy=esc(site['privacy_line']),
            v=site['_v'], extra=extra_head, ink=ink_filters(), page_cls=page_cls, og_type=og_type, main_cls=' class="%s"' % main_cls if main_cls else '',
-           data=data, coins=coins)
+           data=data, coins=coins, fav32=coin_url('opmet-favicon-32.png'), fav64=coin_url('opmet-favicon-64.png'),
+           fav180=coin_url('opmet-favicon-180.png'))  # the favicon: the dark hand coin (D, Oct. 16)
 
 def write(path, text):
     full = os.path.join(DIST, path.lstrip('/'))
