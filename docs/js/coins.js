@@ -228,10 +228,16 @@ async function stage(o) {
   function reframe() {
     const was = frame(); if (!was || !dropped) return;
     release();
-    if (o.aim) {  // the same jitter, the new spots: each coin moves to its spot and the pile settles
-      const pts = landing();
-      coins.forEach((c, i) => { c.body.position.x = pts[i].x; c.body.position.z = pts[i].z; c.body.aabbNeedsUpdate = true; c.body.wakeUp(); });
-      settle(); sync(); draw(); return;
+    if (o.aim) {  // the same jitter, the new spots: the composition is laid again, coin by coin in drop order, each settled
+      const pts = landing();  // before the next lands (sliding resting coins across would knock a leaning one over)
+      coins.forEach(c => { if (c.body.world) world.removeBody(c.body); });
+      coins.forEach((c, i) => {
+        const b = c.body, p = pts[i];
+        b.position.set(p.x, T / 2 + p.y, p.z); b.velocity.set(0, 0, 0); b.angularVelocity.set(0, 0, 0); b.quaternion.setFromEuler(0, p.yaw, 0);
+        world.addBody(b); b.wakeUp(); c.mesh.visible = true;
+        for (let k = 0; k < 600 && awake(); k++) world.step(1 / 120);
+      });
+      rest(); sync(); draw(); return;
     }
     const dx = at.x - was.x, dz = at.z - was.z; let moved = false;
     coins.forEach(({ body: b }) => {
@@ -422,6 +428,10 @@ function coverSpots(j, g) {
   ];
   sp[2].px = sp[1].px - 0.6 * d; sp[2].py = sp[1].py;
   sp[4].px = sp[3].px + 1.1 * d; sp[4].py = sp[3].py + 0.22 * d;  // close, not touching (a tenth of a coin), a little lower (D, Oct. 16)
+  if (sp[4].py + 0.5 * d + 16 > Math.min(cr.bottom, innerHeight)) {  // a short screen (a phone turned): beside the nav's left end instead
+    sp[4].px = V.left - 0.3 * d - 0.5 * d; sp[4].py = (V.top + V.bottom) / 2 + 0.11 * d;
+    sp[3].px = sp[4].px - 1.1 * d; sp[3].py = sp[4].py - 0.22 * d;
+  }
   sp.forEach((p, i) => { p.px += j[i].dx * d; p.py += j[i].dy * d; p.yaw = j[i].yaw; p.tilt = 0.04; p.spin = 0.4; });
   const hit = (x, y) => [N, V].some(q => Math.hypot(Math.max(q.left - x, 0, x - q.right), Math.max(q.top - y, 0, y - q.bottom)) < r + gap);
   const cx = N.left + N.width / 2, cy = N.top + N.height / 2;
