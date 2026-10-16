@@ -326,13 +326,20 @@ html:not(.js) .stage:has(#about:target){transform:translateX(-66.6667%)}
 .cover .mark.is-live .coins-still{opacity:0;animation:none}
 .coin-over,.coin-over *{cursor:grab}
 .coin-held,.coin-held *{cursor:grabbing;-webkit-user-select:none;user-select:none}
-/* About's rings (D, Oct. 15): Opmet and Osserpse in script, two rings overlapping at the top right, cut off by the
-   panel's top and right edges and kept above the text (--loops-h, the room above it), each turning slowly on its own
-   center, the two opposite ways, while About is open; still with reduced motion. --loops-tilt turns the pair. */
-.about-panel{--loops-h:calc(12vh + 6px + clamp(32px,7vw,120px));--loop-d:calc(var(--loops-h) * 2.3);--loops-tilt:0deg}
+/* About's rings (D, Oct. 15): Opmet and Osserpse in script, two rings overlapping at the top right, the pair running
+   down to the right (--loops-tilt, D: a diagonal, down to the right), cut off by the panel's top and right edges, the
+   Osserpse ring's center 0.3 of a ring in from the right edge. Large (--loop-d), and kept above the text: the pair's
+   lowest point, once tilted, rests on --loops-h, the room above it. Each ring turns slowly on its own center, the two
+   opposite ways, while About is open; still with reduced motion. In the pair (1.7 x 1.07 rings), the Opmet ring
+   (1.07 across) is centered 0.315 left of the pair's center and the Osserpse ring (1 across) 0.35 right of it; their
+   swashes reach 0.554 and 0.531 from their centers as they turn. */
+.about-panel{--loops-h:calc(12vh + 6px + clamp(32px,7vw,120px));--loop-d:calc(var(--loops-h) * 2.3);--loops-tilt:30deg}
 @media (max-width:599px){.about-panel{--loops-h:calc(12vh - 8px)}}  /* phones: above the Home row */
-.loops{position:absolute;left:0;right:0;top:0;height:var(--loops-h);overflow:hidden;pointer-events:none}
-.loops-pair{position:absolute;right:calc(var(--loop-d) * -.2);bottom:0;width:calc(var(--loop-d) * 1.7);height:calc(var(--loop-d) * 1.07);transform:rotate(var(--loops-tilt))}
+.loops{position:absolute;left:0;right:0;top:0;height:calc(var(--loops-h) + 2px);overflow:hidden;pointer-events:none}
+.loops-pair{position:absolute;width:calc(var(--loop-d) * 1.7);height:calc(var(--loop-d) * 1.07);transform:rotate(var(--loops-tilt));
+  right:calc(var(--loop-d) * -.247);top:calc(var(--loops-h) - 2px - var(--loop-d) * 1.241);  /* at 30deg, for browsers without CSS sin() and cos() */
+  right:calc(var(--loop-d) * (.35 * cos(var(--loops-tilt)) - .55));
+  top:calc(var(--loops-h) - 2px - var(--loop-d) * (max(.35 * sin(var(--loops-tilt)) + .531, .554 - .315 * sin(var(--loops-tilt))) + .535))}
 .loop{position:absolute;top:50%;max-width:none;will-change:transform;animation:loop-turn 90s linear infinite paused}
 .loop-osserpse{right:0;width:var(--loop-d);height:var(--loop-d);margin-top:calc(var(--loop-d) * -.5)}
 .loop-opmet{left:0;width:calc(var(--loop-d) * 1.07);height:calc(var(--loop-d) * 1.07);margin-top:calc(var(--loop-d) * -.535);animation-direction:reverse}
