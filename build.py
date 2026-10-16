@@ -205,6 +205,20 @@ def brand_svg(name, cls, label=None):
     a11y = 'role="img" aria-label="%s"' % label if label else 'aria-hidden="true"'
     return s.replace('<svg ', '<svg class="%s" %s focusable="false" ' % (cls, a11y), 1)
 
+# The stone coins (D, Oct. 15, 2026): three carved stone coins on the cover, in the hand's slot, and one coin where the
+# hand was at the top of every inner page. The models and stills are in static/brand/coins/; static/js/coins.js draws
+# them with three.js and cannon-es (static/js/vendor/coins/). A model's address carries its fingerprint, so a new file
+# loads fresh; the header coin's still is site.css's.
+COIN_LABEL = "Three carved stone coins, each with the studio's hand"
+def coin_url(name):
+    with open(os.path.join(ROOT, 'static', 'brand', 'coins', name), 'rb') as f:
+        return '/brand/coins/%s?v=%s' % (name, hashlib.sha1(f.read()).hexdigest()[:10])
+
+def header_coin(cls, hooks=''):
+    """One coin where a header's hand was: the still at once, the live coin on a fine pointer (coins.js). It keeps the
+    hand's element, classes and data- hooks, at the hand's size: the coin itself bleeds past it (site.css .coin)."""
+    return '<span class="%s coin"%s data-coin="%s" aria-hidden="true"></span>' % (cls, hooks, coin_url('opmet-coin_alabaster_header.glb'))
+
 
 # The stamped ink on the hand and the name: a static SVG filter applied at render time, never to the masters.
 # Edge wobble (turbulence into displacement), a light blur re-sharpened into bleed, and a second, low-frequency
@@ -233,9 +247,12 @@ def page(site, title, desc, path, body, og_image=None, current=None, extra_head=
     # The machine-readable layer, last in the head and invisible: the data feeds, then one JSON-LD block
     data = ''.join('<link rel="alternate" type="application/json" href="%s" title="%s">\n' % f for f in FEEDS) + ld_script(ld_graph(site) + list(ld))
     og = og_image or '/media/site/og.jpg'
-    # No menu bar. Inner pages carry only the hand and the name (live text, in Opmet Serif Black Italic), centered, back to the cover.
-    header = '' if path == '/' or not header else ('<header class="site-header"><a class="lockup" href="/">%s<span class="wordmark">%s</span></a></header>'
-                                     % (brand_svg('hand-mark.svg', 'lockup-hand'), esc(site['name'])))
+    # No menu bar. Inner pages carry only the coin and the name (live text, in Opmet Serif Light), centered, back to the
+    # cover. data-w: the name in Black, hidden, holds the box it had (site.css), so nothing moves.
+    header = '' if path == '/' or not header else ('<header class="site-header"><a class="lockup" href="/">%s<span class="wordmark" data-w="%s">%s</span></a></header>'
+                                     % (header_coin('lockup-hand'), esc(site['name']), esc(site['name'])))
+    # The coins' module, on the pages that have a coin (the cover, every header)
+    coins = '<script type="module" src="/js/coins.js?v=%s"></script>\n' % site['_cv'] if 'data-coin' in header + body else ''
     # Which way the page flips: forward onto a project, back onto home
     page_cls = ' class="page-home"' if path == '/' else ' class="page-project"' if path.startswith('/projects/') and path != '/projects/' else ''
     nav = header
@@ -272,13 +289,13 @@ def page(site, title, desc, path, body, og_image=None, current=None, extra_head=
 %(body)s
 </main>
 <script src="/js/site.js?v=%(v)s" defer></script>
-</body>
+%(coins)s</body>
 </html>
 ''' % dict(title=esc(title), desc=esc(desc), url=url, domain=site['domain'], og=og, nav=nav, tz=site['clock_timezone'],
            place=esc(site['clock_place']), body=body, name=esc(site['name']), descr=esc(site['description'].rstrip('.')),
            email=site['email'], line=esc(site['line']), copy=esc(site['copyright']), privacy=esc(site['privacy_line']),
            v=site['_v'], extra=extra_head, ink=ink_filters(), page_cls=page_cls, og_type=og_type, main_cls=' class="%s"' % main_cls if main_cls else '',
-           data=data)
+           data=data, coins=coins)
 
 def write(path, text):
     full = os.path.join(DIST, path.lstrip('/'))
@@ -459,7 +476,7 @@ def headers_file():
         "default-src 'self'",
         "script-src 'self' %s %s" % (' '.join(inline_script_hashes()), STRIPE_SCRIPT),
         "style-src 'self' 'unsafe-inline'",
-        "img-src 'self' data:",
+        "img-src 'self' data: blob:",  # blob: for the coins: GLTFLoader decodes their textures through blob: URLs in Safari
         "font-src 'self'",
         "media-src 'self'",
         "connect-src 'self' %s" % STRIPE_CONNECT,
@@ -991,13 +1008,13 @@ def article(e, w):
 # that file is ever removed, the hand mark stands in, turned to write. A hook for the later "write Journal" move:
 # [data-journal-hand] is the hand, [data-journal-word] the word it writes. On a project page, the studio's hand mark,
 # upright, in the same place beside "Osserpse" (pending D's OK).
+# Since Oct. 15, 2026 (D), a stone coin stands where each hand was (header_coin), in the same element with its hooks.
 def journal_hand():
     pose = 'writing' if os.path.exists(os.path.join(ROOT, 'static', 'brand', 'writing-hand.svg')) else 'stand-in'
-    art = brand_svg('writing-hand.svg' if pose == 'writing' else 'hand-mark.svg', 'mast-hand-art')
-    return '<span class="mast-hand" data-journal-hand data-pose="%s" aria-hidden="true">%s</span>' % (pose, art)
+    return header_coin('mast-hand', ' data-journal-hand data-pose="%s"' % pose)
 
 def studio_hand():
-    return '<span class="mast-hand" data-pose="mark" aria-hidden="true">%s</span>' % brand_svg('hand-mark.svg', 'mast-hand-art')
+    return header_coin('mast-hand', ' data-pose="mark"')
 
 NAME = ('Opmet', 'Osserpse')
 
@@ -1009,11 +1026,11 @@ def masthead(words, hand, hook='', line=None, link=None, last_attr='', lockup=Fa
     Journal's panel back to the cover; data-cover closes a project to the cover); without it, a plain link to /.
     lockup: the studio's nameplate (a project page): the hand first, then the words on one line, small, the pair
     centered (D, Oct. 13)."""
-    word = esc
-    first = ' '.join('<span>%s</span>' % word(x) for x in words[:-1])
-    last = '<span class="mast-last"><span class="mast-word"%s>%s</span>%s</span>' % (last_attr, word(words[-1]), hand)
+    word = esc  # data-w: the words in Black, hidden, hold the boxes they had (the name is Light, D, Oct. 15; site.css)
+    first = ' '.join('<span data-w="%s">%s</span>' % (word(x), word(x)) for x in words[:-1])
+    last = '<span class="mast-last"><span class="mast-word" data-w="%s"%s>%s</span>%s</span>' % (word(words[-1]), last_attr, word(words[-1]), hand)
     if lockup:  # the hand, then the words, one a line
-        first, last = hand, '<span class="mast-words">%s</span>' % ' '.join('<span>%s</span>' % word(x) for x in words)
+        first, last = hand, '<span class="mast-words" data-w="%s">%s</span>' % (word(' '.join(words)), ' '.join('<span>%s</span>' % word(x) for x in words))
     under = '<p class="journal-line">%s</p>' % typo(line) if line else ''
     # home: Home beside All work (a project page, D, Oct. 9), back to the cover like the nameplate (data-cover)
     if link: under += '<p class="mast-link"><a class="ctl" href="%s" data-all-work>%s</a>%s</p>' % (
@@ -1111,6 +1128,7 @@ def main():
     for f in ('static/css/site.css', 'static/js/site.js'):
         with open(os.path.join(ROOT, f), 'rb') as fh: h.update(fh.read())
     site['_v'] = h.hexdigest()[:10]
+    with open(os.path.join(ROOT, 'static/js/coins.js'), 'rb') as fh: site['_cv'] = hashlib.sha1(fh.read()).hexdigest()[:10]
     site['_entity'] = load_entity(site)  # the studio's facts, for the data layer
     wj = {e['slug']: e for e in load(os.path.join(CONTENT, 'work.json'))['projects']}  # each project's list title and tags
     index = load(os.path.join(CONTENT, 'index.json'))
@@ -1268,10 +1286,10 @@ def main():
     write('/projects/index.html', page(site, pr['og_title'], pr['og_description'], '/projects/', body, so, '/projects',
                                        ld=collection_ld(site, listed, wj)))
 
-    # home: the hand and the name, alone on the first screen. Scroll for the studio, then the index.
+    # home: the coins and the name, alone on the first screen. Scroll for the studio, then the index.
     h = site['home']
-    hand = moves.hand_svg()  # the rig in moves/_rig/ if there is one, else static/brand/hand.svg
-    # The hand's moves: one folder each in moves/ (see moves.py and moves/README.md).
+    # The hand's moves: one folder each in moves/ (see moves.py and moves/README.md). The coins took the hand's place on
+    # the cover (D, Oct. 15, 2026); the moves stay in the repo, checked and built, unused.
     mv = moves.load()
     if mv['problems']:
         sys.exit('Fix the hand moves first:\n  ' + '\n  '.join(mv['problems']))
@@ -1341,10 +1359,13 @@ def main():
           '<link rel="canonical" href="https://%s%s"><meta http-equiv="refresh" content="0; url=%s">'
           '<meta name="robots" content="noindex"><script>location.replace("%s")</script></head>'
           '<body><p><a href="%s">%s</a></p></body></html>\n' % (esc(to_title), site['domain'], to, to, to, to, esc(to_name)))
-    # The hand and the name: the name is live text in Opmet Serif Black, upright (static/fonts/opmet-serif/opmet-serif.woff2)
-    cover = ('<section class="cover"><div class="cover-inner"><h1><span class="mark" %s>%s</span><span class="name">%s</span></h1>'
+    # The coins and the name: the name is live text in Opmet Serif, upright (static/fonts/opmet-serif/opmet-serif.woff2).
+    # The hand's slot (.mark) holds the coins: coins.js drops them there, or puts the still in it when 3D can't run.
+    cover = ('<section class="cover"><div class="cover-inner"><h1><span class="mark" role="img" aria-label="%s" data-coins="%s" data-coins-still="%s">'
+             '<noscript><img class="coins-still" src="%s" alt=""></noscript></span><span class="name">%s</span></h1>'
              '<nav class="cover-nav" aria-label="Site">%s</nav></div></section>') % (
-        moves.mark_attrs(mv), hand + mv['layers'], esc(site['name']), nav)
+        esc(COIN_LABEL), ' '.join(coin_url('opmet-coin_%s.glb' % k) for k in ('sandstone', 'basalt', 'alabaster')),
+        coin_url('opmet-coins_pile.webp'), coin_url('opmet-coins_pile.webp'), esc(site['name']), nav)
     body = ('<div class="stage-clip"><div class="stage" data-stage>%s<div class="panel home-panel">%s<div data-home>%s%s</div></div>%s</div></div>'
             '<section class="project-panel" id="project" aria-label="Project"><div class="project-inner"></div></section>') % (
         foundry, blog, cover, work_section(items, h['work']), about_panel)
@@ -1353,7 +1374,7 @@ def main():
     early = '<script>if(/^#(%s)([\\/?]|$)/.test(location.hash))document.documentElement.classList.add("at-"+location.hash.slice(1).split(/[\\/?]/)[0])</script>\n' % names
     if a.drafts: early += '<meta name="drafts" content="on">\n'  # check.py lets bracketed placeholders pass in a drafts build
     write('/index.html', page(site, 'Opmet Osserpse', h['og_description'], '/', body, so, '/', main_cls='home-main',
-                              extra_head=early + '<link rel="stylesheet" href="/css/moves.css?v=%s">\n' % site['_v']))
+                              extra_head=early))
 
     # foundry (a holding page until the shop opens; not built while the Foundry is hidden), privacy, 404
     # /foundry is now a panel on the home page: send the old address there, inside this site

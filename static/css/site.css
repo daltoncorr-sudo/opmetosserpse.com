@@ -27,6 +27,8 @@
   --slide:.9s; --slide-ease:cubic-bezier(.65,0,.35,1); --open:.7s;
   /* The cover */
   --hand-h:clamp(120px,24vh,260px); --hand-w:calc(var(--hand-h) * .484); --lockup-gap:clamp(18px,2vw,32px);
+  /* The stone coins (D, Oct. 15, 2026): a cover coin's diameter is 0.56 of the slot's height times this */
+  --coins-scale:1;
   /* One spacing scale, used everywhere on home */
   --s1:8px; --s2:16px; --s3:24px; --s4:40px; --s5:64px; --s6:104px;
   --margin:clamp(20px,3.4vw,56px);
@@ -39,6 +41,8 @@
   --title-font:var(--serif); --title-weight:900;
   /* The exception (D, Oct. 15): the cover's name and the About text are Opmet Serif regular, not Black */
   --name-weight:400;
+  /* The name beside the coin at the top of inner pages: Opmet Serif Light (D, Oct. 15) */
+  --header-name-weight:300;
   /* Controls: one face and size for every list link, toggle and filter; pure black only for the chosen filter */
   --ctl-font:var(--serif); --ctl-size:clamp(17px,1.35vw,20px); --black:#000;
 }
@@ -104,8 +108,20 @@ ul{list-style:none;margin:0;padding:0}
 /* Inner pages: the name only, centered. No menu bar. */
 .site-header{position:relative;display:flex;justify-content:center;padding:28px var(--gutter) 0}
 .lockup{display:flex;align-items:flex-end;gap:13px;color:var(--ink)}
-.lockup-hand{display:block;height:42px;width:auto}
-.lockup .wordmark{display:block;margin-bottom:4px;font:var(--title-weight) calc(168px / 9.95)/1.17 var(--title-font);white-space:nowrap}  /* 168px wide, upright (9.95em) */
+.lockup-hand{display:block;height:42px;width:calc(42px * 793.4 / 1830.2)}  /* the hand mark's box; the coin bleeds up and left of it */
+.lockup .wordmark{display:block;margin-bottom:4px;font:var(--header-name-weight) calc(168px / 9.95)/1.17 var(--title-font);white-space:nowrap}  /* 168px wide in Black, upright (9.95em) */
+/* The name in Light at its Black width: a hidden copy in Black (data-w, build.py) holds the box, so nothing moves */
+.lockup .wordmark::after,.mast-lockup .mast-words::after,.journal .mast-name>span[data-w]::after,.journal .mast-word::after{content:attr(data-w);display:block;height:0;overflow:hidden;visibility:hidden;white-space:nowrap;font-weight:var(--title-weight)}
+/* The coin where the hand was (D, Oct. 15, 2026; static/js/coins.js): about 1.5 times the hand's height, 64px (48px on
+   phones), drawn past the hand's box into the header's top padding, so the header and everything below keep their
+   places. The still at once; on a fine pointer the live coin fades in over it. The still's disc has a 7% margin. */
+.coin{--coin:64px;--coin-x:calc(var(--coin) * -.07);--coin-y:0px;position:relative}
+.coin::before,.coin canvas{content:"";position:absolute;right:var(--coin-x);bottom:var(--coin-y);width:var(--coin);height:var(--coin);pointer-events:none}
+.coin::before{background:url(/brand/coins/opmet-coin_header.webp) 50%/contain no-repeat;transition:opacity 0s var(--t)}
+.coin canvas{display:block;opacity:0;transition:opacity var(--t) var(--ease)}
+.coin.is-live::before{opacity:0}
+.coin.is-live canvas{opacity:1}
+@media (max-width:640px){.coin{--coin:48px}}
 main{padding:0 var(--gutter);flex:1}
 
 /* Home: a stage of three panels. The foundry is one screen to the left of home, About one screen to the right. */
@@ -153,6 +169,10 @@ html.is-locked{overflow:hidden}
 .mast-hand-art{display:block;height:100%;width:auto}
 .mast-hand[data-pose="stand-in"]{height:1em;transform:rotate(-24deg);transform-origin:0 100%}
 .mast-hand[data-pose="mark"]{left:calc(100% + .1em)}
+.mast-hand[data-journal-hand]{width:calc(1.18em * 1039 / 863);--coin:calc(1.18em * 1.5);--coin-x:auto}
+.mast-hand[data-journal-hand]::before,.mast-hand[data-journal-hand] canvas{left:0}
+.journal .mast .mast-name{font-weight:var(--header-name-weight)}  /* the name and Journal in Light (D, Oct. 15) */
+.journal .mast-word{display:inline-grid}  /* its baseline stays the word's, with the Black copy under it */
 .journal-line{margin:18px 0 0;font:400 20px/1.4 var(--serif);letter-spacing:.01em;color:var(--tag-gray)}
 .mast .mast-link{display:flex;flex-wrap:wrap;justify-content:center;gap:0 var(--s3);margin:var(--s3) 0 0}  /* All work, and Home beside it */
 @media (max-width:599px){.journal-line{font-size:18px}}
@@ -179,7 +199,8 @@ html.is-locked{overflow:hidden}
 .journal.is-reading .mast-name{display:grid;grid-template-columns:auto auto;column-gap:.24em;align-items:end}
 .journal.is-reading .mast-name>span,.journal.is-reading .mast-word{grid-column:2}
 .journal.is-reading .mast-last{display:contents}
-.journal.is-reading .mast-hand{position:static;grid-column:1;grid-row:1/span 3;align-self:end;height:2.4em;margin-bottom:.16em}
+.journal.is-reading .mast-hand{position:relative;left:auto;bottom:auto;grid-column:1;grid-row:1/span 3;align-self:end;height:2.4em;margin-bottom:.16em;width:calc(2.4em * 1039 / 863);--coin:calc(2.4em * 1.5);--coin-x:0px}
+.journal.is-reading .mast-hand[data-journal-hand]::before,.journal.is-reading .mast-hand[data-journal-hand] canvas{left:auto}
 .journal.is-reading .journal-line{display:none}
 /* An article: All articles about 40px under the masthead; the date and topic in small sans, the title in bold, then the
    text at the measure with a margin to its right (about 260px) for handwritten notes. */
@@ -281,7 +302,7 @@ html:not(.js) .stage:has(#about:target){transform:translateX(-66.6667%)}
 }
 
 /* The cover: centered. The hand and the name side by side, the words below, then three lines in bold. */
-.cover{height:100vh;height:100svh;min-height:420px;display:flex;align-items:center;justify-content:center;text-align:center}
+.cover{position:relative;height:100vh;height:100svh;min-height:420px;display:flex;align-items:center;justify-content:center;text-align:center}
 .cover-inner{display:flex;flex-direction:column;align-items:center;animation:arrive 1.6s var(--ease) both}
 .cover h1{display:flex;flex-direction:column;align-items:center;gap:var(--s3)}
 .cover .mark{position:relative;display:block;flex:none;height:var(--hand-h);width:var(--hand-w);transform-origin:50% 96%}
@@ -292,6 +313,13 @@ html:not(.js) .stage:has(#about:target){transform:translateX(-66.6667%)}
 .cover .name{display:block;color:var(--ink);--wm-w:clamp(322px,46.2vw,784px);font:var(--name-weight) calc(var(--wm-w) / 9.76)/1.17 var(--title-font);white-space:nowrap}
 .cover-nav{display:flex;flex-wrap:wrap;justify-content:center;gap:var(--s1) var(--s4);margin:var(--s4) 0 0}
 /* The hand on the cover. Each move lives in its own folder under moves/; build.py gathers them into /css/moves.css. */
+/* The stone coins on the cover (D, Oct. 15, 2026; static/js/coins.js): one transparent canvas over the whole cover,
+   the coins drawn at the hand's slot; it takes no clicks, so the name, the nav and every link work as before. A
+   pointer over a coin grabs it. When 3D can't run, the still sits in the slot at the pile's size. */
+.coins-stage{position:absolute;left:0;top:0;width:100%;height:100%;z-index:1;pointer-events:none}
+.cover.coin-over,.cover.coin-over *{cursor:grab}
+.cover.coin-held,.cover.coin-held *{cursor:grabbing;-webkit-user-select:none;user-select:none}
+.cover .coins-still{position:absolute;left:50%;top:50%;height:calc(100% * var(--coins-scale) * 1.1);width:auto;max-width:none;transform:translate(-50%,-50%)}
 @keyframes arrive{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
 @media (max-width:719px){
   :root{--hand-h:clamp(100px,18vh,160px)}
@@ -406,7 +434,8 @@ html:not(.js) .stage:has(#about:target){transform:translateX(-66.6667%)}
 .pp .mast{--mh:clamp(17px,1.3vw,19px);padding-top:clamp(28px,5vh,56px)}
 /* The nameplate: the hand beside Opmet Osserpse, one line, the hand centered on it (D, Oct. 13) */
 .mast .mast-lockup{display:flex;align-items:center;gap:13px;line-height:1.2;letter-spacing:0;width:max-content;max-width:100%;margin:0 auto;text-align:left}
-.mast-lockup .mast-hand{position:static;flex:none;height:42px}
+.mast-lockup .mast-hand{position:relative;left:auto;bottom:auto;flex:none;height:42px;width:calc(42px * 793.4 / 1830.2);--coin-y:calc((42px - var(--coin)) / 2)}
+.mast .mast-lockup .mast-words{font-weight:var(--header-name-weight)}  /* the name in Light (D, Oct. 15) */
 .pp .mast .mast-link{margin-top:14px}
 .pp figure,.pp h1,.pp h2,.pp p,.pp dl,.pp dd{margin:0}.pp h1,.pp h2{font-weight:400}
 .pp .ph{color:var(--gray);font-style:italic}
