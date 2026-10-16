@@ -337,7 +337,7 @@ html:not(.js) .stage:has(#about:target){transform:translateX(-66.6667%)}
    on a phone just under it), on home and /projects/. The spot is the coin's size and place; the stage (.coins-area) is
    the screen around it, the list's last. Without the script it waits at the page's bottom left. */
 .coins-spot{position:absolute;width:var(--coin-d);height:var(--coin-d);pointer-events:none}  /* the cover coin's size (D) */
-.coins-about-area{position:absolute;left:0;top:0;width:100%;pointer-events:none;z-index:1}  /* About's stage (coins.js about) */
+.about-panel .coins-track{bottom:auto}  /* About's stage: a track as tall as its text (coins.js about) */
 .coins-spot>.coins-still{position:absolute;inset:0;width:100%;height:100%;max-width:none}  /* the work list's still, until 3D runs */
 .coins-work{left:0;bottom:var(--s5)}
 main>.coins-work{left:var(--gutter)}

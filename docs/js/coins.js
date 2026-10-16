@@ -206,39 +206,32 @@ async function stage(o) {
     return pts.map(p => ({ ...p, x: clamp(at.x + p.x - cx, box.x0 + R, box.x1 - R), z: clamp(at.z + p.z - cz, box.z0 + R, box.z1 - R) }));
   }
   const toGround = (px, py) => { const cr = area.getBoundingClientRect(); return onGround((px - cr.left) / cr.width * 2 - 1, 1 - (py - cr.top) / cr.height * 2, T / 2); };
+  // Laying the coins (D, Oct. 16: no drop, no click into place; they are simply there, looking settled, when the page
+  // opens): each placed just above its spot, upright, and settled before the next, in order, so a leaning coin comes to
+  // rest on its base, all before anything is drawn. A resize lays them again at their new spots.
+  function lay(pts) {
+    coins.forEach(c => { if (c.body.world) world.removeBody(c.body); });
+    coins.forEach((c, i) => {
+      const b = c.body, p = pts[i];
+      b.position.set(p.x, T / 2 + p.y, p.z); b.velocity.set(0, 0, 0); b.angularVelocity.set(0, 0, 0); b.quaternion.setFromEuler(0, p.yaw, 0);
+      world.addBody(b); b.wakeUp(); c.mesh.visible = true;
+      for (let k = 0; k < 600 && awake(); k++) world.step(1 / 120);
+    });
+    rest();
+  }
   function drop() {
-    frame();
-    jit = o.aim ? coins.map(() => ({ dx: (rnd() - 0.5) * 0.06, dy: (rnd() - 0.5) * 0.06, yaw: (rnd() - 0.5) * 0.5 })) : null;  // ±0.03 d, ±0.25 rad
-    const pts = landing();
-    const add = i => {
-      const coin = coins[i], b = coin.body, p = pts[i];
-      b.position.set(p.x, T / 2 + p.y, p.z);
-      b.velocity.set(0, -0.4, 0); b.angularVelocity.set((rnd() - 0.5) * 1.6 * p.spin, (rnd() - 0.5) * 0.5 * p.spin, (rnd() - 0.5) * 1.6 * p.spin);
-      b.quaternion.setFromEuler((rnd() - 0.5) * p.tilt, p.yaw, (rnd() - 0.5) * p.tilt);
-      world.addBody(b); b.wakeUp(); coin.mesh.visible = true; start(); if (o.landed) o.landed(i);
-    };
+    if (!frame()) { waiting = false; return; }  // not laid out yet: the next resize or view lays them
+    jit = o.aim ? coins.map(() => ({ dx: 0, dy: 0, yaw: 0 })) : null;  // the composition as designed, the same every visit (its stills match)
+    lay(landing());
     dropped = true;
-    if (reduce || !o.seq) coins.forEach((_, i) => add(i));  // reduced motion: all at once, settled below
-    else (function next(i) { add(i); if (i + 1 < coins.length) setTimeout(() => next(i + 1), o.seq); })(0);  // one after another
-    if (reduce) settle();  // reduced motion: the composition already settled
     sync(); draw(); start();
-    canvas.classList.add('is-on'); if (o.shown) o.shown();  // the coins fade in as they fall (site.css)
+    canvas.classList.add('is-on'); if (o.shown) o.shown();
   }
   // A resize, a turn of the phone or a list opening: frame again and move the pile with its slot, settled
   function reframe() {
     const was = frame(); if (!was || !dropped) return;
     release();
-    if (o.aim) {  // the same jitter, the new spots: the composition is laid again, coin by coin in drop order, each settled
-      const pts = landing();  // before the next lands (sliding resting coins across would knock a leaning one over)
-      coins.forEach(c => { if (c.body.world) world.removeBody(c.body); });
-      coins.forEach((c, i) => {
-        const b = c.body, p = pts[i];
-        b.position.set(p.x, T / 2 + p.y, p.z); b.velocity.set(0, 0, 0); b.angularVelocity.set(0, 0, 0); b.quaternion.setFromEuler(0, p.yaw, 0);
-        world.addBody(b); b.wakeUp(); c.mesh.visible = true;
-        for (let k = 0; k < 600 && awake(); k++) world.step(1 / 120);
-      });
-      rest(); sync(); draw(); return;
-    }
+    if (o.aim) { lay(landing()); sync(); draw(); return; }
     const dx = at.x - was.x, dz = at.z - was.z; let moved = false;
     coins.forEach(({ body: b }) => {
       const x = clamp(b.position.x + dx, box.x0 + R, box.x1 - R), z = clamp(b.position.z + dz, box.z0 + R, box.z1 - R);
@@ -284,7 +277,7 @@ async function stage(o) {
   let raf = 0, last = 0, seen = false, quiet = 0, waiting = false, spotSeen = !o.dropWhen;
   const visible = () => seen && !area.closest('[inert]') && !document.hidden;
   function start() {  // the drop waits for its spot to be on screen (o.dropWhen), however the visitor gets there
-    if (!dropped) { if (!waiting && visible() && spotSeen) { waiting = true; Promise.resolve(o.ready && o.ready()).then(drop); } return; }
+    if (!dropped) { if (!waiting) { waiting = true; drop(); } return; }  // laid at once, seen or not: it's there when it comes into view
     if (!raf && visible()) { last = performance.now(); feel.n = 0; feel.boot = 4; raf = requestAnimationFrame(tick); }  // a few frames to tell whether the page is moving
   }
   function tick(t) {
@@ -337,7 +330,7 @@ async function stage(o) {
     if (joint || press || e.button !== 0) return;
     let h = hit(e);
     if (!h && e.target.classList && e.target.classList.contains('coin-grip') && dropped && visible()) {  // the grip's edge, past the coin's own: its middle
-      const c = coins.find(c => c.grip === e.target); h = { object: { parent: c.mesh }, point: c.mesh.position.clone() };
+      const c = coins.find(c => c.grip === e.target); if (c) h = { object: { parent: c.mesh }, point: c.mesh.position.clone() };  // another stage's grip (one stage's host can hold another's) isn't ours
     }
     if (!h) return;
     e.preventDefault();
@@ -391,8 +384,9 @@ function cover(slot) {
   const geom = () => {
     const cr = sec.getBoundingClientRect(), N = name.getBoundingClientRect(), V = nav.getBoundingClientRect(), S = slot.getBoundingClientRect();
     const rg = document.createRange(); rg.setStart(name.firstChild, 0); rg.setEnd(name.firstChild, 5);
-    const k = parseFloat(getComputedStyle(slot).getPropertyValue('--coins-scale')) || 1;
-    return { cr, N, O: rg.getBoundingClientRect(), V, d: S.height * 0.56 * k };
+    const k = parseFloat(getComputedStyle(slot).getPropertyValue('--coins-scale')) || 1, dy = shift();
+    const rest = r => ({ left: r.left, right: r.right, width: r.width, height: r.height, top: r.top - dy, bottom: r.bottom - dy });  // where the name rests, not where its arrival has it now
+    return { cr, N: rest(N), O: rest(rg.getBoundingClientRect()), V: rest(V), d: S.height * 0.56 * k };
   };
   const aim = j => coverSpots(j, geom());
   // The stills hold the cover until each coin lands (and stay if 3D can't run): five pictures at the same spots, each
@@ -405,9 +399,8 @@ function cover(slot) {
   }
   placeStills();
   addEventListener('resize', placeStills);
-  afterPaint().then(() => { placeStills(); stage({ host: sec, area: sec, slot, unit: 0.56, scaled: true, aim, seq: 500, shift,
-    landed: i => { const img = stills[i]; if (img) { img.classList.add('is-gone'); setTimeout(() => img.remove(), 600); } },
-    fail: () => {}, shown: () => slot.classList.add('is-live') }); });
+  afterPaint().then(() => { placeStills(); stage({ host: sec, area: sec, slot, unit: 0.56, scaled: true, aim, shift,
+    fail: () => {}, shown: () => { slot.classList.add('is-live'); setTimeout(() => stills.forEach(img => img.remove()), 600); } }); });  // the coins fade in over their stills
 }
 
 // The cover (D, Oct. 16): five coins around the name, placed from the name's box (N), its word Opmet (O), the nav (V) and
@@ -450,24 +443,31 @@ function coverSpots(j, g) {
   return sp;
 }
 
-// About (D, Oct. 16): two coins in the upper right, above the press, where the rings were (on one column, in the room at
-// the top that the rings took, at the right); and the cup right next to "espresso tempo", as large as fits between the
-// lines around it. Each is its own stage over the panel's text, which scrolls in itself, and loads only once About is in
-// view. Each spot is placed from the text on load and when the width changes.
-const aboutPile = rnd => [{ x: -1.1, z: -0.2, y: 0.3, yaw: (rnd() - 0.5) * 0.5, tilt: 0.04, spin: 0.4 },
-                          { x: 1.1, z: 0.2, y: 0.3, yaw: (rnd() - 0.5) * 0.5, tilt: 0.04, spin: 0.4 }];
+// About (D, Oct. 16): three coins on one stage over the whole page, sharing its physics, so each can be carried anywhere
+// on About and they meet: the wave and the alabaster hand in the upper right, above the press, where the rings were (in one
+// column, in the room at the top the rings took, at the right), and the cup beside "espresso tempo", all at the cover
+// coin's size. The stage is a track over the panel's whole text with a window onto it pinned to the panel (which scrolls
+// in itself), as the work list's is. It loads once home has loaded, so the coins are there when About opens.
 function about(el) {
-  const panel = el.closest('.about-panel'), cup = el.classList.contains('coins-cup');
-  const area = document.createElement('div'); area.className = 'coins-about-area'; area.setAttribute('aria-hidden', 'true'); el.parentNode.insertBefore(area, el);  // positioned from the panel
+  const panel = el.closest('.about-panel'), cupEl = panel.querySelector('.coins-cup');
+  const track = document.createElement('div'), area = document.createElement('div');
+  track.className = 'coins-track coins-about-track'; track.setAttribute('aria-hidden', 'true'); area.className = 'coins-area';
+  track.appendChild(area); el.parentNode.insertBefore(track, el);  // positioned from the panel
   const place = () => {
-    (cup ? cupPlace : pairPlace)(el, panel);
-    const g = el.parentNode; area.style.height = Math.max(panel.clientHeight, Math.min(el.offsetTop + el.offsetHeight * 2, g.offsetTop + g.offsetHeight), (el.offsetTop + el.offsetHeight * 1.06) / 0.995) + 'px';
+    pairPlace(el, panel); if (cupEl) cupPlace(cupEl, panel);
+    const g = el.parentNode, low = cupEl ? cupEl.offsetTop + cupEl.offsetHeight : 0;
+    track.style.height = Math.max(panel.clientHeight, g.offsetTop + g.offsetHeight, low + 24) + 'px';
   };
   place();
-  const go = () => stage({ host: panel, area, slot: el, unit: 1, pile: cup ? onePile : aboutPile, seq: 500, walls: 0.995, place, dropWhen: el, ready: () => atRest(panel), shown: () => {} });
-  if (!('IntersectionObserver' in window)) return afterPaint().then(go);
-  const io = new IntersectionObserver(e => { if (e.some(x => x.intersectionRect.width >= 2)) { io.disconnect(); afterPaint().then(go); } }, { threshold: [0.01, 0.1] });  // a sliver at the screen's edge (it rests 0.03 px in) isn't in view
-  io.observe(area);
+  const aim = j => {
+    const a = el.getBoundingClientRect(), d = a.width, cx = a.left + d / 2, cy = a.top + d / 2;
+    const c = (cupEl || el).getBoundingClientRect();
+    return [{ px: cx - 0.55 * d, py: cy - 0.1 * d }, { px: cx + 0.55 * d, py: cy + 0.1 * d }, { px: c.left + c.width / 2, py: c.top + c.height / 2 }]
+      .map((p, i) => ({ ...p, px: p.px + j[i].dx * d, py: p.py + j[i].dy * d, yaw: j[i].yaw, y: 0.3, tilt: 0, spin: 0 }));
+  };
+  const go = () => stage({ host: panel, area, track, slot: el, unit: 1, aim, walls: 0.995, place });
+  const idle = window.requestIdleCallback || (f => setTimeout(f, 200));
+  if (document.readyState === 'complete') afterPaint().then(() => idle(go)); else addEventListener('load', () => afterPaint().then(() => idle(go)), { once: true });
 }
 // The panel's text, in its own coordinates (it scrolls in itself): one box per line of the paragraphs, and the press's rows
 function aboutText(panel) {
@@ -492,22 +492,21 @@ function pairPlace(el, panel) {
   }
   el.style.left = (cx - d / 2) + 'px'; el.style.top = (cy - d / 2) + 'px';
 }
-function cupPlace(el, panel) {
-  el.style.width = el.style.height = ''; const d = el.offsetWidth;
+function cupPlace(el, panel) {  // the nearest place beside the line "espresso tempo." ends, where a whole coin clears the text
+  el.style.width = el.style.height = ''; const d = el.offsetWidth, gap = 0.14 * d;
   const link = [...panel.querySelectorAll('.about-body a')].find(a => /espresso tempo/i.test(a.textContent)); if (!link) return;
   const T2 = aboutText(panel), p = link.closest('p');
   const lr = T2.rel([...link.getClientRects()].pop());
   const own = (() => { const rg = document.createRange(); rg.selectNodeContents(p); return [...rg.getClientRects()].map(T2.rel); })();
-  const right = Math.max(...own.filter(b => (b.t + b.b) / 2 > lr.t && (b.t + b.b) / 2 < lr.b).map(b => b.r));  // the end of the line "espresso tempo." is on (glyph boxes overlap the lines around: by their middles)
-  const mid = (lr.t + lr.b) / 2, lh = lr.b - lr.t;
-  for (let s = Math.round(d); s >= 28; s -= 2) {  // as large as fits, as close to the line's middle as it can sit (down to two lines below)
-    const gap = 0.16 * s, x = right + 0.3 * s + s / 2;  // 0.12 s of paper, and room for the coin to settle
-    if (x + s / 2 > T2.pr.width - 16) continue;
-    for (let k = 0; k <= 60; k++) {
-      const y = mid + (k % 3 ? Math.ceil(k * 2 / 3) : -k / 3) * lh / 10;
-      if (clears(T2.all, x, y, s / 2, gap)) { Object.assign(el.style, { width: s + 'px', height: s + 'px', left: (x - s / 2) + 'px', top: (y - s / 2) + 'px' }); return; }
-    }
+  const right = Math.max(...own.filter(b => (b.t + b.b) / 2 > lr.t && (b.t + b.b) / 2 < lr.b).map(b => b.r));  // glyph boxes overlap the lines around: by their middles
+  const x0 = right + 0.3 * d + d / 2, y0 = (lr.t + lr.b) / 2, xMax = T2.pr.width - 16 - d / 2, step = d / 12;
+  let best = null;
+  for (let y = y0 - d; y <= y0 + 12 * d; y += step) for (let x = Math.min(x0, xMax); x <= xMax; x += step) {
+    const cost = Math.hypot((x - x0) * 1.5, y - y0); if (best && cost >= best.cost) continue;
+    if (clears(T2.all, x, y, d / 2, gap)) best = { x, y, cost };
   }
+  if (!best) { const low = Math.max(...T2.all.map(b => b.b)); best = { x: Math.max(d / 2 + 16, Math.min(x0, xMax)), y: low + gap + d / 2 }; }  // below everything
+  el.style.left = (best.x - d / 2) + 'px'; el.style.top = (best.y - d / 2) + 'px';
 }
 
 // The work list's coin (D, Oct. 15): a spot (build.py coins_spot) marks where and how big, right next to the list's last
@@ -610,7 +609,7 @@ if (fine && !reduce) {
 const slot = document.querySelector('.cover .mark[data-coins]');
 if (slot) cover(slot);
 document.querySelectorAll('.coins-spot[data-coins]:not(.coins-about)').forEach(spot);
-document.querySelectorAll('.coins-about[data-coins]').forEach(about);
+document.querySelectorAll('.coins-about[data-coins]').forEach(about);  // one stage for About's three coins
 headers(document);
 // Projects open in a panel on home: their nameplates arrive later
 new MutationObserver(ms => {
