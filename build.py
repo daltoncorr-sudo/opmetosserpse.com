@@ -221,13 +221,6 @@ def coins_spot(beside):
     return '<span class="coins-spot coins-work" data-coins="%s" data-beside="%s" aria-hidden="true"></span>' % (
         coin_url('opmet-coin_alabaster.glb'), beside)
 
-def about_loops():
-    """About's two script rings, Opmet and Osserpse, overlapping at its top right and cut off by its edges, each turning
-    slowly (D, Oct. 15; static/brand/loops/, from 01 Assets/cursive-script). Decorative."""
-    return ('<div class="loops" aria-hidden="true"><div class="loops-pair">'
-            '<img class="loop loop-opmet" src="/brand/loops/opmet-ring.svg" alt="">'
-            '<img class="loop loop-osserpse" src="/brand/loops/osserpse-ring.svg" alt=""></div></div>')
-
 def header_coin(cls, hooks=''):
     """One coin where a header's hand was: the still at once, the live coin on a fine pointer (coins.js). It keeps the
     hand's element, classes and data- hooks; it is as wide as the coin and as tall as the hand was, the coin bleeding
@@ -1337,7 +1330,7 @@ def main():
     foundry = foundry_panel(load(os.path.join(CONTENT, 'foundry.json')), fd['title'], a.drafts) if 'foundry' not in hidden else ''
     ap = site['about']
     press = load(os.path.join(CONTENT, 'press.json'))['press']
-    about_panel = ('<section class="panel side about-panel" id="about" aria-labelledby="about-title">' + about_loops() +
+    about_panel = ('<section class="panel side about-panel" id="about" aria-labelledby="about-title">' +
                    '<div class="about-grid"><div class="title-row">'
                    '<h2 class="vh" id="about-title">%s</h2><p class="home-big"><a class="ctl" href="#" data-studio>%s</a></p></div>'
                    '<div class="about-main"><div class="about-body">%s</div></div>'
