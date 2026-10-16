@@ -214,6 +214,12 @@ def coin_url(name):
     with open(os.path.join(ROOT, 'static', 'brand', 'coins', name), 'rb') as f:
         return '/brand/coins/%s?v=%s' % (name, hashlib.sha1(f.read()).hexdigest()[:10])
 
+def coins_spot(kind, stones):
+    """Where more coins you can pick up sit (D, Oct. 15): 'press', two stacked at About's top right; 'work', one at the
+    work list's bottom left. An empty, decorative box (site.css .coins-spot); coins.js drops the coins on it."""
+    return '<span class="coins-spot coins-%s" data-coins="%s" aria-hidden="true"></span>' % (
+        kind, ' '.join(coin_url('opmet-coin_%s.glb' % k) for k in stones))
+
 def header_coin(cls, hooks=''):
     """One coin where a header's hand was: the still at once, the live coin on a fine pointer (coins.js). It keeps the
     hand's element, classes and data- hooks, at the hand's size: the coin itself bleeds past it (site.css .coin)."""
@@ -1282,7 +1288,7 @@ def main():
     entries = items
     listed = [every[e['slug']] for e in entries if e['page']]  # every page, in the list's order
     pr = site['projects']
-    body = '<section class="index">%s</section><div class="preview" aria-hidden="true"><img alt=""></div>' % list_rows(entries)
+    body = '<section class="index">%s</section><div class="preview" aria-hidden="true"><img alt=""></div>%s' % (list_rows(entries), coins_spot('work', ('alabaster',)))
     write('/projects/index.html', page(site, pr['og_title'], pr['og_description'], '/projects/', body, so, '/projects',
                                        ld=collection_ld(site, listed, wj)))
 
@@ -1321,7 +1327,7 @@ def main():
     foundry = foundry_panel(load(os.path.join(CONTENT, 'foundry.json')), fd['title'], a.drafts) if 'foundry' not in hidden else ''
     ap = site['about']
     press = load(os.path.join(CONTENT, 'press.json'))['press']
-    about_panel = ('<section class="panel side about-panel" id="about" aria-labelledby="about-title">'
+    about_panel = ('<section class="panel side about-panel" id="about" aria-labelledby="about-title">' + coins_spot('press', ('sandstone', 'basalt')) +
                    '<div class="about-grid"><div class="title-row">'
                    '<h2 class="vh" id="about-title">%s</h2><p class="home-big"><a class="ctl" href="#" data-studio>%s</a></p></div>'
                    '<div class="about-main"><div class="about-body">%s</div></div>'
@@ -1366,9 +1372,9 @@ def main():
              '<nav class="cover-nav" aria-label="Site">%s</nav></div></section>') % (
         esc(COIN_LABEL), ' '.join(coin_url('opmet-coin_%s.glb' % k) for k in ('sandstone', 'basalt', 'alabaster')),
         coin_url('opmet-coins_pile.webp'), coin_url('opmet-coins_pile.webp'), esc(site['name']), nav)
-    body = ('<div class="stage-clip"><div class="stage" data-stage>%s<div class="panel home-panel">%s<div data-home>%s%s</div></div>%s</div></div>'
+    body = ('<div class="stage-clip"><div class="stage" data-stage>%s<div class="panel home-panel">%s<div data-home>%s%s%s</div></div>%s</div></div>'
             '<section class="project-panel" id="project" aria-label="Project"><div class="project-inner"></div></section>') % (
-        foundry, blog, cover, work_section(items, h['work']), about_panel)
+        foundry, blog, cover, work_section(items, h['work']), coins_spot('work', ('alabaster',)), about_panel)
     # Arriving at a panel's address opens it at once: only the panels home carries (a hidden section's isn't built)
     names = '|'.join(n for n, sec in (('foundry', 'foundry'), ('about', 'about'), ('blog', 'journal')) if sec not in hidden)
     early = '<script>if(/^#(%s)([\\/?]|$)/.test(location.hash))document.documentElement.classList.add("at-"+location.hash.slice(1).split(/[\\/?]/)[0])</script>\n' % names

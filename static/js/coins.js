@@ -67,35 +67,56 @@ function lights(L, scene, r, map) {
   scene.add(key); return key;
 }
 
-/* ---------------- the cover: three coins, a physics stage ---------------- */
+/* ---------------- the stages: coins you can pick up ---------------- */
+// Three stages, each its own canvas and physics: the cover (three coins dropped into the hand's slot), About (two coins
+// stacked at its top right) and the work list (one coin at its bottom left, on home and on /projects/). A stage's
+// coins drop when it first comes into view, and draw only while one is awake or held and the stage is in sight.
 
-// The pile: three slots, in coin radii, that overlap by about a tenth of a coin, each a little above its resting
-// height, so the coins land one after another, each on the last one's edge. Alabaster always lands last, on top.
+// The cover's pile: three slots, in coin radii, that overlap by about a tenth of a coin, each a little above its
+// resting height, so the coins land one after another, each on the last one's edge. Alabaster always lands last, on
+// top. Sandstone and basalt trade the first two slots at random; the pile turns and mirrors at random, each coin's yaw
+// countering the turn so the hands stay roughly upright. Every visit drops a slightly different pile.
 const PILE = [{ x: -0.92, z: 0.05, y: 0.12 }, { x: 0.92, z: -0.28, y: 0.62 }, { x: 0.02, z: 1.48, y: 1.05 }];
+function coverPile(rnd) {
+  const turn = (rnd() - 0.5) * 1.1, flip = rnd() < 0.5 ? -1 : 1, c = Math.cos(turn), s = Math.sin(turn);
+  const lower = rnd() < 0.5 ? [0, 1] : [1, 0], slotOf = [lower[0], lower[1], 2];
+  const rot = PILE.map(p => ({ x: p.x * flip + (rnd() - 0.5) * 0.14, z: p.z + (rnd() - 0.5) * 0.14, y: p.y }))
+    .map(p => ({ x: p.x * c - p.z * s, z: p.x * s + p.z * c, y: p.y }));
+  return slotOf.map(k => ({ ...rot[k], yaw: -turn + (rnd() - 0.5) * 0.8, tilt: 0.32, spin: 1 }));
+}
+// About's stack (D, Oct. 15): basalt first, sandstone on top of it, a third of a coin off center so both show
+function stackPile(rnd) {
+  const turn = (rnd() - 0.5) * 0.6, c = Math.cos(turn), s = Math.sin(turn), ox = 0.36 * c + 0.26 * s, oz = 0.36 * s - 0.26 * c;
+  const yaw = () => -turn + (rnd() - 0.5) * 0.4;
+  return [{ x: ox / 2, z: oz / 2, y: T + 0.45, yaw: yaw(), tilt: 0.1, spin: 0.3 }, { x: -ox / 2, z: -oz / 2, y: 0.1, yaw: yaw(), tilt: 0.1, spin: 0.3 }];
+}
+// The work list's one coin (D, Oct. 15)
+const onePile = rnd => [{ x: 0, z: 0, y: 0.35, yaw: (rnd() - 0.5) * 0.5, tilt: 0.08, spin: 0.15 }];  // nearly flat: it lands, not rolls
 
-function still(slot) {  // when 3D can't run: the pile as a picture, in the slot
+function still(slot) {  // when 3D can't run on the cover: the pile as a picture, in the slot
   const src = slot.getAttribute('data-coins-still');
   if (!src || slot.querySelector('.coins-still')) return;
   const img = new Image(); img.className = 'coins-still'; img.alt = slot.getAttribute('aria-label') || ''; img.src = src;
   slot.appendChild(img);
 }
 
-async function cover(slot) {
-  const sec = slot.closest('.cover'), home = sec.closest('[data-home]'), inner = sec.querySelector('.cover-inner');
-  await afterPaint();
+// o.host: takes the pointer and holds the cursor; o.area: the canvas covers it; o.slot: where the pile sits, its
+// height the coin's size (o.unit: a coin's diameter as a share of it); o.pile(rnd): where each coin starts;
+// o.ready: what the drop waits for once the stage is in view; o.fail: what to show if 3D can't run.
+async function stage(o) {
+  const { host, area, slot } = o;
+  const urls = slot.getAttribute('data-coins').split(' ');
   let L, C, r, meshes;
   try {
     [L, C] = await Promise.all([three(), import(VENDOR + 'cannon-es.js')]);
     r = renderer(L);
-    meshes = await Promise.all(slot.getAttribute('data-coins').split(' ').map((u, i) => coin(u, i === 2)));
-  } catch (e) { if (r) r.dispose(); still(slot); return; }
+    meshes = await Promise.all(urls.map(u => coin(u, /alabaster/.test(u))));
+  } catch (e) { if (r) r.dispose(); if (o.fail) o.fail(); return; }
   const THREE = L.THREE;
-  // The cover's arrive (1.6 s) first; until then the slot is empty, as it was before the hand appeared
-  await Promise.all((inner && inner.getAnimations ? inner.getAnimations() : []).map(a => a.finished.catch(() => {})));
 
-  const canvas = r.domElement; canvas.className = 'coins-stage'; sec.insertBefore(canvas, sec.firstChild);
+  const canvas = r.domElement; canvas.className = 'coins-stage'; area.insertBefore(canvas, area.firstChild);
   const scene = new THREE.Scene(), key = lights(L, scene, r, 2048);
-  key.position.multiplyScalar(2); key.shadow.camera.far = 60;  // the light's frustum reaches the whole cover
+  key.position.multiplyScalar(2); key.shadow.camera.far = 60;  // the light's frustum reaches the whole stage
   const ground = new THREE.Mesh(new THREE.PlaneGeometry(400, 400), new THREE.ShadowMaterial({ opacity: 0.14 }));
   ground.rotation.x = -Math.PI / 2; ground.receiveShadow = true; scene.add(ground);
   const cam = new THREE.PerspectiveCamera(26, 1, 0.5, 400);
@@ -123,8 +144,8 @@ async function cover(slot) {
   const rest = () => coins.forEach(c => c.body.sleep());
   const settle = () => { for (let i = 0; i < 900 && awake(); i++) world.step(1 / 120); rest(); };  // off screen
 
-  // Framing: the camera looks almost straight down; a coin's diameter is 0.56 of the slot's height (times
-  // --coins-scale), and the pile sits at the slot's center
+  // Framing: the camera looks almost straight down at the stage; a coin's diameter is o.unit of the slot's height
+  // (times --coins-scale), and the pile's outline sits at the slot's center
   const ray = new THREE.Raycaster(), ndc = new THREE.Vector2(), up = new THREE.Vector3(0, 1, 0);
   let at = null, box = null, dropped = false;
   function onGround(x, y, h) {
@@ -132,63 +153,61 @@ async function cover(slot) {
     return ray.ray.intersectPlane(new THREE.Plane(up, -h), new THREE.Vector3());
   }
   function frame() {
-    const cr = sec.getBoundingClientRect(), sr = slot.getBoundingClientRect();
+    const cr = area.getBoundingClientRect(), sr = slot.getBoundingClientRect();
     if (!cr.width || !cr.height || !sr.height) return null;
     r.setSize(cr.width, cr.height, false); cam.aspect = cr.width / cr.height;
-    const k = 0.28 * sr.height * (parseFloat(getComputedStyle(slot).getPropertyValue('--coins-scale')) || 1);  // pixels per unit
+    const k = o.unit / 2 * sr.height * (parseFloat(getComputedStyle(slot).getPropertyValue('--coins-scale')) || 1);  // pixels per unit
     const dist = cr.height / 2 / k / Math.tan(13 * Math.PI / 180);
     cam.position.set(0, dist * Math.cos(0.10), dist * Math.sin(0.10)); cam.lookAt(0, 0, 0); cam.updateProjectionMatrix(); cam.updateMatrixWorld();
     const was = at;
     at = onGround((sr.left + sr.width / 2 - cr.left) / cr.width * 2 - 1, 1 - (sr.top + sr.height / 2 - cr.top) / cr.height * 2, T / 2);
-    // Four walls at 94% of the visible cover, so no coin can leave the screen
-    box = { x0: onGround(-0.94, 0, 0).x, x1: onGround(0.94, 0, 0).x, z0: onGround(0, 0.94, 0).z, z1: onGround(0, -0.94, 0).z };
+    // Four walls at 94% of the visible stage (the cover; the others' at its edges), so no coin can leave it
+    const f = o.walls || 0.94;
+    box = { x0: onGround(-f, 0, 0).x, x1: onGround(f, 0, 0).x, z0: onGround(0, f, 0).z, z1: onGround(0, -f, 0).z };
     walls[0].position.set(box.x0, 0, 0); walls[1].position.set(box.x1, 0, 0); walls[2].position.set(0, 0, box.z0); walls[3].position.set(0, 0, box.z1);
     const s = key.shadow.camera, e = Math.hypot(box.x1 - box.x0, box.z1 - box.z0) / 2 + 2;
     s.left = s.bottom = -e; s.right = s.top = e; s.updateProjectionMatrix();
     return was || at;
   }
 
-  // The drop: sandstone and basalt trade the first two slots at random; the pile turns and mirrors at random, each
-  // coin's yaw countering the turn so the hands stay roughly upright. Every visit drops a slightly different pile.
   const rnd = Math.random;
   function drop() {
     frame();
-    const turn = (rnd() - 0.5) * 1.1, flip = rnd() < 0.5 ? -1 : 1, c = Math.cos(turn), s = Math.sin(turn);
-    const lower = rnd() < 0.5 ? [0, 1] : [1, 0], slotOf = [lower[0], lower[1], 2];
-    const pts = PILE.map(p => ({ x: p.x * flip + (rnd() - 0.5) * 0.14, z: p.z + (rnd() - 0.5) * 0.14, y: p.y }));
-    const rot = pts.map(p => ({ x: p.x * c - p.z * s, z: p.x * s + p.z * c, y: p.y }));
-    const xs = rot.map(p => p.x), zs = rot.map(p => p.z);  // center the pile's outline, not its middle coin
+    const pts = o.pile(rnd), xs = pts.map(p => p.x), zs = pts.map(p => p.z);  // center the pile's outline, not a coin
     const cx = (Math.min(...xs) + Math.max(...xs)) / 2, cz = (Math.min(...zs) + Math.max(...zs)) / 2;
     coins.forEach((coin, i) => {
-      const b = coin.body, p = rot[slotOf[i]];
-      b.position.set(at.x + p.x - cx, T / 2 + p.y, at.z + p.z - cz);
-      b.velocity.set(0, -0.4, 0); b.angularVelocity.set((rnd() - 0.5) * 1.6, (rnd() - 0.5) * 0.5, (rnd() - 0.5) * 1.6);
-      b.quaternion.setFromEuler((rnd() - 0.5) * 0.32, -turn + (rnd() - 0.5) * 0.8, (rnd() - 0.5) * 0.32);
+      const b = coin.body, p = pts[i];
+      b.position.set(clamp(at.x + p.x - cx, box.x0 + R, box.x1 - R), T / 2 + p.y, clamp(at.z + p.z - cz, box.z0 + R, box.z1 - R));
+      b.velocity.set(0, -0.4, 0); b.angularVelocity.set((rnd() - 0.5) * 1.6 * p.spin, (rnd() - 0.5) * 0.5 * p.spin, (rnd() - 0.5) * 1.6 * p.spin);
+      b.quaternion.setFromEuler((rnd() - 0.5) * p.tilt, p.yaw, (rnd() - 0.5) * p.tilt);
       world.addBody(b); b.wakeUp(); coin.mesh.visible = true;
     });
     dropped = true;
     if (reduce) settle();  // reduced motion: the pile already settled
-    sync(); draw();
+    sync(); draw(); start();
   }
-  // A resize or a turn of the phone: frame again and move the pile with its slot, settled, without a new drop
+  // A resize, a turn of the phone or a list opening: frame again and move the pile with its slot, settled
   function reframe() {
     const was = frame(); if (!was || !dropped) return;
     release();
     const dx = at.x - was.x, dz = at.z - was.z; let moved = false;
     coins.forEach(({ body: b }) => {
       const x = clamp(b.position.x + dx, box.x0 + R, box.x1 - R), z = clamp(b.position.z + dz, box.z0 + R, box.z1 - R);
-      if (x !== b.position.x + dx || z !== b.position.z + dz) moved = true;
+      if (Math.abs(x - b.position.x - dx) + Math.abs(z - b.position.z - dz) > 1e-6) moved = true;
       b.position.set(x, b.position.y, z); b.aabbNeedsUpdate = true;
     });
     if (moved) { coins.forEach(c => c.body.wakeUp()); settle(); }
     sync(); draw();
   }
 
-  // Render only while a coin is awake or held; pause while the cover is out of sight (scrolled away, a panel or a
+  // Render only while a coin is awake or held; pause while the stage is out of sight (scrolled away, a panel or a
   // project open over it, the tab hidden)
-  let raf = 0, last = 0, seen = true, quiet = 0;
-  const visible = () => seen && !(home && home.inert) && !document.hidden;
-  function start() { if (!raf && dropped && visible()) { last = performance.now(); raf = requestAnimationFrame(tick); } }
+  let raf = 0, last = 0, seen = false, quiet = 0, waiting = false;
+  const visible = () => seen && !area.closest('[inert]') && !document.hidden;
+  function start() {
+    if (!dropped) { if (!waiting && visible()) { waiting = true; Promise.resolve(o.ready && o.ready()).then(drop); } return; }
+    if (!raf && visible()) { last = performance.now(); raf = requestAnimationFrame(tick); }
+  }
   function tick(t) {
     raf = 0;
     if (!visible()) { release(); return; }
@@ -200,19 +219,22 @@ async function cover(slot) {
     sync(); draw();
     if (joint || awake()) raf = requestAnimationFrame(tick);
   }
-  if ('IntersectionObserver' in window) new IntersectionObserver(e => { seen = e[e.length - 1].isIntersecting; start(); }).observe(sec);
-  if (home) new MutationObserver(start).observe(home, { attributes: true, attributeFilter: ['inert'] });
+  if ('IntersectionObserver' in window) new IntersectionObserver(e => { seen = e[e.length - 1].isIntersecting; start(); }, { threshold: o.threshold || 0 }).observe(area);
+  else seen = true;
+  inertWatch.push(start);
   document.addEventListener('visibilitychange', start);
   let rs = 0;
-  addEventListener('resize', () => { cancelAnimationFrame(rs); rs = requestAnimationFrame(reframe); });
+  const later = () => { cancelAnimationFrame(rs); rs = requestAnimationFrame(reframe); };
+  addEventListener('resize', later);
+  if ('ResizeObserver' in window) new ResizeObserver(later).observe(area);
 
   // Picking up: a point constraint hangs the coin from the grabbed point, so it tilts and swings with its weight.
-  // A miss does nothing: the name, the nav and every link work as before.
+  // A miss does nothing: the words and every link under the stage work as before.
   const grip = new C.Body({ mass: 0 }); grip.collisionFilterGroup = 0; grip.collisionFilterMask = 0; world.addBody(grip);
   const lift = 1.25, aim = new THREE.Vector3(), plane = new THREE.Plane(up, -lift);
   let joint = null, held = null, over = false, hover = null, until = 0;
   function point(e) {
-    const cr = sec.getBoundingClientRect();
+    const cr = area.getBoundingClientRect();
     ndc.set((e.clientX - cr.left) / cr.width * 2 - 1, 1 - (e.clientY - cr.top) / cr.height * 2); ray.setFromCamera(ndc, cam);
   }
   function hit(e) {
@@ -223,20 +245,20 @@ async function cover(slot) {
     if (!joint) return;
     world.removeConstraint(joint); joint = null;
     held.body.linearDamping = 0.06; held.body.angularDamping = 0.18; held.body.wakeUp(); held = null;
-    sec.classList.remove('coin-held'); until = performance.now() + 400; start();
+    host.classList.remove('coin-held'); until = performance.now() + 400; start();
   }
-  sec.addEventListener('pointerdown', e => {
+  host.addEventListener('pointerdown', e => {
     if (joint || e.button !== 0) return;
     const h = hit(e); if (!h) return;
     e.preventDefault();
-    try { sec.setPointerCapture(e.pointerId); } catch (_) {}
+    try { host.setPointerCapture(e.pointerId); } catch (_) {}
     held = coins[h.object.parent.userData.i];
     const p = h.point; grip.position.set(p.x, p.y, p.z);
     joint = new C.PointToPointConstraint(held.body, held.body.pointToLocalFrame(new C.Vec3(p.x, p.y, p.z)), grip, new C.Vec3(0, 0, 0), 60);
     world.addConstraint(joint); held.body.wakeUp(); held.body.linearDamping = 0.35; held.body.angularDamping = 0.55;
-    aim.set(p.x, lift, p.z); sec.classList.add('coin-held'); start();
+    aim.set(p.x, lift, p.z); host.classList.add('coin-held'); start();
   });
-  sec.addEventListener('pointermove', e => {
+  host.addEventListener('pointermove', e => {
     if (joint) {
       point(e);
       if (ray.ray.intersectPlane(plane, aim)) { aim.x = clamp(aim.x, box.x0 + R, box.x1 - R); aim.z = clamp(aim.z, box.z0 + R, box.z1 - R); }
@@ -245,18 +267,40 @@ async function cover(slot) {
     if (e.pointerType !== 'mouse') return;
     if (!hover) requestAnimationFrame(() => {  // the cursor: grab over a coin, the default elsewhere
       const o = !!hit(hover); hover = null;
-      if (o !== over) { over = o; sec.classList.toggle('coin-over', o); }
+      if (o !== over) { over = o; host.classList.toggle('coin-over', o); }
     });
     hover = { clientX: e.clientX, clientY: e.clientY };
   });
-  sec.addEventListener('pointerleave', () => { if (over) { over = false; sec.classList.remove('coin-over'); } });
-  ['pointerup', 'pointercancel', 'lostpointercapture'].forEach(n => sec.addEventListener(n, release));
+  host.addEventListener('pointerleave', () => { if (over) { over = false; host.classList.remove('coin-over'); } });
+  ['pointerup', 'pointercancel', 'lostpointercapture'].forEach(n => host.addEventListener(n, release));
   // On a phone, a touch that starts on a coin drags it; anywhere else it scrolls the page as always
-  sec.addEventListener('touchstart', e => { if (joint || (e.touches.length === 1 && hit(e.touches[0]))) e.preventDefault(); }, { passive: false });
+  host.addEventListener('touchstart', e => { if (joint || (e.touches.length === 1 && hit(e.touches[0]))) e.preventDefault(); }, { passive: false });
   // The click that ends a pick-up never reaches a link under the coin
-  addEventListener('click', e => { if (performance.now() < until && sec.contains(e.target)) { e.preventDefault(); e.stopPropagation(); } }, true);
+  addEventListener('click', e => { if (performance.now() < until && host.contains(e.target)) { e.preventDefault(); e.stopPropagation(); } }, true);
 
-  drop(); start();
+  start();
+}
+// About and the project panel open over home by marking what they cover inert: a stage under one pauses
+const inertWatch = [];
+new MutationObserver(() => inertWatch.forEach(f => f())).observe(document.documentElement, { attributes: true, attributeFilter: ['inert'], subtree: true });
+
+// The cover: after the first paint; the drop waits for the cover's arrive (1.6 s), and until then the slot is empty,
+// as it was before the hand appeared
+function cover(slot) {
+  const sec = slot.closest('.cover'), inner = sec.querySelector('.cover-inner');
+  afterPaint().then(() => stage({ host: sec, area: sec, slot, unit: 0.56, pile: coverPile, fail: () => still(slot),
+    ready: () => Promise.all((inner && inner.getAnimations ? inner.getAnimations() : []).map(a => a.finished.catch(() => {}))) }));
+}
+// About's stack and the work list's coin (D, Oct. 15): a spot (build.py coins_spot) marks where and how big; the stage
+// covers the screen around it. They load when the stage nears the screen, and drop once it is mostly in view.
+function spot(el) {
+  const host = el.parentElement, area = document.createElement('div');
+  area.className = 'coins-area ' + (el.classList.contains('coins-press') ? 'coins-area-top' : 'coins-area-bottom');
+  area.setAttribute('aria-hidden', 'true'); host.insertBefore(area, el);
+  const go = () => stage({ host, area, slot: el, unit: 1, pile: el.classList.contains('coins-press') ? stackPile : onePile, threshold: 0.5, walls: 0.995 });
+  if (!('IntersectionObserver' in window)) return afterPaint().then(go);
+  const io = new IntersectionObserver(e => { if (e.some(x => x.isIntersecting)) { io.disconnect(); afterPaint().then(go); } }, { rootMargin: '50% 0px' });
+  io.observe(area);
 }
 
 /* ---------------- the headers: one coin where the hand was ---------------- */
@@ -319,6 +363,7 @@ if (fine && !reduce) {
 
 const slot = document.querySelector('.cover .mark[data-coins]');
 if (slot) cover(slot);
+document.querySelectorAll('.coins-spot[data-coins]').forEach(spot);
 headers(document);
 // Projects open in a panel on home: their nameplates arrive later
 new MutationObserver(ms => {

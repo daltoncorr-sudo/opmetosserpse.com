@@ -317,8 +317,21 @@ html:not(.js) .stage:has(#about:target){transform:translateX(-66.6667%)}
    the coins drawn at the hand's slot; it takes no clicks, so the name, the nav and every link work as before. A
    pointer over a coin grabs it. When 3D can't run, the still sits in the slot at the pile's size. */
 .coins-stage{position:absolute;left:0;top:0;width:100%;height:100%;z-index:1;pointer-events:none}
-.cover.coin-over,.cover.coin-over *{cursor:grab}
-.cover.coin-held,.cover.coin-held *{cursor:grabbing;-webkit-user-select:none;user-select:none}
+.coin-over,.coin-over *{cursor:grab}
+.coin-held,.coin-held *{cursor:grabbing;-webkit-user-select:none;user-select:none}
+/* More coins you can pick up (D, Oct. 15): two stacked at About's top right, level with Home and on the press list's
+   right edge; one at the work list's bottom left, on the page margin (home and /projects/). The spot is the coin's
+   size and place; the stage (.coins-area) is the screen around it: About's first screen, the list's last. */
+.coins-spot{position:absolute;width:var(--coin-d);height:var(--coin-d);pointer-events:none;--coin-d:clamp(52px,6.4vw,96px)}
+.coins-press{top:calc(12vh + 15px - var(--coin-d) / 2);right:calc(var(--gutter) + clamp(8px,calc(4vw - var(--gutter)),56px))}
+@media (max-width:599px){.coins-press{right:var(--gutter)}}
+.coins-work{left:0;bottom:var(--s5)}
+main>.coins-work{left:var(--gutter)}
+[data-home]:has(>.coins-spot),main:has(>.coins-spot){position:relative}
+.coins-area{position:absolute;left:0;right:0;height:min(100%,100vh);height:min(100%,100svh);pointer-events:none;z-index:1}
+.coins-area-top{top:0}
+.coins-area-bottom{bottom:0}
+[data-home]>.coins-area{left:calc(var(--gutter) * -1);right:calc(var(--gutter) * -1)}  /* the full width of the screen */
 .cover .coins-still{position:absolute;left:50%;top:50%;height:calc(100% * var(--coins-scale) * 1.1);width:auto;max-width:none;transform:translate(-50%,-50%)}
 @keyframes arrive{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
 @media (max-width:719px){
