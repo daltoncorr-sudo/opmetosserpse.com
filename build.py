@@ -209,7 +209,7 @@ def brand_svg(name, cls, label=None):
 # hand was at the top of every inner page. The models and stills are in static/brand/coins/; static/js/coins.js draws
 # them with three.js and cannon-es (static/js/vendor/coins/). A model's address carries its fingerprint, so a new file
 # loads fresh; the header coin's still is site.css's.
-COIN_LABEL = "Three carved stone coins, each with the studio's hand"
+COIN_LABEL = "Five carved stone coins: a hand, a cup, an eye, a dancer and a leaf"
 def coin_url(name):
     with open(os.path.join(ROOT, 'static', 'brand', 'coins', name), 'rb') as f:
         return '/brand/coins/%s?v=%s' % (name, hashlib.sha1(f.read()).hexdigest()[:10])
@@ -218,14 +218,17 @@ def coins_spot(beside):
     """The work list's coin, one you can pick up (D, Oct. 15): beside the list's last name, at its left (on a phone, just
     under it). An empty, decorative box (site.css .coins-spot); coins.js places it by the list (beside: its selector)
     and drops the coin on it."""
-    return '<span class="coins-spot coins-work" data-coins="%s" data-beside="%s" aria-hidden="true"></span>' % (
-        coin_url('opmet-coin_alabaster.glb'), beside)
+    return ('<span class="coins-spot coins-work" data-coins="%s" data-beside="%s" aria-hidden="true">'
+            '<img class="coins-still" src="%s" alt="" hidden></span>') % (
+        coin_url('opmet-coin_basalt.glb'), beside, coin_url('opmet-coin_basalt.webp'))
 
-def header_coin(cls, hooks=''):
+def header_coin(cls, hooks='', model='alabaster_header', still=None):
     """One coin where a header's hand was: the still at once, the live coin on a fine pointer (coins.js). It keeps the
     hand's element, classes and data- hooks; it is as wide as the coin and as tall as the hand was, the coin bleeding
     up into the header's top padding (site.css .coin)."""
-    return '<span class="%s coin"%s data-coin="%s" aria-hidden="true"></span>' % (cls, hooks, coin_url('opmet-coin_alabaster_header.glb'))
+    # a model's own still, when it has one (the Journal's quill): site.css's --still
+    style = ' style="--still:url(%s)"' % coin_url(still) if still else ''
+    return '<span class="%s coin"%s%s data-coin="%s" aria-hidden="true"></span>' % (cls, hooks, style, coin_url('opmet-coin_%s.glb' % model))
 
 
 # The stamped ink on the hand and the name: a static SVG filter applied at render time, never to the masters.
@@ -1023,7 +1026,7 @@ def article(e, w):
 # Since Oct. 15, 2026 (D), a stone coin stands where each hand was (header_coin), in the same element with its hooks.
 def journal_hand():
     pose = 'writing' if os.path.exists(os.path.join(ROOT, 'static', 'brand', 'writing-hand.svg')) else 'stand-in'
-    return header_coin('mast-hand', ' data-journal-hand data-pose="%s"' % pose)
+    return header_coin('mast-hand', ' data-journal-hand data-pose="%s"' % pose, model='quill_header', still='opmet-coin_quill_header.webp')
 
 NAME = ('Opmet', 'Osserpse')
 
@@ -1334,8 +1337,10 @@ def main():
                    '<div class="about-grid"><div class="title-row">'
                    '<h2 class="vh" id="about-title">%s</h2><p class="home-big"><a class="ctl" href="#" data-studio>%s</a></p></div>'
                    '<div class="about-main"><div class="about-body">%s</div></div>'
-                   '<div class="about-press"><h3 class="press-title vh">%s</h3>%s</div></div></section>') % (  # no Press heading on screen (D, Oct. 13)
-        ' '.join('<span>%s</span>' % esc(x) for x in ap['title'].split()), ctl(site['back']), ''.join('<p>%s</p>' % link(typo(x)) for x in ap['lines']) + ''.join('<p class="contact">%s</p>' % link(typo(x)) for x in ap['contact']), esc(ap['press_title']), press_list(press))
+                   '<div class="about-press"><h3 class="press-title vh">%s</h3>%s</div>'
+                   '<span class="coins-spot coins-about" data-coins="%s %s" aria-hidden="true"></span></div></section>') % (  # no Press heading on screen (D, Oct. 13)
+        ' '.join('<span>%s</span>' % esc(x) for x in ap['title'].split()), ctl(site['back']), ''.join('<p>%s</p>' % link(typo(x)) for x in ap['lines']) + ''.join('<p class="contact">%s</p>' % link(typo(x)) for x in ap['contact']), esc(ap['press_title']), press_list(press),
+        coin_url('opmet-coin_cup.glb'), coin_url('opmet-coin_wave.glb'))
     # The Journal: a panel one screen above home, and its own pages at /journal/ and /journal/<slug>, all with the same
     # masthead, slot and list. Until a post is published it's out of the menu and the sitemap, and /journal/ is noindex.
     # Hidden, none of it is built: no panel, no pages, no pictures.
@@ -1371,11 +1376,12 @@ def main():
     # The coins and the name: the name is live text in Opmet Serif, upright (static/fonts/opmet-serif/opmet-serif.woff2).
     # The hand's slot (.mark) holds the coins: the pile's still from the first frame, then the live coins (coins.js),
     # which drop as soon as they load; the still stays when 3D can't run.
-    cover = ('<section class="cover"><div class="cover-inner"><h1><span class="mark" role="img" aria-label="%s" data-coins="%s" data-coins-still="%s">'
-             '<img class="coins-still" src="%s" alt=""></span><span class="name">%s</span></h1>'
-             '<nav class="cover-nav" aria-label="Site">%s</nav></div></section>') % (
-        esc(COIN_LABEL), ' '.join(coin_url('opmet-coin_%s.glb' % k) for k in ('sandstone', 'basalt', 'alabaster')),
-        coin_url('opmet-coins_pile.webp'), coin_url('opmet-coins_pile.webp'), esc(site['name']), nav)
+    # the five, in drop order: dancer, alabaster hand, eye, leaf, sandstone hand (coins.js coverSpots)
+    cover_coins = ('dancer', 'cup', 'eye', 'leaf', 'sandstone')
+    cover = ('<section class="cover"><div class="cover-inner"><h1><span class="mark" role="img" aria-label="%s" data-coins="%s" data-stills="%s"></span>'
+             '<span class="name">%s</span></h1><nav class="cover-nav" aria-label="Site">%s</nav></div></section>') % (
+        esc(COIN_LABEL), ' '.join(coin_url('opmet-coin_%s.glb' % k) for k in cover_coins),
+        ' '.join(coin_url('opmet-coin_%s.webp' % k) for k in cover_coins), esc(site['name']), nav)
     body = ('<div class="stage-clip"><div class="stage" data-stage>%s<div class="panel home-panel">%s<div data-home>%s%s%s</div></div>%s</div></div>'
             '<section class="project-panel" id="project" aria-label="Project"><div class="project-inner"></div></section>') % (
         foundry, blog, cover, work_section(items, h['work']), coins_spot('.work .works'), about_panel)
