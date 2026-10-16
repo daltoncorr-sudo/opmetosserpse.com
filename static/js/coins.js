@@ -212,10 +212,15 @@ async function stage(o) {
     const dt = clamp((t - last) / 1000, 0, 0.05); last = t;
     if (joint) { const p = grip.position; p.x += (aim.x - p.x) * 0.35; p.y += (aim.y - p.y) * 0.18; p.z += (aim.z - p.z) * 0.35; }
     world.step(1 / 120, dt, 6);
-    quiet = !joint && calm() ? quiet + dt : 0;
+    if (glide) {
+      const k = Math.min(1, (t - glide.t0) / glide.dur), e = ease(k);
+      glide.moves.forEach(m => { m.b.position.x = m.x0 + (m.x1 - m.x0) * e; m.b.position.z = m.z0 + (m.z1 - m.z0) * e; m.b.velocity.set(0, 0, 0); m.b.angularVelocity.set(0, 0, 0); m.b.aabbNeedsUpdate = true; });
+      if (k === 1) { glide.moves.forEach(m => m.b.sleep()); glide = null; }
+    }
+    quiet = !joint && !glide && calm() ? quiet + dt : 0;
     if (quiet > 1) { rest(); quiet = 0; }
     sync(); draw();
-    if (joint || awake()) raf = requestAnimationFrame(tick);
+    if (joint || glide || awake()) raf = requestAnimationFrame(tick);
   }
   if ('IntersectionObserver' in window) new IntersectionObserver(e => { seen = e[e.length - 1].isIntersecting; start(); }, { threshold: o.threshold || 0 }).observe(area);
   else seen = true;
@@ -224,8 +229,24 @@ async function stage(o) {
   let rs = 0;
   const later = () => { cancelAnimationFrame(rs); rs = requestAnimationFrame(reframe); };
   addEventListener('resize', later);
-  if ('ResizeObserver' in window) { const ro = new ResizeObserver(later); ro.observe(area); if (o.watch) ro.observe(o.watch); }
-  if (o.place) host.addEventListener('transitionend', later);  // the list opening, closing or gliding sideways
+  if ('ResizeObserver' in window) {
+    new ResizeObserver(later).observe(area);
+    if (o.watch) new ResizeObserver(() => { if (dropped) follow(); }).observe(o.watch);  // the list opening or closing
+  }
+
+  // The list opens or closes: the coin beside it glides once to its new place, with the list (0.7 s, the list's own
+  // easing), instead of jumping; a coin thrown elsewhere stays where it is (D, Oct. 15)
+  let glide = null;
+  const ease = p => p < 0.5 ? 4 * p * p * p : 1 - Math.pow(-2 * p + 2, 3) / 2;
+  function follow() {
+    const was = at; if (!frame() || !was) return;
+    const dx = at.x - was.x, dz = at.z - was.z; if (Math.abs(dx) + Math.abs(dz) < 1e-3) return;
+    const near = c => Math.hypot(c.body.position.x - was.x, c.body.position.z - was.z) < 1.5 * R || (glide && glide.moves.some(m => m.b === c.body));
+    const moves = coins.filter(c => c !== held && near(c)).map(c => ({ b: c.body, x0: c.body.position.x, z0: c.body.position.z, x1: c.body.position.x + dx, z1: c.body.position.z + dz }));
+    if (glide) glide.moves.forEach(m => { const n = moves.find(x => x.b === m.b); if (n) { n.x1 = m.x1 + dx; n.z1 = m.z1 + dz; } });  // a second change mid-glide: aim on from the last target
+    if (!moves.length) return;
+    glide = { t0: performance.now(), dur: 700, moves }; moves.forEach(m => m.b.wakeUp()); start();
+  }
 
   // Picking up: a point constraint hangs the coin from the grabbed point, so it tilts and swings with its weight.
   // A miss does nothing: the words and every link under the stage work as before.
@@ -309,14 +330,19 @@ function spot(el) {
 
 // Beside the list's last name, at its left, the coin's bottom on the name's (D, Oct. 15: right next to the text); on a
 // phone, where the list runs the full width, just under it, on the names' left edge
+// It reads where the list will rest, not where it is mid-motion: layout offsets (which ignore the rows' slide into their
+// new order) plus the list's sideways glide at its target (site.js opmetCenter sets style.translate)
 function beside(el, host, list) {
   const rows = [...list.children].filter(r => r.getClientRects().length), last = rows[rows.length - 1]; if (!last) return;
-  const t = (last.querySelector(':scope > a, :scope > .plain') || last).getBoundingClientRect(), h = host.getBoundingClientRect();
-  const yr = last.querySelector('.yr'), y = yr && getComputedStyle(yr).visibility === 'visible' ? yr.getBoundingClientRect() : null;
-  const edge = y && y.width && y.left < t.left ? y.left : t.left;  // the open list's year, in the margin: the coin goes left of it
-  const d = el.offsetWidth, gap = 24, x = edge - gap - d, room = x >= 16;
-  el.style.left = (room ? x : t.left) - h.left + 'px';
-  el.style.top = (room ? t.bottom - d : t.bottom + gap) - h.top + 'px';
+  const name = last.querySelector(':scope > a, :scope > .plain') || last, yr = last.querySelector('.yr');
+  const at = n => { let x = 0, y = 0; for (let e = n; e && e !== host; e = e.offsetParent) { x += e.offsetLeft; y += e.offsetTop; if (!host.contains(e.offsetParent)) break; } return [x, y]; };
+  const shift = parseFloat(list.style.translate) || 0, [nx, ny] = at(name);
+  const left = nx + shift, bottom = ny + name.offsetHeight;
+  const yx = yr && getComputedStyle(yr).visibility === 'visible' && yr.offsetWidth ? at(yr)[0] + shift : Infinity;
+  const edge = Math.min(left, yx);  // the open list's year, in the margin: the coin goes left of it
+  const d = el.offsetWidth, gap = 24, x = edge - gap - d, room = x + host.getBoundingClientRect().left >= 16;
+  el.style.left = (room ? x : left) + 'px';
+  el.style.top = (room ? bottom - d : bottom + gap) + 'px';
   el.style.bottom = 'auto';
 }
 
