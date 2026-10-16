@@ -214,11 +214,19 @@ def coin_url(name):
     with open(os.path.join(ROOT, 'static', 'brand', 'coins', name), 'rb') as f:
         return '/brand/coins/%s?v=%s' % (name, hashlib.sha1(f.read()).hexdigest()[:10])
 
-def coins_spot(kind, stones):
-    """Where more coins you can pick up sit (D, Oct. 15): 'press', two stacked at About's top right; 'work', one at the
-    work list's bottom left. An empty, decorative box (site.css .coins-spot); coins.js drops the coins on it."""
-    return '<span class="coins-spot coins-%s" data-coins="%s" aria-hidden="true"></span>' % (
-        kind, ' '.join(coin_url('opmet-coin_%s.glb' % k) for k in stones))
+def coins_spot(beside):
+    """The work list's coin, one you can pick up (D, Oct. 15): beside the list's last name, at its left (on a phone, just
+    under it). An empty, decorative box (site.css .coins-spot); coins.js places it by the list (beside: its selector)
+    and drops the coin on it."""
+    return '<span class="coins-spot coins-work" data-coins="%s" data-beside="%s" aria-hidden="true"></span>' % (
+        coin_url('opmet-coin_alabaster.glb'), beside)
+
+def about_loops():
+    """About's two script rings, Opmet and Osserpse, overlapping at its top right and cut off by its edges, each turning
+    slowly (D, Oct. 15; static/brand/loops/, from 01 Assets/cursive-script). Decorative."""
+    return ('<div class="loops" aria-hidden="true"><div class="loops-pair">'
+            '<img class="loop loop-opmet" src="/brand/loops/opmet-ring.svg" alt="">'
+            '<img class="loop loop-osserpse" src="/brand/loops/osserpse-ring.svg" alt=""></div></div>')
 
 def header_coin(cls, hooks=''):
     """One coin where a header's hand was: the still at once, the live coin on a fine pointer (coins.js). It keeps the
@@ -720,7 +728,7 @@ def project_body(p, blocks, chapters, notes, all_work='All work', top='Back to t
     # research: each picture's label is a short paragraph, its research (the notes file's "research": Red Mask, D, Oct. 14)
     out = ['<div class="pp%s%s" data-lightbox%s>' % (' pp-air' if notes.get('air') else '', ' pp-research' if notes.get('research') else '',
                                                     ' data-page-only' if p.get('_scripts') else ''),
-           masthead(list(NAME), studio_hand(), ' data-cover', link=('/#work', all_work), lockup=True, home=home),
+           masthead(list(NAME), '', ' data-cover', link=('/#work', all_work), lockup=True, home=home),
            '<section class="open g">%s<h1>%s</h1><p class="lede">%s</p><div class="info">%s%s</div></section>' % (
                '<p class="kicker">%s</p>' % typo(notes['kicker']) if notes.get('kicker') else '', typo(p['title']), typo(notes.get('lede') or p['lede']), dl(facts, 'facts'), dl(credits, 'cr'))]
     starts = {c['starts_at']: c for c in chapters}
@@ -867,7 +875,7 @@ def finished_body(p, all_work='All work', top='Back to top', home='Home'):
     along when it slides in from home); Work, Home and Back to top."""
     return '\n'.join([
         '<div class="pp" data-lightbox>',
-        masthead(list(NAME), studio_hand(), ' data-cover', link=('/#work', all_work), lockup=True, home=home),
+        masthead(list(NAME), '', ' data-cover', link=('/#work', all_work), lockup=True, home=home),
         '<style>\n%s</style>' % p['_css'],
         '<div class="os" data-page="%s" data-page-js="/js/pages/%s.js?v=%s">\n%s</div>' % (p['slug'], p['slug'], p['_jsv'], p['_html']),
         project_foot(all_work, top, home),
@@ -1022,9 +1030,6 @@ def article(e, w):
 def journal_hand():
     pose = 'writing' if os.path.exists(os.path.join(ROOT, 'static', 'brand', 'writing-hand.svg')) else 'stand-in'
     return header_coin('mast-hand', ' data-journal-hand data-pose="%s"' % pose)
-
-def studio_hand():
-    return header_coin('mast-hand', ' data-pose="mark"')
 
 NAME = ('Opmet', 'Osserpse')
 
@@ -1292,7 +1297,7 @@ def main():
     entries = items
     listed = [every[e['slug']] for e in entries if e['page']]  # every page, in the list's order
     pr = site['projects']
-    body = '<section class="index">%s</section><div class="preview" aria-hidden="true"><img alt=""></div>%s' % (list_rows(entries), coins_spot('work', ('alabaster',)))
+    body = '<section class="index">%s</section><div class="preview" aria-hidden="true"><img alt=""></div>%s' % (list_rows(entries), coins_spot('.index .list'))
     write('/projects/index.html', page(site, pr['og_title'], pr['og_description'], '/projects/', body, so, '/projects',
                                        ld=collection_ld(site, listed, wj)))
 
@@ -1331,7 +1336,7 @@ def main():
     foundry = foundry_panel(load(os.path.join(CONTENT, 'foundry.json')), fd['title'], a.drafts) if 'foundry' not in hidden else ''
     ap = site['about']
     press = load(os.path.join(CONTENT, 'press.json'))['press']
-    about_panel = ('<section class="panel side about-panel" id="about" aria-labelledby="about-title">' + coins_spot('press', ('sandstone', 'basalt')) +
+    about_panel = ('<section class="panel side about-panel" id="about" aria-labelledby="about-title">' + about_loops() +
                    '<div class="about-grid"><div class="title-row">'
                    '<h2 class="vh" id="about-title">%s</h2><p class="home-big"><a class="ctl" href="#" data-studio>%s</a></p></div>'
                    '<div class="about-main"><div class="about-body">%s</div></div>'
@@ -1379,7 +1384,7 @@ def main():
         coin_url('opmet-coins_pile.webp'), coin_url('opmet-coins_pile.webp'), esc(site['name']), nav)
     body = ('<div class="stage-clip"><div class="stage" data-stage>%s<div class="panel home-panel">%s<div data-home>%s%s%s</div></div>%s</div></div>'
             '<section class="project-panel" id="project" aria-label="Project"><div class="project-inner"></div></section>') % (
-        foundry, blog, cover, work_section(items, h['work']), coins_spot('work', ('alabaster',)), about_panel)
+        foundry, blog, cover, work_section(items, h['work']), coins_spot('.work .works'), about_panel)
     # Arriving at a panel's address opens it at once: only the panels home carries (a hidden section's isn't built)
     names = '|'.join(n for n, sec in (('foundry', 'foundry'), ('about', 'about'), ('blog', 'journal')) if sec not in hidden)
     early = '<script>if(/^#(%s)([\\/?]|$)/.test(location.hash))document.documentElement.classList.add("at-"+location.hash.slice(1).split(/[\\/?]/)[0])</script>\n' % names

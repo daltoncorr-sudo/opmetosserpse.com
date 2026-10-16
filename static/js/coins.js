@@ -68,8 +68,8 @@ function lights(L, scene, r, map) {
 }
 
 /* ---------------- the stages: coins you can pick up ---------------- */
-// Three stages, each its own canvas and physics: the cover (three coins dropped into the hand's slot), About (two coins
-// stacked at its top right) and the work list (one coin at its bottom left, on home and on /projects/). A stage's
+// Two kinds of stage, each its own canvas and physics: the cover (three coins dropped into the hand's slot) and the work
+// list (one coin beside its last name, on home and on /projects/). A stage's
 // coins drop when it first comes into view, and draw only while one is awake or held and the stage is in sight.
 
 // The cover's pile: three slots, in coin radii, that overlap by about a tenth of a coin, each a little above its
@@ -83,12 +83,6 @@ function coverPile(rnd) {
   const rot = PILE.map(p => ({ x: p.x * flip + (rnd() - 0.5) * 0.14, z: p.z + (rnd() - 0.5) * 0.14, y: p.y }))
     .map(p => ({ x: p.x * c - p.z * s, z: p.x * s + p.z * c, y: p.y }));
   return slotOf.map(k => ({ ...rot[k], yaw: -turn + (rnd() - 0.5) * 0.8, tilt: 0.32, spin: 1 }));
-}
-// About's stack (D, Oct. 15): basalt first, sandstone on top of it, a third of a coin off center so both show
-function stackPile(rnd) {
-  const turn = (rnd() - 0.5) * 0.6, c = Math.cos(turn), s = Math.sin(turn), ox = 0.36 * c + 0.26 * s, oz = 0.36 * s - 0.26 * c;
-  const yaw = () => -turn + (rnd() - 0.5) * 0.4;
-  return [{ x: ox / 2, z: oz / 2, y: T + 0.45, yaw: yaw(), tilt: 0.1, spin: 0.3 }, { x: -ox / 2, z: -oz / 2, y: 0.1, yaw: yaw(), tilt: 0.1, spin: 0.3 }];
 }
 // The work list's one coin (D, Oct. 15)
 const onePile = rnd => [{ x: 0, z: 0, y: 0.35, yaw: (rnd() - 0.5) * 0.5, tilt: 0.08, spin: 0.15 }];  // nearly flat: it lands, not rolls
@@ -154,6 +148,7 @@ async function stage(o) {
     return ray.ray.intersectPlane(new THREE.Plane(up, -h), new THREE.Vector3());
   }
   function frame() {
+    if (o.place) o.place();
     const cr = area.getBoundingClientRect(), b = slot.getBoundingClientRect(), dy = o.shift ? o.shift() : 0;
     const sr = { left: b.left, top: b.top - dy, width: b.width, height: b.height };  // where the slot rests
     if (!cr.width || !cr.height || !sr.height) return null;
@@ -229,7 +224,8 @@ async function stage(o) {
   let rs = 0;
   const later = () => { cancelAnimationFrame(rs); rs = requestAnimationFrame(reframe); };
   addEventListener('resize', later);
-  if ('ResizeObserver' in window) new ResizeObserver(later).observe(area);
+  if ('ResizeObserver' in window) { const ro = new ResizeObserver(later); ro.observe(area); if (o.watch) ro.observe(o.watch); }
+  if (o.place) host.addEventListener('transitionend', later);  // the list opening, closing or gliding sideways
 
   // Picking up: a point constraint hangs the coin from the grabbed point, so it tilts and swings with its weight.
   // A miss does nothing: the words and every link under the stage work as before.
@@ -296,16 +292,32 @@ function cover(slot) {
   afterPaint().then(() => stage({ host: sec, area: sec, slot, unit: 0.56, scaled: true, pile: coverPile, shift,
     fail: () => still(slot), shown: () => slot.classList.add('is-live') }));
 }
-// About's stack and the work list's coin (D, Oct. 15): a spot (build.py coins_spot) marks where and how big; the stage
-// covers the screen around it. They load when the stage nears the screen, and drop once it is mostly in view.
+// The work list's coin (D, Oct. 15): a spot (build.py coins_spot) marks where and how big, placed beside the list's last
+// name; the stage covers the screen around it, the list's last. It loads when the stage nears the screen, and drops once
+// it is mostly in view.
 function spot(el) {
   const host = el.parentElement, area = document.createElement('div');
-  area.className = 'coins-area ' + (el.classList.contains('coins-press') ? 'coins-area-top' : 'coins-area-bottom');
+  area.className = 'coins-area coins-area-bottom';
   area.setAttribute('aria-hidden', 'true'); host.insertBefore(area, el);
-  const go = () => stage({ host, area, slot: el, unit: 1, pile: el.classList.contains('coins-press') ? stackPile : onePile, threshold: 0.5, walls: 0.995 });
+  const list = document.querySelector(el.getAttribute('data-beside')), place = list ? () => beside(el, host, list) : null;
+  if (place) place();
+  const go = () => stage({ host, area, slot: el, unit: 1, pile: onePile, threshold: 0.5, walls: 0.995, place, watch: list });
   if (!('IntersectionObserver' in window)) return afterPaint().then(go);
   const io = new IntersectionObserver(e => { if (e.some(x => x.isIntersecting)) { io.disconnect(); afterPaint().then(go); } }, { rootMargin: '50% 0px' });
   io.observe(area);
+}
+
+// Beside the list's last name, at its left, the coin's bottom on the name's (D, Oct. 15: right next to the text); on a
+// phone, where the list runs the full width, just under it, on the names' left edge
+function beside(el, host, list) {
+  const rows = [...list.children].filter(r => r.getClientRects().length), last = rows[rows.length - 1]; if (!last) return;
+  const t = (last.querySelector(':scope > a, :scope > .plain') || last).getBoundingClientRect(), h = host.getBoundingClientRect();
+  const yr = last.querySelector('.yr'), y = yr && getComputedStyle(yr).visibility === 'visible' ? yr.getBoundingClientRect() : null;
+  const edge = y && y.width && y.left < t.left ? y.left : t.left;  // the open list's year, in the margin: the coin goes left of it
+  const d = el.offsetWidth, gap = 24, x = edge - gap - d, room = x >= 16;
+  el.style.left = (room ? x : t.left) - h.left + 'px';
+  el.style.top = (room ? t.bottom - d : t.bottom + gap) - h.top + 'px';
+  el.style.bottom = 'auto';
 }
 
 /* ---------------- the headers: one coin where the hand was ---------------- */
