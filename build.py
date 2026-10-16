@@ -312,7 +312,7 @@ def page(site, title, desc, path, body, og_image=None, current=None, extra_head=
            email=site['email'], line=esc(site['line']), copy=esc(site['copyright']), privacy=esc(site['privacy_line']),
            v=site['_v'], extra=extra_head, ink=ink_filters(), page_cls=page_cls, og_type=og_type, main_cls=' class="%s"' % main_cls if main_cls else '',
            data=data, coins=coins, fav32=coin_url('opmet-favicon-32.png'), fav64=coin_url('opmet-favicon-64.png'),
-           fav180=coin_url('opmet-favicon-180.png'))  # the favicon: the dark hand coin (D, Oct. 16)
+           fav180=coin_url('opmet-favicon-180.png'))  # the favicon: the handprint from the dark hand coin (D, Oct. 16)
 
 def write(path, text):
     full = os.path.join(DIST, path.lstrip('/'))
