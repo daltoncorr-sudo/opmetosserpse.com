@@ -440,41 +440,66 @@ function coverSpots(j, g) {
   return sp;
 }
 
-// About's pair (D, Oct. 16): the cup and the wave, a tenth of a coin apart, the cup first. Their spot (about) is set by
-// aboutPlace; the pair is centered on it.
-const aboutPile = rnd => [{ x: -1.1, z: 0, y: 0.3, yaw: (rnd() - 0.5) * 0.5, tilt: 0.04, spin: 0.4 },
-                          { x: 1.1, z: 0, y: 0.3, yaw: (rnd() - 0.5) * 0.5, tilt: 0.04, spin: 0.4 }];
+// About (D, Oct. 16): two coins in the upper right, above the press, where the rings were (on one column, in the room at
+// the top that the rings took, at the right); and the cup right next to "espresso tempo", as large as fits between the
+// lines around it. Each is its own stage over the panel's text, which scrolls in itself, and loads only once About is in
+// view. Each spot is placed from the text on load and when the width changes.
+const aboutPile = rnd => [{ x: -1.1, z: -0.2, y: 0.3, yaw: (rnd() - 0.5) * 0.5, tilt: 0.04, spin: 0.4 },
+                          { x: 1.1, z: 0.2, y: 0.3, yaw: (rnd() - 0.5) * 0.5, tilt: 0.04, spin: 0.4 }];
 function about(el) {
-  const panel = el.closest('.about-panel');
-  // The panel scrolls in itself: the stage is a box from its top down past the pair's spot, so it scrolls with the text
+  const panel = el.closest('.about-panel'), cup = el.classList.contains('coins-cup');
   const area = document.createElement('div'); area.className = 'coins-about-area'; area.setAttribute('aria-hidden', 'true'); el.parentNode.insertBefore(area, el);  // positioned from the panel
-  const place = () => { aboutPlace(el, panel); const g = el.parentNode; area.style.height = Math.max(panel.clientHeight, Math.min(el.offsetTop + el.offsetHeight * 2, g.offsetTop + g.offsetHeight), (el.offsetTop + el.offsetHeight * 1.06) / 0.995) + 'px'; };  // past the text's end only as far as the coins need
+  const place = () => {
+    (cup ? cupPlace : pairPlace)(el, panel);
+    const g = el.parentNode; area.style.height = Math.max(panel.clientHeight, Math.min(el.offsetTop + el.offsetHeight * 2, g.offsetTop + g.offsetHeight), (el.offsetTop + el.offsetHeight * 1.06) / 0.995) + 'px';
+  };
   place();
-  const go = () => stage({ host: panel, area, slot: el, unit: 1, pile: aboutPile, seq: 500, walls: 0.995, place, dropWhen: el, ready: () => atRest(panel), shown: () => {} });
-  // loads only once About comes into view, so home never pays for it
+  const go = () => stage({ host: panel, area, slot: el, unit: 1, pile: cup ? onePile : aboutPile, seq: 500, walls: 0.995, place, dropWhen: el, ready: () => atRest(panel), shown: () => {} });
   if (!('IntersectionObserver' in window)) return afterPaint().then(go);
   const io = new IntersectionObserver(e => { if (e.some(x => x.intersectionRect.width >= 2)) { io.disconnect(); afterPaint().then(go); } }, { threshold: [0.01, 0.1] });  // a sliver at the screen's edge (it rests 0.03 px in) isn't in view
   io.observe(area);
 }
-// Open paper for About's pair, left-aligned to the text: first at the foot of the panel's first screen, bottom left; where
-// that would touch text (a long first screen), straight down, past each block it touches, to the first place where both
-// coins clear every text block by 0.12 d.
-function aboutPlace(el, panel) {
-  const pr = panel.getBoundingClientRect(), d = el.offsetWidth, gap = 0.12 * d;
-  const y0 = pr.top - panel.scrollTop, box = e => { const r = e.getBoundingClientRect(); return { l: r.left - pr.left, t: r.top - y0, r: r.right - pr.left, b: r.bottom - y0 }; };
-  const all = [...panel.querySelectorAll('.about-body p, .title-row, .about-press li, .about-press p')].map(box).filter(b => b.r > b.l && b.b > b.t);
-  const body = [...panel.querySelectorAll('.about-body p')].map(box).filter(b => b.r > b.l);
-  if (!all.length || !body.length) return;
-  const left = Math.min(...body.map(b => b.l));
-  const near = (b, x, y) => Math.hypot(Math.max(b.l - x, 0, x - b.r), Math.max(b.t - y, 0, y - b.b)) < d / 2 + gap;
-  let top = panel.clientHeight - 24 - d;
-  for (let k = 0; k < 80; k++) {
-    const hits = all.filter(b => near(b, left + d / 2, top + d / 2) || near(b, left + 1.6 * d, top + d / 2));
-    if (!hits.length) break;
-    top = Math.max(...hits.map(b => b.b)) + gap + 1;
-  }
-  el.style.left = (left + 0.55 * d) + 'px'; el.style.top = top + 'px';  // the spot's center is the pair's, 1.05 d from its left
+// The panel's text, in its own coordinates (it scrolls in itself): one box per line of the paragraphs, and the press's rows
+function aboutText(panel) {
+  const pr = panel.getBoundingClientRect(), y0 = pr.top - panel.scrollTop;
+  const rel = r => ({ l: r.left - pr.left, t: r.top - y0, r: r.right - pr.left, b: r.bottom - y0 });
+  const lines = e => { const rg = document.createRange(); rg.selectNodeContents(e); return [...rg.getClientRects()]; };
+  const body = [...panel.querySelectorAll('.about-body p, .title-row')].flatMap(lines).map(rel).filter(b => b.r > b.l && b.b > b.t);
+  const press = [...panel.querySelectorAll('.about-press li, .about-press p')].map(e => rel(e.getBoundingClientRect())).filter(b => b.r > b.l && b.b > b.t);
+  return { pr, rel, body, press, all: body.concat(press) };
 }
+const clears = (all, x, y, rad, gap) => all.every(b => Math.hypot(Math.max(b.l - x, 0, x - b.r), Math.max(b.t - y, 0, y - b.b)) >= rad + gap);
+function pairPlace(el, panel) {
+  el.style.width = el.style.height = ''; const d = el.offsetWidth, gap = 0.12 * d;
+  const { body, press } = aboutText(panel); if (!body.length) return;
+  const bodyR = Math.max(...body.map(b => b.r)), top = Math.min(...body.map(b => b.t));
+  let cx, cy;
+  if (press.length && Math.min(...press.map(b => b.l)) > bodyR) {  // two columns: over the press, its bottom coin 0.12 d above it
+    const pl = Math.min(...press.map(b => b.l)), pr = Math.max(...press.map(b => b.r)), pt = Math.min(...press.map(b => b.t));
+    cx = (pl + pr) / 2; cy = pt - gap - 0.62 * d;
+  } else {  // one column: in the room above Home, at the right of the text
+    cx = bodyR - 1.05 * d; cy = Math.max(top / 2, 0.75 * d);
+  }
+  el.style.left = (cx - d / 2) + 'px'; el.style.top = (cy - d / 2) + 'px';
+}
+function cupPlace(el, panel) {
+  el.style.width = el.style.height = ''; const d = el.offsetWidth;
+  const link = [...panel.querySelectorAll('.about-body a')].find(a => /espresso tempo/i.test(a.textContent)); if (!link) return;
+  const T2 = aboutText(panel), p = link.closest('p');
+  const lr = T2.rel([...link.getClientRects()].pop());
+  const own = (() => { const rg = document.createRange(); rg.selectNodeContents(p); return [...rg.getClientRects()].map(T2.rel); })();
+  const right = Math.max(...own.filter(b => (b.t + b.b) / 2 > lr.t && (b.t + b.b) / 2 < lr.b).map(b => b.r));  // the end of the line "espresso tempo." is on (glyph boxes overlap the lines around: by their middles)
+  const mid = (lr.t + lr.b) / 2, lh = lr.b - lr.t;
+  for (let s = Math.round(d); s >= 28; s -= 2) {  // as large as fits, as close to the line's middle as it can sit (down to two lines below)
+    const gap = 0.16 * s, x = right + 0.3 * s + s / 2;  // 0.12 s of paper, and room for the coin to settle
+    if (x + s / 2 > T2.pr.width - 16) continue;
+    for (let k = 0; k <= 60; k++) {
+      const y = mid + (k % 3 ? Math.ceil(k * 2 / 3) : -k / 3) * lh / 10;
+      if (clears(T2.all, x, y, s / 2, gap)) { Object.assign(el.style, { width: s + 'px', height: s + 'px', left: (x - s / 2) + 'px', top: (y - s / 2) + 'px' }); return; }
+    }
+  }
+}
+
 // The work list's coin (D, Oct. 15): a spot (build.py coins_spot) marks where and how big, right next to the list's last
 // name; the stage is a track over the list's part of the page with a window onto it pinned to the browser window, so the
 // coin can be seen, picked up and thrown wherever it is on screen, and dragged anywhere in that part of the page. It
