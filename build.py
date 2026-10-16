@@ -258,8 +258,11 @@ def page(site, title, desc, path, body, og_image=None, current=None, extra_head=
     # back to the cover.
     header = '' if path == '/' or not header else ('<header class="site-header"><a class="lockup" href="/">%s<span class="wordmark">%s</span></a></header>'
                                      % (header_coin('lockup-hand'), esc(site['name'])))
-    # The coins' module, on the pages that have a coin (the cover, every header)
+    # The coins' module, on the pages that have a coin (the cover, every header); the header coin's still, preloaded so
+    # it is there at the first paint (it is site.css's, so the browser would find it late)
     coins = '<script type="module" src="/js/coins.js?v=%s"></script>\n' % site['_cv'] if 'data-coin' in header + body else ''
+    if 'data-coin="' in header + body:
+        extra_head += '<link rel="preload" href="/brand/coins/opmet-coin_header.webp" as="image" type="image/webp">\n'
     # Which way the page flips: forward onto a project, back onto home
     page_cls = ' class="page-home"' if path == '/' else ' class="page-project"' if path.startswith('/projects/') and path != '/projects/' else ''
     nav = header
@@ -1367,9 +1370,10 @@ def main():
           '<meta name="robots" content="noindex"><script>location.replace("%s")</script></head>'
           '<body><p><a href="%s">%s</a></p></body></html>\n' % (esc(to_title), site['domain'], to, to, to, to, esc(to_name)))
     # The coins and the name: the name is live text in Opmet Serif, upright (static/fonts/opmet-serif/opmet-serif.woff2).
-    # The hand's slot (.mark) holds the coins: coins.js drops them there, or puts the still in it when 3D can't run.
+    # The hand's slot (.mark) holds the coins: the pile's still from the first frame, then the live coins (coins.js),
+    # which drop as soon as they load; the still stays when 3D can't run.
     cover = ('<section class="cover"><div class="cover-inner"><h1><span class="mark" role="img" aria-label="%s" data-coins="%s" data-coins-still="%s">'
-             '<noscript><img class="coins-still" src="%s" alt=""></noscript></span><span class="name">%s</span></h1>'
+             '<img class="coins-still" src="%s" alt=""></span><span class="name">%s</span></h1>'
              '<nav class="cover-nav" aria-label="Site">%s</nav></div></section>') % (
         esc(COIN_LABEL), ' '.join(coin_url('opmet-coin_%s.glb' % k) for k in ('sandstone', 'basalt', 'alabaster')),
         coin_url('opmet-coins_pile.webp'), coin_url('opmet-coins_pile.webp'), esc(site['name']), nav)

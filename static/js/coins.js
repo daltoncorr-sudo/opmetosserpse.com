@@ -101,7 +101,8 @@ function still(slot) {  // when 3D can't run on the cover: the pile as a picture
 }
 
 // o.host: takes the pointer and holds the cursor; o.area: the canvas covers it; o.slot: where the pile sits, its
-// height the coin's size (o.unit: a coin's diameter as a share of it); o.pile(rnd): where each coin starts;
+// height the coin's size (o.unit: a coin's diameter as a share of it, times --coins-scale when o.scaled: the cover;
+// a spot is already the coin's size, site.css --coin-d); o.pile(rnd): where each coin starts;
 // o.ready: what the drop waits for once the stage is in view; o.fail: what to show if 3D can't run.
 async function stage(o) {
   const { host, area, slot } = o;
@@ -153,10 +154,11 @@ async function stage(o) {
     return ray.ray.intersectPlane(new THREE.Plane(up, -h), new THREE.Vector3());
   }
   function frame() {
-    const cr = area.getBoundingClientRect(), sr = slot.getBoundingClientRect();
+    const cr = area.getBoundingClientRect(), b = slot.getBoundingClientRect(), dy = o.shift ? o.shift() : 0;
+    const sr = { left: b.left, top: b.top - dy, width: b.width, height: b.height };  // where the slot rests
     if (!cr.width || !cr.height || !sr.height) return null;
     r.setSize(cr.width, cr.height, false); cam.aspect = cr.width / cr.height;
-    const k = o.unit / 2 * sr.height * (parseFloat(getComputedStyle(slot).getPropertyValue('--coins-scale')) || 1);  // pixels per unit
+    const k = o.unit / 2 * sr.height * (o.scaled ? parseFloat(getComputedStyle(slot).getPropertyValue('--coins-scale')) || 1 : 1);  // pixels per unit
     const dist = cr.height / 2 / k / Math.tan(13 * Math.PI / 180);
     cam.position.set(0, dist * Math.cos(0.10), dist * Math.sin(0.10)); cam.lookAt(0, 0, 0); cam.updateProjectionMatrix(); cam.updateMatrixWorld();
     const was = at;
@@ -185,6 +187,7 @@ async function stage(o) {
     dropped = true;
     if (reduce) settle();  // reduced motion: the pile already settled
     sync(); draw(); start();
+    canvas.classList.add('is-on'); if (o.shown) o.shown();  // the coins fade in as they fall (site.css)
   }
   // A resize, a turn of the phone or a list opening: frame again and move the pile with its slot, settled
   function reframe() {
@@ -284,12 +287,14 @@ async function stage(o) {
 const inertWatch = [];
 new MutationObserver(() => inertWatch.forEach(f => f())).observe(document.documentElement, { attributes: true, attributeFilter: ['inert'], subtree: true });
 
-// The cover: after the first paint; the drop waits for the cover's arrive (1.6 s), and until then the slot is empty,
-// as it was before the hand appeared
+// The cover: loads after the first paint and drops as soon as it can, while the name arrives (D, Oct. 15: an empty slot
+// looked odd). Until then the pile's still holds the slot (build.py); it fades out as the coins fade in, and stays if
+// 3D can't run. shift: the arrive's lift, so the pile lands where the slot rests.
 function cover(slot) {
   const sec = slot.closest('.cover'), inner = sec.querySelector('.cover-inner');
-  afterPaint().then(() => stage({ host: sec, area: sec, slot, unit: 0.56, pile: coverPile, fail: () => still(slot),
-    ready: () => Promise.all((inner && inner.getAnimations ? inner.getAnimations() : []).map(a => a.finished.catch(() => {}))) }));
+  const shift = () => inner ? new DOMMatrixReadOnly(getComputedStyle(inner).transform).m42 : 0;
+  afterPaint().then(() => stage({ host: sec, area: sec, slot, unit: 0.56, scaled: true, pile: coverPile, shift,
+    fail: () => still(slot), shown: () => slot.classList.add('is-live') }));
 }
 // About's stack and the work list's coin (D, Oct. 15): a spot (build.py coins_spot) marks where and how big; the stage
 // covers the screen around it. They load when the stage nears the screen, and drop once it is mostly in view.

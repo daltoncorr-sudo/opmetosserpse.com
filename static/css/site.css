@@ -27,7 +27,8 @@
   --slide:.9s; --slide-ease:cubic-bezier(.65,0,.35,1); --open:.7s;
   /* The cover */
   --hand-h:clamp(120px,24vh,260px); --hand-w:calc(var(--hand-h) * .484); --lockup-gap:clamp(18px,2vw,32px);
-  /* The stone coins (D, Oct. 15, 2026): a cover coin's diameter is 0.56 of the slot's height times this */
+  /* The stone coins (D, Oct. 15, 2026): a cover coin's diameter is 0.56 of the slot's height times this. About's stack
+     and the work list's coin are the same size (--coin-d, below); the header coins stay small */
   --coins-scale:1;
   /* One spacing scale, used everywhere on home */
   --s1:8px; --s2:16px; --s3:24px; --s4:40px; --s5:64px; --s6:104px;
@@ -41,8 +42,10 @@
   --title-font:var(--serif); --title-weight:900;
   /* The exception (D, Oct. 15): the cover's name and the About text are Opmet Serif regular, not Black */
   --name-weight:400;
-  /* The name beside the coin at the top of inner pages: Opmet Serif Light (D, Oct. 15) */
-  --header-name-weight:300;
+  /* The name beside the coin at the top of inner pages: Opmet Serif Bold, larger than it was, to read easily (D, Oct.
+     15; it was Light, then hard to read at its size) */
+  --header-name-weight:700; --header-name-size:clamp(20px,1.7vw,24px);
+  --coin-d:calc(var(--hand-h) * .56 * var(--coins-scale));  /* the cover coin's diameter */
   /* Controls: one face and size for every list link, toggle and filter; pure black only for the chosen filter */
   --ctl-font:var(--serif); --ctl-size:clamp(17px,1.35vw,20px); --black:#000;
 }
@@ -109,7 +112,7 @@ ul{list-style:none;margin:0;padding:0}
 .site-header{position:relative;display:flex;justify-content:center;padding:28px var(--gutter) 0}
 .lockup{display:flex;align-items:flex-end;gap:13px;color:var(--ink)}
 .lockup-hand{display:block;height:42px;width:calc(var(--coin) * .86)}  /* the hand's height, the coin's disc's width */
-.lockup .wordmark{display:block;margin-bottom:4px;font:var(--header-name-weight) calc(168px / 9.95)/1.17 var(--title-font);white-space:nowrap}  /* the size it had at 168px wide in Black (9.95em) */
+.lockup .wordmark{display:block;margin-bottom:4px;font:var(--header-name-weight) var(--header-name-size)/1.17 var(--title-font);white-space:nowrap}
 /* The coin where the hand was (D, Oct. 15, 2026; static/js/coins.js): about 1.5 times the hand's height, 64px (48px on
    phones). Its box is as wide as its disc (the still's disc has a 7% margin), so the coin and the name center as a
    pair, and as tall as the hand was: the coin bleeds up into the header's top padding, so the header and everything
@@ -170,7 +173,7 @@ html.is-locked{overflow:hidden}
 .mast-hand[data-pose="mark"]{left:calc(100% + .1em)}
 .mast-hand[data-journal-hand]{width:calc(1.18em * 1039 / 863);--coin:calc(1.18em * 1.5);--coin-x:auto}
 .mast-hand[data-journal-hand]::before,.mast-hand[data-journal-hand] canvas{left:0}
-.journal .mast .mast-name{font-weight:var(--header-name-weight)}  /* the name and Journal in Light (D, Oct. 15) */
+.journal .mast .mast-name{font-weight:var(--header-name-weight)}  /* the name and Journal in Bold (D, Oct. 15) */
 .journal .mast .mast-name{position:relative}.journal .mast-last{position:static}  /* the coin right of the whole name, level with Journal: taller than the hand, it would meet Osserpse */
 .journal-line{margin:18px 0 0;font:400 20px/1.4 var(--serif);letter-spacing:.01em;color:var(--tag-gray)}
 .mast .mast-link{display:flex;flex-wrap:wrap;justify-content:center;gap:0 var(--s3);margin:var(--s3) 0 0}  /* All work, and Home beside it */
@@ -315,14 +318,20 @@ html:not(.js) .stage:has(#about:target){transform:translateX(-66.6667%)}
 /* The stone coins on the cover (D, Oct. 15, 2026; static/js/coins.js): one transparent canvas over the whole cover,
    the coins drawn at the hand's slot; it takes no clicks, so the name, the nav and every link work as before. A
    pointer over a coin grabs it. When 3D can't run, the still sits in the slot at the pile's size. */
-.coins-stage{position:absolute;left:0;top:0;width:100%;height:100%;z-index:1;pointer-events:none}
+.coins-stage{position:absolute;left:0;top:0;width:100%;height:100%;z-index:1;pointer-events:none;opacity:0;transition:opacity var(--t) var(--ease)}
+.coins-stage.is-on{opacity:1}  /* the coins fade in as they fall */
+/* The still holds the slot only when the coins are slow to load: it fades in after 0.7s, and gives way to them */
+.cover .mark .coins-still{transition:opacity var(--t) var(--ease);animation:coins-still-in var(--t) var(--ease) .7s both}
+@keyframes coins-still-in{from{opacity:0}}
+.cover .mark.is-live .coins-still{opacity:0;animation:none}
 .coin-over,.coin-over *{cursor:grab}
 .coin-held,.coin-held *{cursor:grabbing;-webkit-user-select:none;user-select:none}
 /* More coins you can pick up (D, Oct. 15): two stacked at About's top right, level with Home and on the press list's
    right edge; one at the work list's bottom left, on the page margin (home and /projects/). The spot is the coin's
    size and place; the stage (.coins-area) is the screen around it: About's first screen, the list's last. */
-.coins-spot{position:absolute;width:var(--coin-d);height:var(--coin-d);pointer-events:none;--coin-d:clamp(52px,6.4vw,96px)}
+.coins-spot{position:absolute;width:var(--coin-d);height:var(--coin-d);pointer-events:none}  /* the cover coin's size (D) */
 .coins-press{top:calc(12vh + 15px - var(--coin-d) / 2);right:calc(var(--gutter) + clamp(8px,calc(4vw - var(--gutter)),56px))}
+@media (max-width:860px){.coins-press{top:calc(20px + var(--coin-d) * .12)}}  /* one column: the stack at the top, clear of the text */
 @media (max-width:599px){.coins-press{right:var(--gutter)}}
 .coins-work{left:0;bottom:var(--s5)}
 main>.coins-work{left:var(--gutter)}
@@ -443,12 +452,12 @@ main>.coins-work{left:var(--gutter)}
 .pp a:hover{color:var(--gray)}
 /* The masthead on a project page is the studio's nameplate, small (D, Oct. 10): the hand mark to the left of Opmet
    Osserpse, the two words left-justified on each other, the pair centered. The project's title is the focus. */
-.pp .mast{--mh:clamp(17px,1.3vw,19px);padding-top:clamp(28px,5vh,56px)}
+.pp .mast{--mh:var(--header-name-size);padding-top:clamp(28px,5vh,56px)}
 /* The nameplate: the hand beside Opmet Osserpse, one line, the hand centered on it (D, Oct. 13) */
 .mast .mast-lockup{display:flex;align-items:center;gap:13px;line-height:1.2;letter-spacing:0;width:max-content;max-width:100%;margin:0 auto;text-align:left}
 .mast-lockup .mast-hand{position:relative;left:auto;bottom:auto;flex:none;height:42px;width:calc(var(--coin) * .86);--coin-y:calc((42px - var(--coin)) / 2)}
-.mast .mast-lockup .mast-words{font-weight:var(--header-name-weight)}  /* the name in Light (D, Oct. 15) */
-.pp .mast .mast-link{margin-top:14px}
+.mast .mast-lockup .mast-words{font-weight:var(--header-name-weight)}  /* the name in Bold (D, Oct. 15) */
+.pp .mast .mast-link{margin-top:28px}  /* more room under the nameplate before Work and Home (D, Oct. 15; was 14px) */
 .pp figure,.pp h1,.pp h2,.pp p,.pp dl,.pp dd{margin:0}.pp h1,.pp h2{font-weight:400}
 .pp .ph{color:var(--gray);font-style:italic}
 .pp .g{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));column-gap:var(--g);padding:0 var(--m)}
