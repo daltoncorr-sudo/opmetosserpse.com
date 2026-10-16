@@ -446,24 +446,30 @@ const aboutPile = rnd => [{ x: -1.1, z: 0, y: 0.3, yaw: (rnd() - 0.5) * 0.5, til
                           { x: 1.1, z: 0, y: 0.3, yaw: (rnd() - 0.5) * 0.5, tilt: 0.04, spin: 0.4 }];
 function about(el) {
   const panel = el.closest('.about-panel');
-  const place = () => aboutPlace(el, panel);
+  // The panel scrolls in itself: the stage is a box from its top down past the pair's spot, so it scrolls with the text
+  const area = document.createElement('div'); area.className = 'coins-about-area'; area.setAttribute('aria-hidden', 'true'); el.parentNode.insertBefore(area, el);  // positioned from the panel
+  const place = () => { aboutPlace(el, panel); const g = el.parentNode; area.style.height = Math.max(panel.clientHeight, Math.min(el.offsetTop + el.offsetHeight * 2, g.offsetTop + g.offsetHeight), (el.offsetTop + el.offsetHeight * 1.06) / 0.995) + 'px'; };  // past the text's end only as far as the coins need
   place();
-  const go = () => stage({ host: panel, area: panel, slot: el, unit: 1, pile: aboutPile, seq: 500, walls: 0.94, place, dropWhen: el, ready: () => atRest(panel), shown: () => {} });
+  const go = () => stage({ host: panel, area, slot: el, unit: 1, pile: aboutPile, seq: 500, walls: 0.995, place, dropWhen: el, ready: () => atRest(panel), shown: () => {} });
   afterPaint().then(go);
 }
-// Open paper at the foot of About's first screen, bottom left, left-aligned to the text, if the pair clears every text block
-// on the first screen by 0.12 d; if not (a long first screen), under the last text block of it, left-aligned to the text.
+// Open paper for About's pair, left-aligned to the text: first at the foot of the panel's first screen, bottom left; where
+// that would touch text (a long first screen), straight down, past each block it touches, to the first place where both
+// coins clear every text block by 0.12 d.
 function aboutPlace(el, panel) {
   const pr = panel.getBoundingClientRect(), d = el.offsetWidth, gap = 0.12 * d;
-  const box = e => { const r = e.getBoundingClientRect(); return { l: r.left - pr.left, t: r.top - pr.top, r: r.right - pr.left, b: r.bottom - pr.top }; };
-  const seen = e => { const b = box(e); return b.r > b.l && b.b > b.t && b.t < innerHeight; };
-  const all = [...panel.querySelectorAll('.about-body p, .title-row, .about-press li, .about-press p')].filter(seen).map(box);
-  if (!all.length) return;
-  const textL = Math.min(...all.map(b => b.l)), textB = Math.max(...all.map(b => b.b));
-  const clear = (x, y) => all.every(b => Math.hypot(Math.max(b.l - x, 0, x - b.r), Math.max(b.t - y, 0, y - b.b)) >= d / 2 + gap);
-  const pairOK = (l, t) => clear(l + d / 2, t + d / 2) && clear(l + 1.6 * d, t + d / 2);
-  let left = textL, top = innerHeight - 24 - d;
-  if (!pairOK(left, top)) top = textB + gap;
+  const y0 = pr.top - panel.scrollTop, box = e => { const r = e.getBoundingClientRect(); return { l: r.left - pr.left, t: r.top - y0, r: r.right - pr.left, b: r.bottom - y0 }; };
+  const all = [...panel.querySelectorAll('.about-body p, .title-row, .about-press li, .about-press p')].map(box).filter(b => b.r > b.l && b.b > b.t);
+  const body = [...panel.querySelectorAll('.about-body p')].map(box).filter(b => b.r > b.l);
+  if (!all.length || !body.length) return;
+  const left = Math.min(...body.map(b => b.l));
+  const near = (b, x, y) => Math.hypot(Math.max(b.l - x, 0, x - b.r), Math.max(b.t - y, 0, y - b.b)) < d / 2 + gap;
+  let top = panel.clientHeight - 24 - d;
+  for (let k = 0; k < 80; k++) {
+    const hits = all.filter(b => near(b, left + d / 2, top + d / 2) || near(b, left + 1.6 * d, top + d / 2));
+    if (!hits.length) break;
+    top = Math.max(...hits.map(b => b.b)) + gap + 1;
+  }
   el.style.left = (left + 0.55 * d) + 'px'; el.style.top = top + 'px';  // the spot's center is the pair's, 1.05 d from its left
 }
 // The work list's coin (D, Oct. 15): a spot (build.py coins_spot) marks where and how big, right next to the list's last
