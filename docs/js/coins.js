@@ -37,9 +37,10 @@ function three() {
 // and offset that put the coin at the origin, so the mesh keeps them inside a holder, and the holder is what moves.
 // Sandstone and basalt keep their own material, matte; alabaster gets a touch of translucency.
 const models = {};
-// Each model's stone, in one place: alabaster takes the alabaster material (the hand and the quill); sandstone and basalt
-// keep their own, matte.
-const ALABASTER = /opmet-coin_(alabaster|quill)/;
+// Each model's surface, in one place: alabaster's polished, slightly translucent material for the alabaster hand and the
+// quill, and for the cup and the eye, which keep their own color (D, Oct. 16: matte and polished stone mixed on the
+// cover); the rest keep their own, matte.
+const ALABASTER = /opmet-coin_(alabaster|quill|cup|eye)/;
 // A model lightened from its own baked color, so the basalt hand is the cover's only dark coin (D, Oct. 16)
 const LIGHTER = { dancer: 2.5 };
 function coin(url) {
