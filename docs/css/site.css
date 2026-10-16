@@ -326,20 +326,27 @@ html:not(.js) .stage:has(#about:target){transform:translateX(-66.6667%)}
 .cover .mark.is-live .coins-still{opacity:0;animation:none}
 .coin-over,.coin-over *{cursor:grab}
 .coin-held,.coin-held *{cursor:grabbing;-webkit-user-select:none;user-select:none}
-/* About's rings (D, Oct. 15): Opmet and Osserpse in script, two rings overlapping at the top right, the pair running
-   down to the right (--loops-tilt, D: a diagonal, down to the right), cut off by the panel's top and right edges, the
-   Osserpse ring's center 0.3 of a ring in from the right edge. Large (--loop-d), and kept above the text: the pair's
-   lowest point, once tilted, rests on --loops-h, the room above it. Each ring turns slowly on its own center, the two
-   opposite ways, while About is open; still with reduced motion. In the pair (1.7 x 1.07 rings), the Opmet ring
-   (1.07 across) is centered 0.315 left of the pair's center and the Osserpse ring (1 across) 0.35 right of it; their
-   swashes reach 0.554 and 0.531 from their centers as they turn. */
-.about-panel{--loops-h:calc(12vh + 6px + clamp(32px,7vw,120px));--loop-d:calc(var(--loops-h) * 2.3);--loops-tilt:30deg}
-@media (max-width:599px){.about-panel{--loops-h:calc(12vh - 8px)}}  /* phones: above the Home row */
-.loops{position:absolute;left:0;right:0;top:0;height:calc(var(--loops-h) + 2px);overflow:hidden;pointer-events:none}
+/* About's rings (D, Oct. 15): Opmet and Osserpse in script, two rings overlapping in the top right corner, the pair
+   running down to the right (--loops-tilt, D: a diagonal, down to the right), most of each ring in view (D: we didn't
+   see nearly enough of them). The Osserpse ring sits nearly whole, its center a quarter ring in from the right edge and
+   0.619 of a ring down; the Opmet ring rides above it, about a quarter cut off by the top. Each turns slowly on its own
+   center, the two opposite ways, while About is open; still with reduced motion. On a wide screen they fill the corner
+   above the press list, which already starts low (--press-top), and clear of the paragraphs (29vw at most); in one
+   column (860px and under) they lead the page, and Home and the text start under them.
+   Geometry, in rings (--loop-d): the pair is 1.7 x 1.07; the Opmet ring (1.07 across) is centered 0.315 left of its
+   center, the Osserpse ring (1 across) 0.35 right; their swashes reach 0.554 and 0.531 from their centers as they turn,
+   so the lowest ink rests at 1.15 (--loops-bottom, with room to spare). */
+.about-panel{--loops-tilt:30deg;--press-top:calc(12vh + 30px + clamp(32px,7vw,120px) + clamp(120px,30vh,320px));
+  --loop-d:min(29vw,calc((var(--press-top) - 24px) / 1.17));--loops-bottom:calc(var(--loop-d) * 1.17)}
+@media (max-width:860px){
+  .about-panel{--loop-d:min(62vw,360px)}
+  .about-grid{padding-top:max(12vh,calc(var(--loops-bottom) + 24px))}  /* one column: the rings lead the page */
+}
+.loops{position:absolute;left:0;right:0;top:0;height:calc(var(--loops-bottom) + 4px);overflow:hidden;pointer-events:none}
 .loops-pair{position:absolute;width:calc(var(--loop-d) * 1.7);height:calc(var(--loop-d) * 1.07);transform:rotate(var(--loops-tilt));
-  right:calc(var(--loop-d) * -.247);top:calc(var(--loops-h) - 2px - var(--loop-d) * 1.241);  /* at 30deg, for browsers without CSS sin() and cos() */
-  right:calc(var(--loop-d) * (.35 * cos(var(--loops-tilt)) - .55));
-  top:calc(var(--loops-h) - 2px - var(--loop-d) * (max(.35 * sin(var(--loops-tilt)) + .531, .554 - .315 * sin(var(--loops-tilt))) + .535))}
+  right:calc(var(--loop-d) * -.297);top:calc(var(--loop-d) * -.091);  /* at 30deg, for browsers without CSS sin() and cos() */
+  right:calc(var(--loop-d) * (.35 * cos(var(--loops-tilt)) - .6));
+  top:calc(var(--loop-d) * (.084 - .35 * sin(var(--loops-tilt))))}
 .loop{position:absolute;top:50%;max-width:none;will-change:transform;animation:loop-turn 90s linear infinite paused}
 .loop-osserpse{right:0;width:var(--loop-d);height:var(--loop-d);margin-top:calc(var(--loop-d) * -.5)}
 .loop-opmet{left:0;width:calc(var(--loop-d) * 1.07);height:calc(var(--loop-d) * 1.07);margin-top:calc(var(--loop-d) * -.535);animation-direction:reverse}
