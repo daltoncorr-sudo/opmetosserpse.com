@@ -142,7 +142,7 @@ async function stage(o) {
   // Framing: the camera looks almost straight down at the stage; a coin's diameter is o.unit of the slot's height
   // (times --coins-scale), and the pile's outline sits at the slot's center
   const ray = new THREE.Raycaster(), ndc = new THREE.Vector2(), up = new THREE.Vector3(0, 1, 0);
-  let at = null, box = null, dropped = false;
+  let at = null, box = null, dropped = false, kpx = 1;
   function onGround(x, y, h) {
     ndc.set(x, y); ray.setFromCamera(ndc, cam);
     return ray.ray.intersectPlane(new THREE.Plane(up, -h), new THREE.Vector3());
@@ -153,7 +153,7 @@ async function stage(o) {
     const sr = { left: b.left, top: b.top - dy, width: b.width, height: b.height };  // where the slot rests
     if (!cr.width || !cr.height || !sr.height) return null;
     r.setSize(cr.width, cr.height, false); cam.aspect = cr.width / cr.height;
-    const k = o.unit / 2 * sr.height * (o.scaled ? parseFloat(getComputedStyle(slot).getPropertyValue('--coins-scale')) || 1 : 1);  // pixels per unit
+    const k = kpx = o.unit / 2 * sr.height * (o.scaled ? parseFloat(getComputedStyle(slot).getPropertyValue('--coins-scale')) || 1 : 1);  // pixels per unit
     const dist = cr.height / 2 / k / Math.tan(13 * Math.PI / 180);
     cam.position.set(0, dist * Math.cos(0.10), dist * Math.sin(0.10)); cam.lookAt(0, 0, 0); cam.updateProjectionMatrix(); cam.updateMatrixWorld();
     const was = at;
@@ -198,18 +198,49 @@ async function stage(o) {
     sync(); draw();
   }
 
-  // Render only while a coin is awake or held; pause while the stage is out of sight (scrolled away, a panel or a
-  // project open over it, the tab hidden)
+  // The page carries the coins (D, Oct. 15): when the page moves under them (a scroll; About, the Journal or a project
+  // sliding the cover back into view), they feel it as coins on a moving tray do: they lag as it sets off, slide on as
+  // it stops, and settle. The page's acceleration, read from the stage's place on screen each frame, is felt as a pull
+  // across the ground on top of gravity (CARRY of it, at most PULL, in scene units). cannon-es grants each contact point
+  // its own friction, and a coin lying flat touches the paper at up to 28, so it grips far harder than its 0.42 says
+  // and would never slide, then fly once tipped. While the page moves, friction is reckoned from a gravity of SLIP
+  // instead (world.frictionGravity), which lets a flat coin slide about as freely as friction 0.25 would; the full grip
+  // comes back once the page is still. Not with reduced motion.
+  const CARRY = 0.35, PULL = 30, SLIP = new C.Vec3(0, 0.06, 0);  // measured: a flat coin then slides like friction 0.25
+  const feel = { n: 0, x: 0, y: 0, vx: 0, vy: 0, ax: 0, ay: 0, until: 0, boot: 0 };
+  function carry(t, s) {
+    if (reduce || !s) return false;
+    const r = area.getBoundingClientRect();
+    if (feel.n === 0) { feel.x = r.left; feel.y = r.top; feel.n = 1; feel.ax = feel.ay = 0; return false; }
+    const vx = (r.left - feel.x) / s, vy = (r.top - feel.y) / s; feel.x = r.left; feel.y = r.top;
+    const moving = Math.abs(vx) + Math.abs(vy) > 20;
+    if (moving) feel.until = t + 250;
+    if (feel.n === 1) { feel.vx = vx; feel.vy = vy; feel.n = 2; return moving; }
+    feel.ax += ((vx - feel.vx) / s - feel.ax) * 0.5; feel.ay += ((vy - feel.vy) / s - feel.ay) * 0.5; feel.vx = vx; feel.vy = vy;
+    const gx = clamp(-feel.ax / kpx * CARRY, -PULL, PULL), gz = clamp(-feel.ay / kpx * CARRY, -PULL, PULL);
+    world.gravity.set(gx, -30, gz);  // screen right is the scene's +x, screen down its +z
+    const pulled = Math.hypot(gx, gz) > 2;
+    if (pulled) coins.forEach(c => c.body.wakeUp());
+    world.frictionGravity = pulled || moving ? SLIP : undefined;
+    return moving;
+  }
+  const stir = () => { if (!reduce && dropped) { feel.until = Math.max(feel.until, performance.now() + 250); start(); } };
+  addEventListener('scroll', stir, { passive: true, capture: true });
+  document.addEventListener('transitionstart', e => { if (e.target.contains && e.target.contains(area)) stir(); }, true);  // a panel sliding
+
+  // Render only while a coin is awake or held, or the page is carrying them; pause while the stage is out of sight
+  // (scrolled away, a panel or a project open over it, the tab hidden)
   let raf = 0, last = 0, seen = false, quiet = 0, waiting = false;
   const visible = () => seen && !area.closest('[inert]') && !document.hidden;
   function start() {
     if (!dropped) { if (!waiting && visible()) { waiting = true; Promise.resolve(o.ready && o.ready()).then(drop); } return; }
-    if (!raf && visible()) { last = performance.now(); raf = requestAnimationFrame(tick); }
+    if (!raf && visible()) { last = performance.now(); feel.n = 0; feel.boot = 4; raf = requestAnimationFrame(tick); }  // a few frames to tell whether the page is moving
   }
   function tick(t) {
     raf = 0;
-    if (!visible()) { release(); return; }
-    const dt = clamp((t - last) / 1000, 0, 0.05); last = t;
+    if (!visible()) { release(); world.gravity.set(0, -30, 0); world.frictionGravity = undefined; return; }
+    const raw = (t - last) / 1000, dt = clamp(raw, 0, 0.05); last = t;
+    const carried = carry(t, raw) || t < feel.until || feel.boot-- > 0, was = joint || glide || awake();
     if (joint) { const p = grip.position; p.x += (aim.x - p.x) * 0.35; p.y += (aim.y - p.y) * 0.18; p.z += (aim.z - p.z) * 0.35; }
     world.step(1 / 120, dt, 6);
     if (glide) {
@@ -217,10 +248,12 @@ async function stage(o) {
       glide.moves.forEach(m => { m.b.position.x = m.x0 + (m.x1 - m.x0) * e; m.b.position.z = m.z0 + (m.z1 - m.z0) * e; m.b.velocity.set(0, 0, 0); m.b.angularVelocity.set(0, 0, 0); m.b.aabbNeedsUpdate = true; });
       if (k === 1) { glide.moves.forEach(m => m.b.sleep()); glide = null; }
     }
-    quiet = !joint && !glide && calm() ? quiet + dt : 0;
+    quiet = !joint && !glide && !carried && calm() ? quiet + dt : 0;
     if (quiet > 1) { rest(); quiet = 0; }
-    sync(); draw();
-    if (joint || glide || awake()) raf = requestAnimationFrame(tick);
+    const live = joint || glide || awake();
+    if (was || live) { sync(); draw(); }  // and the frame a glide ends or the coins fall asleep
+    if (live || carried) raf = requestAnimationFrame(tick);
+    else { world.gravity.set(0, -30, 0); world.frictionGravity = undefined; }
   }
   if ('IntersectionObserver' in window) new IntersectionObserver(e => { seen = e[e.length - 1].isIntersecting; start(); }, { threshold: o.threshold || 0 }).observe(area);
   else seen = true;
