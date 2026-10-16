@@ -209,7 +209,7 @@ def brand_svg(name, cls, label=None):
 # hand was at the top of every inner page. The models and stills are in static/brand/coins/; static/js/coins.js draws
 # them with three.js and cannon-es (static/js/vendor/coins/). A model's address carries its fingerprint, so a new file
 # loads fresh; the header coin's still is site.css's.
-COIN_LABEL = "Five carved stone coins: a hand, a cup, an eye, a dancer and a leaf"
+COIN_LABEL = "Five carved stone coins: a hand, an eye, a leaf, a dancer and a cup"
 def coin_url(name):
     with open(os.path.join(ROOT, 'static', 'brand', 'coins', name), 'rb') as f:
         return '/brand/coins/%s?v=%s' % (name, hashlib.sha1(f.read()).hexdigest()[:10])
@@ -1376,8 +1376,8 @@ def main():
     # The coins and the name: the name is live text in Opmet Serif, upright (static/fonts/opmet-serif/opmet-serif.woff2).
     # The hand's slot (.mark) holds the coins: the pile's still from the first frame, then the live coins (coins.js),
     # which drop as soon as they load; the still stays when 3D can't run.
-    # the five, in drop order: dancer, alabaster hand, eye, leaf, sandstone hand (coins.js coverSpots)
-    cover_coins = ('dancer', 'cup', 'eye', 'leaf', 'basalt')  # the basalt hand is the cover's only dark coin; the dancer is lightened (coins.js LIGHTER)
+    # the five, in drop order (coins.js coverSpots)
+    cover_coins = ('basalt', 'eye', 'leaf', 'dancer', 'cup')  # the basalt hand alone above Opmet, the cover's only dark coin; two leaning pairs (coins.js coverSpots)
     cover = ('<section class="cover"><div class="cover-inner"><h1><span class="mark" role="img" aria-label="%s" data-coins="%s" data-stills="%s"></span>'
              '<span class="name">%s</span></h1><nav class="cover-nav" aria-label="Site">%s</nav></div></section>') % (
         esc(COIN_LABEL), ' '.join(coin_url('opmet-coin_%s.glb' % k) for k in cover_coins),

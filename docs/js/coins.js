@@ -405,34 +405,38 @@ function cover(slot) {
 }
 
 // The cover (D, Oct. 16): five coins around the name, placed from the name's box (N), its word Opmet (O), the nav (V) and
-// the cover coin's diameter d, in screen px. The leaning pair sits above Opmet: the dancer lands flat, the hand is dropped
-// 0.6 d right of it, on the dancer's right edge. The eye sits right of the name; the leaf and its hand, bottom left, close
-// but not touching. j: each coin's jitter (up to 0.03 d, 0.25 rad), fixed for the visit. Then each coin must clear the
-// name and the nav by 0.12 d, pushed straight out from the name when it doesn't (a pair, or the leaf and its hand,
-// moves together), and stays 16 px inside the cover.
+// the cover coin's diameter d, in screen px. The dark basalt hand stands alone, centered above Opmet. The others lean in
+// two pairs on a diagonal around the name: the leaf on the eye's left edge, above Osserpse; the cup on the dancer's right
+// edge, below the nav at the left. A leaning coin is dropped 0.6 d from its base's center and rests on its edge.
+// j: each coin's jitter (up to 0.03 d, 0.25 rad), fixed for the visit. Then each coin must clear the name and the nav by
+// 0.12 d, pushed straight out from the name when it doesn't (a pair moves together), and each group stays 16 px inside
+// the cover.
 function coverSpots(j, g) {
-  const { N, O, V, d, cr } = g, gap = 0.12 * d, r = d / 2;
+  const { N, O, V, d, cr } = g, gap = 0.12 * d, r = d / 2, foot = Math.max(N.bottom, V.bottom);
   const sp = [
-    { px: O.left + O.width / 2 - 0.31 * d, py: N.top - 0.85 * d, y: 0.3 },           // dancer
-    { px: 0, py: 0, y: T + 0.3 },                                                  // the cup, on the dancer's edge (D, Oct. 16)
-    { px: N.right + 0.15 * d, py: N.top - 1.1 * d, y: 0.3 },                       // eye
-    { px: N.left - 0.15 * d, py: Math.max(N.bottom, V.bottom) + 0.95 * d, y: 0.3 },  // leaf
-    { px: 0, py: 0, y: 0.3 },                                                      // sandstone hand, by the leaf
+    { px: O.left + O.width / 2, py: N.top - 0.9 * d, y: 0.3 },     // the basalt hand, alone
+    { px: N.right - 0.05 * d, py: N.top - 1.2 * d, y: 0.3 },       // eye
+    { px: 0, py: 0, y: T + 0.3 },                                  // leaf, on the eye's left edge
+    { px: N.left + 0.35 * d, py: foot + 1.0 * d, y: 0.3 },         // dancer
+    { px: 0, py: 0, y: T + 0.3 },                                  // cup, on the dancer's right edge
   ];
-  sp[1].px = sp[0].px + 0.6 * d; sp[1].py = sp[0].py;
-  sp[4].px = sp[3].px + 1.5 * d; sp[4].py = sp[3].py + 0.12 * d;  // apart: half a coin between them (D, Oct. 16)
+  sp[2].px = sp[1].px - 0.6 * d; sp[2].py = sp[1].py;
+  sp[4].px = sp[3].px + 0.6 * d; sp[4].py = sp[3].py;
   sp.forEach((p, i) => { p.px += j[i].dx * d; p.py += j[i].dy * d; p.yaw = j[i].yaw; p.tilt = 0.04; p.spin = 0.4; });
   const hit = (x, y) => [N, V].some(q => Math.hypot(Math.max(q.left - x, 0, x - q.right), Math.max(q.top - y, 0, y - q.bottom)) < r + gap);
   const cx = N.left + N.width / 2, cy = N.top + N.height / 2;
-  [[0, 1], [2], [3, 4]].forEach(c => {
+  [[0], [1, 2], [3, 4]].forEach(c => {
     const bx = c.map(i => sp[i].px), by = c.map(i => sp[i].py);
     const ux = bx[0] - cx, uy = by[0] - cy, len = Math.hypot(ux, uy) || 1, nx = ux / len, ny = uy / len;
     let t = 0;
     const blocked = () => c.some((_, k) => hit(bx[k] + nx * t, by[k] + ny * t));
     while (t < 4 * d && blocked()) t += 0.5;
-    c.forEach((i, k) => { sp[i].px = bx[k] + nx * t; sp[i].py = by[k] + ny * t; });
+    // the group stays 16 px inside the cover, moved as one so a pair keeps its lean
+    const xs = c.map((_, k) => bx[k] + nx * t), ys = c.map((_, k) => by[k] + ny * t);
+    const sx = Math.max(0, cr.left + 16 + r - Math.min(...xs)) - Math.max(0, Math.max(...xs) - (cr.right - 16 - r));
+    const sy = Math.max(0, cr.top + 16 + r - Math.min(...ys)) - Math.max(0, Math.max(...ys) - (cr.bottom - 16 - r));
+    c.forEach((i, k) => { sp[i].px = xs[k] + sx; sp[i].py = ys[k] + sy; });
   });
-  sp.forEach(p => { p.px = clamp(p.px, cr.left + 16 + r, cr.right - 16 - r); p.py = clamp(p.py, cr.top + 16 + r, cr.bottom - 16 - r); });
   return sp;
 }
 
