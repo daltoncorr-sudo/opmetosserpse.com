@@ -40,6 +40,8 @@ const models = {};
 // Each model's stone, in one place: alabaster takes the alabaster material (the hand and the quill); sandstone and basalt
 // keep their own, matte.
 const ALABASTER = /opmet-coin_(alabaster|quill)/;
+// A model lightened from its own baked color, so the basalt hand is the cover's only dark coin (D, Oct. 16)
+const LIGHTER = { dancer: 2.5 };
 function coin(url) {
   const alabaster = ALABASTER.test(url);
   return models[url] ||= three().then(L => L.loader.loadAsync(url).then(g => {
@@ -50,7 +52,7 @@ function coin(url) {
     if (alabaster) mesh.material = new L.THREE.MeshPhysicalMaterial({ map: m.map, normalMap: m.normalMap, roughness: 0.36,
       transmission: 0.12, thickness: 0.8, attenuationColor: new C('#d8a873'), attenuationDistance: 1.2, ior: 1.49,
       sheen: 0.25, sheenRoughness: 0.6, sheenColor: new C('#fff4e2') });
-    else { m.roughness = 0.92; m.metalness = 0; }
+    else { m.roughness = 0.92; m.metalness = 0; const k = LIGHTER[(url.match(/opmet-coin_([a-z]+)\./) || [])[1]]; if (k) m.color.setScalar(k); }
     return holder;
   }));
 }
