@@ -484,21 +484,23 @@ function aboutText(panel) {
     const rg = document.createRange(); rg.selectNodeContents(e); const em = parseFloat(getComputedStyle(e).fontSize) || 0;  // to the type's own size, where its ink is
     return [...rg.getClientRects()].map(r => { const cut = em && r.height > em ? (r.height - em) / 2 : 0; return { left: r.left, right: r.right, top: r.top + cut, bottom: r.bottom - cut }; });
   };
-  const body = [...panel.querySelectorAll('.about-body p, .title-row')].flatMap(lines).map(rel).filter(b => b.r > b.l && b.b > b.t);
+  // the paragraphs and Home, not the screen readers' heading (.vh), which is unseen
+  const body = [...panel.querySelectorAll('.about-body p, .title-row .home-big')].flatMap(lines).map(rel).filter(b => b.r > b.l && b.b > b.t);
   const press = [...panel.querySelectorAll('.about-press li, .about-press p')].map(e => rel(e.getBoundingClientRect())).filter(b => b.r > b.l && b.b > b.t);
   return { pr, rel, body, press, all: body.concat(press) };
 }
 const clears = (all, x, y, rad, gap) => all.every(b => Math.hypot(Math.max(b.l - x, 0, x - b.r), Math.max(b.t - y, 0, y - b.b)) >= rad + gap);
 function pairPlace(el, panel) {
   el.style.width = el.style.height = ''; const d = el.offsetWidth, gap = 0.12 * d;
-  const { body, press } = aboutText(panel); if (!body.length) return;
+  const T2 = aboutText(panel), { body, press } = T2; if (!body.length) return;
   const bodyR = Math.max(...body.map(b => b.r)), top = Math.min(...body.map(b => b.t));
   let cx, cy;
   if (press.length && Math.min(...press.map(b => b.l)) > bodyR) {  // two columns: over the press, its bottom coin 0.12 d above it
     const pl = Math.min(...press.map(b => b.l)), pr = Math.max(...press.map(b => b.r)), pt = Math.min(...press.map(b => b.t));
     cx = (pl + pr) / 2; cy = pt - gap - 0.62 * d;
-  } else {  // one column: in the room above Home, at the right of the text
-    cx = bodyR - 1.05 * d; cy = Math.max(top / 2, 0.75 * d);
+  } else {  // one column: at the right, level with Home, the lower coin 0.12 d above the first paragraph
+    const first = panel.querySelector('.about-body p'), ft = first ? T2.rel(first.getBoundingClientRect()).t : top;
+    cx = bodyR - 1.05 * d; cy = Math.max(ft - gap - 0.62 * d, 12 + 0.62 * d);
   }
   el.style.left = (cx - d / 2) + 'px'; el.style.top = (cy - d / 2) + 'px';
 }

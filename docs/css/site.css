@@ -288,7 +288,7 @@ html:not(.js) .stage:has(#about:target){transform:translateX(-66.6667%)}
 .about-body p.contact{margin-top:.75em}
 .about-press{grid-column:9/13;text-align:left;padding-top:clamp(120px,30vh,320px)}
 .about-press .press-title{margin-top:0}
-@media (max-width:860px){.about-grid{padding-top:max(12vh,calc(min(62vw,360px) * 1.17 + 24px))}}  /* the room the rings took: the text stays put (D, Oct. 16) */
+@media (max-width:860px){.about-grid{padding-top:max(12vh,calc(var(--coin-d) * 1.32 - 30px))}}  /* one column: a little room at the top, enough for the two coins beside Home (D, Oct. 16) */
 @media (max-width:860px){.about-grid{grid-template-columns:minmax(0,1fr)}.about-main,.about-press{grid-column:1/-1}.about-press{padding-top:0}}
 @media (min-width:600px) and (max-width:860px){.about-grid{grid-template-columns:minmax(0,30rem);justify-content:center}}  /* one column, centered (Oct. 14) */
 /* Phones (Oct. 14): the press as the work list is there, on the paragraphs' left edge: each year on its own line above
