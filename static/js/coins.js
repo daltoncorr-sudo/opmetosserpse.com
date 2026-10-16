@@ -451,7 +451,10 @@ function about(el) {
   const place = () => { aboutPlace(el, panel); const g = el.parentNode; area.style.height = Math.max(panel.clientHeight, Math.min(el.offsetTop + el.offsetHeight * 2, g.offsetTop + g.offsetHeight), (el.offsetTop + el.offsetHeight * 1.06) / 0.995) + 'px'; };  // past the text's end only as far as the coins need
   place();
   const go = () => stage({ host: panel, area, slot: el, unit: 1, pile: aboutPile, seq: 500, walls: 0.995, place, dropWhen: el, ready: () => atRest(panel), shown: () => {} });
-  afterPaint().then(go);
+  // loads only once About comes into view, so home never pays for it
+  if (!('IntersectionObserver' in window)) return afterPaint().then(go);
+  const io = new IntersectionObserver(e => { if (e.some(x => x.intersectionRect.width >= 2)) { io.disconnect(); afterPaint().then(go); } }, { threshold: [0.01, 0.1] });  // a sliver at the screen's edge (it rests 0.03 px in) isn't in view
+  io.observe(area);
 }
 // Open paper for About's pair, left-aligned to the text: first at the foot of the panel's first screen, bottom left; where
 // that would touch text (a long first screen), straight down, past each block it touches, to the first place where both
