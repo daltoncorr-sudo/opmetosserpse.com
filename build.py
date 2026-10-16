@@ -222,7 +222,8 @@ def coins_spot(kind, stones):
 
 def header_coin(cls, hooks=''):
     """One coin where a header's hand was: the still at once, the live coin on a fine pointer (coins.js). It keeps the
-    hand's element, classes and data- hooks, at the hand's size: the coin itself bleeds past it (site.css .coin)."""
+    hand's element, classes and data- hooks; it is as wide as the coin and as tall as the hand was, the coin bleeding
+    up into the header's top padding (site.css .coin)."""
     return '<span class="%s coin"%s data-coin="%s" aria-hidden="true"></span>' % (cls, hooks, coin_url('opmet-coin_alabaster_header.glb'))
 
 
@@ -253,10 +254,10 @@ def page(site, title, desc, path, body, og_image=None, current=None, extra_head=
     # The machine-readable layer, last in the head and invisible: the data feeds, then one JSON-LD block
     data = ''.join('<link rel="alternate" type="application/json" href="%s" title="%s">\n' % f for f in FEEDS) + ld_script(ld_graph(site) + list(ld))
     og = og_image or '/media/site/og.jpg'
-    # No menu bar. Inner pages carry only the coin and the name (live text, in Opmet Serif Light), centered, back to the
-    # cover. data-w: the name in Black, hidden, holds the box it had (site.css), so nothing moves.
-    header = '' if path == '/' or not header else ('<header class="site-header"><a class="lockup" href="/">%s<span class="wordmark" data-w="%s">%s</span></a></header>'
-                                     % (header_coin('lockup-hand'), esc(site['name']), esc(site['name'])))
+    # No menu bar. Inner pages carry only the coin and the name (live text, in Opmet Serif Light), centered as a pair,
+    # back to the cover.
+    header = '' if path == '/' or not header else ('<header class="site-header"><a class="lockup" href="/">%s<span class="wordmark">%s</span></a></header>'
+                                     % (header_coin('lockup-hand'), esc(site['name'])))
     # The coins' module, on the pages that have a coin (the cover, every header)
     coins = '<script type="module" src="/js/coins.js?v=%s"></script>\n' % site['_cv'] if 'data-coin' in header + body else ''
     # Which way the page flips: forward onto a project, back onto home
@@ -1032,11 +1033,11 @@ def masthead(words, hand, hook='', line=None, link=None, last_attr='', lockup=Fa
     Journal's panel back to the cover; data-cover closes a project to the cover); without it, a plain link to /.
     lockup: the studio's nameplate (a project page): the hand first, then the words on one line, small, the pair
     centered (D, Oct. 13)."""
-    word = esc  # data-w: the words in Black, hidden, hold the boxes they had (the name is Light, D, Oct. 15; site.css)
-    first = ' '.join('<span data-w="%s">%s</span>' % (word(x), word(x)) for x in words[:-1])
-    last = '<span class="mast-last"><span class="mast-word" data-w="%s"%s>%s</span>%s</span>' % (word(words[-1]), last_attr, word(words[-1]), hand)
+    word = esc
+    first = ' '.join('<span>%s</span>' % word(x) for x in words[:-1])
+    last = '<span class="mast-last"><span class="mast-word"%s>%s</span>%s</span>' % (last_attr, word(words[-1]), hand)
     if lockup:  # the hand, then the words, one a line
-        first, last = hand, '<span class="mast-words" data-w="%s">%s</span>' % (word(' '.join(words)), ' '.join('<span>%s</span>' % word(x) for x in words))
+        first, last = hand, '<span class="mast-words">%s</span>' % ' '.join('<span>%s</span>' % word(x) for x in words)
     under = '<p class="journal-line">%s</p>' % typo(line) if line else ''
     # home: Home beside All work (a project page, D, Oct. 9), back to the cover like the nameplate (data-cover)
     if link: under += '<p class="mast-link"><a class="ctl" href="%s" data-all-work>%s</a>%s</p>' % (

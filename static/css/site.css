@@ -108,13 +108,12 @@ ul{list-style:none;margin:0;padding:0}
 /* Inner pages: the name only, centered. No menu bar. */
 .site-header{position:relative;display:flex;justify-content:center;padding:28px var(--gutter) 0}
 .lockup{display:flex;align-items:flex-end;gap:13px;color:var(--ink)}
-.lockup-hand{display:block;height:42px;width:calc(42px * 793.4 / 1830.2)}  /* the hand mark's box; the coin bleeds up and left of it */
-.lockup .wordmark{display:block;margin-bottom:4px;font:var(--header-name-weight) calc(168px / 9.95)/1.17 var(--title-font);white-space:nowrap}  /* 168px wide in Black, upright (9.95em) */
-/* The name in Light at its Black width: a hidden copy in Black (data-w, build.py) holds the box, so nothing moves */
-.lockup .wordmark::after,.mast-lockup .mast-words::after,.journal .mast-name>span[data-w]::after,.journal .mast-word::after{content:attr(data-w);display:block;height:0;overflow:hidden;visibility:hidden;white-space:nowrap;font-weight:var(--title-weight)}
+.lockup-hand{display:block;height:42px;width:calc(var(--coin) * .86)}  /* the hand's height, the coin's disc's width */
+.lockup .wordmark{display:block;margin-bottom:4px;font:var(--header-name-weight) calc(168px / 9.95)/1.17 var(--title-font);white-space:nowrap}  /* the size it had at 168px wide in Black (9.95em) */
 /* The coin where the hand was (D, Oct. 15, 2026; static/js/coins.js): about 1.5 times the hand's height, 64px (48px on
-   phones), drawn past the hand's box into the header's top padding, so the header and everything below keep their
-   places. The still at once; on a fine pointer the live coin fades in over it. The still's disc has a 7% margin. */
+   phones). Its box is as wide as its disc (the still's disc has a 7% margin), so the coin and the name center as a
+   pair, and as tall as the hand was: the coin bleeds up into the header's top padding, so the header and everything
+   below keep their places. The still at once; on a fine pointer the live coin fades in over it. */
 .coin{--coin:64px;--coin-x:calc(var(--coin) * -.07);--coin-y:0px;position:relative}
 .coin::before,.coin canvas{content:"";position:absolute;right:var(--coin-x);bottom:var(--coin-y);width:var(--coin);height:var(--coin);pointer-events:none}
 .coin::before{background:url(/brand/coins/opmet-coin_header.webp) 50%/contain no-repeat;transition:opacity 0s var(--t)}
@@ -172,7 +171,7 @@ html.is-locked{overflow:hidden}
 .mast-hand[data-journal-hand]{width:calc(1.18em * 1039 / 863);--coin:calc(1.18em * 1.5);--coin-x:auto}
 .mast-hand[data-journal-hand]::before,.mast-hand[data-journal-hand] canvas{left:0}
 .journal .mast .mast-name{font-weight:var(--header-name-weight)}  /* the name and Journal in Light (D, Oct. 15) */
-.journal .mast-word{display:inline-grid}  /* its baseline stays the word's, with the Black copy under it */
+.journal .mast .mast-name{position:relative}.journal .mast-last{position:static}  /* the coin right of the whole name, level with Journal: taller than the hand, it would meet Osserpse */
 .journal-line{margin:18px 0 0;font:400 20px/1.4 var(--serif);letter-spacing:.01em;color:var(--tag-gray)}
 .mast .mast-link{display:flex;flex-wrap:wrap;justify-content:center;gap:0 var(--s3);margin:var(--s3) 0 0}  /* All work, and Home beside it */
 @media (max-width:599px){.journal-line{font-size:18px}}
@@ -199,7 +198,7 @@ html.is-locked{overflow:hidden}
 .journal.is-reading .mast-name{display:grid;grid-template-columns:auto auto;column-gap:.24em;align-items:end}
 .journal.is-reading .mast-name>span,.journal.is-reading .mast-word{grid-column:2}
 .journal.is-reading .mast-last{display:contents}
-.journal.is-reading .mast-hand{position:relative;left:auto;bottom:auto;grid-column:1;grid-row:1/span 3;align-self:end;height:2.4em;margin-bottom:.16em;width:calc(2.4em * 1039 / 863);--coin:calc(2.4em * 1.5);--coin-x:0px}
+.journal.is-reading .mast-hand{position:relative;left:auto;bottom:auto;grid-column:1;grid-row:1/span 3;align-self:end;height:2.4em;margin-bottom:.16em;--coin:calc(2.4em * 1.5);width:calc(var(--coin) * .86);--coin-x:calc(var(--coin) * -.07)}
 .journal.is-reading .mast-hand[data-journal-hand]::before,.journal.is-reading .mast-hand[data-journal-hand] canvas{left:auto}
 .journal.is-reading .journal-line{display:none}
 /* An article: All articles about 40px under the masthead; the date and topic in small sans, the title in bold, then the
@@ -447,7 +446,7 @@ main>.coins-work{left:var(--gutter)}
 .pp .mast{--mh:clamp(17px,1.3vw,19px);padding-top:clamp(28px,5vh,56px)}
 /* The nameplate: the hand beside Opmet Osserpse, one line, the hand centered on it (D, Oct. 13) */
 .mast .mast-lockup{display:flex;align-items:center;gap:13px;line-height:1.2;letter-spacing:0;width:max-content;max-width:100%;margin:0 auto;text-align:left}
-.mast-lockup .mast-hand{position:relative;left:auto;bottom:auto;flex:none;height:42px;width:calc(42px * 793.4 / 1830.2);--coin-y:calc((42px - var(--coin)) / 2)}
+.mast-lockup .mast-hand{position:relative;left:auto;bottom:auto;flex:none;height:42px;width:calc(var(--coin) * .86);--coin-y:calc((42px - var(--coin)) / 2)}
 .mast .mast-lockup .mast-words{font-weight:var(--header-name-weight)}  /* the name in Light (D, Oct. 15) */
 .pp .mast .mast-link{margin-top:14px}
 .pp figure,.pp h1,.pp h2,.pp p,.pp dl,.pp dd{margin:0}.pp h1,.pp h2{font-weight:400}
