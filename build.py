@@ -722,7 +722,8 @@ def project_body(p, blocks, chapters, notes, all_work='All work', top='Back to t
     rows, _ = credit_rows(p, notes)
     credits = [(typo(r), ', '.join(typo(x) for x in names) if names else '<span class="ph">[To come]</span>') for r, names in rows]
     dl = lambda xs, cls: '<dl class="%s">%s</dl>' % (cls, ''.join('<div><dt>%s</dt><dd>%s</dd></div>' % x for x in xs))
-    # data-page-only: a page with a 3D or interactive piece opens as its own page from home, so its scripts run.
+    # data-page-only: a page with a 3D or interactive piece; from home it slides in like the rest, and site.js brings its
+    # stylesheet and scripts along (runPieces; D, Oct. 15: it used to open as its own page).
     # data-lightbox: every picture on the page opens in the site lightbox, the page's pictures one group (its pieces stay out)
     # air: a page with more room between its sections and its rows (the notes file's "air": Sunny's, after its Bible)
     # research: each picture's label is a short paragraph, its research (the notes file's "research": Red Mask, D, Oct. 14)

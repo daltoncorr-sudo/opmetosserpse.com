@@ -548,8 +548,13 @@
     if (cache[slug]) return Promise.resolve(cache[slug]);
     return fetch('/projects/' + slug).then(function (r) { if (!r.ok) throw new Error(r.status); return r.text(); }).then(function (t) {
       var d = new DOMParser().parseFromString(t, 'text/html');
-      if (d.querySelector('[data-page-only]')) throw new Error('page');  // 3D or interactive pieces: open the page itself
-      return (cache[slug] = { html: d.querySelector('main').innerHTML, title: d.title });
+      // A page with 3D or interactive pieces (data-page-only) slides in like the rest (D, Oct. 15: it used to open as its
+      // own page): its stylesheet and scripts come with it, in their order (runPieces)
+      var pieces = d.querySelector('[data-page-only]') ? {
+        css: [].map.call(d.querySelectorAll('link[rel="stylesheet"][href^="/css/work.css"]'), function (l) { return l.getAttribute('href'); }),
+        js: [].map.call(d.querySelectorAll('script[src^="/js/work/"], script[src^="/js/vendor/"]'), function (x) { return x.getAttribute('src'); })
+      } : null;
+      return (cache[slug] = { html: d.querySelector('main').innerHTML, title: d.title, pieces: pieces });
     });
   }
   function showProject(open, animate) {
@@ -570,10 +575,28 @@
     var r = inFlow(work), y = then === 'work' || r.bottom < 0 || r.top > innerHeight ? workY() : Math.round(window.scrollY);
     landAt(y, then === 'work' ? work : ppFrom && animate ? ppFrom : null);
   }
+  // A project's 3D and interactive pieces, in the panel: their stylesheet once, then their scripts in order, each run
+  // again for each copy that lands (each sets up the pieces it finds in the page; badge-float's watches for them too);
+  // the pinned three.js (/js/vendor/) only once. Weissman's catalog viewer is let go when the panel is emptied.
+  function runPieces(p) {
+    p.css.forEach(function (h) {
+      if (document.querySelector('link[href="' + h + '"]')) return;
+      var l = document.createElement('link'); l.rel = 'stylesheet'; l.href = h; document.head.appendChild(l);
+    });
+    p.js.reduce(function (chain, src) {
+      return chain.then(function () {
+        if (/^\/js\/vendor\//.test(src) && document.querySelector('script[src="' + src + '"]')) return;
+        return new Promise(function (ok) { var x = document.createElement('script'); x.src = src; x.onload = x.onerror = ok; document.body.appendChild(x); });
+      });
+    }, Promise.resolve());
+  }
+  function emptyPieces() { if (window._catalogViewerDispose) { try { window._catalogViewerDispose(); } catch (e) {} window._catalogViewerDispose = null; } }
   function openProject(slug, animate, push) {
     return fetchProject(slug).then(function (p) {
+      emptyPieces();
       ppInner.innerHTML = p.html; pp.scrollTop = 0; document.title = p.title;
       if (window.opmetProject) window.opmetProject(ppInner);  // films and notes on the project just dropped in
+      if (p.pieces) runPieces(p.pieces);
       $$('video[data-loop]', pp).forEach(function (v) { if (!reduce) { v.preload = 'auto'; var x = v.play(); if (x && x.catch) x.catch(function () {}); } });
       if (push) { history.pushState({ project: slug }, '', '/projects/' + slug); ppPushed = true; }
       showProject(true, animate);
