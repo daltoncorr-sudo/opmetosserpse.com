@@ -164,6 +164,7 @@ async function stage(o) {
     walls[0].position.set(box.x0, 0, 0); walls[1].position.set(box.x1, 0, 0); walls[2].position.set(0, 0, box.z0); walls[3].position.set(0, 0, box.z1);
     const s = key.shadow.camera, e = Math.hypot(box.x1 - box.x0, box.z1 - box.z0) / 2 + 2;
     s.left = s.bottom = -e; s.right = s.top = e; s.updateProjectionMatrix();
+    feel.n = 0;  // the stage may have moved with it: not the page moving
     return was || at;
   }
 
@@ -240,18 +241,13 @@ async function stage(o) {
     raf = 0;
     if (!visible()) { release(); world.gravity.set(0, -30, 0); world.frictionGravity = undefined; return; }
     const raw = (t - last) / 1000, dt = clamp(raw, 0, 0.05); last = t;
-    const carried = carry(t, raw) || t < feel.until || feel.boot-- > 0, was = joint || glide || awake();
+    const carried = carry(t, raw) || t < feel.until || feel.boot-- > 0, was = joint || awake();
     if (joint) { const p = grip.position; p.x += (aim.x - p.x) * 0.35; p.y += (aim.y - p.y) * 0.18; p.z += (aim.z - p.z) * 0.35; }
     world.step(1 / 120, dt, 6);
-    if (glide) {
-      const k = Math.min(1, (t - glide.t0) / glide.dur), e = ease(k);
-      glide.moves.forEach(m => { m.b.position.x = m.x0 + (m.x1 - m.x0) * e; m.b.position.z = m.z0 + (m.z1 - m.z0) * e; m.b.velocity.set(0, 0, 0); m.b.angularVelocity.set(0, 0, 0); m.b.aabbNeedsUpdate = true; });
-      if (k === 1) { glide.moves.forEach(m => m.b.sleep()); glide = null; }
-    }
-    quiet = !joint && !glide && !carried && calm() ? quiet + dt : 0;
+    quiet = !joint && !carried && calm() ? quiet + dt : 0;
     if (quiet > 1) { rest(); quiet = 0; }
-    const live = joint || glide || awake();
-    if (was || live) { sync(); draw(); }  // and the frame a glide ends or the coins fall asleep
+    const live = joint || awake();
+    if (was || live) { sync(); draw(); }  // and the frame the coins fall asleep
     if (live || carried) raf = requestAnimationFrame(tick);
     else { world.gravity.set(0, -30, 0); world.frictionGravity = undefined; }
   }
@@ -262,30 +258,13 @@ async function stage(o) {
   let rs = 0;
   const later = () => { cancelAnimationFrame(rs); rs = requestAnimationFrame(reframe); };
   addEventListener('resize', later);
-  if ('ResizeObserver' in window) {
-    new ResizeObserver(later).observe(area);
-    if (o.watch) new ResizeObserver(() => { if (dropped) follow(); }).observe(o.watch);  // the list opening or closing
-  }
-
-  // The list opens or closes: the coin beside it glides once to its new place, with the list (0.7 s, the list's own
-  // easing), instead of jumping; a coin thrown elsewhere stays where it is (D, Oct. 15)
-  let glide = null;
-  const ease = p => p < 0.5 ? 4 * p * p * p : 1 - Math.pow(-2 * p + 2, 3) / 2;
-  function follow() {
-    const was = at; if (!frame() || !was) return;
-    const dx = at.x - was.x, dz = at.z - was.z; if (Math.abs(dx) + Math.abs(dz) < 1e-3) return;
-    const near = c => Math.hypot(c.body.position.x - was.x, c.body.position.z - was.z) < 1.5 * R || (glide && glide.moves.some(m => m.b === c.body));
-    const moves = coins.filter(c => c !== held && near(c)).map(c => ({ b: c.body, x0: c.body.position.x, z0: c.body.position.z, x1: c.body.position.x + dx, z1: c.body.position.z + dz }));
-    if (glide) glide.moves.forEach(m => { const n = moves.find(x => x.b === m.b); if (n) { n.x1 = m.x1 + dx; n.z1 = m.z1 + dz; } });  // a second change mid-glide: aim on from the last target
-    if (!moves.length) return;
-    glide = { t0: performance.now(), dur: 700, moves }; moves.forEach(m => m.b.wakeUp()); start();
-  }
+  if ('ResizeObserver' in window) new ResizeObserver(later).observe(area);
 
   // Picking up: a point constraint hangs the coin from the grabbed point, so it tilts and swings with its weight.
   // A miss does nothing: the words and every link under the stage work as before.
   const grip = new C.Body({ mass: 0 }); grip.collisionFilterGroup = 0; grip.collisionFilterMask = 0; world.addBody(grip);
   const lift = 1.25, aim = new THREE.Vector3(), plane = new THREE.Plane(up, -lift);
-  let joint = null, held = null, over = false, hover = null, until = 0;
+  let joint = null, held = null, over = false, hover = null, until = 0, press = null, passing = false;
   function point(e) {
     const cr = area.getBoundingClientRect();
     ndc.set((e.clientX - cr.left) / cr.width * 2 - 1, 1 - (e.clientY - cr.top) / cr.height * 2); ray.setFromCamera(ndc, cam);
@@ -300,18 +279,34 @@ async function stage(o) {
     held.body.linearDamping = 0.06; held.body.angularDamping = 0.18; held.body.wakeUp(); held = null;
     host.classList.remove('coin-held'); until = performance.now() + 400; start();
   }
+  // A press on a coin picks it up once the pointer moves (or after a short hold); a quick tap that doesn't move passes
+  // through to whatever is under the coin, so a coin lying on See more, a name or a link never blocks it (D, Oct. 15)
   host.addEventListener('pointerdown', e => {
-    if (joint || e.button !== 0) return;
+    if (joint || press || e.button !== 0) return;
     const h = hit(e); if (!h) return;
     e.preventDefault();
     try { host.setPointerCapture(e.pointerId); } catch (_) {}
+    press = { x: e.clientX, y: e.clientY, h, hold: setTimeout(() => grab(), 200) };
+  });
+  function grab() {
+    if (!press || joint) return;
+    const h = press.h; clearTimeout(press.hold); press = null;
     held = coins[h.object.parent.userData.i];
     const p = h.point; grip.position.set(p.x, p.y, p.z);
     joint = new C.PointToPointConstraint(held.body, held.body.pointToLocalFrame(new C.Vec3(p.x, p.y, p.z)), grip, new C.Vec3(0, 0, 0), 60);
     world.addConstraint(joint); held.body.wakeUp(); held.body.linearDamping = 0.35; held.body.angularDamping = 0.55;
     aim.set(p.x, lift, p.z); host.classList.add('coin-held'); start();
+  }
+  function through(x, y) {  // a tap: the click goes to the link or button under the coin
+    const t = document.elementFromPoint(x, y), c = t && t.closest('a, button, summary, label, [role="button"]');
+    until = performance.now() + 400;  // the browser's own click from this tap never lands twice
+    if (c) { passing = true; c.click(); passing = false; }
+  }
+  host.addEventListener('pointerup', e => {
+    if (press) { clearTimeout(press.hold); press = null; through(e.clientX, e.clientY); } else release();
   });
   host.addEventListener('pointermove', e => {
+    if (press && Math.hypot(e.clientX - press.x, e.clientY - press.y) > 4) grab();
     if (joint) {
       point(e);
       if (ray.ray.intersectPlane(plane, aim)) { aim.x = clamp(aim.x, box.x0 + R, box.x1 - R); aim.z = clamp(aim.z, box.z0 + R, box.z1 - R); }
@@ -325,11 +320,11 @@ async function stage(o) {
     hover = { clientX: e.clientX, clientY: e.clientY };
   });
   host.addEventListener('pointerleave', () => { if (over) { over = false; host.classList.remove('coin-over'); } });
-  ['pointerup', 'pointercancel', 'lostpointercapture'].forEach(n => host.addEventListener(n, release));
+  ['pointercancel', 'lostpointercapture'].forEach(n => host.addEventListener(n, () => { if (press) { clearTimeout(press.hold); press = null; } release(); }));
   // On a phone, a touch that starts on a coin drags it; anywhere else it scrolls the page as always
-  host.addEventListener('touchstart', e => { if (joint || (e.touches.length === 1 && hit(e.touches[0]))) e.preventDefault(); }, { passive: false });
-  // The click that ends a pick-up never reaches a link under the coin
-  addEventListener('click', e => { if (performance.now() < until && host.contains(e.target)) { e.preventDefault(); e.stopPropagation(); } }, true);
+  host.addEventListener('touchstart', e => { if (joint || press || (e.touches.length === 1 && hit(e.touches[0]))) e.preventDefault(); }, { passive: false });
+  // The click that ends a pick-up never reaches a link under the coin (a tap's own, passed through, does)
+  addEventListener('click', e => { if (!passing && performance.now() < until && host.contains(e.target)) { e.preventDefault(); e.stopPropagation(); } }, true);
 
   start();
 }
@@ -353,30 +348,29 @@ function spot(el) {
   const host = el.parentElement, area = document.createElement('div');
   area.className = 'coins-area coins-area-bottom';
   area.setAttribute('aria-hidden', 'true'); host.insertBefore(area, el);
-  const list = document.querySelector(el.getAttribute('data-beside')), place = list ? () => beside(el, host, list) : null;
+  const list = document.querySelector(el.getAttribute('data-beside')), place = list ? () => beside(el, host, list, area) : null;
   if (place) place();
-  const go = () => stage({ host, area, slot: el, unit: 1, pile: onePile, threshold: 0.5, walls: 0.995, place, watch: list });
+  const go = () => stage({ host, area, slot: el, unit: 1, pile: onePile, threshold: 0.5, walls: 0.995, place });
   if (!('IntersectionObserver' in window)) return afterPaint().then(go);
   const io = new IntersectionObserver(e => { if (e.some(x => x.isIntersecting)) { io.disconnect(); afterPaint().then(go); } }, { rootMargin: '50% 0px' });
   io.observe(area);
 }
 
-// Beside the list's last name, at its left, the coin's bottom on the name's (D, Oct. 15: right next to the text); on a
-// phone, where the list runs the full width, just under it, on the names' left edge
-// It reads where the list will rest, not where it is mid-motion: layout offsets (which ignore the rows' slide into their
-// new order) plus the list's sideways glide at its target (site.js opmetCenter sets style.translate)
-function beside(el, host, list) {
+// At the list's bottom left, level with its last name (D, Oct. 15), in the margin left of where the open list's years
+// sit (the list glides left to its column's edge when it opens, its years 40px further out), so neither state covers
+// it; on a phone, with no margin, just under the last name. Opening or closing the list never moves a coin (D, Oct. 15):
+// its stage is pinned around it, so the list growing below doesn't carry it off, and rows that come under a coin stay
+// clickable through it (a tap passes through). Placed on load and on a resize only.
+function beside(el, host, list, area) {
   const rows = [...list.children].filter(r => r.getClientRects().length), last = rows[rows.length - 1]; if (!last) return;
-  const name = last.querySelector(':scope > a, :scope > .plain') || last, yr = last.querySelector('.yr');
+  const name = last.querySelector(':scope > a, :scope > .plain') || last, yr = list.querySelector('.yr'), col = list.closest('section') || list;
   const at = n => { let x = 0, y = 0; for (let e = n; e && e !== host; e = e.offsetParent) { x += e.offsetLeft; y += e.offsetTop; if (!host.contains(e.offsetParent)) break; } return [x, y]; };
-  const shift = parseFloat(list.style.translate) || 0, [nx, ny] = at(name);
-  const left = nx + shift, bottom = ny + name.offsetHeight;
-  const yx = yr && getComputedStyle(yr).visibility === 'visible' && yr.offsetWidth ? at(yr)[0] + shift : Infinity;
-  const edge = Math.min(left, yx);  // the open list's year, in the margin: the coin goes left of it
-  const d = el.offsetWidth, gap = 24, x = edge - gap - d, room = x + host.getBoundingClientRect().left >= 16;
-  el.style.left = (room ? x : left) + 'px';
-  el.style.top = (room ? bottom - d : bottom + gap) + 'px';
-  el.style.bottom = 'auto';
+  const [nx, ny] = at(name), bottom = ny + name.offsetHeight, margin = yr ? 40 + yr.offsetWidth : 0;
+  const d = el.offsetWidth, gap = 24, x = at(col)[0] - margin - gap - d, room = x + host.getBoundingClientRect().left >= 16;
+  const left = room ? x : nx + (parseFloat(list.style.translate) || 0), top = room ? bottom - d : bottom + gap;
+  el.style.left = left + 'px'; el.style.top = top + 'px'; el.style.bottom = 'auto';
+  const h = Math.min(host.clientHeight, innerHeight);  // the stage: a screen tall, centered on the coin, inside the host
+  area.style.height = h + 'px'; area.style.top = clamp(top + d / 2 - h / 2, 0, host.clientHeight - h) + 'px'; area.style.bottom = 'auto';
 }
 
 /* ---------------- the headers: one coin where the hand was ---------------- */
