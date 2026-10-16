@@ -330,7 +330,8 @@ html:not(.js) .stage:has(#about:target){transform:translateX(-66.6667%)}
    running down to the right (--loops-tilt, D: a diagonal, down to the right), most of each ring in view (D: we didn't
    see nearly enough of them). The Osserpse ring sits nearly whole, its center a quarter ring in from the right edge and
    0.619 of a ring down; the Opmet ring rides above it, about a quarter cut off by the top. Each turns slowly on its own
-   center, the two opposite ways, while About is open; still with reduced motion. On a wide screen they fill the corner
+   center, both clockwise (D, Oct. 15: the Opmet ring turned the other way at first), while About is open; still with
+   reduced motion. On a wide screen they fill the corner
    above the press list, which already starts low (--press-top), and clear of the paragraphs (29vw at most); in one
    column (860px and under) they lead the page, and Home and the text start under them.
    Geometry, in rings (--loop-d): the pair is 1.7 x 1.07; the Opmet ring (1.07 across) is centered 0.315 left of its
@@ -349,7 +350,7 @@ html:not(.js) .stage:has(#about:target){transform:translateX(-66.6667%)}
   top:calc(var(--loop-d) * (.084 - .35 * sin(var(--loops-tilt))))}
 .loop{position:absolute;top:50%;max-width:none;will-change:transform;animation:loop-turn 90s linear infinite paused}
 .loop-osserpse{right:0;width:var(--loop-d);height:var(--loop-d);margin-top:calc(var(--loop-d) * -.5)}
-.loop-opmet{left:0;width:calc(var(--loop-d) * 1.07);height:calc(var(--loop-d) * 1.07);margin-top:calc(var(--loop-d) * -.535);animation-direction:reverse}
+.loop-opmet{left:0;width:calc(var(--loop-d) * 1.07);height:calc(var(--loop-d) * 1.07);margin-top:calc(var(--loop-d) * -.535)}
 @keyframes loop-turn{to{transform:rotate(360deg)}}
 .stage.is-about .loop,.at-about .loop{animation-play-state:running}
 /* The work list's coin, one you can pick up (D, Oct. 15): beside the list's last name, at its left (coins.js places it;
