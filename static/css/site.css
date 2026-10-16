@@ -306,6 +306,10 @@ html:not(.js) .stage:has(#about:target){transform:translateX(-66.6667%)}
 /* The cover: centered. The hand and the name side by side, the words below, then three lines in bold. */
 .cover{position:relative;height:100vh;height:100svh;min-height:420px;display:flex;align-items:center;justify-content:center;text-align:center}
 .cover-inner{display:flex;flex-direction:column;align-items:center;animation:arrive 1.6s var(--ease) both}
+/* The name at the very middle of the cover (D, Oct. 15): the group (the coins' slot, the name, the links) is centered
+   with room under the links equal to what the slot and its gap add above the name, so the name lands on the middle
+   line. The links are 1.4 times their type tall. */
+.cover-inner{padding-bottom:calc(var(--hand-h) + var(--s3) - var(--s4) - var(--ctl-size) * 1.4)}
 .cover h1{display:flex;flex-direction:column;align-items:center;gap:var(--s3)}
 .cover .mark{position:relative;display:block;flex:none;height:var(--hand-h);width:var(--hand-w);transform-origin:50% 96%}
 .cover .hand{display:block;width:100%;height:100%}
