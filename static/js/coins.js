@@ -406,8 +406,8 @@ function cover(slot) {
 
 // The cover (D, Oct. 16): five coins around the name, placed from the name's box (N), its word Opmet (O), the nav (V) and
 // the cover coin's diameter d, in screen px. The dark basalt hand stands alone, centered above Opmet. The others lean in
-// two pairs on a diagonal around the name: the leaf on the eye's left edge, above Osserpse; the cup on the dancer's right
-// edge, below the nav at the left. A leaning coin is dropped 0.6 d from its base's center and rests on its edge.
+// two pairs on a diagonal around the name: the leaf leaning on the eye's left edge, above Osserpse (dropped 0.6 d from the
+// eye's center, it rests on its edge); below the nav at the left, the dancer and the cup, close but not touching.
 // j: each coin's jitter (up to 0.03 d, 0.25 rad), fixed for the visit. Then each coin must clear the name and the nav by
 // 0.12 d, pushed straight out from the name when it doesn't (a pair moves together), and each group stays 16 px inside
 // the cover.
@@ -418,10 +418,10 @@ function coverSpots(j, g) {
     { px: N.right - 0.05 * d, py: N.top - 1.2 * d, y: 0.3 },       // eye
     { px: 0, py: 0, y: T + 0.3 },                                  // leaf, on the eye's left edge
     { px: N.left + 0.35 * d, py: foot + 1.0 * d, y: 0.3 },         // dancer
-    { px: 0, py: 0, y: T + 0.3 },                                  // cup, on the dancer's right edge
+    { px: 0, py: 0, y: 0.3 },                                      // cup, beside the dancer
   ];
   sp[2].px = sp[1].px - 0.6 * d; sp[2].py = sp[1].py;
-  sp[4].px = sp[3].px + 0.6 * d; sp[4].py = sp[3].py;
+  sp[4].px = sp[3].px + 1.1 * d; sp[4].py = sp[3].py + 0.22 * d;  // close, not touching (a tenth of a coin), a little lower (D, Oct. 16)
   sp.forEach((p, i) => { p.px += j[i].dx * d; p.py += j[i].dy * d; p.yaw = j[i].yaw; p.tilt = 0.04; p.spin = 0.4; });
   const hit = (x, y) => [N, V].some(q => Math.hypot(Math.max(q.left - x, 0, x - q.right), Math.max(q.top - y, 0, y - q.bottom)) < r + gap);
   const cx = N.left + N.width / 2, cy = N.top + N.height / 2;

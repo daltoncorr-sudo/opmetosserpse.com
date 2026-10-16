@@ -1377,7 +1377,7 @@ def main():
     # The hand's slot (.mark) holds the coins: the pile's still from the first frame, then the live coins (coins.js),
     # which drop as soon as they load; the still stays when 3D can't run.
     # the five, in drop order (coins.js coverSpots)
-    cover_coins = ('basalt', 'eye', 'leaf', 'dancer', 'cup')  # the basalt hand alone above Opmet, the cover's only dark coin; two leaning pairs (coins.js coverSpots)
+    cover_coins = ('basalt', 'eye', 'leaf', 'dancer', 'cup')  # the basalt hand alone above Opmet, the cover's only dark coin; a leaning pair and a pair apart (coins.js coverSpots)
     cover = ('<section class="cover"><div class="cover-inner"><h1><span class="mark" role="img" aria-label="%s" data-coins="%s" data-stills="%s"></span>'
              '<span class="name">%s</span></h1><nav class="cover-nav" aria-label="Site">%s</nav></div></section>') % (
         esc(COIN_LABEL), ' '.join(coin_url('opmet-coin_%s.glb' % k) for k in cover_coins),
