@@ -205,7 +205,10 @@ async function stage(o) {
     const cx = (Math.min(...xs) + Math.max(...xs)) / 2, cz = (Math.min(...zs) + Math.max(...zs)) / 2;
     return pts.map(p => ({ ...p, x: clamp(at.x + p.x - cx, box.x0 + R, box.x1 - R), z: clamp(at.z + p.z - cz, box.z0 + R, box.z1 - R) }));
   }
-  const toGround = (px, py) => { const cr = area.getBoundingClientRect(); return onGround((px - cr.left) / cr.width * 2 - 1, 1 - (py - cr.top) / cr.height * 2, T / 2); };
+  const toGround = (px, py) => {  // a page point on the ground: a track stage's scene is the page itself, scaled (as its slot is placed);
+    if (track) { const tr = track.getBoundingClientRect(); return { x: (px - tr.left - tr.width / 2) / kpx, z: (py - tr.top) / kpx }; }  // a fixed stage's is seen through the camera
+    const cr = area.getBoundingClientRect(); return onGround((px - cr.left) / cr.width * 2 - 1, 1 - (py - cr.top) / cr.height * 2, T / 2);
+  };
   // Laying the coins (D, Oct. 16: no drop, no click into place; they are simply there, looking settled, when the page
   // opens): each placed just above its spot, upright, and settled before the next, in order, so a leaning coin comes to
   // rest on its base, all before anything is drawn. A resize lays them again at their new spots.
@@ -392,7 +395,10 @@ function cover(slot) {
   // The stills hold the cover until each coin lands (and stay if 3D can't run): five pictures at the same spots, each
   // disc as wide as the coin (a still's disc is 0.71 of its frame)
   const flat = slot.getAttribute('data-coins').split(' ').map(() => ({ dx: 0, dy: 0, yaw: 0 }));
-  const stills = slot.getAttribute('data-stills').split(' ').map(src => { const img = new Image(); img.className = 'coins-still'; img.alt = ''; img.src = src; sec.appendChild(img); return img; });
+  // The stills wait unseen: the coins appear once, settled, in 3D (D, Oct. 16: seamless, no jump from picture to model). They
+  // show only if 3D can't run, or hasn't arrived after 2.5 s (a slow connection), and then give way to it.
+  const stills = slot.getAttribute('data-stills').split(' ').map(src => { const img = new Image(); img.className = 'coins-still is-waiting'; img.alt = ''; img.src = src; sec.appendChild(img); return img; });
+  const showStills = () => stills.forEach(img => img.classList.remove('is-waiting')), slow = setTimeout(showStills, 2500);
   function placeStills() {
     const g = geom(), pts = coverSpots(flat, g), W = g.d / 0.71;
     stills.forEach((img, i) => { if (img.isConnected) Object.assign(img.style, { width: W + 'px', height: W + 'px', left: (pts[i].px - W / 2 - g.cr.left) + 'px', top: (pts[i].py - W / 2 - g.cr.top) + 'px' }); });
@@ -400,7 +406,8 @@ function cover(slot) {
   placeStills();
   addEventListener('resize', placeStills);
   afterPaint().then(() => { placeStills(); stage({ host: sec, area: sec, slot, unit: 0.56, scaled: true, aim, shift,
-    fail: () => {}, shown: () => { slot.classList.add('is-live'); setTimeout(() => stills.forEach(img => img.remove()), 600); } }); });  // the coins fade in over their stills
+    fail: () => { clearTimeout(slow); showStills(); },
+    shown: () => { clearTimeout(slow); slot.classList.add('is-live'); const seen = stills.some(img => !img.classList.contains('is-waiting')); setTimeout(() => stills.forEach(img => img.remove()), seen ? 600 : 0); } }); });  // shown stills give way under the fading-in coins
 }
 
 // The cover (D, Oct. 16): five coins around the name, placed from the name's box (N), its word Opmet (O), the nav (V) and
@@ -473,7 +480,10 @@ function about(el) {
 function aboutText(panel) {
   const pr = panel.getBoundingClientRect(), y0 = pr.top - panel.scrollTop;
   const rel = r => ({ l: r.left - pr.left, t: r.top - y0, r: r.right - pr.left, b: r.bottom - y0 });
-  const lines = e => { const rg = document.createRange(); rg.selectNodeContents(e); return [...rg.getClientRects()]; };
+  const lines = e => {  // each line's own box: a glyph box runs past its line (ascenders, descenders), so it is trimmed to the line height
+    const rg = document.createRange(); rg.selectNodeContents(e); const em = parseFloat(getComputedStyle(e).fontSize) || 0;  // to the type's own size, where its ink is
+    return [...rg.getClientRects()].map(r => { const cut = em && r.height > em ? (r.height - em) / 2 : 0; return { left: r.left, right: r.right, top: r.top + cut, bottom: r.bottom - cut }; });
+  };
   const body = [...panel.querySelectorAll('.about-body p, .title-row')].flatMap(lines).map(rel).filter(b => b.r > b.l && b.b > b.t);
   const press = [...panel.querySelectorAll('.about-press li, .about-press p')].map(e => rel(e.getBoundingClientRect())).filter(b => b.r > b.l && b.b > b.t);
   return { pr, rel, body, press, all: body.concat(press) };
@@ -493,7 +503,7 @@ function pairPlace(el, panel) {
   el.style.left = (cx - d / 2) + 'px'; el.style.top = (cy - d / 2) + 'px';
 }
 function cupPlace(el, panel) {  // the nearest place beside the line "espresso tempo." ends, where a whole coin clears the text
-  el.style.width = el.style.height = ''; const d = el.offsetWidth, gap = 0.14 * d;
+  el.style.width = el.style.height = ''; const d = el.offsetWidth, gap = 0.08 * d;
   const link = [...panel.querySelectorAll('.about-body a')].find(a => /espresso tempo/i.test(a.textContent)); if (!link) return;
   const T2 = aboutText(panel), p = link.closest('p');
   const lr = T2.rel([...link.getClientRects()].pop());
@@ -501,8 +511,11 @@ function cupPlace(el, panel) {  // the nearest place beside the line "espresso t
   const right = Math.max(...own.filter(b => (b.t + b.b) / 2 > lr.t && (b.t + b.b) / 2 < lr.b).map(b => b.r));  // glyph boxes overlap the lines around: by their middles
   const x0 = right + 0.3 * d + d / 2, y0 = (lr.t + lr.b) / 2, xMax = T2.pr.width - 16 - d / 2, step = d / 12;
   let best = null;
-  for (let y = y0 - d; y <= y0 + 12 * d; y += step) for (let x = Math.min(x0, xMax); x <= xMax; x += step) {
-    const cost = Math.hypot((x - x0) * 1.5, y - y0); if (best && cost >= best.cost) continue;
+  for (let dy = 0; dy <= 0.6 * d && !best; dy += 1) for (const y of [y0 + dy, y0 - dy]) {  // right after the words, level with them (within 0.6 d), finely
+    if (!best && x0 <= xMax && clears(T2.all, x0, y, d / 2, gap)) best = { x: x0, y, cost: 0 };
+  }
+  if (!best) for (let y = y0 - d; y <= y0 + 12 * d; y += step) for (let x = Math.min(x0, xMax); x <= xMax; x += step) {
+    const cost = Math.hypot(x - x0, (y - y0) * 1.6); if (best && cost >= best.cost) continue;  // beside the line first: up or down costs more than along
     if (clears(T2.all, x, y, d / 2, gap)) best = { x, y, cost };
   }
   if (!best) { const low = Math.max(...T2.all.map(b => b.b)); best = { x: Math.max(d / 2 + 16, Math.min(x0, xMax)), y: low + gap + d / 2 }; }  // below everything
@@ -520,9 +533,9 @@ function spot(el) {
   track.appendChild(area); host.insertBefore(track, el);
   const list = document.querySelector(el.getAttribute('data-beside')), place = list ? () => beside(el, host, list, track) : null;
   if (place) place();
-  const img = el.querySelector('.coins-still'); if (img) img.hidden = false;  // its still, until 3D runs (placed first)
+  const img = el.querySelector('.coins-still'), slow = img && setTimeout(() => { img.hidden = false; }, 2500);  // its still only if 3D is slow or can't run
   const go = () => stage({ host, area, track, slot: el, unit: 1, pile: onePile, walls: 0.995, place, dropWhen: el, ready: () => atRest(track),
-    shown: () => img && img.remove() });
+    shown: () => { clearTimeout(slow); if (img) img.remove(); }, fail: () => { clearTimeout(slow); if (img) img.hidden = false; } });
   if (!('IntersectionObserver' in window)) return afterPaint().then(go);
   const io = new IntersectionObserver(e => { if (e.some(x => x.isIntersecting)) { io.disconnect(); afterPaint().then(go); } }, { rootMargin: '50% 0px' });
   io.observe(track);

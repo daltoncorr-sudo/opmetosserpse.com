@@ -327,7 +327,7 @@ html:not(.js) .stage:has(#about:target){transform:translateX(-66.6667%)}
 .coins-stage.is-on{opacity:1}  /* the coins fade in as they fall */
 /* The still holds the slot only when the coins are slow to load: it fades in after 0.7s, and gives way to them */
 .cover .coins-still{transition:opacity var(--t) var(--ease)}
-.cover .coins-still.is-gone{opacity:0}  /* each still leaves as its coin lands (coins.js landed) */
+.cover .coins-still.is-waiting{opacity:0}  /* unseen unless 3D fails or is slow (coins.js cover) */
 /* Each coin's grip (coins.js): an invisible round target riding on the coin, so a touch on a coin never scrolls the
    page and the cursor reads grab; a tap passes through to whatever is under it */
 .coin-grips{position:absolute;left:0;top:0;width:100%;height:100%;overflow:hidden;pointer-events:none;z-index:2}
