@@ -264,6 +264,7 @@ html:not(.js) .stage:has(#about:target){transform:translateX(-66.6667%)}
 .about-body{font-size:var(--size-m)}
 .about-body{font-family:var(--serif);line-height:1.6}
 .about-body a{text-decoration:underline;text-underline-offset:.2em;text-decoration-thickness:1px}
+.about-panel .about-body a{font-style:italic;text-decoration:none}  /* About's links (espresso tempo, the email, the handle): italic, not underlined (D, Oct. 16) */
 .press-title{font:400 var(--size-m) var(--serif);margin:3.2em 0 1.2em}
 /* The press: no heading on screen; each year in the left margin beside its first line, as in the work list (.yr)
    (D, Oct. 13). Narrower, the list steps in to make room, as the work list does on phones */
@@ -285,7 +286,8 @@ html:not(.js) .stage:has(#about:target){transform:translateX(-66.6667%)}
 .home-big{margin:0}
 .about-panel .about-body{font-family:var(--bold-font);font-weight:var(--name-weight);font-size:clamp(min(5.4vw,26px),3.5vw,50px);line-height:1.12;letter-spacing:-.01em;max-width:16em}
 .about-body p{margin:0 0 .75em}
-.about-body p.contact{margin-top:.75em}
+.about-body p.contact{margin-top:.75em;margin-bottom:0}
+.about-body p.contact+p.contact{margin-top:.35em}  /* the email, then the handle: a little apart (D, Oct. 16) */
 .about-press{grid-column:9/13;text-align:left;padding-top:clamp(120px,30vh,320px)}
 .about-press .press-title{margin-top:0}
 @media (max-width:860px){.about-grid{padding-top:max(12vh,calc(var(--coin-d) * 1.32 - 30px))}}  /* one column: a little room at the top, enough for the two coins beside Home (D, Oct. 16) */

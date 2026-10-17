@@ -451,25 +451,29 @@ function coverSpots(j, g) {
 }
 
 // About (D, Oct. 16): three coins on one stage over the whole page, sharing its physics, so each can be carried anywhere
-// on About and they meet: the wave and the alabaster hand in the upper right, above the press, where the rings were (in one
-// column, in the room at the top the rings took, at the right), and the cup beside "espresso tempo", all at the cover
-// coin's size. The stage is a track over the panel's whole text with a window onto it pinned to the panel (which scrolls
+// on About and they meet, all at the cover coin's size: the wave beside the opening line, the alabaster hand in the upper
+// right, above the press, where the rings were (in one column, at the right, level with Home), and the cup beside
+// "espresso tempo". The stage is a track over the panel's whole text with a window onto it pinned to the panel (which scrolls
 // in itself), as the work list's is. It loads once home has loaded, so the coins are there when About opens.
 function about(el) {
-  const panel = el.closest('.about-panel'), cupEl = panel.querySelector('.coins-cup');
+  const panel = el.closest('.about-panel'), cupEl = panel.querySelector('.coins-cup'), waveEl = panel.querySelector('.coins-wave');
   const track = document.createElement('div'), area = document.createElement('div');
   track.className = 'coins-track coins-about-track'; track.setAttribute('aria-hidden', 'true'); area.className = 'coins-area';
   track.appendChild(area); el.parentNode.insertBefore(track, el);  // positioned from the panel
   const place = () => {
-    pairPlace(el, panel); if (cupEl) cupPlace(cupEl, panel);
+    const one = handPlace(el, panel) === 'one';
+    if (waveEl && one) {  // one column: no room beside the opening line, so just above it, left of the hand, level with Home
+      const d = el.offsetWidth; waveEl.style.width = waveEl.style.height = '';
+      waveEl.style.left = (el.offsetLeft - 1.1 * d) + 'px'; waveEl.style.top = (el.offsetTop - 0.08 * d) + 'px';
+    } else if (waveEl) besidePlace(waveEl, panel, () => { const p = panel.querySelector('.about-body p'); return p && { p, end: null }; }, 0.15, [el]);  // the opening line's end
+    if (cupEl) besidePlace(cupEl, panel, () => { const a = [...panel.querySelectorAll('.about-body a')].find(a => /espresso tempo/i.test(a.textContent)); return a && { p: a.closest('p'), end: a }; }, 0.3, [el, waveEl]);
     const g = el.parentNode, low = cupEl ? cupEl.offsetTop + cupEl.offsetHeight : 0;
     track.style.height = Math.max(panel.clientHeight, g.offsetTop + g.offsetHeight, low + 24) + 'px';
   };
   place();
   const aim = j => {
-    const a = el.getBoundingClientRect(), d = a.width, cx = a.left + d / 2, cy = a.top + d / 2;
-    const c = (cupEl || el).getBoundingClientRect();
-    return [{ px: cx - 0.55 * d, py: cy - 0.1 * d }, { px: cx + 0.55 * d, py: cy + 0.1 * d }, { px: c.left + c.width / 2, py: c.top + c.height / 2 }]
+    const mid = e => { const r = (e || el).getBoundingClientRect(); return { px: r.left + r.width / 2, py: r.top + r.height / 2 }; }, d = el.getBoundingClientRect().width;
+    return [mid(waveEl), mid(el), mid(cupEl)]  // the models' order: wave, alabaster hand, cup
       .map((p, i) => ({ ...p, px: p.px + j[i].dx * d, py: p.py + j[i].dy * d, yaw: j[i].yaw, y: 0.3, tilt: 0, spin: 0 }));
   };
   const go = () => stage({ host: panel, area, track, slot: el, unit: 1, aim, walls: 0.995, place });
@@ -490,28 +494,33 @@ function aboutText(panel) {
   return { pr, rel, body, press, all: body.concat(press) };
 }
 const clears = (all, x, y, rad, gap) => all.every(b => Math.hypot(Math.max(b.l - x, 0, x - b.r), Math.max(b.t - y, 0, y - b.b)) >= rad + gap);
-function pairPlace(el, panel) {
+function handPlace(el, panel) {  // the alabaster hand
   el.style.width = el.style.height = ''; const d = el.offsetWidth, gap = 0.12 * d;
   const T2 = aboutText(panel), { body, press } = T2; if (!body.length) return;
   const bodyR = Math.max(...body.map(b => b.r)), top = Math.min(...body.map(b => b.t));
   let cx, cy;
-  if (press.length && Math.min(...press.map(b => b.l)) > bodyR) {  // two columns: over the press, its bottom coin 0.12 d above it
+  const two = press.length && Math.min(...press.map(b => b.l)) > bodyR;
+  if (two) {  // two columns: over the press, 0.12 d above it
     const pl = Math.min(...press.map(b => b.l)), pr = Math.max(...press.map(b => b.r)), pt = Math.min(...press.map(b => b.t));
-    cx = (pl + pr) / 2; cy = pt - gap - 0.62 * d;
-  } else {  // one column: at the right, level with Home, the lower coin 0.12 d above the first paragraph
+    cx = (pl + pr) / 2; cy = pt - gap - 0.5 * d;
+  } else {  // one column: at the right, level with Home, 0.12 d above the first paragraph
     const first = panel.querySelector('.about-body p'), ft = first ? T2.rel(first.getBoundingClientRect()).t : top;
-    cx = bodyR - 1.05 * d; cy = Math.max(ft - gap - 0.62 * d, 12 + 0.62 * d);
+    cx = bodyR - 0.5 * d; cy = Math.max(ft - gap - 0.5 * d, 12 + 0.5 * d);
   }
   el.style.left = (cx - d / 2) + 'px'; el.style.top = (cy - d / 2) + 'px';
+  return two ? 'two' : 'one';
 }
-function cupPlace(el, panel) {  // the nearest place beside the line "espresso tempo." ends, where a whole coin clears the text
+// The nearest place beside the end of a line (find: its paragraph, and the element it ends with, or its last line), a
+// little after the words (after: in coins), where a whole coin clears the text
+function besidePlace(el, panel, find, after, avoid) {  // avoid: the coins already placed, which it mustn't land on
   el.style.width = el.style.height = ''; const d = el.offsetWidth, gap = 0.08 * d;
-  const link = [...panel.querySelectorAll('.about-body a')].find(a => /espresso tempo/i.test(a.textContent)); if (!link) return;
-  const T2 = aboutText(panel), p = link.closest('p');
-  const lr = T2.rel([...link.getClientRects()].pop());
+  const f = find(); if (!f) return;
+  const T2 = aboutText(panel), p = f.p;
+  (avoid || []).filter(Boolean).forEach(e => { const b = T2.rel(e.getBoundingClientRect()), r = b.r - b.l, k = 0.12 * r; T2.all.push({ l: b.l + k, t: b.t + k, r: b.r - k, b: b.b - k }); });  // a coin as a box a little inside its disc
   const own = (() => { const rg = document.createRange(); rg.selectNodeContents(p); return [...rg.getClientRects()].map(T2.rel); })();
+  const lr = f.end ? T2.rel([...f.end.getClientRects()].pop()) : own.reduce((a, b) => (b.t + b.b > a.t + a.b + 2 ? b : a));  // the last line
   const right = Math.max(...own.filter(b => (b.t + b.b) / 2 > lr.t && (b.t + b.b) / 2 < lr.b).map(b => b.r));  // glyph boxes overlap the lines around: by their middles
-  const x0 = right + 0.3 * d + d / 2, y0 = (lr.t + lr.b) / 2, xMax = T2.pr.width - 16 - d / 2, step = d / 12;
+  const x0 = right + after * d + d / 2, y0 = (lr.t + lr.b) / 2, xMax = T2.pr.width - 16 - d / 2, step = d / 12;
   let best = null;
   for (let dy = 0; dy <= 0.6 * d && !best; dy += 1) for (const y of [y0 + dy, y0 - dy]) {  // right after the words, level with them (within 0.6 d), finely
     if (!best && x0 <= xMax && clears(T2.all, x0, y, d / 2, gap)) best = { x: x0, y, cost: 0 };
