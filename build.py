@@ -1342,9 +1342,10 @@ def main():
                    '<div class="about-main"><div class="about-body">%s</div></div>'
                    '<div class="about-press"><h3 class="press-title vh">%s</h3>%s</div>'
                    '<span class="coins-spot coins-about" data-coins="%s %s %s" aria-hidden="true"></span>'
-                   '<span class="coins-spot coins-about coins-cup" aria-hidden="true"></span></div></section>') % (  # one stage, three coins; the cup's spot  # no Press heading on screen (D, Oct. 13)
+                   '<span class="coins-spot coins-about coins-cup" aria-hidden="true"></span>'
+                   '<span class="coins-spot coins-about coins-wave" aria-hidden="true"></span></div></section>') % (  # one stage, three coins; the cup's and wave's spots  # no Press heading on screen (D, Oct. 13)
         ' '.join('<span>%s</span>' % esc(x) for x in ap['title'].split()), ctl(site['back']), ''.join('<p>%s</p>' % link(typo(x)) for x in ap['lines']) + ''.join('<p class="contact">%s</p>' % link(typo(x)) for x in ap['contact']), esc(ap['press_title']), press_list(press),
-        coin_url('opmet-coin_wave.glb'), coin_url('opmet-coin_alabaster.glb'), coin_url('opmet-coin_cup.glb'))  # D, Oct. 16: two above the press, the cup by espresso tempo, one stage
+        coin_url('opmet-coin_wave.glb'), coin_url('opmet-coin_alabaster.glb'), coin_url('opmet-coin_cup.glb'))  # D, Oct. 16: the wave by the opening line, the hand above the press, the cup by espresso tempo, one stage
     # The Journal: a panel one screen above home, and its own pages at /journal/ and /journal/<slug>, all with the same
     # masthead, slot and list. Until a post is published it's out of the menu and the sitemap, and /journal/ is noindex.
     # Hidden, none of it is built: no panel, no pages, no pictures.
