@@ -116,8 +116,10 @@ class Media:
             h = round(im.height * w / im.width)
             fn = '%s-%d.webp' % (name, w); dst = os.path.join(out_dir, fn)
             stale = not os.path.exists(dst) or not os.path.getsize(dst)  # re-encode an empty file too
-            if not stale:
-                with Image.open(dst) as o: stale = o.size != (w, h)  # and one of another size (a picture trimmed since)
+            if not stale:  # and one of another size (a picture trimmed since), or one that no longer opens
+                try:
+                    with Image.open(dst) as o: stale = o.size != (w, h)
+                except Exception: stale = True
             if stale:
                 (im if w == im.width else im.resize((w, h), Image.LANCZOS)).save(dst, 'WEBP', quality=QUALITY, method=4)
             parts.append(('/media/%s/%s' % (slug, fn), w)); self.made.add(dst)
@@ -583,6 +585,9 @@ def notes_list(p, src_root):
         for x in ('scale', 'gap'):
             if m.get(x) is not None and not (isinstance(m[x], (int, float)) and m[x] > 0): errs.append('%s: "%s" is a number above 0' % (m['src'], x))
         if m.get('scale') is not None and m.get('fit') != 'height': errs.append('%s: "scale" goes with "fit": "height"' % m['src'])
+        if m.get('gap') is not None and not m.get('fit'): errs.append('%s: "gap" goes with "fit"' % m['src'])
+        if m.get('layout') == 'table' and (m.get('cut') != 'true' or not isinstance(m.get('w'), (int, float))):
+            errs.append('%s: a "table" holds "true" cut-outs, each with "w"' % m['src'])
         out.append(dict(kind=kind, src=m['src'], alt=alt, w=0, h=0, gallery=m.get('gallery', 0), wide=m.get('slot') == 'W',
                         cut=m.get('cut'), row=m.get('row'), cap=m.get('cap', True), align=m.get('align'), grain=m.get('grain'), pt=m.get('w'),
                         fit=m.get('fit'), scale=m.get('scale', 1), gap=m.get('gap'), layout=m.get('layout'),
@@ -619,6 +624,7 @@ def load_notes(p, keys):
         if c.get('panel') and not n.get('plates'): errs.append('chapter "%s": a panel needs "plates"' % c['label'])
         if c.get('panel') not in (None,) + PANELS: errs.append('chapter "%s": "panel" is %s' % (c['label'], ', '.join(PANELS)))
         if c.get('phone') not in (None, 'pairs'): errs.append('chapter "%s": "phone" is "pairs"' % c['label'])
+        if c.get('phone') and not n.get('plates'): errs.append('chapter "%s": "phone" needs "plates"' % c['label'])
     if not n.get('plates'):
         for m in n.get('media', []):
             if m.get('align') == 'center' or any(m.get(x) is not None for x in ('fit', 'layout', 'scale', 'gap')):
@@ -696,11 +702,24 @@ def lead(x, research):
     m = re.match(r'([A-Z][a-z]+(?: [a-z]+)?):\s', x) if research else None
     return '<span class="lbl-k">%s</span>%s' % (x[:m.end(1) + 1], x[m.end(1) + 1:]) if m else x
 
-def plate(items):
+def keep(x):
+    """A label's measures hold together (a page with plates): a figure stays with its unit ("24 pt"), and a short part
+    with a figure in it, between middle dots ("16 to 40 mm"), doesn't break, so a line breaks only after a dot"""
+    x = re.sub(r'(\d) (?=(?:mm|px|pt|in)\b)', '\\1\u00a0', x)
+    return '\u00a0\u00b7 '.join(s.replace(' ', '\u00a0') if re.search(r'\d', s) and len(s) <= 16 and '<' not in s else s
+                                for s in x.split('\u00a0\u00b7 '))
+
+def plate(items, panel=False):
     """A plate's measures (Sunny's, D, Oct. 19; site.css .pp-plates): a fill row's share for each mark (--f: the square
     root of its shape for "area", one visual area; its shape times its "scale" for "height", one height) and the row's
     sums, or a table's columns, each as wide as its widest piece in points (every third piece). Returns (row style,
-    {key: item style}) as custom properties, and the key of a lone last piece (an odd one out on a phone's two columns)."""
+    {key: item style}) as custom properties, and the key of a lone last piece (an odd one out on a phone's two columns,
+    where an xl piece, and a large one in a panel, takes the whole line). A row has one "fit", "layout", "gap" and "align"."""
+    for x in ('fit', 'layout', 'gap', 'align'):
+        if len({it.get(x) for it in items if it.get(x) is not None}) > 1:
+            sys.exit('A row of cut-outs (%s) has more than one "%s": give it one.' % (items[0]['key'], x))
+    if any(it.get('fit') for it in items) and not all(it.get('fit') for it in items):
+        sys.exit('A row of cut-outs (%s): "fit" goes on every piece in it, or none.' % items[0]['key'])
     fit = next((it['fit'] for it in items if it.get('fit')), None)
     layout = next((it['layout'] for it in items if it.get('layout')), None)
     row, each = [], {}
@@ -714,18 +733,18 @@ def plate(items):
     if layout == 'table':
         cols = [max(it['pt'] for it in items[j::3]) for j in range(min(3, len(items)))]
         row += ['--c%d:%gfr' % (j + 1, c) for j, c in enumerate(cols)] + ['--tw:%g' % sum(cols), '--wmax:%g' % max(cols)]
-    free = [it['key'] for it in items if it['cut'] not in ('xl', 'large')]
+    free = [it['key'] for it in items if it['cut'] != 'xl' and not (panel and it['cut'] == 'large')]
     lone = free[-1] if layout != 'shelf' and len(free) % 2 else None
     return ';'.join(row), each, lone
 
-def block_html(b, slug, research=False, plates=False):
+def block_html(b, slug, research=False, plates=False, panel=False):
     """A block, with its note (if it has one) in the right margin, beside its top. Every picture shows whole: a portrait
     picture or film (.cap) and a row are never taller than about 85vh, centered in their columns (--ar, its width over
     its height; a row's is the sum of its pictures', so they keep one height). On a page with plates, a row of cut-outs
     is a plate (plate(), above)."""
     kind = b['kind']
     ms = []
-    prow, peach, lone = plate(b['items']) if plates and kind == 'cuts' else ('', {}, None)
+    prow, peach, lone = plate(b['items'], panel) if plates and kind == 'cuts' else ('', {}, None)
     for it in b['items']:
         cls = 'm' + (' piece' if it['kind'] == 'widget' else '') + (' cut cut-%s' % it['cut'] if kind == 'cuts' else '') + (' grain' if it.get('grain') else '')
         cls += ' cut-lone' if it['key'] == lone else ''
@@ -743,7 +762,8 @@ def block_html(b, slug, research=False, plates=False):
             n, t, note = it['lbl']
             notes = [note] if isinstance(note, str) else note or []
             lbl = '<p class="lbl">%s<span class="lbl-t">%s</span>%s</p>' % (
-                '<span class="lbl-n">%s</span>' % esc(n) if n else '', typo(t), ''.join('<span class="lbl-s">%s</span>' % lead(typo(x), research) for x in notes))
+                '<span class="lbl-n">%s</span>' % esc(n) if n else '', typo(t),
+                ''.join('<span class="lbl-s">%s</span>' % lead(keep(typo(x)) if plates else typo(x), research) for x in notes))
         ms.append('<div class="%s" data-i="%s"%s%s>%s%s</div>' % (cls, esc(it['key']), style, skip, it['html'](sizes), lbl))
     if kind == 'row':
         ar = sum(it['w'] / it['h'] for it in b['items'])
@@ -822,7 +842,7 @@ def project_body(p, blocks, chapters, notes, all_work='All work', top='Back to t
                           '<div class="pnl pnl-%s">' % pnl if pnl else ''))
         if pnl and b['kind'] != 'cuts':
             sys.exit('Chapter "%s": a panel holds cut-outs only (a film or photograph stays on the paper).' % label)
-        out.append(block_html(b, p['slug'], notes.get('research'), plates))
+        out.append(block_html(b, p['slug'], notes.get('research'), plates, bool(pnl)))
     if pnl: out.append('</div>')
     if open_ch: out.append('</section>')
     out.append(project_foot(all_work, top, home))

@@ -196,7 +196,7 @@ for f in glob.glob(D + '/projects/*.html'):
     for label, inner in re.findall(r'<section class="ch[^"]*" aria-label="([^"]*)">([\s\S]*?)</section>', t):
         if '<div class="pnl ' not in inner: continue
         if 'pnl-navy' in inner and label != 'Journal &amp; Press': problems.append('%s: Ink Navy is for Journal & Press only (%s)' % (rel, label))
-        if re.search(r'<video|class="row|b-single|b-tall|b-full', inner): problems.append('%s: a panel holds cut-outs only (%s)' % (rel, label))
+        if re.search(r'<video|<div class="row[ "]|<figure class="b(?: g)? b-(?:single|tall|full|row)\b', inner): problems.append('%s: a panel holds cut-outs only (%s)' % (rel, label))
     if tones and "closest('.pnl')" not in open(os.path.join(D, 'js', 'site.js'), encoding='utf-8').read():
         problems.append('%s: the lightbox does not take a panel\'s ground (site.js)' % rel)
 # Work resolves to the work list: /#work lands on it on home (/#archive opens the full list)

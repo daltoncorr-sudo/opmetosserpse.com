@@ -587,36 +587,43 @@ main>.coins-work{left:var(--gutter)}
    (.pp .b .m:where(:not(.cut)): no added specificity, so .b-wide and .b-tall still win). ===== */
 
 /* Measures. --edge: the photos' edge (columns 2 to 11 from 1100 px, the content edge under it). --pr: a panel's top and
-   bottom padding, and the room between its rows and between the lines of a plate. --px: a panel's side padding. */
-.pp-plates{--edge:var(--m);--pr:clamp(28px,4.45vw,64px);--px:clamp(16px,3.9vw,56px)}
+   bottom padding, and the room between its rows and between the lines of a plate. --px: a panel's side padding, never
+   less than the page's own 20 px margin on a phone. */
+.pp-plates{--edge:var(--m);--pr:clamp(28px,4.45vw,64px);--px:clamp(20px,3.9vw,56px)}
 @media (min-width:1100px){.pp-plates{--edge:calc(var(--m) + (100% - 2 * var(--m) - 11 * var(--g)) / 12 + var(--g))}}
+@media (max-width:640px){.pp.pp-plates{--pr:32px}}
 
 /* Chapter labels: every chapter is ch-above (build), so every label shows, 12 px above its first block or its panel:
    in the left margin from 1100 px (x 56 at 1440), at the content's left edge under it. Never inside a panel. */
 .pp.pp-plates .chap{grid-column:1/-1}  /* the whole line, so a long label ("Stationery and the shop" at 1100 px) is never cut */
 @media (max-width:1099px){.pp.pp-plates .chl{display:grid}.pp.pp-plates .chap{margin-left:0}}
 
-/* The room between sections: 240 px from 1100 px (as now; and after the opening film, which got 56 px), 160 on
-   tablets, 64 on phones. Rows on the paper: 98 px as now, 72 on tablets, 32 on phones. */
+/* The room between sections: 240 px from 1100 px, 160 on tablets, 64 on phones. Rows on the paper: 98 px as now, 72 on
+   tablets, 32 on phones. From the opening film to the first chapter it is shorter, for the same distance by eye: both
+   films' frames carry paper around their drawings (about 70 px under the signature and 76 over the book, at 1440). */
 .pp.pp-air.pp-plates>.ch{margin-top:calc(var(--U) * 2)}
-@media (min-width:641px) and (max-width:1099px){.pp.pp-air.pp-plates>.ch{margin-top:160px}.pp.pp-air.pp-plates .ch>.b+.b{margin-top:72px}}
-@media (max-width:640px){.pp.pp-air.pp-plates>.ch{margin-top:64px}.pp.pp-air.pp-plates .ch>.b+.b{margin-top:32px}}
+.pp.pp-air.pp-plates>.b+.ch{margin-top:104px}
+@media (min-width:641px) and (max-width:1099px){.pp.pp-air.pp-plates>.ch{margin-top:160px}.pp.pp-air.pp-plates>.b+.ch{margin-top:72px}.pp.pp-air.pp-plates .ch>.b+.b{margin-top:72px}}
+@media (max-width:640px){.pp.pp-air.pp-plates>.ch,.pp.pp-air.pp-plates>.b+.ch{margin-top:64px}.pp.pp-air.pp-plates .ch>.b+.b{margin-top:32px}}
 
 /* Panels: a chapter's blocks on one of the Bible's grounds. The photos' edges at every width; no border, shadow,
    z-index or overflow, so the fixed multiply grain lies over the ground as over the paper. */
 .pp.pp-plates .pnl{margin-inline:var(--edge);padding:var(--pr) var(--px);border-radius:clamp(16px,1.4vw,20px);background:var(--pbg)}
 .pp.pp-plates .pnl>.b+.b{margin-top:var(--pr)}
 .pp.pp-plates .pnl-vellum{--pbg:#F2EBDC;--gray:var(--tag-gray)}
-.pp.pp-plates .pnl-linen{--pbg:#E3D7BD;--gray:var(--tag-gray)}
+.pp.pp-plates .pnl-linen{--pbg:#E3D7BD;--gray:#524E48}  /* notes a shade darker on Linen: 5.8:1, 5.3 on the grain's darkest */
 .pp.pp-plates .pnl-navy{--pbg:#1F2B45;--ink:#F2EBDC;--gray:rgb(242 235 220 / .7);color:var(--ink)}
 
-/* Plates. The row (.b-cuts) is the size container: the photo column on the paper, the panel's inside (at most 960 px)
-   in a panel. Its position and z-index keep it above the grain like every picture, also in engines that still give a
-   size container layout containment (a layer of its own, which would otherwise sit under the grain). */
+/* Plates, where the browser has size containers (container queries and cqi); elsewhere a row of cut-outs keeps the
+   flex row above, on the paper or its panel. The row (.b-cuts) is the size container: the photo column on the paper,
+   the panel's inside (at most 960 px) in a panel. Its position and z-index keep it above the grain like every picture,
+   also in engines that still give a size container layout containment (a layer of its own, under the grain). */
+@supports (container-type:inline-size){
 .pp.pp-plates .b-cuts{display:block;padding-inline:var(--edge);container-type:inline-size;position:relative;z-index:2}
 .pp.pp-plates .pnl>.b-cuts{padding-inline:0;max-width:960px;margin-inline:auto}
 .pp.pp-plates .b-cuts>.cuts{--cg:clamp(16px,5cqi,48px);--band:var(--pr);display:grid;grid-auto-flow:column;grid-template-rows:auto auto;
-  grid-auto-columns:max-content;justify-content:center;align-items:stretch;column-gap:var(--cg);row-gap:0;margin-bottom:calc(-1 * var(--band))}
+  grid-auto-columns:max-content;justify-content:center;align-items:stretch;column-gap:var(--cg);row-gap:0}
+.pp.pp-plates .b-cuts>.cuts:has(>.cut>.lbl){margin-bottom:calc(-1 * var(--band))}  /* the last labels' room given back; a plate without labels keeps its own */
 .pp.pp-plates .cuts>.cut{--pw:var(--cw);display:grid;grid-row:span 2;grid-template-rows:subgrid;row-gap:0;width:max(var(--pw),8em);max-width:100%;min-width:0}
 .pp.pp-plates .cuts>.cut>img{width:var(--pw);max-width:100%;align-self:end;justify-self:start}
 .pp.pp-plates .cuts.top>.cut>img{align-self:start}
@@ -627,6 +634,11 @@ main>.coins-work{left:var(--gutter)}
    specimen) two thirds of the plate, 600 px at least, 640 at most, never past the plate */
 .pp.pp-plates .pnl .cut-large{--pw:calc((100cqi - var(--cg)) / 2)}
 .pp.pp-plates .cuts>.cut-xl{--pw:min(100cqi,max(600px,66.667cqi),640px)}
+/* 04 and 05, top-aligned so their books and names coincide: three gaps apart, so the two names never read as one line */
+@container (min-width:560px){
+  .pp.pp-plates .pnl .b-cuts>.cuts.top{column-gap:calc(var(--cg) * 3)}
+  .pp.pp-plates .pnl .cuts.top>.cut-large{--pw:calc((100cqi - 3 * var(--cg)) / 2)}
+}
 
 /* fill (notes "fit"): the row is exactly as wide as the plate, each mark's width in proportion to its --f (build:
    "area", the square root of its shape, for equal visual area; "height", its shape times its "scale", for one height).
@@ -637,15 +649,15 @@ main>.coins-work{left:var(--gutter)}
 
 /* table (Stationery): one grid of nine, the Bible's three rows; each column as wide as its widest piece (build: --c1 to
    --c3, in points, as fr; --tw, their sum), every piece at true relative size, k px per point */
-.pp.pp-plates .b-cuts>.cuts.table{grid-auto-flow:row;grid-template-columns:minmax(0,var(--c1)) minmax(0,var(--c2)) minmax(0,var(--c3));
+.pp.pp-plates .b-cuts>.cuts.table{grid-auto-flow:row;grid-template-columns:minmax(0,var(--c1)) minmax(0,var(--c2,0fr)) minmax(0,var(--c3,0fr));
   justify-content:stretch;--k:min(calc((100cqi - 2 * var(--cg)) / var(--tw)),1.6px)}
 .pp.pp-plates .cuts.table>.cut{width:auto;--pw:calc(var(--w) * var(--k))}
 
 /* swatches (The colors, on the paper): six equal columns across the photo column, each chip its column (168 px at most);
-   three a line under 1000 px of row, two under 560 */
+   under 1000 px of row three chips of 168 px, spread from edge to edge; under 560 two a line, each chip its column */
 .pp.pp-plates .b-cuts>.cuts.swatches{grid-auto-flow:row;grid-template-columns:repeat(6,minmax(0,1fr));justify-content:stretch;column-gap:24px}
 .pp.pp-plates .cuts.swatches>.cut{width:auto;--pw:min(100%,168px)}
-@container (max-width:999px){.pp.pp-plates .b-cuts>.cuts.swatches{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@container (max-width:999px){.pp.pp-plates .b-cuts>.cuts.swatches{grid-template-columns:repeat(3,minmax(0,168px));justify-content:space-between}}
 
 /* A row with an xl mark beside smaller ones (the signature row; Journal & Press) stacks under 700 px of row: the xl
    mark takes the line (640 px at most), the others keep its scale (--fx, the xl mark's --f), two to a line */
@@ -665,9 +677,10 @@ main>.coins-work{left:var(--gutter)}
   .pp.pp-plates .cuts.fill>.cut{--pw:min(100%,calc((100cqi - var(--cg)) / 2 * var(--f) / var(--fmax)))}
   .pp.pp-plates .b-cuts>.cuts.shelf{grid-template-columns:40fr 32fr 28fr;column-gap:12px}
   .pp.pp-plates .cuts.shelf>.cut{--pw:min(100%,var(--cw))}
-  .pp.pp-plates .b-cuts>.cuts.swatches{grid-template-columns:repeat(2,minmax(0,1fr));column-gap:16px}
-  .pp.pp-plates .cuts.swatches>.cut{--pw:min(100%,120px)}
+  .pp.pp-plates .b-cuts>.cuts.swatches{grid-template-columns:repeat(2,minmax(0,1fr));justify-content:stretch;column-gap:16px}
+  .pp.pp-plates .cuts.swatches>.cut{--pw:100%}
   .pp.pp-plates .b-cuts>.cuts.table{grid-template-columns:repeat(2,minmax(0,1fr));--k:calc((100cqi - var(--cg)) / 2 / var(--wmax))}
+}
 }
 
 /* Films: Play under its film's bottom-right corner on desktop (the 9:16 film's too, as the two opening films);

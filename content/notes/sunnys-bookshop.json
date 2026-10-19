@@ -360,8 +360,8 @@
     "The shop’s own press, in its own color, Ink Navy.",
     "35 mm · 160 px minimum"
    ],
-   "align": "center",
-   "fit": "area"
+   "fit": "area",
+   "gap": 6
   },
   {
    "src": "content/media/sunnys-bookshop/SB-Journal-and-Press-Stamp-Vellum.png",
@@ -375,8 +375,8 @@
     "20 mm · 96 px minimum · Ink Navy, and Green, Vellum, Black, White",
     "Cormorant Garamond, with its italic ampersand"
    ],
-   "align": "center",
-   "fit": "area"
+   "fit": "area",
+   "gap": 6
   },
   {
    "src": "content/media/sunnys-bookshop/sb-stationery-business-card.png",
