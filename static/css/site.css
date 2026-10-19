@@ -273,7 +273,8 @@ html:not(.js) .stage:has(#about:target){transform:translateX(-66.6667%)}
 @media (max-width:1199px){.about-press{padding-left:3.2rem}.press-year{right:auto;left:-3.2rem}}  /* under 1200px the margin would reach the text */
 .press li{margin:0 0 .3em}
 .press{font-size:15px}
-.press .outlet{font-family:var(--sans);font-size:19px}  /* outlet names only; the headline is .vh (D, Oct. 19) */
+.press .outlet{font-family:var(--sans);font-size:19px;margin-right:.35em}  /* outlet names only; the headline is .vh, except "headline": true entries (D, Oct. 19) */
+.press .headline{color:#747069} /* lighter gray, 4.55:1 on --paper */
 .press a:hover .outlet{color:inherit}
 /* About: Home at the top left, the paragraphs under it, the press to the right, set a little lower. A 12-column grid
    (the project pages' gutter): the paragraphs in the first eight columns, the press from the ninth. */
@@ -300,7 +301,9 @@ html:not(.js) .stage:has(#about:target){transform:translateX(-66.6667%)}
   .press-group+.press-group{margin-top:var(--s4)}
   .press-year{position:static;padding:0;margin:0 0 12px}
   .press li{margin:0 0 8px}
-  .press .outlet{display:block;margin:0;line-height:1.3}
+  .press .outlet,.press .headline{display:block}
+  .press .outlet{margin:0;line-height:1.3}
+  .press .headline{margin-top:2px;line-height:1.4}
 }
 
 /* The cover: centered. The hand and the name side by side, the words below, then three lines in bold. */

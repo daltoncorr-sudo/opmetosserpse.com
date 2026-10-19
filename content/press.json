@@ -1,5 +1,5 @@
 {
- "_note": "Press, newest first. Shown as outlet names only, one per line under each year; the title is kept for screen readers (D, Oct. 19, 2026: curated from 49 to 13, tier-one outlets and pieces that credit the work). The cut entries are in _cut, to restore by moving one back.",
+ "_note": "Press, newest first. Shown as outlet names only (an entry with \"headline\": true shows its title too), one per line under each year; the title is kept for screen readers (D, Oct. 19, 2026: curated from 49 to 13, tier-one outlets and pieces that credit the work). The cut entries are in _cut, to restore by moving one back.",
  "press": [
   {
    "year": "2026",
@@ -59,7 +59,15 @@
    "year": "2024",
    "outlet": "Festival In LA",
    "title": "“World’s Best Film Festival Posters 2024”",
-   "url": "http://www.festivalinla.com/2024/11/the-worlds-best-film-festival-posters.html"
+   "url": "http://www.festivalinla.com/2024/11/the-worlds-best-film-festival-posters.html",
+   "headline": true
+  },
+  {
+   "year": "2023",
+   "outlet": "Festival In LA",
+   "title": "“World’s Best Film Festival Posters 2023”",
+   "url": "http://www.festivalinla.com/2023/11/the-worlds-best-film-festival-posters.html",
+   "headline": true
   },
   {
    "year": "2023",
@@ -230,12 +238,6 @@
    "outlet": "Variety",
    "title": "HollyShorts 19th Coverage",
    "url": "https://variety.com/2023/film/news/hollyshorts-film-festival-2023-selection-1235673204/"
-  },
-  {
-   "year": "2023",
-   "outlet": "Festival In LA",
-   "title": "“World’s Best Film Festival Posters 2023”",
-   "url": "http://www.festivalinla.com/2023/11/the-worlds-best-film-festival-posters.html"
   },
   {
    "year": "2023",
