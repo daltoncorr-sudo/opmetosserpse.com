@@ -1,19 +1,17 @@
 {
- "_note": "Press, newest first. Shown as outlet names only (an entry with \"headline\": true shows its title too), one per line under each year; the title is kept for screen readers (D, Oct. 19, 2026: curated from 49 to 14, then 37 with D's picks back in, tier-one outlets and pieces that credit the work). The cut entries are in _cut, to restore by moving one back. An outlet that appears twice in a year shows its headlines, so the lines differ.",
+ "_note": "Press, newest first. Shown as outlet names only (an entry with \"headline\": true shows its title too), one per line under each year; the title is kept for screen readers (D, Oct. 19, 2026: curated from 49 to 14, then 37 with D's picks back in, tier-one outlets and pieces that credit the work). The cut entries are in _cut, to restore by moving one back. Only Festival In LA's World's Best Film Festival Posters show their headlines (D, Oct. 19).",
  "press": [
   {
    "year": "2026",
    "outlet": "Deadline",
    "title": "HollyShorts 22nd Annual Winners",
-   "url": "https://deadline.com/2026/08/2026-hollyshorts-awards-winners-1237048472/",
-   "headline": true
+   "url": "https://deadline.com/2026/08/2026-hollyshorts-awards-winners-1237048472/"
   },
   {
    "year": "2026",
    "outlet": "Deadline",
    "title": "HollyShorts 22nd Annual Documentary Contenders",
-   "url": "https://deadline.com/2026/08/2026-hollyshorts-documentary-contenders-1237048128/",
-   "headline": true
+   "url": "https://deadline.com/2026/08/2026-hollyshorts-documentary-contenders-1237048128/"
   },
   {
    "year": "2026",
@@ -61,15 +59,13 @@
    "year": "2025",
    "outlet": "MovieMaker",
    "title": "\"Top 50 Film Festivals Worth the Entry Fee 2025\"",
-   "url": "https://www.moviemaker.com/50-film-festivals-worth-the-entry-fee-2025/",
-   "headline": true
+   "url": "https://www.moviemaker.com/50-film-festivals-worth-the-entry-fee-2025/"
   },
   {
    "year": "2025",
    "outlet": "MovieMaker",
    "title": "\"25 Coolest Film Festivals in the World\"",
-   "url": "https://www.moviemaker.com/coolest-film-festivals-2024/",
-   "headline": true
+   "url": "https://www.moviemaker.com/coolest-film-festivals-2024/"
   },
   {
    "year": "2025",
@@ -203,22 +199,19 @@
    "year": "2017",
    "outlet": "Washington Square News",
    "title": "Print Interview",
-   "url": "https://issuu.com/nyu.news/docs/wsn20170327/8",
-   "headline": true
+   "url": "https://issuu.com/nyu.news/docs/wsn20170327/8"
   },
   {
    "year": "2017",
    "outlet": "Washington Square News",
    "title": "Online Interview",
-   "url": "https://nyunews.com/2017/04/11/steinhardt-senior-talks-music-and-lyrics/",
-   "headline": true
+   "url": "https://nyunews.com/2017/04/11/steinhardt-senior-talks-music-and-lyrics/"
   },
   {
    "year": "2017",
    "outlet": "Washington Square News",
    "title": "I Think Of You Review",
-   "url": "https://nyunews.com/2017/04/25/i-think-of-you-feels-as-salty-sweet-as-summer/",
-   "headline": true
+   "url": "https://nyunews.com/2017/04/25/i-think-of-you-feels-as-salty-sweet-as-summer/"
   },
   {
    "year": "2015",
