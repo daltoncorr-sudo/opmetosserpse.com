@@ -1064,14 +1064,14 @@ def blurb(s, n=155):
     return s[:n].rsplit(' ', 1)[0].rstrip(' ,;:.—') + '…'
 
 def press_list(press):
-    """Press, by year, newest first. Plain lines: the outlet, then the headline. Each year sits in the left margin beside
-    its first line, as the years do in the work list (D, Oct. 13)."""
+    """Press, by year, newest first. Outlet names only, one per line; the headline is there for screen readers alone
+    (D, Oct. 19). Each year sits in the left margin beside its first line, as the years do in the work list (D, Oct. 13)."""
     out, year = [], None
     for x in press:
         if x['year'] != year:
             if year: out.append('</ul></div>')
             year = x['year']; out.append('<div class="press-group"><h4 class="press-year">%s</h4><ul class="press">' % year)
-        line = '<span class="outlet">%s</span> <span class="headline">%s</span>' % (typo(x['outlet']), typo(x['title']))
+        line = '<span class="outlet">%s</span><span class="vh">, %s</span>' % (typo(x['outlet']), typo(x['title']))
         out.append('<li>%s</li>' % ('<a href="%s" rel="noopener">%s</a>' % (esc(x['url']), line) if x['url'] else line))
     return ''.join(out) + '</ul></div>'
 
