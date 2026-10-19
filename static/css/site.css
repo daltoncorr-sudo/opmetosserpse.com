@@ -580,9 +580,8 @@ main>.coins-work{left:var(--gutter)}
 }
 /* ===== Sunny's Bookshop: grounds and plates (D, Oct. 19, 2026).
    Sunny-only: .pp-plates comes only from its notes file ("plates": true), .pnl only from a chapter's "panel".
-   Four chapters sit in rounded panels on the Brand Bible's own grounds (The marks on Vellum; The type and Stationery
-   on Linen, the Bible's "quiet panels"; Journal & Press on Ink Navy); everything filmed, photographed or delivered,
-   and the palette itself, stays on the paper. Every row of cut-outs is a plate: its pictures share one line, their
+   Four chapters sit in rounded panels (The marks, The type and Stationery on a light off-white; Journal & Press on
+   the Bible's Ink Navy); everything filmed, photographed or delivered, and the palette itself, stays on the paper. Every row of cut-outs is a plate: its pictures share one line, their
    labels the next, so a label can never move a picture. The shared .pp .b .m rules above skip cut-outs
    (.pp .b .m:where(:not(.cut)): no added specificity, so .b-wide and .b-tall still win). ===== */
 
@@ -610,8 +609,9 @@ main>.coins-work{left:var(--gutter)}
    z-index or overflow, so the fixed multiply grain lies over the ground as over the paper. */
 .pp.pp-plates .pnl{margin-inline:var(--edge);padding:var(--pr) var(--px);border-radius:clamp(16px,1.4vw,20px);background:var(--pbg)}
 .pp.pp-plates .pnl>.b+.b{margin-top:var(--pr)}
-.pp.pp-plates .pnl-vellum{--pbg:#F2EBDC;--gray:var(--tag-gray)}
-.pp.pp-plates .pnl-linen{--pbg:#E3D7BD;--gray:#524E48}  /* notes a shade darker on Linen: 5.8:1, 5.3 on the grain's darkest */
+/* The light panels are one off-white, a shade under the paper (D, Oct. 19: "less dark, more like off white"; they were
+   the Bible's Vellum and Linen) */
+.pp.pp-plates .pnl-light{--pbg:#F3F0E9;--gray:var(--tag-gray)}
 .pp.pp-plates .pnl-navy{--pbg:#1F2B45;--ink:#F2EBDC;--gray:rgb(242 235 220 / .7);color:var(--ink)}
 
 /* Plates, where the browser has size containers (container queries and cqi); elsewhere a row of cut-outs keeps the
@@ -647,11 +647,11 @@ main>.coins-work{left:var(--gutter)}
 .pp.pp-plates .b-cuts>.cuts.fill{column-gap:0;justify-content:space-between}
 .pp.pp-plates .cuts.fill>.cut{--pw:calc((100cqi - (var(--n) - 1) * var(--cg) * var(--gx,1)) * var(--f) / var(--sf));width:max(var(--pw),7em)}
 
-/* table (Stationery): one grid of nine, the Bible's three rows; each column as wide as its widest piece (build: --c1 to
-   --c3, in points, as fr; --tw, their sum), every piece at true relative size, k px per point */
-.pp.pp-plates .b-cuts>.cuts.table{grid-auto-flow:row;grid-template-columns:minmax(0,var(--c1)) minmax(0,var(--c2,0fr)) minmax(0,var(--c3,0fr));
-  justify-content:stretch;--k:min(calc((100cqi - 2 * var(--cg)) / var(--tw)),1.6px)}
-.pp.pp-plates .cuts.table>.cut{width:auto;--pw:calc(var(--w) * var(--k))}
+/* grid (Stationery, D, Oct. 19): three even columns, the Bible's three rows, every piece at one visual area (build: --f,
+   the square root of its shape; --ea, the side of that area), never wider than its column nor taller than 1.3 times --ea
+   (the bookmark); each sits on its row's line, at the left of its column */
+.pp.pp-plates .b-cuts>.cuts.grid{grid-auto-flow:row;grid-template-columns:repeat(3,minmax(0,1fr));justify-content:stretch;--ea:calc((100cqi - 2 * var(--cg)) / 3 * .58)}
+.pp.pp-plates .cuts.grid>.cut{width:auto;--pw:min(100%,calc(var(--ea) * var(--f)),calc(var(--ea) * 1.3 * var(--f) * var(--f)))}
 
 /* swatches (The colors, on the paper): six equal columns across the photo column, each chip its column (168 px at most);
    under 1000 px of row three chips of 168 px, spread from edge to edge; under 560 two a line, each chip its column */
@@ -679,7 +679,8 @@ main>.coins-work{left:var(--gutter)}
   .pp.pp-plates .cuts.shelf>.cut{--pw:min(100%,var(--cw))}
   .pp.pp-plates .b-cuts>.cuts.swatches{grid-template-columns:repeat(2,minmax(0,1fr));justify-content:stretch;column-gap:16px}
   .pp.pp-plates .cuts.swatches>.cut{--pw:100%}
-  .pp.pp-plates .b-cuts>.cuts.table{grid-template-columns:repeat(2,minmax(0,1fr));--k:calc((100cqi - var(--cg)) / 2 / var(--wmax))}
+  .pp.pp-plates .b-cuts>.cuts.grid{grid-auto-flow:row dense;grid-template-columns:repeat(2,minmax(0,1fr));--ea:calc((100cqi - var(--cg)) / 2 * .8)}  /* two columns; a wide piece takes the line, the next pair fills in */
+  .pp.pp-plates .cuts.grid>.cut-wide{grid-column:1/-1;--pw:min(100%,calc(var(--ea) * 1.4 * var(--f)))}
 }
 }
 
@@ -687,6 +688,17 @@ main>.coins-work{left:var(--gutter)}
    on phones, where the note spans the column, centered on the film's axis. Tablets keep theirs (under it, on the right) */
 @media (min-width:1100px){.pp.pp-plates .b-tall .note{align-self:end}}
 @media (max-width:640px){.pp.pp-plates .note{text-align:center}.pp.pp-plates .note .again{margin-inline:auto}}
+/* A row of films (the book drawn by hand and the announcement film, side by side at one height, D, Oct. 19): each
+   film's controls right under it, centered on it; on a phone, where the vertical film is narrow, at the row's two
+   outer edges, so they never meet */
+.pp.pp-plates .row .m>.film-ctl{margin:10px 0 0;text-align:center}
+.pp.pp-plates .row .m>.note{margin:6px 0 0;text-align:center}
+.pp.pp-plates .row .m>.note .again{margin-inline:auto}
+@media (max-width:640px){
+  .pp.pp-plates .row .m>.film-ctl,.pp.pp-plates .row .m>.note{white-space:nowrap}
+  .pp.pp-plates .row .m:first-child>*{text-align:left}.pp.pp-plates .row .m:first-child>.note .again{margin-inline:0 auto}
+  .pp.pp-plates .row .m:last-child>.film-ctl,.pp.pp-plates .row .m:last-child>.note{display:flex;justify-content:flex-end}  /* wider than its film: runs left, never off the page */
+}
 
 /* Phones: the delivery sheets and the studies two to a line, one even grid (notes chapter "phone": "pairs") */
 @media (max-width:640px){

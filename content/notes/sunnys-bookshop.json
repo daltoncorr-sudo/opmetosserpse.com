@@ -18,13 +18,13 @@
    "label": "The marks",
    "starts_at": "SB-Logo-Hero-Horizontal-Green",
    "src": "Brand Bible, III · The marks",
-   "panel": "vellum"
+   "panel": "light"
   },
   {
    "label": "The type",
    "starts_at": "sb-type-sailing-club",
    "src": "Brand Bible, V · Type",
-   "panel": "linen"
+   "panel": "light"
   },
   {
    "label": "The colors",
@@ -41,7 +41,7 @@
    "label": "Stationery and the shop",
    "starts_at": "sb-stationery-business-card",
    "src": "Brand Bible, VII · In use: Stationery and the shop",
-   "panel": "linen"
+   "panel": "light"
   },
   {
    "label": "The delivery",
@@ -79,7 +79,7 @@
  },
  "hide": [],
  "hide_src": "D, Oct. 10, 2026: the page's own media list (below) replaces the hide list; the eight repeats it hid stay out, with the rest D cut.",
- "media_src": "D, Oct. 10, 2026 (Checkpoint 3b): the page rebuilt after the Brand Bible, the work straight on the paper. The signature written on, first, looping (Final Assets/Video/SB-Video-Logo-Script-16x9-White.mp4, 7.5 to 13 s: the book, then the script, before the film's closing credit; cropped, its white mapped to the paper, no sound); the book drawn by hand (03 Source/Sketches/Hand drawing/SB-Book-Drawing-Timelapse.mov, cut before its last clean frame and fade, cropped to the drawing, twice the speed, its white mapped to the site's paper and under the grain); the fourteen marks, numbered and labeled with the Bible's words and sizes (transparent PNGs from 01 Deliverables/Final Assets/Logos, copied at 1600 px); the six colors as plain swatches with the Bible's names and roles; in use, the tote, the cap and the tags, then the announcement film. Then (D, Oct. 10, more room and order after the Bible): the type, five faces and the hierarchy, as transparent specimens rendered once from the package's fonts with the Bible's own lines (never shipped as fonts); Journal & Press on its own; stationery and the shop, each piece cut on its own from the Bible's page source at its real relative size; the studies and the delivery sheets back. The client's name and email are censored (D, Oct. 10): on the business card and the email signature (re-cut with solid bars in place of the text) and on study page 30 (a copy, its first word under a bar). Then (D, Oct. 14): the delivery, then in use, ending on the announcement film, and the studies last. Then (D, Oct. 19): four chapters on the Bible’s own grounds, in rounded panels: the marks on Vellum, the type and the stationery on Linen, Journal & Press on Ink Navy, in its Vellum marks (Final Assets/Logos/Journal-and-Press, copied at 1600 px); every row of cut-outs a level plate, its pictures on one line and its labels on the next; the stationery one table of nine; on phones the delivery sheets and the studies two to a line.",
+ "media_src": "D, Oct. 10, 2026 (Checkpoint 3b): the page rebuilt after the Brand Bible, the work straight on the paper. The signature written on, first, looping (Final Assets/Video/SB-Video-Logo-Script-16x9-White.mp4, 7.5 to 13 s: the book, then the script, before the film's closing credit; cropped, its white mapped to the paper, no sound); the book drawn by hand (03 Source/Sketches/Hand drawing/SB-Book-Drawing-Timelapse.mov, cut before its last clean frame and fade, cropped to the drawing, twice the speed, its white mapped to the site's paper and under the grain); the fourteen marks, numbered and labeled with the Bible's words and sizes (transparent PNGs from 01 Deliverables/Final Assets/Logos, copied at 1600 px); the six colors as plain swatches with the Bible's names and roles; in use, the tote, the cap and the tags, then the announcement film. Then (D, Oct. 10, more room and order after the Bible): the type, five faces and the hierarchy, as transparent specimens rendered once from the package's fonts with the Bible's own lines (never shipped as fonts); Journal & Press on its own; stationery and the shop, each piece cut on its own from the Bible's page source at its real relative size; the studies and the delivery sheets back. The client's name and email are censored (D, Oct. 10): on the business card and the email signature (re-cut with solid bars in place of the text) and on study page 30 (a copy, its first word under a bar). Then (D, Oct. 14): the delivery, then in use, ending on the announcement film, and the studies last. Then (D, Oct. 19): four chapters on the Bible’s own grounds, in rounded panels: the marks on Vellum, the type and the stationery on Linen, Journal & Press on Ink Navy, in its Vellum marks (Final Assets/Logos/Journal-and-Press, copied at 1600 px); every row of cut-outs a level plate, its pictures on one line and its labels on the next; the stationery one table of nine; on phones the delivery sheets and the studies two to a line. Then (D, Oct. 19, on the canvas): the panels a lighter off-white; the announcement film beside the book drawn by hand, the two films on one row; every mark on its label line; the stationery an even grid, each piece at one visual weight.",
  "media": [
   {
    "src": "content/media/sunnys-bookshop/sb-signature-script.mp4",
@@ -89,7 +89,14 @@
   {
    "src": "content/media/sunnys-bookshop/sb-book-drawing-timelapse.mp4",
    "alt": "The book drawn by hand, line by line, sped up.",
-   "grain": true
+   "grain": true,
+   "row": "book-films",
+   "stack": false
+  },
+  {
+   "src": "media/sunnys-bookshop/sb-14-film-01-9x16.mp4",
+   "row": "book-films",
+   "stack": false
   },
   {
    "src": "content/media/sunnys-bookshop/SB-Book-Hero-Green.png",
@@ -128,8 +135,7 @@
    "row": "horizontal",
    "n": "04",
    "label": "Horizontal · the primary logo",
-   "note": "40 mm · 160 px minimum",
-   "align": "top"
+   "note": "40 mm · 160 px minimum"
   },
   {
    "src": "content/media/sunnys-bookshop/SB-Logo-Hero-Horizontal-Stores-Green.png",
@@ -138,8 +144,7 @@
    "row": "horizontal",
    "n": "05",
    "label": "Horizontal · stores",
-   "note": "50 mm · 200 px · names both shops",
-   "align": "top"
+   "note": "50 mm · 200 px · names both shops"
   },
   {
    "src": "content/media/sunnys-bookshop/SB-Logo-Hero-Stacked-Green.png",
@@ -149,7 +154,6 @@
    "n": "06",
    "label": "Stacked",
    "note": "25 mm · 110 px",
-   "align": "center",
    "fit": "area"
   },
   {
@@ -160,7 +164,6 @@
    "n": "07",
    "label": "Seal",
    "note": "25 mm · 120 px",
-   "align": "center",
    "fit": "area"
   },
   {
@@ -171,7 +174,6 @@
    "n": "08",
    "label": "Half moon",
    "note": "30 mm · 140 px",
-   "align": "center",
    "fit": "area"
   },
   {
@@ -182,7 +184,6 @@
    "n": "09",
    "label": "Signature · book",
    "note": "35 mm · 150 px",
-   "align": "center",
    "fit": "area"
   },
   {
@@ -193,7 +194,6 @@
    "n": "10",
    "label": "Signature",
    "note": "30 mm wide minimum, 24 pt tall",
-   "align": "center",
    "fit": "height",
    "gap": 1.5
   },
@@ -205,7 +205,6 @@
    "n": "11",
    "label": "Signature · Sunny’s",
    "note": "20 mm minimum · tags, stickers, bookplates",
-   "align": "center",
    "fit": "height",
    "scale": 0.95,
    "gap": 1.5
@@ -218,7 +217,6 @@
    "n": "12",
    "label": "Monogram",
    "note": "12 mm · 48 px minimum",
-   "align": "center",
    "fit": "height",
    "scale": 1.5,
    "gap": 1.5
@@ -386,7 +384,7 @@
    "row": "stationery",
    "label": "Business card",
    "note": "3.5 × 2 in · front and back",
-   "layout": "table"
+   "layout": "grid"
   },
   {
    "src": "content/media/sunnys-bookshop/sb-stationery-envelope.png",
@@ -396,7 +394,7 @@
    "row": "stationery",
    "label": "Envelope",
    "note": "No. 10 · the monogram as return mark",
-   "layout": "table"
+   "layout": "grid"
   },
   {
    "src": "content/media/sunnys-bookshop/sb-stationery-letterhead.png",
@@ -406,7 +404,7 @@
    "row": "stationery",
    "label": "Letterhead",
    "note": "US Letter · white or natural",
-   "layout": "table"
+   "layout": "grid"
   },
   {
    "src": "content/media/sunnys-bookshop/sb-stationery-email-signature.png",
@@ -416,7 +414,7 @@
    "row": "stationery",
    "label": "Email signature",
    "note": "the Digital logo at 160 px · Georgia where the brand fonts aren’t installed",
-   "layout": "table"
+   "layout": "grid"
   },
   {
    "src": "content/media/sunnys-bookshop/sb-stationery-gift-card.png",
@@ -426,7 +424,7 @@
    "row": "stationery",
    "label": "Gift card",
    "note": "3.375 × 2.125 in",
-   "layout": "table"
+   "layout": "grid"
   },
   {
    "src": "content/media/sunnys-bookshop/sb-stationery-bag-sticker.png",
@@ -436,7 +434,7 @@
    "row": "stationery",
    "label": "Bag sticker",
    "note": "50 mm round · the Seal",
-   "layout": "table"
+   "layout": "grid"
   },
   {
    "src": "content/media/sunnys-bookshop/sb-stationery-event-card.png",
@@ -446,7 +444,7 @@
    "row": "stationery",
    "label": "Event card",
    "note": "A6 · one per event",
-   "layout": "table"
+   "layout": "grid"
   },
   {
    "src": "content/media/sunnys-bookshop/sb-stationery-bookmark.png",
@@ -456,7 +454,7 @@
    "row": "stationery",
    "label": "Bookmark",
    "note": "2 × 7 in · Green stock, Vellum ink",
-   "layout": "table"
+   "layout": "grid"
   },
   {
    "src": "content/media/sunnys-bookshop/sb-stationery-receipt-header.png",
@@ -466,7 +464,7 @@
    "row": "stationery",
    "label": "Receipt header",
    "note": "80 mm · the Black logo",
-   "layout": "table"
+   "layout": "grid"
   },
   {
    "src": "images/design/sunnys-bookshop/sb-11-assets-01-16x9-2400.jpg"
@@ -489,9 +487,6 @@
   },
   {
    "src": "images/design/sunnys-bookshop/sb-13-world-03-4x5-2400.jpg"
-  },
-  {
-   "src": "media/sunnys-bookshop/sb-14-film-01-9x16.mp4"
   },
   {
    "src": "images/design/sunnys-bookshop/sb-10-studies-page-06-1600.webp",

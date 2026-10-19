@@ -544,8 +544,8 @@ def keyed(items):
 FILMS = ('.mp4', '.mov', '.webm')
 # Up to four chapter labels a page; Sunny's Bookshop, built after its Brand Bible, has one per section (D, Oct. 10)
 MAX_CHAPTERS = {'sunnys-bookshop': 10}
-# The grounds a chapter's panel may take, Sunny's Brand Bible's own (D, Oct. 19): Vellum, Linen and, for Journal & Press, Ink Navy
-PANELS = ('vellum', 'linen', 'navy')
+# The grounds a chapter's panel may take (D, Oct. 19): a light off-white, and Ink Navy, the Bible's, for Journal & Press
+PANELS = ('light', 'navy')
 
 def notes_list(p, src_root):
     """A page that departs from its daltoncorr.com page (D's calls: HDtracks' fresh captures, Comedy 10's opening, Don't
@@ -563,8 +563,9 @@ def notes_list(p, src_root):
     (Sunny's, D, Oct. 19) a row of cut-outs is a plate, its pictures on one line and their labels on the next, and takes:
     "align": "center" (the pictures centered on one line: marks of different shapes), "fit" ("area": each mark at one
     visual area; "height": each at one height, times its "scale"; the row then fills the plate), "gap" (a fill row's gaps,
-    times the usual) and "layout" ("shelf": the books, a row that keeps its sizes on a phone; "table": the stationery,
-    columns as wide as their widest piece; "swatches": the colors, equal columns)."""
+    times the usual) and "layout" ("shelf": the books, a row that keeps its sizes on a phone; "grid": the stationery, three
+    even columns, each piece at one visual area; "swatches": the colors, equal columns). "stack": false keeps a row of
+    pictures or films on one line on a phone (Sunny's two films, D, Oct. 19); rows stack there otherwise."""
     dc, out, errs = None, [], []
     for m in notes_media(p):
         if m.get('piece') or dc is None and not m.get('alt'):
@@ -579,18 +580,17 @@ def notes_list(p, src_root):
         if m.get('cut') == 'true' and not isinstance(m.get('w'), (int, float)): errs.append('%s: a "true" cut-out needs "w", its width in points' % m['src'])
         if m.get('align') not in (None, 'top', 'center'): errs.append('%s: "align" is "top" or "center"' % m['src'])
         if m.get('fit') not in (None, 'area', 'height'): errs.append('%s: "fit" is "area" or "height"' % m['src'])
-        if m.get('layout') not in (None, 'shelf', 'table', 'swatches'): errs.append('%s: "layout" is "shelf", "table" or "swatches"' % m['src'])
+        if m.get('layout') not in (None, 'shelf', 'grid', 'swatches'): errs.append('%s: "layout" is "shelf", "grid" or "swatches"' % m['src'])
+        if m.get('stack') is not None and (m['stack'] is not False or not m.get('row')): errs.append('%s: "stack": false keeps a row on one line on a phone' % m['src'])
         if any(m.get(x) is not None for x in ('fit', 'layout', 'scale', 'gap')) and not m.get('cut'):
             errs.append('%s: "fit", "layout", "scale" and "gap" are for cut-outs' % m['src'])
         for x in ('scale', 'gap'):
             if m.get(x) is not None and not (isinstance(m[x], (int, float)) and m[x] > 0): errs.append('%s: "%s" is a number above 0' % (m['src'], x))
         if m.get('scale') is not None and m.get('fit') != 'height': errs.append('%s: "scale" goes with "fit": "height"' % m['src'])
         if m.get('gap') is not None and not m.get('fit'): errs.append('%s: "gap" goes with "fit"' % m['src'])
-        if m.get('layout') == 'table' and (m.get('cut') != 'true' or not isinstance(m.get('w'), (int, float))):
-            errs.append('%s: a "table" holds "true" cut-outs, each with "w"' % m['src'])
         out.append(dict(kind=kind, src=m['src'], alt=alt, w=0, h=0, gallery=m.get('gallery', 0), wide=m.get('slot') == 'W',
                         cut=m.get('cut'), row=m.get('row'), cap=m.get('cap', True), align=m.get('align'), grain=m.get('grain'), pt=m.get('w'),
-                        fit=m.get('fit'), scale=m.get('scale', 1), gap=m.get('gap'), layout=m.get('layout'),
+                        fit=m.get('fit'), scale=m.get('scale', 1), gap=m.get('gap'), layout=m.get('layout'), stack=m.get('stack'),
                         lbl=(m.get('n'), m.get('label'), m.get('note')) if m.get('label') else None))
     if errs: sys.exit('Fix the media list in content/notes/%s.json first:\n  %s' % (p['slug'], '\n  '.join(errs)))
     return out
@@ -617,7 +617,7 @@ def load_notes(p, keys):
     for c in n['chapters']:
         if not 2 <= len(c['label'].split()) <= 5: errs.append('chapter "%s" should be 2 to 5 words' % c['label'])
     # plates (Sunny's Bookshop, D, Oct. 19): rows of cut-outs as plates, and chapters on the Brand Bible's grounds, in
-    # rounded panels ("panel": vellum, linen, or navy for Journal & Press); "phone": "pairs" sets a chapter's pictures
+    # rounded panels ("panel": light, or navy for Journal & Press); "phone": "pairs" sets a chapter's pictures
     # two to a line on a phone
     if n.get('plates') and s != 'sunnys-bookshop': errs.append('plates is only for sunnys-bookshop')
     for c in n['chapters']:
@@ -694,7 +694,7 @@ def make_blocks(items, notes):
         else: kind = 'single'
         prev = out[-1] if out else None  # a row that continues its gallery sits closer to the one before it
         cont = kind == 'row' and prev and prev['kind'] == 'row' and it['gallery'] and prev['items'][0]['gallery'] == it['gallery']
-        out.append(dict(kind=kind, items=grp, note=note, cont=bool(cont), stack=kind == 'row' and bool(it.get('row'))))
+        out.append(dict(kind=kind, items=grp, note=note, cont=bool(cont), stack=kind == 'row' and bool(it.get('row')) and it.get('stack') is not False))
     return out
 
 def lead(x, research):
@@ -712,9 +712,10 @@ def keep(x):
 def plate(items, panel=False):
     """A plate's measures (Sunny's, D, Oct. 19; site.css .pp-plates): a fill row's share for each mark (--f: the square
     root of its shape for "area", one visual area; its shape times its "scale" for "height", one height) and the row's
-    sums, or a table's columns, each as wide as its widest piece in points (every third piece). Returns (row style,
-    {key: item style}) as custom properties, and the key of a lone last piece (an odd one out on a phone's two columns,
-    where an xl piece, and a large one in a panel, takes the whole line). A row has one "fit", "layout", "gap" and "align"."""
+    sums; in a grid, each piece's --f (one visual area) and the wide ones (2.5 times as wide as tall or more), which take
+    a phone's whole line. Returns (row style, {key: item style}) as custom properties, the key of a lone last piece (an
+    odd one out on a phone's two columns, where an xl piece, and a large one in a panel, takes the whole line) and the
+    wide keys. A row has one "fit", "layout", "gap" and "align"."""
     for x in ('fit', 'layout', 'gap', 'align'):
         if len({it.get(x) for it in items if it.get(x) is not None}) > 1:
             sys.exit('A row of cut-outs (%s) has more than one "%s": give it one.' % (items[0]['key'], x))
@@ -730,24 +731,37 @@ def plate(items, panel=False):
         row += ['--fx:%.4f' % f[it['key']] for it in items if it['cut'] == 'xl'][:1]
         row += ['--gx:%g' % it['gap'] for it in items if it.get('gap')][:1]
         each = {k: '--f:%.4f' % v for k, v in f.items()}
-    if layout == 'table':
-        cols = [max(it['pt'] for it in items[j::3]) for j in range(min(3, len(items)))]
-        row += ['--c%d:%gfr' % (j + 1, c) for j, c in enumerate(cols)] + ['--tw:%g' % sum(cols), '--wmax:%g' % max(cols)]
+    wide = set()
+    if layout == 'grid':
+        each = {it['key']: '--f:%.4f' % (it['w'] / it['h']) ** .5 for it in items}
+        wide = {it['key'] for it in items if it['w'] >= 2.5 * it['h']}
     free = [it['key'] for it in items if it['cut'] != 'xl' and not (panel and it['cut'] == 'large')]
-    lone = free[-1] if layout != 'shelf' and len(free) % 2 else None
-    return ';'.join(row), each, lone
+    lone = free[-1] if layout not in ('shelf', 'grid') and len(free) % 2 else None
+    return ';'.join(row), each, lone, wide
+
+def film_ctls(it):
+    """A film's controls (build-wide): Play with sound right under a film with sound (the shared control), and Play
+    again, or Play for a looping film under reduced motion, which site.js shows when the film rests. Returns (under, again)."""
+    under = ('<p class="film-ctl"><button type="button" class="ctl" data-unmute="%s" data-off="Play with sound" data-on="Mute">%s</button></p>'
+             % (it['id'], ctl('Play with sound'))) if it['sound'] else ''
+    if it.get('loop'):
+        again = '' if it['sound'] else '<a href="#" class="again" data-again="%s" hidden>Play</a>' % it['id']
+    else:
+        again = '<a href="#" class="again" data-again="%s" hidden>Play again</a>' % it['id']
+    return under, again
 
 def block_html(b, slug, research=False, plates=False, panel=False):
     """A block, with its note (if it has one) in the right margin, beside its top. Every picture shows whole: a portrait
     picture or film (.cap) and a row are never taller than about 85vh, centered in their columns (--ar, its width over
     its height; a row's is the sum of its pictures', so they keep one height). On a page with plates, a row of cut-outs
-    is a plate (plate(), above)."""
+    is a plate (plate(), above), and a row of films keeps each film's controls right under it."""
     kind = b['kind']
     ms = []
-    prow, peach, lone = plate(b['items'], panel) if plates and kind == 'cuts' else ('', {}, None)
+    prow, peach, lone, wide = plate(b['items'], panel) if plates and kind == 'cuts' else ('', {}, None, set())
+    inner = plates and kind == 'row'
     for it in b['items']:
         cls = 'm' + (' piece' if it['kind'] == 'widget' else '') + (' cut cut-%s' % it['cut'] if kind == 'cuts' else '') + (' grain' if it.get('grain') else '')
-        cls += ' cut-lone' if it['key'] == lone else ''
+        cls += (' cut-lone' if it['key'] == lone else '') + (' cut-wide' if it['key'] in wide else '')
         # a row's pictures share its width by their shapes; scaled up so the shares always add to more than 1 (two tall
         # phone captures add to 0.92, and flexbox then leaves the rest of the row empty, on one side)
         style = 'flex-grow:%.4f' % (100 * it['w'] / it['h']) if kind == 'row' else '--w:%g' % it['pt'] if kind == 'cuts' and it.get('pt') else ''
@@ -764,6 +778,9 @@ def block_html(b, slug, research=False, plates=False, panel=False):
             lbl = '<p class="lbl">%s<span class="lbl-t">%s</span>%s</p>' % (
                 '<span class="lbl-n">%s</span>' % esc(n) if n else '', typo(t),
                 ''.join('<span class="lbl-s">%s</span>' % lead(keep(typo(x)) if plates else typo(x), research) for x in notes))
+        if inner and it['kind'] == 'video':  # its own controls, under it, not the row's
+            under, again = film_ctls(it)
+            lbl += under + ('<p class="note">%s</p>' % again if again else '')
         ms.append('<div class="%s" data-i="%s"%s%s>%s%s</div>' % (cls, esc(it['key']), style, skip, it['html'](sizes), lbl))
     if kind == 'row':
         ar = sum(it['w'] / it['h'] for it in b['items'])
@@ -773,20 +790,16 @@ def block_html(b, slug, research=False, plates=False, panel=False):
         mid = any(it.get('align') == 'center' for it in b['items'])
         cls = ' top' if top else ' mid' if mid else ' end' if any(it.get('lbl') for it in b['items']) else ''
         cls += ''.join(' ' + x for x in [next((it['layout'] for it in b['items'] if it.get('layout')), None)] if x)
-        cls += ' fill' if any(it.get('fit') for it in b['items']) else ''
+        cls += ' fill' if any(it.get('fit') for it in b['items']) and 'grid' not in cls else ''
         media = '<div class="cuts%s"%s>%s</div>' % (cls, ' style="%s"' % prow if prow else '', ''.join(ms))
     else:
         media = ''.join(ms)
     cap_ = '<span class="nt">%s</span>' % typo(b['note']) if b['note'] else ''  # the words; the film links stay apart
-    for it in b['items']:
-        if it['kind'] != 'video': continue
-        if it['sound']:  # every film plays muted; one with sound has Play with sound right under it (the shared control)
-            media += ('<p class="film-ctl"><button type="button" class="ctl" data-unmute="%s" data-off="Play with sound" data-on="Mute">%s</button></p>'
-                      % (it['id'], ctl('Play with sound')))
-        if it.get('loop'):  # Play: reduced motion
-            if not it['sound']: cap_ += ' <a href="#" class="again" data-again="%s" hidden>Play</a>' % it['id']
-        else:
-            cap_ += ' <a href="#" class="again" data-again="%s" hidden>Play again</a>' % it['id']
+    for it in b['items']:  # every film plays muted; one with sound has Play with sound right under it, Play again in its note
+        if it['kind'] != 'video' or inner: continue
+        under, again = film_ctls(it)
+        media += under
+        if again: cap_ += ' ' + again
     cap_ = cap_.strip()
     if kind == 'full':  # a full bleed has no grid of its own: its note sits in one, under it, in the right margin
         fc = '<figcaption class="g fcap"><span class="note">%s</span></figcaption>' % cap_ if cap_ else ''
@@ -1302,7 +1315,7 @@ def main():
                 if not v: continue
                 vid = 'v-%s-%s' % (s, name)
                 items.append(dict(key=k, slot='V', kind='video', w=v['w'], h=v['h'], id=vid, sound=sound, v=v, rest=rest, gallery=x['gallery'], alt=alt,
-                                  row=x.get('row'), loop=loop, grain=x.get('grain'),
+                                  row=x.get('row'), stack=x.get('stack'), loop=loop, grain=x.get('grain'),
                                   html=lambda sz, v=v, vid=vid, alt=alt, rest=rest, sound=sound, e=eager, loop=loop: video_tag(v, vid, alt, rest, sound, e, loop)))
                 p.setdefault('_bigs', []).append(v['mp4'])
                 continue
@@ -1317,7 +1330,7 @@ def main():
             else: slot = 'P' if r[3] > r[2] else 'L'
             items.append(dict(key=k, slot=slot, kind='img', w=r[2], h=r[3], r=r, gallery=x['gallery'], alt=alt, cut=x.get('cut'), row=x.get('row'), cap=x.get('cap', True),
                               lbl=x.get('lbl'), align=x.get('align'), pt=x.get('pt'),
-                              fit=x.get('fit'), scale=x.get('scale', 1), gap=x.get('gap'), layout=x.get('layout'),
+                              fit=x.get('fit'), scale=x.get('scale', 1), gap=x.get('gap'), layout=x.get('layout'), stack=x.get('stack'),
                               html=lambda sz, r=r, alt=alt, e=eager: img_tag(r, sz, alt, e)))
             p.setdefault('_bigs', []).append(r[0])
         blocks = make_blocks(items, notes['notes'])
