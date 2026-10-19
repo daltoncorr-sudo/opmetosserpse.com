@@ -1078,6 +1078,8 @@
     pic.sizes = '100vw'; pic.srcset = src.getAttribute('srcset') || ''; pic.src = src.currentSrc || src.src;
     if (pic.complete && pic.naturalWidth) pic.classList.remove('out');
     box.setAttribute('aria-label', src.alt || '');
+    // a picture in one of Sunny's panels opens on that panel's ground (its Vellum marks would vanish on the paper)
+    var gr = src.closest('.pnl'); box.style.backgroundColor = gr ? getComputedStyle(gr).backgroundColor : '';
   }
   function step(d) { if (group.length > 1) show(at + d); }
   function open(img) {

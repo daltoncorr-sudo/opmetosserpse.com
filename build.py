@@ -33,6 +33,7 @@ def typo(s):
     s = re.sub(r'(^|[\s(\[\u2014])&#x27;', '\\1\u2018', s).replace('&#x27;', '\u2019')
     s = re.sub(r'(^|[\s(\[\u2014])&quot;', '\\1\u201c', s).replace('&quot;', '\u201d')
     s = s.replace(' | ', '\u00a0| ')  # a bar in a title stays at the end of its line
+    s = s.replace(' \u00b7 ', '\u00a0\u00b7 ')  # and a middle dot in a label (Sunny's: "Book \u00b7 hero"), so no line starts with one
     s = re.sub(r'\b(\d+)(st|nd|rd|th)\b', r'\1<sup class="ord">\2</sup>', s)
     return s.replace('Venice, California', 'Venice,\u00a0California')  # keep the place on one line
 
@@ -90,9 +91,11 @@ class Media:
                 if full not in self.made and os.path.isfile(full): os.remove(full); gone += 1
         if gone: print('Removed %d media files no page uses any more.' % gone)
 
-    def image(self, rel, slug, name, max_w=2400):
-        """Resize one source image into WebP at up to three widths. Returns (src, srcset, w, h)."""
-        key = (rel, max_w)
+    def image(self, rel, slug, name, max_w=2400, trim=False):
+        """Resize one source image into WebP at up to three widths. Returns (src, srcset, w, h). trim: a transparent
+        picture cut to its ink first (Sunny's plates: a type specimen or a stationery piece, whose canvas had a margin),
+        so its picture and its label meet the way a mark's do."""
+        key = (rel, max_w, trim)
         if key in self.cache: return self.cache[key]
         src = self.path(rel)
         if not os.path.exists(src):
@@ -104,12 +107,18 @@ class Media:
             self.cache[key] = r; return r
         im = ImageOps.exif_transpose(Image.open(src))
         if im.mode not in ('RGB', 'RGBA'): im = im.convert('RGBA' if 'A' in im.getbands() else 'RGB')
+        if trim and im.mode == 'RGBA':
+            box = im.getchannel('A').getbbox()
+            if box and box != (0, 0) + im.size: im = im.crop(box)
         widths = [w for w in WIDTHS if w < im.width and w <= max_w] + [min(im.width, max_w)]
         widths = sorted(set(widths)); parts = []
         for w in widths:
             h = round(im.height * w / im.width)
             fn = '%s-%d.webp' % (name, w); dst = os.path.join(out_dir, fn)
-            if not os.path.exists(dst) or not os.path.getsize(dst):  # re-encode an empty file too
+            stale = not os.path.exists(dst) or not os.path.getsize(dst)  # re-encode an empty file too
+            if not stale:
+                with Image.open(dst) as o: stale = o.size != (w, h)  # and one of another size (a picture trimmed since)
+            if stale:
                 (im if w == im.width else im.resize((w, h), Image.LANCZOS)).save(dst, 'WEBP', quality=QUALITY, method=4)
             parts.append(('/media/%s/%s' % (slug, fn), w)); self.made.add(dst)
         big = parts[-1]; w = big[1]; h = round(im.height * w / im.width)
@@ -533,6 +542,8 @@ def keyed(items):
 FILMS = ('.mp4', '.mov', '.webm')
 # Up to four chapter labels a page; Sunny's Bookshop, built after its Brand Bible, has one per section (D, Oct. 10)
 MAX_CHAPTERS = {'sunnys-bookshop': 10}
+# The grounds a chapter's panel may take, Sunny's Brand Bible's own (D, Oct. 19): Vellum, Linen and, for Journal & Press, Ink Navy
+PANELS = ('vellum', 'linen', 'navy')
 
 def notes_list(p, src_root):
     """A page that departs from its daltoncorr.com page (D's calls: HDtracks' fresh captures, Comedy 10's opening, Don't
@@ -546,7 +557,12 @@ def notes_list(p, src_root):
     of lines: shown under the picture, as in Sunny's Brand Bible), "align": "top" (a row of cut-outs top-aligned, not on one baseline)
     "grain": true (a film drawn on white, its white set to the paper: it sits under the grain, like the page) and "cut" (small, medium, large or xl: a cut-out, a transparent picture
     straight on the paper, no frame or box; cut-outs that share a "row" sit in one row, each at its own size; "true"
-    with "w", its width in points, keeps pieces at their real relative sizes, shown reduced)."""
+    with "w", its width in points, keeps pieces at their real relative sizes, shown reduced). On a page with "plates"
+    (Sunny's, D, Oct. 19) a row of cut-outs is a plate, its pictures on one line and their labels on the next, and takes:
+    "align": "center" (the pictures centered on one line: marks of different shapes), "fit" ("area": each mark at one
+    visual area; "height": each at one height, times its "scale"; the row then fills the plate), "gap" (a fill row's gaps,
+    times the usual) and "layout" ("shelf": the books, a row that keeps its sizes on a phone; "table": the stationery,
+    columns as wide as their widest piece; "swatches": the colors, equal columns)."""
     dc, out, errs = None, [], []
     for m in notes_media(p):
         if m.get('piece') or dc is None and not m.get('alt'):
@@ -559,8 +575,17 @@ def notes_list(p, src_root):
         alt = m.get('alt') or next((x['alt'] for x in dc or [] if x.get('src') and dc_source.stem(x['src']) == dc_source.stem(m['src'])), '')
         if m.get('cut') and (m['cut'] not in CUTS or kind != 'img'): errs.append('%s: "cut" is small, medium, large, xl or true, for a picture' % m['src'])
         if m.get('cut') == 'true' and not isinstance(m.get('w'), (int, float)): errs.append('%s: a "true" cut-out needs "w", its width in points' % m['src'])
+        if m.get('align') not in (None, 'top', 'center'): errs.append('%s: "align" is "top" or "center"' % m['src'])
+        if m.get('fit') not in (None, 'area', 'height'): errs.append('%s: "fit" is "area" or "height"' % m['src'])
+        if m.get('layout') not in (None, 'shelf', 'table', 'swatches'): errs.append('%s: "layout" is "shelf", "table" or "swatches"' % m['src'])
+        if any(m.get(x) is not None for x in ('fit', 'layout', 'scale', 'gap')) and not m.get('cut'):
+            errs.append('%s: "fit", "layout", "scale" and "gap" are for cut-outs' % m['src'])
+        for x in ('scale', 'gap'):
+            if m.get(x) is not None and not (isinstance(m[x], (int, float)) and m[x] > 0): errs.append('%s: "%s" is a number above 0' % (m['src'], x))
+        if m.get('scale') is not None and m.get('fit') != 'height': errs.append('%s: "scale" goes with "fit": "height"' % m['src'])
         out.append(dict(kind=kind, src=m['src'], alt=alt, w=0, h=0, gallery=m.get('gallery', 0), wide=m.get('slot') == 'W',
                         cut=m.get('cut'), row=m.get('row'), cap=m.get('cap', True), align=m.get('align'), grain=m.get('grain'), pt=m.get('w'),
+                        fit=m.get('fit'), scale=m.get('scale', 1), gap=m.get('gap'), layout=m.get('layout'),
                         lbl=(m.get('n'), m.get('label'), m.get('note')) if m.get('label') else None))
     if errs: sys.exit('Fix the media list in content/notes/%s.json first:\n  %s' % (p['slug'], '\n  '.join(errs)))
     return out
@@ -586,6 +611,18 @@ def load_notes(p, keys):
     if len(n['chapters']) > MAX_CHAPTERS.get(s, 4): errs.append('more than %d chapter labels' % MAX_CHAPTERS.get(s, 4))
     for c in n['chapters']:
         if not 2 <= len(c['label'].split()) <= 5: errs.append('chapter "%s" should be 2 to 5 words' % c['label'])
+    # plates (Sunny's Bookshop, D, Oct. 19): rows of cut-outs as plates, and chapters on the Brand Bible's grounds, in
+    # rounded panels ("panel": vellum, linen, or navy for Journal & Press); "phone": "pairs" sets a chapter's pictures
+    # two to a line on a phone
+    if n.get('plates') and s != 'sunnys-bookshop': errs.append('plates is only for sunnys-bookshop')
+    for c in n['chapters']:
+        if c.get('panel') and not n.get('plates'): errs.append('chapter "%s": a panel needs "plates"' % c['label'])
+        if c.get('panel') not in (None,) + PANELS: errs.append('chapter "%s": "panel" is %s' % (c['label'], ', '.join(PANELS)))
+        if c.get('phone') not in (None, 'pairs'): errs.append('chapter "%s": "phone" is "pairs"' % c['label'])
+    if not n.get('plates'):
+        for m in n.get('media', []):
+            if m.get('align') == 'center' or any(m.get(x) is not None for x in ('fit', 'layout', 'scale', 'gap')):
+                errs.append('%s: "align": "center", "fit", "layout", "scale" and "gap" need "plates"' % m.get('src'))
     if errs: sys.exit('Fix content/notes/%s.json first:\n  %s' % (s, '\n  '.join(errs)))
     return n
 
@@ -659,17 +696,43 @@ def lead(x, research):
     m = re.match(r'([A-Z][a-z]+(?: [a-z]+)?):\s', x) if research else None
     return '<span class="lbl-k">%s</span>%s' % (x[:m.end(1) + 1], x[m.end(1) + 1:]) if m else x
 
-def block_html(b, slug, research=False):
+def plate(items):
+    """A plate's measures (Sunny's, D, Oct. 19; site.css .pp-plates): a fill row's share for each mark (--f: the square
+    root of its shape for "area", one visual area; its shape times its "scale" for "height", one height) and the row's
+    sums, or a table's columns, each as wide as its widest piece in points (every third piece). Returns (row style,
+    {key: item style}) as custom properties, and the key of a lone last piece (an odd one out on a phone's two columns)."""
+    fit = next((it['fit'] for it in items if it.get('fit')), None)
+    layout = next((it['layout'] for it in items if it.get('layout')), None)
+    row, each = [], {}
+    if fit:
+        f = {it['key']: (it['w'] / it['h']) ** .5 if fit == 'area' else it['w'] / it['h'] * it.get('scale', 1) for it in items}
+        rest = [f[it['key']] for it in items if it['cut'] != 'xl'] or list(f.values())
+        row += ['--n:%d' % len(items), '--sf:%.4f' % sum(f.values()), '--fmax:%.4f' % max(rest)]
+        row += ['--fx:%.4f' % f[it['key']] for it in items if it['cut'] == 'xl'][:1]
+        row += ['--gx:%g' % it['gap'] for it in items if it.get('gap')][:1]
+        each = {k: '--f:%.4f' % v for k, v in f.items()}
+    if layout == 'table':
+        cols = [max(it['pt'] for it in items[j::3]) for j in range(min(3, len(items)))]
+        row += ['--c%d:%gfr' % (j + 1, c) for j, c in enumerate(cols)] + ['--tw:%g' % sum(cols), '--wmax:%g' % max(cols)]
+    free = [it['key'] for it in items if it['cut'] not in ('xl', 'large')]
+    lone = free[-1] if layout != 'shelf' and len(free) % 2 else None
+    return ';'.join(row), each, lone
+
+def block_html(b, slug, research=False, plates=False):
     """A block, with its note (if it has one) in the right margin, beside its top. Every picture shows whole: a portrait
     picture or film (.cap) and a row are never taller than about 85vh, centered in their columns (--ar, its width over
-    its height; a row's is the sum of its pictures', so they keep one height)."""
+    its height; a row's is the sum of its pictures', so they keep one height). On a page with plates, a row of cut-outs
+    is a plate (plate(), above)."""
     kind = b['kind']
     ms = []
+    prow, peach, lone = plate(b['items']) if plates and kind == 'cuts' else ('', {}, None)
     for it in b['items']:
         cls = 'm' + (' piece' if it['kind'] == 'widget' else '') + (' cut cut-%s' % it['cut'] if kind == 'cuts' else '') + (' grain' if it.get('grain') else '')
+        cls += ' cut-lone' if it['key'] == lone else ''
         # a row's pictures share its width by their shapes; scaled up so the shares always add to more than 1 (two tall
         # phone captures add to 0.92, and flexbox then leaves the rest of the row empty, on one side)
         style = 'flex-grow:%.4f' % (100 * it['w'] / it['h']) if kind == 'row' else '--w:%g' % it['pt'] if kind == 'cuts' and it.get('pt') else ''
+        if it['key'] in peach: style = ';'.join(x for x in (style, peach[it['key']]) if x)
         if kind in ('single', 'tall') and it['kind'] != 'widget' and it['h'] > it['w'] and it.get('cap', True):
             cls += ' cap'; style = '--ar:%.4f' % (it['w'] / it['h'])
         style = ' style="%s"' % style if style else ''
@@ -686,8 +749,12 @@ def block_html(b, slug, research=False):
         ar = sum(it['w'] / it['h'] for it in b['items'])
         media = '<div class="row%s" style="--ar:%.4f;--n:%d">%s</div>' % (' row-stack' if b.get('stack') else '', ar, len(b['items']), ''.join(ms))
     elif kind == 'cuts':  # labeled cut-outs stand on one baseline, their labels under them; "align": "top" hangs them from one line
-        top = any(it.get('align') == 'top' for it in b['items'])
-        media = '<div class="cuts%s">%s</div>' % (' top' if top else ' end' if any(it.get('lbl') for it in b['items']) else '', ''.join(ms))
+        top = any(it.get('align') == 'top' for it in b['items'])  # "center" (plates only): centered on one line
+        mid = any(it.get('align') == 'center' for it in b['items'])
+        cls = ' top' if top else ' mid' if mid else ' end' if any(it.get('lbl') for it in b['items']) else ''
+        cls += ''.join(' ' + x for x in [next((it['layout'] for it in b['items'] if it.get('layout')), None)] if x)
+        cls += ' fill' if any(it.get('fit') for it in b['items']) else ''
+        media = '<div class="cuts%s"%s>%s</div>' % (cls, ' style="%s"' % prow if prow else '', ''.join(ms))
     else:
         media = ''.join(ms)
     cap_ = '<span class="nt">%s</span>' % typo(b['note']) if b['note'] else ''  # the words; the film links stay apart
@@ -726,8 +793,10 @@ def project_body(p, blocks, chapters, notes, all_work='All work', top='Back to t
     # data-lightbox: every picture on the page opens in the site lightbox, the page's pictures one group (its pieces stay out)
     # air: a page with more room between its sections and its rows (the notes file's "air": Sunny's, after its Bible)
     # research: each picture's label is a short paragraph, its research (the notes file's "research": Red Mask, D, Oct. 14)
-    out = ['<div class="pp%s%s" data-lightbox%s>' % (' pp-air' if notes.get('air') else '', ' pp-research' if notes.get('research') else '',
-                                                    ' data-page-only' if p.get('_scripts') else ''),
+    # plates: rows of cut-outs as level plates, chapters on the Brand Bible's grounds (the notes file's "plates": Sunny's, D, Oct. 19)
+    plates = bool(notes.get('plates'))
+    out = ['<div class="pp%s%s%s" data-lightbox%s>' % (' pp-air' if notes.get('air') else '', ' pp-plates' if plates else '',
+                                                      ' pp-research' if notes.get('research') else '', ' data-page-only' if p.get('_scripts') else ''),
            masthead(list(NAME), '', ' data-cover', link=('/#work', all_work), lockup=True, home=home),
            '<section class="open g">%s<h1>%s</h1><p class="lede">%s</p><div class="info">%s%s</div></section>' % (
                '<p class="kicker">%s</p>' % typo(notes['kicker']) if notes.get('kicker') else '', typo(p['title']), typo(notes.get('lede') or p['lede']), dl(facts, 'facts'), dl(credits, 'cr'))]
@@ -737,16 +806,24 @@ def project_body(p, blocks, chapters, notes, all_work='All work', top='Back to t
     for b in blocks:
         it = b['items'][0]
         b['wide'] = b['kind'] == 'row' or (b['kind'] == 'single' and it['kind'] != 'widget' and it['w'] >= it['h'])
-    open_ch, n = False, 0
+    open_ch, n, pnl, label = False, 0, None, ''
     for b in blocks:
         c = starts.get(b['items'][0]['key'])
         if c:
+            if pnl: out.append('</div>')
             if open_ch: out.append('</section>')
-            n += 1; open_ch = True
-            # the label sits in the left margin beside its first block; above it, on its own line, when that block is a full bleed
-            out.append('<section class="ch%s" aria-label="%s"><div class="chl g"><h2 class="chap"><span class="n">%d</span>%s</h2></div>'
-                       % (' ch-above' if b['kind'] == 'full' or b.get('wide') else '', esc(c['label']), n, typo(c['label'])))
-        out.append(block_html(b, p['slug'], notes.get('research')))
+            n += 1; open_ch = True; pnl = c.get('panel'); label = c['label']
+            # the label sits in the left margin beside its first block; above it, on its own line, when that block is a full
+            # bleed, and always on a page with plates (where it shows at every width). A panel: the chapter's blocks on its
+            # ground, the label above it, on the paper
+            above = b['kind'] == 'full' or b.get('wide') or plates
+            out.append('<section class="ch%s%s" aria-label="%s"><div class="chl g"><h2 class="chap"><span class="n">%d</span>%s</h2></div>%s'
+                       % (' ch-above' if above else '', ' ch-pairs' if c.get('phone') == 'pairs' else '', esc(c['label']), n, typo(c['label']),
+                          '<div class="pnl pnl-%s">' % pnl if pnl else ''))
+        if pnl and b['kind'] != 'cuts':
+            sys.exit('Chapter "%s": a panel holds cut-outs only (a film or photograph stays on the paper).' % label)
+        out.append(block_html(b, p['slug'], notes.get('research'), plates))
+    if pnl: out.append('</div>')
     if open_ch: out.append('</section>')
     out.append(project_foot(all_work, top, home))
     out.append('</div>')
@@ -1208,7 +1285,8 @@ def main():
                                   html=lambda sz, v=v, vid=vid, alt=alt, rest=rest, sound=sound, e=eager, loop=loop: video_tag(v, vid, alt, rest, sound, e, loop)))
                 p.setdefault('_bigs', []).append(v['mp4'])
                 continue
-            r = media.image(src, s, name, max_w=1600 if x.get('cut') else 2400)  # a cut-out is never wider than 440 px
+            # a cut-out is never wider than 640 px (xl); on a page with plates it is cut to its ink, so every picture meets its label alike
+            r = media.image(src, s, name, max_w=1600 if x.get('cut') else 2400, trim=bool(x.get('cut') and notes.get('plates')))
             if not r: continue
             # the size: the approved slot when the picture was already on this site; otherwise from daltoncorr.com's layout
             nm = next((m for m in notes_media(p) if m.get('src') == x['src']), None)
@@ -1218,6 +1296,7 @@ def main():
             else: slot = 'P' if r[3] > r[2] else 'L'
             items.append(dict(key=k, slot=slot, kind='img', w=r[2], h=r[3], r=r, gallery=x['gallery'], alt=alt, cut=x.get('cut'), row=x.get('row'), cap=x.get('cap', True),
                               lbl=x.get('lbl'), align=x.get('align'), pt=x.get('pt'),
+                              fit=x.get('fit'), scale=x.get('scale', 1), gap=x.get('gap'), layout=x.get('layout'),
                               html=lambda sz, r=r, alt=alt, e=eager: img_tag(r, sz, alt, e)))
             p.setdefault('_bigs', []).append(r[0])
         blocks = make_blocks(items, notes['notes'])

@@ -111,9 +111,9 @@ for s in finished:
     if not re.search(r'<div class="os" data-page="%s" data-page-js="/js/pages/%s\.js\?v=\w+">' % (s, s), t): problems.append('%s: no part for its script (data-page)' % rel)
 # The order of each project's daltoncorr.com page, as recorded on Oct. 8, 2026 (v02), with the pages D changed on purpose
 # at their new orders (v03, Oct. 10, 2026; the lists in their notes files; v04, Oct. 14: Sunny's studies last; v05, Oct. 15:
-# v04 plus five new pages at their daltoncorr.com orders; v06, Oct. 15: Chop Suey Club's logo, D's): the pages must show it,
-# item for item
-record = json.load(open(os.path.join(ROOT, '_review', '2026-10-15_media-order-record_v06.json'), encoding='utf-8'))
+# v04 plus five new pages at their daltoncorr.com orders; v06, Oct. 15: Chop Suey Club's logo, D's; v07, Oct. 19: Sunny's
+# Journal & Press marks in Vellum, for its Ink Navy panel, D's): the pages must show it, item for item
+record = json.load(open(os.path.join(ROOT, '_review', '2026-10-19_media-order-record_v07.json'), encoding='utf-8'))
 for i, slug in enumerate(order):
     f = os.path.join(D, 'projects', slug + '.html')
     if not os.path.exists(f): problems.append('projects/%s: in project_order but not built' % slug); continue
@@ -182,6 +182,23 @@ for f in glob.glob(D + '/projects/*.html'):
     for src, piece, opens in lb.out:
         if piece and opens: problems.append('%s: a picture in a 3D or interactive piece opens in the lightbox (%s)' % (rel, src))
         if not piece and not opens: problems.append('%s: a picture that does not open in the lightbox (%s)' % (rel, src))
+# Sunny's Bookshop's panels and plates (D, Oct. 19) are its alone: a panel sits on one of its Brand Bible's grounds
+# (Vellum, Linen, and Ink Navy for Journal & Press only) and holds cut-outs only (no film, photograph or row of pictures),
+# and the lightbox opens a panel's picture on that panel's ground (site.js), or its Vellum marks would vanish
+for f in glob.glob(D + '/projects/*.html'):
+    t = open(f, encoding='utf-8').read(); rel = os.path.relpath(f, D)
+    tones = re.findall(r'<div class="pnl pnl-([\w-]+)">', t)
+    if rel != os.path.join('projects', 'sunnys-bookshop.html'):
+        if tones or re.search(r'<div class="pp(?: [\w-]+)* pp-plates[ "]', t): problems.append('%s: panels and plates are Sunny\'s Bookshop\'s alone' % rel)
+        continue
+    for tone in tones:
+        if tone not in ('vellum', 'linen', 'navy'): problems.append('%s: a panel on a ground that is not the Bible\'s (%s)' % (rel, tone))
+    for label, inner in re.findall(r'<section class="ch[^"]*" aria-label="([^"]*)">([\s\S]*?)</section>', t):
+        if '<div class="pnl ' not in inner: continue
+        if 'pnl-navy' in inner and label != 'Journal &amp; Press': problems.append('%s: Ink Navy is for Journal & Press only (%s)' % (rel, label))
+        if re.search(r'<video|class="row|b-single|b-tall|b-full', inner): problems.append('%s: a panel holds cut-outs only (%s)' % (rel, label))
+    if tones and "closest('.pnl')" not in open(os.path.join(D, 'js', 'site.js'), encoding='utf-8').read():
+        problems.append('%s: the lightbox does not take a panel\'s ground (site.js)' % rel)
 # Work resolves to the work list: /#work lands on it on home (/#archive opens the full list)
 home_t = open(os.path.join(D, 'index.html'), encoding='utf-8').read()
 if not ('id="work"' in home_t and 'id="works"' in home_t and 'class="ctl archive-toggle"' in home_t): problems.append('index.html: no work list for Work (/#work) to land on')
