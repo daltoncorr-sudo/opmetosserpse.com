@@ -647,12 +647,17 @@ main>.coins-work{left:var(--gutter)}
 .pp.pp-plates .b-cuts>.cuts.fill{column-gap:0;justify-content:space-between}
 .pp.pp-plates .cuts.fill>.cut{--pw:calc((100cqi - (var(--n) - 1) * var(--cg) * var(--gx,1)) * var(--f) / var(--sf));width:max(var(--pw),7em)}
 
-/* grid (Stationery, D, Oct. 19): three even columns, the Bible's three rows, every piece at one visual area (build: --f,
-   the square root of its shape; --ea, the side of that area), never wider than its column nor taller than 1.3 times --ea
-   (the bookmark); each sits on its row's line, at the left of its column */
-.pp.pp-plates .b-cuts>.cuts.grid{grid-auto-flow:row;grid-template-columns:repeat(3,minmax(0,1fr));justify-content:stretch;--ea:calc((100cqi - 2 * var(--cg)) / 3 * .58)}
-.pp.pp-plates .cuts.grid>.cut{width:auto;--pw:min(100%,calc(var(--ea) * var(--f)),calc(var(--ea) * 1.3 * var(--f) * var(--f)))}
-
+/* bento (Stationery, D, Oct. 19): each piece in its box (build: grid-area, from its "area"), filling it whole, at the
+   bottom left: the tall pieces (letterhead, event card, bookmark) the full height, the small ones stacked beside them, two
+   to a box; every label 12 px under its piece's box. On a phone two columns, the tall pieces still two rows tall */
+.pp.pp-plates .b-cuts>.cuts.bento{--r:clamp(96px,17cqi,168px);grid-auto-flow:row;justify-content:stretch;row-gap:32px;margin-bottom:0;
+  grid-template-columns:minmax(0,1fr) minmax(0,1.25fr) minmax(0,1fr) minmax(0,.62fr);grid-template-rows:repeat(4,var(--r));
+  grid-template-areas:"lh bc ev bm" "lh en ev bm" "es es gc gc" "rc rc st st"}
+.pp.pp-plates .b-cuts>.cuts.bento:has(>.cut>.lbl){margin-bottom:0}
+.pp.pp-plates .cuts.bento>.cut{display:flex;flex-direction:column;width:auto;min-height:0}
+.pp.pp-plates .cuts.bento>.cut>img{flex:1 1 0;min-height:0;width:100%;max-width:100%;object-fit:contain;object-position:left bottom}
+.pp.pp-plates .cuts.bento>.cut>.lbl{margin:12px 0 0;min-height:4.2em}  /* three lines held, so neighbors' pieces end level */
+@container (min-width:560px) and (max-width:879px){.pp.pp-plates .cuts.bento>.cut>.lbl{min-height:5.6em}}  /* four, where the bookmark's column is narrow */
 /* swatches (The colors, on the paper): six equal columns across the photo column, each chip its column (168 px at most);
    under 1000 px of row three chips of 168 px, spread from edge to edge; under 560 two a line, each chip its column */
 .pp.pp-plates .b-cuts>.cuts.swatches{grid-auto-flow:row;grid-template-columns:repeat(6,minmax(0,1fr));justify-content:stretch;column-gap:24px}
@@ -679,8 +684,8 @@ main>.coins-work{left:var(--gutter)}
   .pp.pp-plates .cuts.shelf>.cut{--pw:min(100%,var(--cw))}
   .pp.pp-plates .b-cuts>.cuts.swatches{grid-template-columns:repeat(2,minmax(0,1fr));justify-content:stretch;column-gap:16px}
   .pp.pp-plates .cuts.swatches>.cut{--pw:100%}
-  .pp.pp-plates .b-cuts>.cuts.grid{grid-auto-flow:row dense;grid-template-columns:repeat(2,minmax(0,1fr));--ea:calc((100cqi - var(--cg)) / 2 * .8)}  /* two columns; a wide piece takes the line, the next pair fills in */
-  .pp.pp-plates .cuts.grid>.cut-wide{grid-column:1/-1;--pw:min(100%,calc(var(--ea) * 1.4 * var(--f)))}
+  .pp.pp-plates .b-cuts>.cuts.bento{--r:clamp(120px,46cqi,200px);row-gap:24px;grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:repeat(7,var(--r));
+    grid-template-areas:"lh bc" "lh en" "ev bm" "ev bm" "es es" "gc st" "rc rc"}
 }
 }
 
@@ -688,9 +693,11 @@ main>.coins-work{left:var(--gutter)}
    on phones, where the note spans the column, centered on the film's axis. Tablets keep theirs (under it, on the right) */
 @media (min-width:1100px){.pp.pp-plates .b-tall .note{align-self:end}}
 @media (max-width:640px){.pp.pp-plates .note{text-align:center}.pp.pp-plates .note .again{margin-inline:auto}}
-/* A row of films (the book drawn by hand and the announcement film, side by side at one height, D, Oct. 19): each
-   film's controls right under it, centered on it; on a phone, where the vertical film is narrow, at the row's two
-   outer edges, so they never meet */
+/* A row of films (the book drawn by hand and the announcement film, D, Oct. 19): two columns, the vertical film large
+   (two fifths of the row, never taller than the screen allows), the book drawing centered beside it; each film's
+   controls right under it, centered on it; on a phone at the row's two outer edges, so they never meet */
+.pp.pp-plates .b-row .row:has(>.m>video){display:grid;grid-template-columns:minmax(0,1fr) minmax(0,min(40%,calc(var(--cap) * .5625)));align-items:center;max-width:none}
+.pp.pp-plates .b-row .row:has(>.m>video)>.m{grid-column:auto!important;grid-row:auto!important;width:auto}  /* the page grid's columns don't apply in here */
 .pp.pp-plates .row .m>.film-ctl{margin:10px 0 0;text-align:center}
 .pp.pp-plates .row .m>.note{margin:6px 0 0;text-align:center}
 .pp.pp-plates .row .m>.note .again{margin-inline:auto}

@@ -563,8 +563,9 @@ def notes_list(p, src_root):
     (Sunny's, D, Oct. 19) a row of cut-outs is a plate, its pictures on one line and their labels on the next, and takes:
     "align": "center" (the pictures centered on one line: marks of different shapes), "fit" ("area": each mark at one
     visual area; "height": each at one height, times its "scale"; the row then fills the plate), "gap" (a fill row's gaps,
-    times the usual) and "layout" ("shelf": the books, a row that keeps its sizes on a phone; "grid": the stationery, three
-    even columns, each piece at one visual area; "swatches": the colors, equal columns). "stack": false keeps a row of
+    times the usual) and "layout" ("shelf": the books, a row that keeps its sizes on a phone; "bento": the stationery, each
+    piece in its "area" of site.css's .cuts.bento, filling it, the tall pieces the whole height, the small ones stacked;
+    "swatches": the colors, equal columns). "stack": false keeps a row of
     pictures or films on one line on a phone (Sunny's two films, D, Oct. 19); rows stack there otherwise."""
     dc, out, errs = None, [], []
     for m in notes_media(p):
@@ -580,7 +581,9 @@ def notes_list(p, src_root):
         if m.get('cut') == 'true' and not isinstance(m.get('w'), (int, float)): errs.append('%s: a "true" cut-out needs "w", its width in points' % m['src'])
         if m.get('align') not in (None, 'top', 'center'): errs.append('%s: "align" is "top" or "center"' % m['src'])
         if m.get('fit') not in (None, 'area', 'height'): errs.append('%s: "fit" is "area" or "height"' % m['src'])
-        if m.get('layout') not in (None, 'shelf', 'grid', 'swatches'): errs.append('%s: "layout" is "shelf", "grid" or "swatches"' % m['src'])
+        if m.get('layout') not in (None, 'shelf', 'bento', 'swatches'): errs.append('%s: "layout" is "shelf", "bento" or "swatches"' % m['src'])
+        if m.get('area') is not None and (m.get('layout') != 'bento' or not re.fullmatch(r'[a-z]{2,4}', str(m['area']))):
+            errs.append('%s: "area" is a 2-to-4-letter name, in a "bento"' % m['src'])
         if m.get('stack') is not None and (m['stack'] is not False or not m.get('row')): errs.append('%s: "stack": false keeps a row on one line on a phone' % m['src'])
         if any(m.get(x) is not None for x in ('fit', 'layout', 'scale', 'gap')) and not m.get('cut'):
             errs.append('%s: "fit", "layout", "scale" and "gap" are for cut-outs' % m['src'])
@@ -590,7 +593,7 @@ def notes_list(p, src_root):
         if m.get('gap') is not None and not m.get('fit'): errs.append('%s: "gap" goes with "fit"' % m['src'])
         out.append(dict(kind=kind, src=m['src'], alt=alt, w=0, h=0, gallery=m.get('gallery', 0), wide=m.get('slot') == 'W',
                         cut=m.get('cut'), row=m.get('row'), cap=m.get('cap', True), align=m.get('align'), grain=m.get('grain'), pt=m.get('w'),
-                        fit=m.get('fit'), scale=m.get('scale', 1), gap=m.get('gap'), layout=m.get('layout'), stack=m.get('stack'),
+                        fit=m.get('fit'), scale=m.get('scale', 1), gap=m.get('gap'), layout=m.get('layout'), stack=m.get('stack'), area=m.get('area'),
                         lbl=(m.get('n'), m.get('label'), m.get('note')) if m.get('label') else None))
     if errs: sys.exit('Fix the media list in content/notes/%s.json first:\n  %s' % (p['slug'], '\n  '.join(errs)))
     return out
@@ -712,8 +715,7 @@ def keep(x):
 def plate(items, panel=False):
     """A plate's measures (Sunny's, D, Oct. 19; site.css .pp-plates): a fill row's share for each mark (--f: the square
     root of its shape for "area", one visual area; its shape times its "scale" for "height", one height) and the row's
-    sums; in a grid, each piece's --f (one visual area) and the wide ones (2.5 times as wide as tall or more), which take
-    a phone's whole line. Returns (row style, {key: item style}) as custom properties, the key of a lone last piece (an
+    sums; in a bento, each piece's grid area. Returns (row style, {key: item style}) as custom properties, the key of a lone last piece (an
     odd one out on a phone's two columns, where an xl piece, and a large one in a panel, takes the whole line) and the
     wide keys. A row has one "fit", "layout", "gap" and "align"."""
     for x in ('fit', 'layout', 'gap', 'align'):
@@ -732,11 +734,10 @@ def plate(items, panel=False):
         row += ['--gx:%g' % it['gap'] for it in items if it.get('gap')][:1]
         each = {k: '--f:%.4f' % v for k, v in f.items()}
     wide = set()
-    if layout == 'grid':
-        each = {it['key']: '--f:%.4f' % (it['w'] / it['h']) ** .5 for it in items}
-        wide = {it['key'] for it in items if it['w'] >= 2.5 * it['h']}
+    if layout == 'bento':
+        each = {it['key']: 'grid-area:%s' % it['area'] for it in items if it.get('area')}
     free = [it['key'] for it in items if it['cut'] != 'xl' and not (panel and it['cut'] == 'large')]
-    lone = free[-1] if layout not in ('shelf', 'grid') and len(free) % 2 else None
+    lone = free[-1] if layout not in ('shelf', 'bento') and len(free) % 2 else None
     return ';'.join(row), each, lone, wide
 
 def film_ctls(it):
@@ -790,7 +791,7 @@ def block_html(b, slug, research=False, plates=False, panel=False):
         mid = any(it.get('align') == 'center' for it in b['items'])
         cls = ' top' if top else ' mid' if mid else ' end' if any(it.get('lbl') for it in b['items']) else ''
         cls += ''.join(' ' + x for x in [next((it['layout'] for it in b['items'] if it.get('layout')), None)] if x)
-        cls += ' fill' if any(it.get('fit') for it in b['items']) and 'grid' not in cls else ''
+        cls += ' fill' if any(it.get('fit') for it in b['items']) and 'bento' not in cls else ''
         media = '<div class="cuts%s"%s>%s</div>' % (cls, ' style="%s"' % prow if prow else '', ''.join(ms))
     else:
         media = ''.join(ms)
@@ -1330,7 +1331,7 @@ def main():
             else: slot = 'P' if r[3] > r[2] else 'L'
             items.append(dict(key=k, slot=slot, kind='img', w=r[2], h=r[3], r=r, gallery=x['gallery'], alt=alt, cut=x.get('cut'), row=x.get('row'), cap=x.get('cap', True),
                               lbl=x.get('lbl'), align=x.get('align'), pt=x.get('pt'),
-                              fit=x.get('fit'), scale=x.get('scale', 1), gap=x.get('gap'), layout=x.get('layout'), stack=x.get('stack'),
+                              fit=x.get('fit'), scale=x.get('scale', 1), gap=x.get('gap'), layout=x.get('layout'), stack=x.get('stack'), area=x.get('area'),
                               html=lambda sz, r=r, alt=alt, e=eager: img_tag(r, sz, alt, e)))
             p.setdefault('_bigs', []).append(r[0])
         blocks = make_blocks(items, notes['notes'])

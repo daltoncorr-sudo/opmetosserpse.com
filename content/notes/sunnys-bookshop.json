@@ -384,7 +384,8 @@
    "row": "stationery",
    "label": "Business card",
    "note": "3.5 × 2 in · front and back",
-   "layout": "grid"
+   "layout": "bento",
+   "area": "bc"
   },
   {
    "src": "content/media/sunnys-bookshop/sb-stationery-envelope.png",
@@ -394,7 +395,8 @@
    "row": "stationery",
    "label": "Envelope",
    "note": "No. 10 · the monogram as return mark",
-   "layout": "grid"
+   "layout": "bento",
+   "area": "en"
   },
   {
    "src": "content/media/sunnys-bookshop/sb-stationery-letterhead.png",
@@ -404,7 +406,8 @@
    "row": "stationery",
    "label": "Letterhead",
    "note": "US Letter · white or natural",
-   "layout": "grid"
+   "layout": "bento",
+   "area": "lh"
   },
   {
    "src": "content/media/sunnys-bookshop/sb-stationery-email-signature.png",
@@ -414,7 +417,8 @@
    "row": "stationery",
    "label": "Email signature",
    "note": "the Digital logo at 160 px · Georgia where the brand fonts aren’t installed",
-   "layout": "grid"
+   "layout": "bento",
+   "area": "es"
   },
   {
    "src": "content/media/sunnys-bookshop/sb-stationery-gift-card.png",
@@ -424,7 +428,8 @@
    "row": "stationery",
    "label": "Gift card",
    "note": "3.375 × 2.125 in",
-   "layout": "grid"
+   "layout": "bento",
+   "area": "gc"
   },
   {
    "src": "content/media/sunnys-bookshop/sb-stationery-bag-sticker.png",
@@ -434,7 +439,8 @@
    "row": "stationery",
    "label": "Bag sticker",
    "note": "50 mm round · the Seal",
-   "layout": "grid"
+   "layout": "bento",
+   "area": "st"
   },
   {
    "src": "content/media/sunnys-bookshop/sb-stationery-event-card.png",
@@ -444,7 +450,8 @@
    "row": "stationery",
    "label": "Event card",
    "note": "A6 · one per event",
-   "layout": "grid"
+   "layout": "bento",
+   "area": "ev"
   },
   {
    "src": "content/media/sunnys-bookshop/sb-stationery-bookmark.png",
@@ -454,7 +461,8 @@
    "row": "stationery",
    "label": "Bookmark",
    "note": "2 × 7 in · Green stock, Vellum ink",
-   "layout": "grid"
+   "layout": "bento",
+   "area": "bm"
   },
   {
    "src": "content/media/sunnys-bookshop/sb-stationery-receipt-header.png",
@@ -464,7 +472,8 @@
    "row": "stationery",
    "label": "Receipt header",
    "note": "80 mm · the Black logo",
-   "layout": "grid"
+   "layout": "bento",
+   "area": "rc"
   },
   {
    "src": "images/design/sunnys-bookshop/sb-11-assets-01-16x9-2400.jpg"
