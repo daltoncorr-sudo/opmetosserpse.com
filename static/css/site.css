@@ -648,11 +648,11 @@ main>.coins-work{left:var(--gutter)}
 .pp.pp-plates .cuts.fill>.cut{--pw:calc((100cqi - (var(--n) - 1) * var(--cg) * var(--gx,1)) * var(--f) / var(--sf));width:max(var(--pw),7em)}
 
 /* bento (Stationery, D, Oct. 19): each piece in its box (build: grid-area, from its "area"), filling it whole, at the
-   bottom left: the tall pieces (letterhead, event card, bookmark) the full height, the small ones stacked beside them, two
-   to a box; every label 12 px under its piece's box. On a phone two columns, the tall pieces still two rows tall */
+   bottom left: the letterhead and event card two rows tall, the bookmark the whole height of the panel, the small ones
+   stacked beside them; every label 12 px under its piece's box. On a phone two columns, the tall pieces still two rows tall */
 .pp.pp-plates .b-cuts>.cuts.bento{--r:clamp(96px,17cqi,168px);grid-auto-flow:row;justify-content:stretch;row-gap:32px;margin-bottom:0;
-  grid-template-columns:minmax(0,1fr) minmax(0,1.25fr) minmax(0,1fr) minmax(0,.62fr);grid-template-rows:repeat(4,var(--r));
-  grid-template-areas:"lh bc ev bm" "lh en ev bm" "es es gc gc" "rc rc st st"}
+  grid-template-columns:minmax(0,1fr) minmax(0,1.25fr) minmax(0,1fr) minmax(0,1fr);grid-template-rows:repeat(4,var(--r));
+  grid-template-areas:"lh bc ev bm" "lh en ev bm" "es es gc bm" "rc rc st bm"}
 .pp.pp-plates .b-cuts>.cuts.bento:has(>.cut>.lbl){margin-bottom:0}
 .pp.pp-plates .cuts.bento>.cut{display:flex;flex-direction:column;width:auto;min-height:0}
 .pp.pp-plates .cuts.bento>.cut>img{flex:1 1 0;min-height:0;width:100%;max-width:100%;object-fit:contain;object-position:left bottom}
@@ -684,8 +684,8 @@ main>.coins-work{left:var(--gutter)}
   .pp.pp-plates .cuts.shelf>.cut{--pw:min(100%,var(--cw))}
   .pp.pp-plates .b-cuts>.cuts.swatches{grid-template-columns:repeat(2,minmax(0,1fr));justify-content:stretch;column-gap:16px}
   .pp.pp-plates .cuts.swatches>.cut{--pw:100%}
-  .pp.pp-plates .b-cuts>.cuts.bento{--r:clamp(120px,46cqi,200px);row-gap:24px;grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:repeat(7,var(--r));
-    grid-template-areas:"lh bc" "lh en" "ev bm" "ev bm" "es es" "gc st" "rc rc"}
+  .pp.pp-plates .b-cuts>.cuts.bento{--r:clamp(120px,46cqi,200px);row-gap:24px;grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:repeat(8,var(--r));
+    grid-template-areas:"lh bc" "lh en" "ev bm" "ev bm" "gc bm" "st bm" "es es" "rc rc"}
 }
 }
 
