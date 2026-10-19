@@ -1,11 +1,19 @@
 {
- "_note": "Press, newest first. Shown as outlet names only (an entry with \"headline\": true shows its title too), one per line under each year; the title is kept for screen readers (D, Oct. 19, 2026: curated from 49 to 13, tier-one outlets and pieces that credit the work). The cut entries are in _cut, to restore by moving one back.",
+ "_note": "Press, newest first. Shown as outlet names only (an entry with \"headline\": true shows its title too), one per line under each year; the title is kept for screen readers (D, Oct. 19, 2026: curated from 49 to 14, then 37 with D's picks back in, tier-one outlets and pieces that credit the work). The cut entries are in _cut, to restore by moving one back. An outlet that appears twice in a year shows its headlines, so the lines differ.",
  "press": [
   {
    "year": "2026",
    "outlet": "Deadline",
    "title": "HollyShorts 22nd Annual Winners",
-   "url": "https://deadline.com/2026/08/2026-hollyshorts-awards-winners-1237048472/"
+   "url": "https://deadline.com/2026/08/2026-hollyshorts-awards-winners-1237048472/",
+   "headline": true
+  },
+  {
+   "year": "2026",
+   "outlet": "Deadline",
+   "title": "HollyShorts 22nd Annual Documentary Contenders",
+   "url": "https://deadline.com/2026/08/2026-hollyshorts-documentary-contenders-1237048128/",
+   "headline": true
   },
   {
    "year": "2026",
@@ -18,88 +26,6 @@
    "outlet": "The Contending",
    "title": "Official 2026 Poster Reveal, Design Credit",
    "url": "https://thecontending.com/hollyshorts-2026/"
-  },
-  {
-   "year": "2025",
-   "outlet": "Variety",
-   "title": "HollyShorts Dubai Inaugural Edition",
-   "url": "https://variety.com/2025/film/news/hollyshorts-dubai-1236481474/"
-  },
-  {
-   "year": "2025",
-   "outlet": "Animation Magazine",
-   "title": "HollyShorts 21st Edition Lineup & Poster",
-   "url": "https://www.animationmagazine.net/2025/07/hollyshorts-celebrates-21st-edition-with-star-studded-lineup/"
-  },
-  {
-   "year": "2025",
-   "outlet": "British Cinematographer",
-   "title": "HollyShorts London 2nd Annual",
-   "url": "https://britishcinematographer.co.uk/hollyshorts-london-2025-a-global-celebration-of-film-music-and-culture/"
-  },
-  {
-   "year": "2025",
-   "outlet": "MovieMaker",
-   "title": "\"Top 50 Film Festivals Worth the Entry Fee 2025\"",
-   "url": "https://www.moviemaker.com/50-film-festivals-worth-the-entry-fee-2025/"
-  },
-  {
-   "year": "2024",
-   "outlet": "Variety",
-   "title": "HollyShorts Film Festival 2024",
-   "url": "https://variety.com/2024/film/global/george-r-r-martin-short-the-ugly-chickens-felicia-day-premiere-hollyshorts-1236098401/"
-  },
-  {
-   "year": "2024",
-   "outlet": "Time Out",
-   "title": "HollyShorts 2024",
-   "url": "https://www.timeout.com/los-angeles/things-to-do/hollyshorts-film-festival"
-  },
-  {
-   "year": "2024",
-   "outlet": "Festival In LA",
-   "title": "“World’s Best Film Festival Posters 2024”",
-   "url": "http://www.festivalinla.com/2024/11/the-worlds-best-film-festival-posters.html",
-   "headline": true
-  },
-  {
-   "year": "2023",
-   "outlet": "Festival In LA",
-   "title": "“World’s Best Film Festival Posters 2023”",
-   "url": "http://www.festivalinla.com/2023/11/the-worlds-best-film-festival-posters.html",
-   "headline": true
-  },
-  {
-   "year": "2023",
-   "outlet": "Radio du Cinéma",
-   "title": "Podcast Interview",
-   "url": "https://radioducinema.com/podcasts/rencontre-avec-dalton-corr-musicien-et-designer-au-hollyshorts-film-festival-235"
-  },
-  {
-   "year": "2019",
-   "outlet": "Festival International du Film sur l’Art",
-   "title": "Official Selection",
-   "url": "https://lefifa.com/en/catalog/boys-will-be-flowers"
-  },
-  {
-   "year": "2018",
-   "outlet": "Nowness",
-   "title": "Boys Will Be Flowers",
-   "url": "https://www.nowness.com/story/boys-will-be-flowers-daddy-ramazani"
-  }
- ],
- "_cut": [
-  {
-   "year": "2026",
-   "outlet": "Deadline",
-   "title": "HollyShorts 22nd Annual Documentary Contenders",
-   "url": "https://deadline.com/2026/08/2026-hollyshorts-documentary-contenders-1237048128/"
-  },
-  {
-   "year": "2026",
-   "outlet": "Hello!",
-   "title": "Vanessa Hudgens at HollyShorts 2026",
-   "url": "https://www.hellomagazine.com/us/918301/high-school-musical-star-vanessa-hudgens-hasnt-aged-a-day-in-rare-red-carpet-appearance/"
   },
   {
    "year": "2026",
@@ -115,45 +41,15 @@
   },
   {
    "year": "2026",
-   "outlet": "Netflix Junkie",
-   "title": "HollyShorts 2026 Schedule & Lineup",
-   "url": "https://www.netflixjunkie.com/hollywood-news-hollyshorts-film-festival-2026-complete-schedule-dates-times-venue-and-event-lineup/"
-  },
-  {
-   "year": "2026",
-   "outlet": "The Knockturnal",
-   "title": "“Hooray for HollyShorts Film Festival”",
-   "url": "https://theknockturnal.com/hooray-for-hollyshorts-film-festival/"
-  },
-  {
-   "year": "2026",
-   "outlet": "Ouch! Magazine",
-   "title": "HollyShorts Returns Aug. 13-23",
-   "url": "https://ouchmagazine.com/blogs/entertainment/the-hollyshorts-film-festival-returns-aug-13-23"
-  },
-  {
-   "year": "2026",
    "outlet": "Entertainment and Sports Today",
    "title": "HollyShorts 22nd Annual Opening Night",
    "url": "https://www.entertainmentandsportstoday.com/spectacular-opening-night-of-the-22nd-annual-2026-hollyshorts-film-festival-with-vanessa-hudgens/"
   },
   {
-   "year": "2026",
-   "outlet": "Weekly Wilson",
-   "title": "HollyShorts Film Festival 2026",
-   "url": "https://www.weeklywilson.com/hollyshorts-film-festival-runs-from-aug-13-aug-23-2026/"
-  },
-  {
-   "year": "2026",
-   "outlet": "Outtake",
-   "title": "HollyShorts 22nd Edition",
-   "url": "https://blog.outtakeonline.com/2026/07/hollyshorts-film-festival-22nd-edition.html"
-  },
-  {
-   "year": "2026",
-   "outlet": "Hot Forever",
-   "title": "HollyShorts 2026 Sneak Peek",
-   "url": "https://www.hotforever.com/2026-hollyshorts-film-festival-sneak-peek/"
+   "year": "2025",
+   "outlet": "Variety",
+   "title": "HollyShorts Dubai Inaugural Edition",
+   "url": "https://variety.com/2025/film/news/hollyshorts-dubai-1236481474/"
   },
   {
    "year": "2025",
@@ -164,14 +60,22 @@
   {
    "year": "2025",
    "outlet": "MovieMaker",
-   "title": "\"25 Coolest Film Festivals in the World\"",
-   "url": "https://www.moviemaker.com/coolest-film-festivals-2024/"
+   "title": "\"Top 50 Film Festivals Worth the Entry Fee 2025\"",
+   "url": "https://www.moviemaker.com/50-film-festivals-worth-the-entry-fee-2025/",
+   "headline": true
   },
   {
    "year": "2025",
-   "outlet": "The Contending",
-   "title": "HollyShorts Comedy Festival, Design Credit",
-   "url": "https://thecontending.com/shorts-exclusive-jane-austens-period-drama-wins-best-of-the-best-at-hollyshorts-comedy-film-festival/"
+   "outlet": "MovieMaker",
+   "title": "\"25 Coolest Film Festivals in the World\"",
+   "url": "https://www.moviemaker.com/coolest-film-festivals-2024/",
+   "headline": true
+  },
+  {
+   "year": "2025",
+   "outlet": "British Cinematographer",
+   "title": "HollyShorts London 2nd Annual",
+   "url": "https://britishcinematographer.co.uk/hollyshorts-london-2025-a-global-celebration-of-film-music-and-culture/"
   },
   {
    "year": "2025",
@@ -181,9 +85,9 @@
   },
   {
    "year": "2025",
-   "outlet": "Moviejawn",
-   "title": "HollyShorts at TCL Chinese Theatre",
-   "url": "https://www.moviejawn.com/home/2024/7/31/hollyshorts-film-festival-2025-feature"
+   "outlet": "Animation Magazine",
+   "title": "HollyShorts 21st Edition Lineup & Poster",
+   "url": "https://www.animationmagazine.net/2025/07/hollyshorts-celebrates-21st-edition-with-star-studded-lineup/"
   },
   {
    "year": "2025",
@@ -192,10 +96,10 @@
    "url": "https://voyagela.com/interview/check-out-dalton-corrs-story/"
   },
   {
-   "year": "2025",
-   "outlet": "HollyShorts.com",
-   "title": "21st Anniversary Poster & Comedy Festival Design Credit",
-   "url": "https://www.hollyshorts.com/news/hollyshorts-unveils-21st-anniversary-poster"
+   "year": "2024",
+   "outlet": "Variety",
+   "title": "HollyShorts Film Festival 2024",
+   "url": "https://variety.com/2024/film/global/george-r-r-martin-short-the-ugly-chickens-felicia-day-premiere-hollyshorts-1236098401/"
   },
   {
    "year": "2024",
@@ -211,6 +115,13 @@
   },
   {
    "year": "2024",
+   "outlet": "Festival In LA",
+   "title": "“World’s Best Film Festival Posters 2024”",
+   "url": "http://www.festivalinla.com/2024/11/the-worlds-best-film-festival-posters.html",
+   "headline": true
+  },
+  {
+   "year": "2024",
    "outlet": "Canvas Rebel",
    "title": "Interview",
    "url": "https://canvasrebel.com/meet-dalton-corr/"
@@ -220,6 +131,12 @@
    "outlet": "AwardsDaily",
    "title": "HollyShorts Coverage",
    "url": "https://www.awardsdaily.com/2024/08/shorts-exclusive-hollyshorts-announces-nominees/"
+  },
+  {
+   "year": "2024",
+   "outlet": "Time Out",
+   "title": "HollyShorts 2024",
+   "url": "https://www.timeout.com/los-angeles/things-to-do/hollyshorts-film-festival"
   },
   {
    "year": "2024",
@@ -241,6 +158,19 @@
   },
   {
    "year": "2023",
+   "outlet": "Festival In LA",
+   "title": "“World’s Best Film Festival Posters 2023”",
+   "url": "http://www.festivalinla.com/2023/11/the-worlds-best-film-festival-posters.html",
+   "headline": true
+  },
+  {
+   "year": "2023",
+   "outlet": "Radio du Cinéma",
+   "title": "Podcast Interview",
+   "url": "https://radioducinema.com/podcasts/rencontre-avec-dalton-corr-musicien-et-designer-au-hollyshorts-film-festival-235"
+  },
+  {
+   "year": "2023",
    "outlet": "LAist",
    "title": "“Things To Do This Week”",
    "url": "https://laist.com/news/arts-and-entertainment/best-events-things-to-do-this-week-los-angeles-southern-california-april-21-23-2023"
@@ -258,34 +188,37 @@
    "url": "https://web.archive.org/web/20240414044600/https://dopehiphop.net/dalton-corrs-no-regrets-takes-center-stage-b-bravos-vizionz-remixes/"
   },
   {
-   "year": "2022",
-   "outlet": "Broadway World",
-   "title": "Comedy Shorts",
-   "url": "https://www.broadwayworld.com/los-angeles/article/Cevin-Solings-TIFFANY-BRITTANY-To-Screen-At-The-Hollywood-Comedy-Short-Film-Festival-In-LA-And-NYC-April-30-20220419"
+   "year": "2019",
+   "outlet": "Festival International du Film sur l’Art",
+   "title": "Official Selection",
+   "url": "https://lefifa.com/en/catalog/boys-will-be-flowers"
   },
   {
-   "year": "2022",
-   "outlet": "RichGirl Network TV",
-   "title": "Comedy Shorts",
-   "url": "https://web.archive.org/web/20260215202241/https://www.richgirlnetwork.tv/2022/04/hollywood-comedy-shorts-fest-is-back-april-28th-30th/"
+   "year": "2018",
+   "outlet": "Nowness",
+   "title": "Boys Will Be Flowers",
+   "url": "https://www.nowness.com/story/boys-will-be-flowers-daddy-ramazani"
   },
   {
    "year": "2017",
    "outlet": "Washington Square News",
    "title": "Print Interview",
-   "url": "https://issuu.com/nyu.news/docs/wsn20170327/8"
+   "url": "https://issuu.com/nyu.news/docs/wsn20170327/8",
+   "headline": true
   },
   {
    "year": "2017",
    "outlet": "Washington Square News",
    "title": "Online Interview",
-   "url": "https://nyunews.com/2017/04/11/steinhardt-senior-talks-music-and-lyrics/"
+   "url": "https://nyunews.com/2017/04/11/steinhardt-senior-talks-music-and-lyrics/",
+   "headline": true
   },
   {
    "year": "2017",
    "outlet": "Washington Square News",
    "title": "I Think Of You Review",
-   "url": "https://nyunews.com/2017/04/25/i-think-of-you-feels-as-salty-sweet-as-summer/"
+   "url": "https://nyunews.com/2017/04/25/i-think-of-you-feels-as-salty-sweet-as-summer/",
+   "headline": true
   },
   {
    "year": "2015",
@@ -298,6 +231,80 @@
    "outlet": "Noon Pacific",
    "title": "Feature",
    "url": ""
+  }
+ ],
+ "_cut": [
+  {
+   "year": "2026",
+   "outlet": "Hello!",
+   "title": "Vanessa Hudgens at HollyShorts 2026",
+   "url": "https://www.hellomagazine.com/us/918301/high-school-musical-star-vanessa-hudgens-hasnt-aged-a-day-in-rare-red-carpet-appearance/"
+  },
+  {
+   "year": "2026",
+   "outlet": "Netflix Junkie",
+   "title": "HollyShorts 2026 Schedule & Lineup",
+   "url": "https://www.netflixjunkie.com/hollywood-news-hollyshorts-film-festival-2026-complete-schedule-dates-times-venue-and-event-lineup/"
+  },
+  {
+   "year": "2026",
+   "outlet": "The Knockturnal",
+   "title": "“Hooray for HollyShorts Film Festival”",
+   "url": "https://theknockturnal.com/hooray-for-hollyshorts-film-festival/"
+  },
+  {
+   "year": "2026",
+   "outlet": "Ouch! Magazine",
+   "title": "HollyShorts Returns Aug. 13-23",
+   "url": "https://ouchmagazine.com/blogs/entertainment/the-hollyshorts-film-festival-returns-aug-13-23"
+  },
+  {
+   "year": "2026",
+   "outlet": "Weekly Wilson",
+   "title": "HollyShorts Film Festival 2026",
+   "url": "https://www.weeklywilson.com/hollyshorts-film-festival-runs-from-aug-13-aug-23-2026/"
+  },
+  {
+   "year": "2026",
+   "outlet": "Outtake",
+   "title": "HollyShorts 22nd Edition",
+   "url": "https://blog.outtakeonline.com/2026/07/hollyshorts-film-festival-22nd-edition.html"
+  },
+  {
+   "year": "2026",
+   "outlet": "Hot Forever",
+   "title": "HollyShorts 2026 Sneak Peek",
+   "url": "https://www.hotforever.com/2026-hollyshorts-film-festival-sneak-peek/"
+  },
+  {
+   "year": "2025",
+   "outlet": "The Contending",
+   "title": "HollyShorts Comedy Festival, Design Credit",
+   "url": "https://thecontending.com/shorts-exclusive-jane-austens-period-drama-wins-best-of-the-best-at-hollyshorts-comedy-film-festival/"
+  },
+  {
+   "year": "2025",
+   "outlet": "Moviejawn",
+   "title": "HollyShorts at TCL Chinese Theatre",
+   "url": "https://www.moviejawn.com/home/2024/7/31/hollyshorts-film-festival-2025-feature"
+  },
+  {
+   "year": "2025",
+   "outlet": "HollyShorts.com",
+   "title": "21st Anniversary Poster & Comedy Festival Design Credit",
+   "url": "https://www.hollyshorts.com/news/hollyshorts-unveils-21st-anniversary-poster"
+  },
+  {
+   "year": "2022",
+   "outlet": "Broadway World",
+   "title": "Comedy Shorts",
+   "url": "https://www.broadwayworld.com/los-angeles/article/Cevin-Solings-TIFFANY-BRITTANY-To-Screen-At-The-Hollywood-Comedy-Short-Film-Festival-In-LA-And-NYC-April-30-20220419"
+  },
+  {
+   "year": "2022",
+   "outlet": "RichGirl Network TV",
+   "title": "Comedy Shorts",
+   "url": "https://web.archive.org/web/20260215202241/https://www.richgirlnetwork.tv/2022/04/hollywood-comedy-shorts-fest-is-back-april-28th-30th/"
   }
  ]
 }
