@@ -273,7 +273,7 @@ html:not(.js) .stage:has(#about:target){transform:translateX(-66.6667%)}
 @media (max-width:1199px){.about-press{padding-left:3.2rem}.press-year{right:auto;left:-3.2rem}}  /* under 1200px the margin would reach the text */
 .press li{margin:0 0 .3em}
 .press{font-size:15px}
-.press .outlet{font-family:var(--sans);font-size:19px;margin-right:.35em}
+.press .outlet{font-family:var(--sans);font-size:19px;margin-right:.35em}  /* outlet names only; the headline is .vh, except "headline": true entries (D, Oct. 19) */
 .press .headline{color:#747069} /* lighter gray, 4.55:1 on --paper */
 .press a:hover .outlet{color:inherit}
 /* About: Home at the top left, the paragraphs under it, the press to the right, set a little lower. A 12-column grid
@@ -294,13 +294,13 @@ html:not(.js) .stage:has(#about:target){transform:translateX(-66.6667%)}
 @media (max-width:860px){.about-grid{grid-template-columns:minmax(0,1fr)}.about-main,.about-press{grid-column:1/-1}.about-press{padding-top:0}}
 @media (min-width:600px) and (max-width:860px){.about-grid{grid-template-columns:minmax(0,30rem);justify-content:center}}  /* one column, centered (Oct. 14) */
 /* Phones (Oct. 14): the press as the work list is there, on the paragraphs' left edge: each year on its own line above
-   its outlets, each outlet on its line with its headline under it */
+   its outlets, one name to a line */
 @media (max-width:599px){
   .about-grid{padding-left:0;padding-right:0}
   .about-press{padding-left:0}
   .press-group+.press-group{margin-top:var(--s4)}
   .press-year{position:static;padding:0;margin:0 0 12px}
-  .press li{margin:0 0 14px}
+  .press li{margin:0 0 8px}
   .press .outlet,.press .headline{display:block}
   .press .outlet{margin:0;line-height:1.3}
   .press .headline{margin-top:2px;line-height:1.4}
