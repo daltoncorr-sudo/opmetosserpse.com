@@ -193,10 +193,3 @@
 .os .os-use-grid img{display:block;width:100%;height:auto;max-height:none;background:var(--paper-deep)}
 .os .os-use-grid .os-full{grid-column:1/-1}
 @media (max-width:700px){ .os .os-use-grid{grid-template-columns:minmax(0,1fr)} }
-
-/* Proofs and process: the working sheets, each on its own white plate */
-.os .os-proofs{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:var(--s3)}
-.os .os-proofs .os-plate{margin:0;background:var(--sheet);padding:clamp(14px,3vw,48px);display:grid;place-items:center}
-.os .os-proofs .os-full{grid-column:1/-1}
-.os .os-proofs img{display:block;width:100%;height:auto}
-@media (max-width:700px){ .os .os-proofs{grid-template-columns:minmax(0,1fr)} }
