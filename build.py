@@ -816,7 +816,6 @@ def project_body(p, blocks, chapters, notes, all_work='All work', top='Back to t
     notes in the right one. At the end, Work again. No next project."""
     facts = [('Client', typo(p['client'])), ('Year', esc(p['year']))]
     if notes.get('work'): facts.append(('Work', typo(notes['work'])))
-    facts.append(('Role', typo(p['role'])))
     if p['links']:
         t, u = p['links'][0]; facts.append(('Link', '<a href="%s" rel="noopener">%s</a>' % (esc(u), typo(t))))
     rows, _ = credit_rows(p, notes)
@@ -832,8 +831,8 @@ def project_body(p, blocks, chapters, notes, all_work='All work', top='Back to t
     out = ['<div class="pp%s%s%s" data-lightbox%s>' % (' pp-air' if notes.get('air') else '', ' pp-plates' if plates else '',
                                                       ' pp-research' if notes.get('research') else '', ' data-page-only' if p.get('_scripts') else ''),
            masthead(list(NAME), '', ' data-cover', link=('/#work', all_work), lockup=True, home=home),
-           '<section class="open g">%s<h1>%s</h1><p class="lede">%s</p><div class="info">%s%s</div></section>' % (
-               '<p class="kicker">%s</p>' % typo(notes['kicker']) if notes.get('kicker') else '', typo(p['title']), typo(notes.get('lede') or p['lede']), dl(facts, 'facts'), dl(credits, 'cr'))]
+           '<section class="open g">%s<h1>%s</h1><p class="role">%s</p><p class="lede">%s</p><div class="info">%s%s</div></section>' % (
+               '<p class="kicker">%s</p>' % typo(notes['kicker']) if notes.get('kicker') else '', typo(p['title']), typo(p['role']), typo(notes.get('lede') or p['lede']), dl(facts, 'facts'), dl(credits, 'cr'))]
     starts = {c['starts_at']: c for c in chapters}
     # Rows and landscape pictures always run wide; text never shrinks a picture. (A note on a wide picture sits in the
     # right margin under its corner; a chapter that opens on one has its label just above it, in the left margin.)
