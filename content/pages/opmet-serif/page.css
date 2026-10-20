@@ -1,4 +1,4 @@
-/* A project page of opmetosserpse.com, made for one typeface: a standard header, the quote and the hand it came from,
+/* A project page of opmetosserpse.com, made for one typeface: a standard header, the alphabet across the page,
    then the work, centered. Paper and ink only; the type is the only image that moves. */
 .os{
   --paper:#F7F6F2; --paper-deep:#EEEDE8; --sheet:#FFFFFF; --ink:#161512; --graphite:#635E57; --rule:#D8D5CD; --wash:rgba(22,21,18,.08);
@@ -29,37 +29,10 @@
 .os .os-mast-hand path{fill:currentColor}
 .os .os-mast span{display:block}
 
-/* It started by hand: the quote, then the handwriting with lines pointing to what the serif took from it */
-.os .os-hand{margin-top:var(--s6);display:grid;justify-items:center;text-align:center}
-.os .os-quote{margin:0;max-width:22em;font:italic 400 clamp(24px,3vw,40px)/1.25 var(--serif);font-variation-settings:"opsz" 48;text-wrap:balance}
-.os .os-quote p{margin:0}
-.os .os-quote cite{display:block;margin-top:var(--s2);font:400 15px/1.4 var(--sans);font-style:normal;color:var(--ink)}
-.os .os-sigmap{margin:0;width:min(100%,1000px);padding-block:190px 270px}
-.os .os-sig-box{position:relative}
-.os .os-sig-box > svg{display:block;width:100%;height:auto}
-.os .os-sig-box > svg path{fill:var(--ink)}
-.os .os-call{position:absolute;left:var(--x);top:var(--y);width:0;height:0;--len:64px}
-.os .os-call::before{content:"";position:absolute;left:-3.5px;top:-3.5px;width:7px;height:7px;border-radius:50%;background:var(--ink)}
-.os .os-call .os-lead{position:absolute;left:-.5px;width:1px;height:var(--len);background:var(--ink)}
-.os .os-call.os-up .os-lead{bottom:0} .os .os-call.os-down .os-lead{top:0}
-.os .os-call .os-txt{position:absolute;width:max-content;max-width:19em;display:grid;gap:4px;text-align:left}
-.os .os-call.os-up .os-txt{bottom:calc(var(--len) + 12px)} .os .os-call.os-down .os-txt{top:calc(var(--len) + 12px)}
-.os .os-call.os-left .os-txt{left:-2px} .os .os-call.os-right .os-txt{right:-2px;text-align:right;justify-items:end}
-.os .os-call b{font:400 clamp(19px,2vw,26px)/1.15 var(--serif);font-variation-settings:"opsz" 40;white-space:nowrap}
-.os .os-call span{font:400 14px/1.45 var(--sans);color:var(--ink)}
-.os .os-call.os-o{--len:48px} .os .os-call.os-r{--len:118px}
-@media (max-width:700px){
-  .os .os-sigmap{padding-block:230px 330px}
-  .os .os-call b{white-space:normal}
-  .os .os-call{--len:84px} .os .os-call.os-o{--len:36px} .os .os-call.os-r{--len:156px}
-  .os .os-call .os-txt{max-width:13.5em}
-  .os .os-call span{font-size:13px}
-}
-
 /* The header: the name, the whole range of the family under the pointer, then the client, the year and the work */
 .os .os-hero{padding-top:var(--s5);text-align:center}
-.os .os-hero h1{margin:0;font-family:var(--serif);font-weight:900;font-size:clamp(44px,12.4vw,196px);line-height:.92;letter-spacing:-.018em;
-  font-variation-settings:"wght" var(--w,900),"opsz" 72;white-space:nowrap;cursor:ew-resize;touch-action:pan-y;user-select:none;-webkit-user-select:none}
+.os .os-hero h1{margin:0;font-family:var(--serif);font-weight:400;font-size:clamp(44px,12.4vw,196px);line-height:.92;letter-spacing:-.018em;
+  font-variation-settings:"wght" var(--w,400),"opsz" 72;white-space:nowrap;cursor:ew-resize;touch-action:pan-y;user-select:none;-webkit-user-select:none}
 .os .os-facts{margin:var(--s4) 0 0;display:flex;justify-content:center;flex-wrap:wrap;gap:var(--s2) var(--s5)}
 .os .os-facts div{display:grid;gap:2px;text-align:center}
 .os .os-facts dt{font:400 12px/1.4 var(--sans);color:var(--ink);letter-spacing:.02em}
@@ -188,3 +161,42 @@
    its heading) and the demos' readouts stay in the page, out of sight, because the script writes into them. */
 .os h2.os-mh{position:absolute;top:auto;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);clip-path:inset(50%);white-space:nowrap}
 .os .os-out,.os .os-tester-readout{display:none}
+
+/* The title is regular, the role under it, small, in the italic (D, Oct. 20) */
+.os .os-role{margin:var(--s2) 0 0;font:italic 400 clamp(17px,1.5vw,22px)/1.3 var(--serif);font-variation-settings:"opsz" 24}
+
+/* The alphabet: lowercase on the left, capitals on the right, at one size, across the whole page (D, Oct. 20) */
+.os .os-alpha{margin-top:var(--s5);margin-inline:calc(50% - 50vw);padding:clamp(56px,8vw,140px) var(--margin);background:var(--paper-deep);
+  display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);column-gap:clamp(24px,4vw,80px);align-items:center}
+.os .os-alpha .os-half{display:flex;flex-direction:column;align-items:center;min-width:0}
+.os .os-alpha .os-bl{font-size:calc(var(--au,1px) * 60);font-variation-settings:'wght' 400,'opsz' 72;line-height:1.1}
+@media (max-width:700px){ .os .os-alpha{grid-template-columns:minmax(0,1fr);row-gap:var(--s4)} }
+
+/* Weights and italics: the nine weights, each with its italic, in the Display */
+.os .os-wts{display:grid;gap:clamp(6px,1vw,14px)}
+.os .os-wt{display:grid;grid-template-columns:7.5em minmax(0,1fr) minmax(0,1fr);align-items:baseline;column-gap:var(--s3);border-top:1px solid var(--rule);padding-top:clamp(6px,1vw,14px)}
+.os .os-wt-n{font:400 12px/1.4 var(--sans);letter-spacing:.02em;color:var(--graphite)}
+.os .os-wt-r,.os .os-wt-i{font-family:var(--serif);font-size:clamp(24px,3.2vw,50px);line-height:1.15;white-space:nowrap}
+.os .os-wt-i{font-style:italic}
+@media (max-width:700px){ .os .os-wt{grid-template-columns:minmax(0,1fr) minmax(0,1fr)} .os .os-wt-n{grid-column:1/-1} .os .os-wt-r,.os .os-wt-i{font-size:clamp(20px,6.4vw,30px)} }
+
+/* Features in use: each one named, then set in a line */
+.os .os-feats{display:grid;gap:clamp(18px,2.4vw,32px)}
+.os .os-ft{display:grid;grid-template-columns:12em minmax(0,1fr);align-items:baseline;column-gap:var(--s3);border-top:1px solid var(--rule);padding-top:clamp(10px,1.4vw,18px)}
+.os .os-ft-l{margin:0}
+.os .os-ft-s{margin:0;font-family:var(--serif);font-size:clamp(20px,2.4vw,36px);line-height:1.3;font-variation-settings:"opsz" 18;text-wrap:balance}
+.os .os-ft-s .os-x{color:var(--graphite)}
+@media (max-width:700px){ .os .os-ft{grid-template-columns:minmax(0,1fr);row-gap:6px} }
+
+/* In use: staged pieces, real type rendered as it would be shot; two to a row where they pair */
+.os .os-use-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:var(--s3)}
+.os .os-use-grid img{display:block;width:100%;height:auto;max-height:none;background:var(--paper-deep)}
+.os .os-use-grid .os-full{grid-column:1/-1}
+@media (max-width:700px){ .os .os-use-grid{grid-template-columns:minmax(0,1fr)} }
+
+/* Proofs and process: the working sheets, each on its own white plate */
+.os .os-proofs{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:var(--s3)}
+.os .os-proofs .os-plate{margin:0;background:var(--sheet);padding:clamp(14px,3vw,48px);display:grid;place-items:center}
+.os .os-proofs .os-full{grid-column:1/-1}
+.os .os-proofs img{display:block;width:100%;height:auto}
+@media (max-width:700px){ .os .os-proofs{grid-template-columns:minmax(0,1fr)} }

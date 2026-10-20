@@ -21,10 +21,10 @@ function seg(container, items, current, onPick) {
   });
 }
 
-/* The title follows the pointer across the range, then settles back on Black */
+/* The title follows the pointer across the range, then settles back on Regular (D, Oct. 20) */
 (() => {
   const hero = $("hero"), title = $("title");
-  let target = 900, cur = 900, raf = 0;
+  let target = 400, cur = 400, raf = 0;
   const show = w => { title.style.setProperty("--w", w.toFixed(1)); };
   const tick = () => { cur += (target - cur) * 0.12; if (Math.abs(target - cur) < 0.4) cur = target; show(cur); raf = cur === target ? 0 : requestAnimationFrame(tick); };
   const aim = w => { target = w; if (reduce) { cur = w; show(w); return; } if (!raf) raf = requestAnimationFrame(tick); };
@@ -33,8 +33,8 @@ function seg(container, items, current, onPick) {
     const r = title.getBoundingClientRect(); const x = Math.min(1, Math.max(0, (e.clientX - r.left) / r.width));
     aim(100 + 800 * x);
   });
-  hero.addEventListener("pointerleave", () => aim(900));
-  show(900);
+  hero.addEventListener("pointerleave", () => aim(400));
+  show(400);
   const fit = () => {
     const probe = title.cloneNode(true); probe.removeAttribute("id");
     Object.assign(probe.style, {position: "absolute", visibility: "hidden", fontSize: "100px", width: "auto", left: "0", top: "0",
@@ -149,6 +149,22 @@ function letters(container, items, current, onPick) {
     if (maxw > 0 && h > 0) b.style.setProperty("--u", Math.min((+b.dataset.fill || .86) * W / maxw, H / h).toFixed(3) + "px");
     else b.style.removeProperty("--u");
   });
+  (document.fonts ? document.fonts.ready : Promise.resolve()).then(fit);
+  let t = 0; addEventListener("resize", () => { clearTimeout(t); t = setTimeout(fit, 120); });
+})();
+
+/* The alphabet: lowercase and capitals at one size, as large as the two halves allow */
+(() => {
+  const a = $("alpha"), halves = [$("alpha-lc"), $("alpha-uc")];
+  const fit = () => {
+    a.style.setProperty("--au", "1px");
+    let k = Infinity;
+    halves.forEach(h => {
+      const maxw = Math.max(...[...h.children].map(l => l.getBoundingClientRect().width));
+      if (maxw > 0) k = Math.min(k, .94 * h.clientWidth / maxw);
+    });
+    if (isFinite(k)) a.style.setProperty("--au", k.toFixed(3) + "px"); else a.style.removeProperty("--au");
+  };
   (document.fonts ? document.fonts.ready : Promise.resolve()).then(fit);
   let t = 0; addEventListener("resize", () => { clearTimeout(t); t = setTimeout(fit, 120); });
 })();
