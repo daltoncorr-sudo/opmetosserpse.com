@@ -12,6 +12,7 @@ const VENDOR = '/js/vendor/coins/';
 const R = 1, T = 0.46;  // a coin's radius and thickness, in scene units
 const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const fine = matchMedia('(hover: hover) and (pointer: fine)').matches;
+const touch = !fine;  // a phone or tablet: the page's scroll never carries the coins, and a panel's slide barely (Oct. 20)
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 
 // After the first paint, never before the name: the fonts, then two frames
@@ -99,17 +100,39 @@ async function stage(o) {
   const THREE = L.THREE;
 
   const canvas = r.domElement; canvas.className = 'coins-stage'; area.insertBefore(canvas, area.firstChild);
-  const scene = new THREE.Scene(), key = lights(L, scene, r, 2048);
+  const scene = new THREE.Scene(), key = lights(L, scene, r, touch ? 1024 : 2048);  // a phone's screen needs no finer shadow, and draws faster
   key.position.multiplyScalar(2); key.shadow.camera.far = 60;  // the light's frustum reaches the whole stage
   const ground = new THREE.Mesh(new THREE.PlaneGeometry(400, 400), new THREE.ShadowMaterial({ opacity: 0.14 }));
   ground.rotation.x = -Math.PI / 2; ground.receiveShadow = true; scene.add(ground);
   const cam = new THREE.PerspectiveCamera(26, 1, 0.5, 400);
   scene.add(key.target);  // the light follows the stage's ground (frame)
-  // o.track: a track stage (the work list's coin). The scene is the whole track, the list's part of the page, with its
-  // origin at the track's top center, so the list growing below never moves it; the stage (o.area) is a window onto
-  // it that stays pinned to the browser window (sticky, site.css), and the camera pans with the page (view)
+  // o.track: a track stage (the work list's coin, About's three). The scene is the whole track, the list's part of the
+  // page, with its origin at the track's top center, so the list growing below never moves it; the stage (o.area) is a
+  // window onto it, and the camera looks through wherever the window is (view).
+  //   The window lies on the page (Oct. 20), not pinned to the screen: it scrolls with the page, coins and all, as the
+  // words do, so a resting coin never trails the scroll. (Pinned, it was redrawn a frame after the page moved: a
+  // stutter on phones.) It is a screen and a half tall and moves only when it must (anchor): onto the screen while a
+  // coin is held or moving, and, while they rest, to take in a coin about to come into view.
   const track = o.track || null;
-  let dist = 1, camAt = null, placedW = 0;
+  let dist = 1, camAt = null, placedW = 0, laidW = 0, size = '', anc = -1, tallest = 0;
+  function anchor(onScreen) {  // true when the window moved
+    const th = track.offsetHeight, H = Math.min(th, Math.ceil((tallest = Math.max(tallest, innerHeight)) * 1.5));  // grows only: the phone's bars coming and going never resize it
+    const tr = track.getBoundingClientRect(), v0 = -tr.top, v1 = v0 + innerHeight, has = (a, b) => anc >= 0 && anc <= a && anc + H >= b && area.style.height === H + 'px';
+    let top;
+    if (onScreen || !dropped) {
+      if (has(Math.max(0, v0), Math.min(th, v1))) return false;
+      top = (v0 + v1 - H) / 2;
+    } else {  // at rest: every coin within half a screen of the view, shadow and all, inside the window
+      const m = innerHeight / 2, e = 1.6 * R * kpx, zs = coins.filter(c => c.body.world).map(c => c.body.position.z * kpx).filter(z => z + e > v0 - m && z - e < v1 + m);
+      if (!zs.length) return false;
+      const lo = Math.min(...zs) - e, hi = Math.max(...zs) + e;
+      if (has(lo, hi)) return false;
+      top = hi - lo <= H ? (lo + hi - H) / 2 : (v0 + v1 - H) / 2;
+    }
+    anc = Math.round(clamp(top, 0, Math.max(0, th - H)));
+    area.style.top = anc + 'px'; area.style.height = H + 'px';
+    return true;
+  }
 
   const world = new C.World({ gravity: new C.Vec3(0, -30, 0) });
   world.allowSleep = true; world.broadphase = new C.SAPBroadphase(world); world.solver.iterations = 14;
@@ -159,10 +182,12 @@ async function stage(o) {
   }
   function frame() {
     if (o.place && placedW !== innerWidth) { o.place(); placedW = innerWidth; }  // placed on load and when the width changes: never as the list opens or closes
+    if (track) anchor(!dropped || joint || awake());
     const cr = area.getBoundingClientRect(), b = slot.getBoundingClientRect(), dy = o.shift ? o.shift() : 0;
     const sr = { left: b.left, top: b.top - dy, width: b.width, height: b.height };  // where the slot rests
     if (!cr.width || !cr.height || !sr.height) return null;
-    r.setSize(cr.width, cr.height, false); cam.aspect = cr.width / cr.height; cam.updateProjectionMatrix();
+    if (size !== cr.width + 'x' + cr.height) { size = cr.width + 'x' + cr.height; r.setSize(cr.width, cr.height, false); }  // only when it changed: a resize clears the canvas
+    cam.aspect = cr.width / cr.height; cam.updateProjectionMatrix();
     const k = kpx = o.unit / 2 * sr.height * (o.scaled ? parseFloat(getComputedStyle(slot).getPropertyValue('--coins-scale')) || 1 : 1);  // pixels per unit
     dist = cr.height / 2 / k / Math.tan(13 * Math.PI / 180);
     const was = at;
@@ -225,16 +250,19 @@ async function stage(o) {
   function drop() {
     if (!frame()) { waiting = false; return; }  // not laid out yet: the next resize or view lays them
     jit = o.aim ? coins.map(() => ({ dx: 0, dy: 0, yaw: 0 })) : null;  // the composition as designed, the same every visit (its stills match)
-    lay(landing());
+    lay(landing()); laidW = innerWidth;
     dropped = true;
+    if (track) { anchor(false); view(); }  // the window onto the coins where they lie
     sync(); draw(); start();
     canvas.classList.add('is-on'); if (o.shown) o.shown();
   }
-  // A resize, a turn of the phone or a list opening: frame again and move the pile with its slot, settled
+  // A resize, a turn of the phone or a list opening: frame again and move the coins with their slot, settled. Only a new
+  // width (a turn of the phone, a window made wider) lays the composition again; a change of height alone (a phone's
+  // bars showing and hiding as the page scrolls) leaves every coin where it is, wherever the visitor put it (Oct. 20)
   function reframe() {
     const was = frame(); if (!was || !dropped) return;
     release();
-    if (o.aim) { lay(landing()); sync(); draw(); return; }
+    if (o.aim && laidW !== innerWidth) { lay(landing()); laidW = innerWidth; if (track) { anchor(false); view(); } sync(); draw(); return; }
     const dx = at.x - was.x, dz = at.z - was.z; let moved = false;
     coins.forEach(({ body: b }) => {
       const x = clamp(b.position.x + dx, box.x0 + R, box.x1 - R), z = clamp(b.position.z + dz, box.z0 + R, box.z1 - R);
@@ -253,13 +281,20 @@ async function stage(o) {
   // and would never slide, then fly once tipped. While the page moves, friction is reckoned from a gravity of SLIP
   // instead (world.frictionGravity), which lets a flat coin slide about as freely as friction 0.25 would; the full grip
   // comes back once the page is still. Not with reduced motion.
-  const CARRY = 0.35, PULL = 30, SLIP = new C.Vec3(0, 0.06, 0);  // measured: a flat coin then slides like friction 0.25
+  //   A jump (the page set somewhere at once, as Home from a project does) is not a motion, and carries nothing.
+  //   On a phone or tablet (Oct. 20) the page's own scroll carries nothing: a flick threw the cover's coins three coins
+  // away, and every page change moved them half a coin. Only a panel sliding is felt, as a nudge: the coins keep their
+  // full grip, so they rock a hair where they lie and never travel.
+  const CARRY = 0.35, PULL = touch ? 4 : 30, SLIP = new C.Vec3(0, 0.06, 0);  // measured: a flat coin then slides like friction 0.25
   const feel = { n: 0, x: 0, y: 0, vx: 0, vy: 0, ax: 0, ay: 0, until: 0, boot: 0 };
+  const scroller = o.scroller || document.scrollingElement || document.documentElement;
   function carry(t, s) {
     if (reduce || !s) return false;
-    const r = (track || area).getBoundingClientRect();  // the page itself: a track stage's window stays put
-    if (feel.n === 0) { feel.x = r.left; feel.y = r.top; feel.n = 1; feel.ax = feel.ay = 0; return false; }
-    const vx = (r.left - feel.x) / s, vy = (r.top - feel.y) / s; feel.x = r.left; feel.y = r.top;
+    const r = (track || area).getBoundingClientRect();  // the page itself: a track stage's window moves with it
+    const x = r.left + (touch ? scroller.scrollLeft : 0), y = r.top + (touch ? scroller.scrollTop : 0);  // a phone: the panels' slides, not the scroll
+    if (feel.n === 0) { feel.x = x; feel.y = y; feel.n = 1; feel.ax = feel.ay = 0; return false; }
+    if (Math.abs(x - feel.x) > innerWidth / 2 || Math.abs(y - feel.y) > innerHeight / 2) { feel.n = 0; return false; }  // a jump
+    const vx = (x - feel.x) / s, vy = (y - feel.y) / s; feel.x = x; feel.y = y;
     const moving = Math.abs(vx) + Math.abs(vy) > 20;
     if (moving) feel.until = t + 250;
     if (feel.n === 1) { feel.vx = vx; feel.vy = vy; feel.n = 2; return moving; }
@@ -268,11 +303,21 @@ async function stage(o) {
     world.gravity.set(gx, -30, gz);  // screen right is the scene's +x, screen down its +z
     const pulled = Math.hypot(gx, gz) > 2;
     if (pulled) coins.forEach(c => c.body.wakeUp());
-    world.frictionGravity = pulled || moving ? SLIP : undefined;
+    world.frictionGravity = !touch && (pulled || moving) ? SLIP : undefined;
     return moving;
   }
-  const stir = () => { if (dropped && (!reduce || track)) { feel.until = Math.max(feel.until, performance.now() + 250); start(); } };  // a track stage pans on every scroll
-  addEventListener('scroll', stir, { passive: true, capture: true });
+  const stir = () => { if (dropped && !reduce) { feel.until = Math.max(feel.until, performance.now() + 250); start(); } };
+  // A scroll: on a track stage, the window takes in a coin about to come into view, drawn in the same frame it moves
+  // (or follows the screen while a coin is held or moving); then, but for a phone's, the page carries the coins
+  let near = 0;
+  const onScroll = () => {
+    if (track && dropped && !near) near = requestAnimationFrame(() => {
+      near = 0; if (raf || !visible()) return;  // a running stage frames itself (tick)
+      if (anchor(false)) { view(); draw(); }
+    });
+    if (!touch) stir();
+  };
+  addEventListener('scroll', onScroll, { passive: true, capture: true });
   document.addEventListener('transitionstart', e => { if (e.target.contains && e.target.contains(area)) stir(); }, true);  // a panel sliding
 
   // Render only while a coin is awake or held, or the page is carrying them; pause while the stage is out of sight
@@ -292,7 +337,9 @@ async function stage(o) {
     world.step(1 / 120, dt, 6);
     quiet = !joint && !carried && calm() ? quiet + dt : 0;
     if (quiet > 1) { rest(); quiet = 0; }
-    const live = joint || awake(), panned = view();
+    const live = joint || awake();
+    if (track) anchor(live || carried);  // the window: on the screen while they move, around them once they rest
+    const panned = view();
     if (was || live || panned) { sync(); draw(); }  // and the frame the coins fall asleep, and a track stage's pan
     if (live || carried) raf = requestAnimationFrame(tick);
     else { world.gravity.set(0, -30, 0); world.frictionGravity = undefined; }
@@ -347,7 +394,9 @@ async function stage(o) {
     const p = h.point; grip.position.set(p.x, p.y, p.z);
     joint = new C.PointToPointConstraint(held.body, held.body.pointToLocalFrame(new C.Vec3(p.x, p.y, p.z)), grip, new C.Vec3(0, 0, 0), 60);
     world.addConstraint(joint); held.body.wakeUp(); held.body.linearDamping = 0.35; held.body.angularDamping = 0.55;
-    aim.set(p.x, lift, p.z); host.classList.add('coin-held'); start();
+    aim.set(p.x, lift, p.z); host.classList.add('coin-held');
+    if (track && anchor(true)) { view(); sync(); draw(); }  // the whole screen to carry it across
+    start();
   }
   function through(x, y) {  // a tap: the click goes to the link or button under the coin
     grips.style.display = 'none'; const t = document.elementFromPoint(x, y); grips.style.display = '';
@@ -476,7 +525,7 @@ function about(el) {
     return [mid(waveEl), mid(el), mid(cupEl)]  // the models' order: wave, alabaster hand, cup
       .map((p, i) => ({ ...p, px: p.px + j[i].dx * d, py: p.py + j[i].dy * d, yaw: j[i].yaw, y: 0.3, tilt: 0, spin: 0 }));
   };
-  const go = () => stage({ host: panel, area, track, slot: el, unit: 1, aim, walls: 0.995, place });
+  const go = () => stage({ host: panel, area, track, slot: el, unit: 1, aim, walls: 0.995, place, scroller: panel });
   const idle = window.requestIdleCallback || (f => setTimeout(f, 200));
   if (document.readyState === 'complete') afterPaint().then(() => idle(go)); else addEventListener('load', () => afterPaint().then(() => idle(go)), { once: true });
 }
