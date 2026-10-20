@@ -341,8 +341,9 @@
 /* The title is regular, the role under it, small, in the italic (D, Oct. 20) */
 .os .os-role{margin:var(--s2) 0 0;font:italic 400 clamp(17px,1.5vw,22px)/1.3 var(--serif);font-variation-settings:"opsz" 24}
 
-/* The alphabet: lowercase on the left, capitals on the right, at one size, across the whole page (D, Oct. 20) */
-.os .os-alpha{margin-top:var(--s5);margin-inline:calc(50% - 50vw);padding:clamp(56px,8vw,140px) var(--margin);background:var(--paper-deep);
+/* The alphabet: lowercase on the left, capitals on the right, at one size, across the whole page (D, Oct. 20): out to
+   the page's edges, never past them (the page clips what runs over, so past 1440 px the outer letters were cut) */
+.os .os-alpha{margin-top:var(--s5);margin-inline:calc(-1 * var(--margin));padding:clamp(56px,8vw,140px) var(--margin);background:var(--paper-deep);
   display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);column-gap:clamp(24px,4vw,80px);align-items:center}
 .os .os-alpha .os-half{display:flex;flex-direction:column;align-items:center;min-width:0}
 .os .os-alpha .os-bl{font-size:calc(var(--au,1px) * 60);font-variation-settings:'wght' 400,'opsz' 72;line-height:1.1}
